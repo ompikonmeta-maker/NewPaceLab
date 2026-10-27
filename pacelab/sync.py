@@ -1,0 +1,254 @@
+"""Incremental download of one athlete's runs and wellness into data/<ID>/.
+
+  runs.json        normalized run summaries
+  streams/<id>.json   {"t","d","hr"} per run (from activity details)
+  wellness.json    {"YYYY-MM-DD": {"sleep_s","sleep_score","hrv","hrv_status","bb","rhr","weight"}}
+  state.json       what is already downloaded
+
+Only endpoints the probe confirmed (HTTP 200 on personal keys) are used.
+Field names are read defensively; `pacelab.py check` reports what was found.
+"""
+import datetime as dt
+import json
+from pathlib import Path
+
+from .garmin import ApiError
+
+ACT_LIST = "/activitylist-service/activities/search/activities"
+ACT_DETAILS = "/activity-service/activity/%s/details"
+SLEEP = "/sleep-service/sleep/dailySleepSummariesByDate"
+HRV = "/hrv-service/hrv/daily/%s/%s"
+BB = "/wellness-service/wellness/bodyBattery/reports/daily"
+DAILY = "/usersummary-service/v2/dailysummaries"
+WEIGHT = "/weight-service/weight/range/%s/%s"
+
+# max days per call reported by the community; longer ranges give HTTP 400
+CHUNK = {"sleep": 28, "hrv": 180, "bb": 28, "daily": 28, "weight": 180}
+REFETCH_DAYS = 3  # late-arriving sleep/HRV for the last nights
+
+
+# ------------------------------------------------------------------ helpers
+
+def _read(p, default):
+    try:
+        return json.loads(Path(p).read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return default
+
+
+def _write(p, obj):
+    p = Path(p)
+    p.parent.mkdir(parents=True, exist_ok=True)
+    tmp = p.with_suffix(p.suffix + ".tmp")
+    tmp.write_text(json.dumps(obj, separators=(",", ":")), encoding="utf-8")
+    tmp.replace(p)
+
+
+def pick(obj, *paths):
+    """First non-null value among dotted paths ('a.b.c')."""
+    for path in paths:
+        cur = obj
+        for k in path.split("."):
+            cur = cur.get(k) if isinstance(cur, dict) else None
+            if cur is None:
+                break
+        if cur is not None:
+            return cur
+    return None
+
+
+def find_all(obj, key):
+    """Every value stored under `key` anywhere in a nested structure, with its parent dict."""
+    if isinstance(obj, dict):
+        if key in obj:
+            yield obj
+        for v in obj.values():
+            yield from find_all(v, key)
+    elif isinstance(obj, list):
+        for v in obj:
+            yield from find_all(v, key)
+
+
+def chunks(start, end, days):
+    cur = start
+    while cur <= end:
+        stop = min(end, cur + dt.timedelta(days=days - 1))
+        yield cur, stop
+        cur = stop + dt.timedelta(days=1)
+
+
+# ------------------------------------------------------------------ normalize
+
+def norm_run(a):
+    dist = pick(a, "distance") or 0
+    return {
+        "id": a.get("activityId"),
+        "date": str(pick(a, "startTimeLocal") or "")[:10],
+        "start": pick(a, "startTimeLocal"),
+        "name": a.get("activityName"),
+        "type": pick(a, "activityType.typeKey"),
+        "km": round(dist / 1000.0, 3),
+        "sec": round(pick(a, "duration", "movingDuration", "elapsedDuration") or 0, 1),
+        "avg_hr": pick(a, "averageHR"),
+    }
+
+
+def norm_stream(details):
+    """activity details -> {"t": seconds, "d": metres, "hr": bpm} or None."""
+    desc = details.get("metricDescriptors") or []
+    idx = {m.get("key"): m.get("metricsIndex") for m in desc}
+    rows = [r.get("metrics") for r in details.get("activityDetailMetrics") or [] if r.get("metrics")]
+    if not rows or "sumDistance" not in idx:
+        return None
+    ti = next((idx[k] for k in ("sumDuration", "sumElapsedDuration", "directTimestamp") if k in idx), None)
+    if ti is None:
+        return None
+    ts_ms = ti == idx.get("directTimestamp") and "sumDuration" not in idx and "sumElapsedDuration" not in idx
+    hi = idx.get("directHeartRate")
+    t, d, hr = [], [], []
+    t0 = None
+    for r in rows:
+        tv, dv = r[ti], r[idx["sumDistance"]]
+        if tv is None or dv is None:
+            continue
+        if ts_ms:
+            t0 = tv if t0 is None else t0
+            tv = (tv - t0) / 1000.0
+        if t and (tv < t[-1] or dv < d[-1]):
+            continue  # keep the stream monotonic
+        t.append(round(tv, 1))
+        d.append(round(dv, 1))
+        hv = r[hi] if hi is not None and hi < len(r) else None
+        hr.append(round(hv) if hv else None)
+    return {"t": t, "d": d, "hr": hr, "keys": sorted(k for k in idx if k)} if len(t) > 1 else None
+
+
+def norm_sleep(item):
+    secs = pick(item, "sleepTimeSeconds")
+    if secs is None:
+        parts = [pick(item, k) for k in ("deepSleepSeconds", "lightSleepSeconds", "remSleepSeconds")]
+        secs = sum(p for p in parts if p) or None
+    return pick(item, "calendarDate"), {
+        "sleep_s": secs,
+        "sleep_score": pick(item, "sleepScores.overall.value", "overallSleepScore.value", "sleepScore"),
+    }
+
+
+def norm_hrv(item):
+    return pick(item, "calendarDate"), {
+        "hrv": pick(item, "lastNightAvg"),
+        "hrv_status": (pick(item, "status") or "").upper() or None,
+        "hrv_low": pick(item, "baseline.balancedLow"),
+    }
+
+
+def norm_bb(item):
+    vals = [v[1] for v in pick(item, "bodyBatteryValuesArray") or []
+            if isinstance(v, (list, tuple)) and len(v) > 1 and isinstance(v[1], (int, float))]
+    # the day's peak is the reading after the night's recharge
+    return pick(item, "date", "calendarDate"), {"bb": max(vals) if vals else pick(item, "charged")}
+
+
+def norm_weight(item):
+    g = pick(item, "latestWeight.weight", "weight")
+    date = pick(item, "summaryDate", "calendarDate", "latestWeight.calendarDate")
+    if g is None or not date:
+        return None, {}
+    return date, {"weight": round(g / 1000.0 if g > 1000 else g, 2)}
+
+
+# ------------------------------------------------------------------ sync
+
+class Syncer:
+    def __init__(self, client, out_dir, log=print):
+        self.c = client
+        self.dir = Path(out_dir)
+        self.log = log
+        self.state = _read(self.dir / "state.json", {})
+        self.runs = {r["id"]: r for r in _read(self.dir / "runs.json", [])}
+        self.well = _read(self.dir / "wellness.json", {})
+        self.unavailable = []
+
+    def run(self, since, until):
+        new_runs = self.sync_runs(since, until)
+        days = self.sync_wellness(since, until)
+        self.state["last_sync"] = dt.datetime.now().isoformat(timespec="seconds")
+        _write(self.dir / "state.json", self.state)
+        return {"new_runs": new_runs, "runs": len(self.runs), "wellness_days": days,
+                "requests": self.c.requests, "unavailable": self.unavailable}
+
+    # -------------------------------------------------------------- runs
+    def sync_runs(self, since, until):
+        start, page, new = 0, 50, 0
+        while True:
+            items = self.c.get(ACT_LIST, {"start": start, "limit": page, "startDate": since.isoformat(),
+                                          "endDate": until.isoformat(), "activityType": "running"})
+            if items is None:
+                self.unavailable.append("activities")
+                return new
+            for a in items:
+                r = norm_run(a)
+                if r["id"] is None or not r["date"]:
+                    continue
+                if r["id"] not in self.runs or not (self.dir / "streams" / ("%s.json" % r["id"])).is_file():
+                    self._stream(r)
+                    new += 1
+                    if new % 25 == 0:
+                        self.log("    %d lari diunduh..." % new)
+                self.runs[r["id"]] = r
+            _write(self.dir / "runs.json", sorted(self.runs.values(), key=lambda x: x["start"] or x["date"]))
+            if len(items) < page:
+                return new
+            start += page
+
+    def _stream(self, r):
+        det = self.c.get(ACT_DETAILS % r["id"], {"maxChartSize": 100000, "maxPolylineSize": 0})
+        s = norm_stream(det) if isinstance(det, dict) else None
+        if s:
+            _write(self.dir / "streams" / ("%s.json" % r["id"]), s)
+        else:
+            self.log("    ! %s %.1f km: data per detik tidak tersedia" % (r["date"], r["km"]))
+
+    # -------------------------------------------------------------- wellness
+    def sync_wellness(self, since, until):
+        done = self.state.get("wellness_until")
+        start = since
+        if done:
+            start = max(since, dt.date.fromisoformat(done) - dt.timedelta(days=REFETCH_DAYS))
+        if start > until:
+            return 0
+        self._ranged("sleep", start, until, lambda a, b: self.c.get(SLEEP, {"startDate": a, "endDate": b}),
+                     lambda r: r if isinstance(r, list) else pick(r, "dailySleepSummaries", "sleepSummaries") or [],
+                     norm_sleep)
+        self._ranged("hrv", start, until, lambda a, b: self.c.get(HRV % (a, b)),
+                     lambda r: pick(r, "hrvSummaries") or [], norm_hrv)
+        self._ranged("bb", start, until, lambda a, b: self.c.get(BB, {"startDate": a, "endDate": b}),
+                     lambda r: r if isinstance(r, list) else [], norm_bb)
+        self._ranged("daily", start, until, lambda a, b: self.c.get(DAILY, {"startDate": a, "endDate": b}),
+                     lambda r: list(find_all(r, "restingHeartRate")),
+                     lambda it: (pick(it, "calendarDate", "date"), {"rhr": it.get("restingHeartRate")}))
+        self._ranged("weight", start, until, lambda a, b: self.c.get(WEIGHT % (a, b), {"includeAll": "true"}),
+                     lambda r: pick(r, "dailyWeightSummaries") or [], norm_weight)
+        self.state["wellness_until"] = until.isoformat()
+        _write(self.dir / "wellness.json", dict(sorted(self.well.items())))
+        return (until - start).days + 1
+
+    def _ranged(self, name, start, end, fetch, items, norm):
+        size = CHUNK[name]
+        for a, b in chunks(start, end, size):
+            try:
+                resp = fetch(a.isoformat(), b.isoformat())
+            except ApiError as e:
+                if e.status == 400 and size > 7:  # range too long: retry smaller
+                    CHUNK[name] = max(7, size // 2)
+                    return self._ranged(name, a, end, fetch, items, norm)
+                raise
+            if resp is None:
+                self.unavailable.append(name)
+                return
+            for it in items(resp):
+                date, vals = norm(it)
+                if not date:
+                    continue
+                day = self.well.setdefault(str(date)[:10], {})
+                day.update({k: v for k, v in vals.items() if v is not None})

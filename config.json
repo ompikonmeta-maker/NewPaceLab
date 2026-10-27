@@ -1,0 +1,10 @@
+{
+  "athletes": [
+    {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx"},
+    {"id": "REZA", "name": "Reza", "program": "programs/Program_Marathon_PRAMANA.xlsx"}
+  ],
+  "since": "2026-03-23",
+  "data_dir": "data",
+  "keys_dir": "keys",
+  "output": "dist/dashboard.html"
+}

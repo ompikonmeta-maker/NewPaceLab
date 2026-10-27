@@ -1,0 +1,177 @@
+"""Fake Garmin Personal API for tests and the demo dashboard.
+
+Serves synthetic data in the response shapes sync.py reads. It is NOT real
+Garmin output: field names follow the community-documented web API and the
+probe report; run `python pacelab.py check` on real data to confirm them.
+
+Usage: python tools/mock_garmin.py [port]   (keys: demo-taofik, demo-reza)
+"""
+import datetime as dt
+import json
+import random
+import re
+import sys
+import threading
+import urllib.parse
+from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+
+PROFILES = {
+    "demo-taofik": {"seed": 7, "easy": 470, "hr": 142, "fit_gain": .12, "rhr": 52, "hrv": 52, "sleep": 6.6, "bb": 72, "kg": 68.0},
+    "demo-reza": {"seed": 11, "easy": 545, "hr": 146, "fit_gain": .10, "rhr": 61, "hrv": 36, "sleep": 5.8, "bb": 50, "kg": 81.5},
+}
+START = dt.date(2026, 3, 23)
+MS1 = dt.date(2026, 6, 22)
+
+
+def week_plan(ms):
+    """Rough weekly km / long run before and after MS7 (enough for a demo)."""
+    if ms < 1:
+        return 18, 8
+    base = [20, 21, 22, 23, 24, 22, 28, 30, 32, 24, 34, 36, 38, 28, 40, 24, 21, 36, 43, 31, 33, 45, 46, 48, 35]
+    km = base[min(ms - 1, len(base) - 1)]
+    return km, max(8, round(km * .5))
+
+
+class Athlete:
+    def __init__(self, key, today):
+        p = PROFILES[key]
+        self.p, self.today = p, today
+        rnd = random.Random(p["seed"])
+        self.runs, self.streams, self.well = [], {}, {}
+        day, aid = START, p["seed"] * 10 ** 8
+        while day <= today:
+            ms = (day - MS1).days // 7 + 1
+            km, lr = week_plan(ms)
+            prog = min(1, (day - START).days / 220)
+            fitness = 1 - p["fit_gain"] * prog  # pace multiplier
+            plan = {1: km * .2, 3: km * .2, 5: lr, 6: km - lr - km * .4}  # Tue Thu Sat Sun
+            if day.weekday() in plan and day < today:
+                dist = max(3, plan[day.weekday()] * rnd.uniform(.9, 1.06))
+                pace = p["easy"] * fitness * rnd.uniform(.97, 1.04)
+                if day == dt.date(2026, 10, 11):  # 5K race
+                    dist, pace = 5.02, p["easy"] * fitness * .74
+                aid += 1
+                self._add_run(aid, day, dist, pace, rnd, race=day == dt.date(2026, 10, 11))
+            self._add_day(day, rnd, prog)
+            day += dt.timedelta(days=1)
+
+    def _add_run(self, aid, day, km, pace, rnd, race=False):
+        step, t, d, hr, rows = 5, 0.0, 0.0, [], []
+        total = km * 1000
+        drift = rnd.uniform(.04, .14) if km >= 10 else .02
+        while d < total:
+            frac = d / total
+            v = 1000 / (pace * (1 + rnd.uniform(-.03, .03)))
+            h = self.p["hr"] * (1.12 if race else 1) * (1 + drift * frac) + rnd.uniform(-2, 2)
+            rows.append([t, round(d, 1), round(h), round(v, 3)])
+            t += step
+            d = min(total, d + v * step)
+        rows.append([t, round(total, 1), rows[-1][2], rows[-1][3]])
+        self.streams[aid] = {
+            "activityId": aid, "measurementCount": len(rows), "metricsCount": 4,
+            "metricDescriptors": [{"metricsIndex": 0, "key": "sumDuration"}, {"metricsIndex": 1, "key": "sumDistance"},
+                                  {"metricsIndex": 2, "key": "directHeartRate"}, {"metricsIndex": 3, "key": "directSpeed"}],
+            "activityDetailMetrics": [{"metrics": r} for r in rows]}
+        self.runs.append({
+            "activityId": aid, "activityName": "Lari" if not race else "Race 5K",
+            "activityType": {"typeKey": "running"},
+            "startTimeLocal": "%s 05:%02d:00" % (day.isoformat(), rnd.randint(30, 59)),
+            "distance": round(total, 1), "duration": round(t, 1), "averageHR": round(sum(r[2] for r in rows) / len(rows))})
+
+    def _add_day(self, day, rnd, prog):
+        p = self.p
+        sl = max(3.8, rnd.gauss(p["sleep"] + .3 * prog, .55))
+        hrv = round(rnd.gauss(p["hrv"] + 3 * prog, 4))
+        status = "BALANCED" if hrv >= p["hrv"] - 4 else ("UNBALANCED" if hrv >= p["hrv"] - 8 else "LOW")
+        bb = int(max(15, min(100, rnd.gauss(p["bb"] + (sl - p["sleep"]) * 12, 8))))
+        self.well[day.isoformat()] = {
+            "sleep": round(sl * 3600), "score": int(min(95, 40 + sl * 7)), "hrv": hrv, "status": status,
+            "bb": bb, "rhr": round(rnd.gauss(p["rhr"] - 2 * prog, 1.3)),
+            "kg": round(p["kg"] - (1.2 if p["kg"] > 75 else 0) * prog + rnd.uniform(-.4, .4), 1) if day.weekday() == 6 else None}
+
+    # ----------------------------------------------------------- responses
+    def days(self, a, b):
+        a, b = dt.date.fromisoformat(a), dt.date.fromisoformat(b)
+        return [(k, v) for k, v in sorted(self.well.items()) if a <= dt.date.fromisoformat(k) <= b]
+
+    def respond(self, path, q):
+        if path.startswith("/activitylist-service/activities/search/activities"):
+            rs = [r for r in self.runs if q.get("startDate", "0") <= r["startTimeLocal"][:10] <= q.get("endDate", "9")]
+            rs = sorted(rs, key=lambda r: r["startTimeLocal"], reverse=True)
+            s, n = int(q.get("start", 0)), int(q.get("limit", 20))
+            return rs[s:s + n]
+        m = re.match(r"/activity-service/activity/(\d+)/details$", path)
+        if m:
+            return self.streams.get(int(m.group(1)))
+        if path == "/sleep-service/sleep/dailySleepSummariesByDate":
+            return [{"calendarDate": k, "sleepTimeSeconds": v["sleep"], "deepSleepSeconds": v["sleep"] // 5,
+                     "sleepScores": {"overall": {"value": v["score"]}}} for k, v in self.days(q["startDate"], q["endDate"])]
+        m = re.match(r"/hrv-service/hrv/daily/([\d-]+)/([\d-]+)$", path)
+        if m:
+            return {"userProfilePk": 1, "hrvSummaries": [
+                {"calendarDate": k, "lastNightAvg": v["hrv"], "status": v["status"],
+                 "baseline": {"balancedLow": self.p["hrv"] - 4, "balancedUpper": self.p["hrv"] + 8}}
+                for k, v in self.days(m.group(1), m.group(2))]}
+        if path == "/wellness-service/wellness/bodyBattery/reports/daily":
+            return [{"date": k, "charged": v["bb"] - 20, "drained": 50,
+                     "bodyBatteryValuesArray": [[0, v["bb"] - 25], [1, v["bb"]], [2, v["bb"] - 40]]}
+                    for k, v in self.days(q["startDate"], q["endDate"])]
+        if path == "/usersummary-service/v2/dailysummaries":
+            return {"data": [{"calendarDate": k, "restingHeartRate": v["rhr"]} for k, v in self.days(q["startDate"], q["endDate"])]}
+        m = re.match(r"/weight-service/weight/range/([\d-]+)/([\d-]+)$", path)
+        if m:
+            return {"dailyWeightSummaries": [{"summaryDate": k, "latestWeight": {"weight": v["kg"] * 1000}}
+                                             for k, v in self.days(m.group(1), m.group(2)) if v["kg"]]}
+        return None
+
+
+def make_server(port=0, today=None):
+    today = today or dt.date.today()
+    athletes = {k: Athlete(k, today) for k in PROFILES}
+    tokens = {}
+
+    class H(BaseHTTPRequestHandler):
+        def log_message(self, *a):
+            pass
+
+        def _send(self, code, obj=None):
+            body = json.dumps(obj).encode() if obj is not None else b'{"error":"NOT_FOUND","status":404}'
+            self.send_response(code)
+            self.send_header("Content-Type", "application/json")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_POST(self):
+            key = (self.headers.get("Authorization") or "").replace("ApiKey ", "")
+            if key not in athletes:
+                return self._send(401, {"error": "invalid key"})
+            tok = "tok-" + key
+            tokens[tok] = athletes[key]
+            body = tok.encode()  # real API returns a raw token string
+            self.send_response(200)
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+
+        def do_GET(self):
+            ath = tokens.get((self.headers.get("Authorization") or "").replace("Bearer ", ""))
+            if not ath:
+                return self._send(401, {"error": "unauthorized"})
+            u = urllib.parse.urlparse(self.path)
+            q = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
+            resp = ath.respond(u.path, q)
+            self._send(200 if resp is not None else 404, resp)
+
+    srv = ThreadingHTTPServer(("127.0.0.1", port), H)
+    threading.Thread(target=srv.serve_forever, daemon=True).start()
+    return srv
+
+
+if __name__ == "__main__":
+    s = make_server(int(sys.argv[1]) if len(sys.argv) > 1 else 8787)
+    print("Mock Garmin di http://127.0.0.1:%d  (Ctrl+C untuk berhenti)" % s.server_port)
+    try:
+        threading.Event().wait()
+    except KeyboardInterrupt:
+        pass
