@@ -1,0 +1,10 @@
+# private: never commit
+keys/
+*.key
+.token_cache/
+data/
+programs/*.xlsx
+dist/
+# python
+__pycache__/
+*.pyc
