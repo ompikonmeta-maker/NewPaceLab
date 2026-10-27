@@ -9,6 +9,7 @@ python pacelab.py            # tarik data Garmin kedua atlet, lalu buat dist/das
 python pacelab.py build      # buat ulang dashboard dari data yang sudah ada
 python pacelab.py check      # cek field Garmin yang terbaca (hanya jumlah & nama field)
 python pacelab.py demo       # dashboard dari data rekaan, tanpa key/internet
+python pacelab.py inspect    # struktur respons Garmin (nama field & tipe, tanpa nilai)
 ```
 
 Opsi: `--who TAOFIK|REZA|ALL`, `--since 2026-03-23`.
@@ -44,8 +45,8 @@ Python 3.8+ saja, tanpa `pip install`.
 
 Tabel di Excel ditulis untuk manusia; ini cara program membacanya.
 
-- **HRV normal** = status Garmin `BALANCED`. **Di bawah normal** = `LOW` atau `POOR`.
-- **Detak istirahat naik** = dibanding median 28 hari sebelumnya (minimal 7 hari data).
+- **HRV normal** = status Garmin `BALANCED`. **Di bawah normal** = `LOW` atau `POOR`. Status `NONE` = tidak ada data malam itu (lampu dinilai dari BB dan tidur saja).
+- **Detak istirahat naik** = dibanding median 28 hari sebelumnya (minimal 7 hari data). RHR diambil dari ringkasan harian; kalau kosong, dari data tidur.
 - **Lampu**: MERAH (HRV di bawah normal 3 hari, atau RHR +7) → ORANYE (HRV di bawah normal 2 hari, BB < 40, atau RHR +5) → HIJAU (HRV balanced, BB > 60, tidur ≥ 6 jam) → selain itu KUNING.
 - **Body Battery harian** = nilai tertinggi hari itu (setelah tidur).
 - **Aturan Sabtu**: tidur < 5 jam + BB < 30 + HRV di bawah normal → *Ganti easy 8 km*; tidur < 5 jam + BB < 40 → *Potong 40%*; tidur ≥ 6 jam + BB ≥ 50 → *Jalankan*; selain itu → *Potong 20%*.
