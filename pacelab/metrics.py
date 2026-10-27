@@ -175,9 +175,14 @@ def estimate_series(eff, start, today):
 LOW_HRV = ("LOW", "POOR")
 
 
+def rhr(w):
+    """Daily resting HR; the sleep record's value when the daily summary has none."""
+    return (w or {}).get("rhr") or (w or {}).get("rhr_sleep")
+
+
 def _rhr_base(wellness, day):
-    prev = [wellness[k]["rhr"] for k in wellness
-            if wellness[k].get("rhr") and 0 < (day - d(k)).days <= 28]
+    prev = [rhr(wellness[k]) for k in wellness
+            if rhr(wellness[k]) and 0 < (day - d(k)).days <= 28]
     return statistics.median(prev) if len(prev) >= 7 else None
 
 
@@ -196,7 +201,7 @@ def light(wellness, day):
 
     MERAH : HRV below normal 3 days running, or RHR +7 vs 28-day median
     ORANYE: HRV below normal 2 days running, or Body Battery < 40, or RHR +5
-    HIJAU : HRV balanced, Body Battery > 60 and sleep >= 6 h
+    HIJAU : HRV balanced (or no HRV reading that night), Body Battery > 60, sleep >= 6 h
     KUNING: anything else (HRV slightly down, BB 40-60, sleep < 6 h)
     Returns None when there is no data for the day.
     """
@@ -205,21 +210,22 @@ def light(wellness, day):
         return None
     low_run = _hrv_low_run(wellness, day)
     base = _rhr_base(wellness, day)
-    rhr_up = (w["rhr"] - base) if w.get("rhr") and base else 0
+    rhr_up = (rhr(w) - base) if rhr(w) and base else 0
     bb, sl, st = w.get("bb"), w.get("sleep_s"), w.get("hrv_status")
+    st = None if st == "NONE" else st
     why = []
     if low_run >= 3 or rhr_up >= 7:
         level = "merah"
     elif low_run >= 2 or (bb is not None and bb < 40) or rhr_up >= 5:
         level = "oranye"
-    elif st == "BALANCED" and bb is not None and bb > 60 and sl and sl >= 6 * 3600:
+    elif st in ("BALANCED", None) and bb is not None and bb > 60 and sl and sl >= 6 * 3600:
         level = "hijau"
     else:
         level = "kuning"
     if rhr_up:
         why.append("RHR %+d" % round(rhr_up))
     return {"level": level, "hrv": w.get("hrv"), "hrv_status": st, "bb": bb,
-            "sleep_s": sl, "rhr": w.get("rhr"), "notes": why}
+            "sleep_s": sl, "rhr": rhr(w), "notes": why}
 
 
 def saturday_rule(w):

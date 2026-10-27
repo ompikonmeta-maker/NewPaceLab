@@ -12,7 +12,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "tools")]
 
 from mock_garmin import make_server  # noqa: E402
 from pacelab.garmin import AuthError, Client  # noqa: E402
-from pacelab.sync import Syncer, norm_stream  # noqa: E402
+from pacelab.sync import Syncer, key_tree, norm_hrv, norm_sleep, norm_stream, rhr_by_date  # noqa: E402
 
 TODAY = dt.date(2026, 10, 27)
 
@@ -77,6 +77,22 @@ class SyncTest(unittest.TestCase):
         self.assertTrue((self.tmp / "data" / "REZA" / "runs.json").is_file())
 
 
+class SchemaTest(unittest.TestCase):
+    def test_old_schema_rereads_wellness_once(self):
+        srv = make_server(today=TODAY)
+        tmp = Path(tempfile.mkdtemp())
+        c = Client("REZA", "demo-reza", base="http://127.0.0.1:%d" % srv.server_port,
+                   cache_dir=str(tmp / "tok"), delay=0, log=lambda *a: None)
+        Syncer(c, tmp / "R", log=lambda *a: None).run(dt.date(2026, 9, 1), TODAY)
+        st = json.loads((tmp / "R" / "state.json").read_text())
+        st.pop("schema")
+        (tmp / "R" / "state.json").write_text(json.dumps(st))
+        self.assertEqual(Syncer(c, tmp / "R", log=lambda *a: None).run(dt.date(2026, 9, 1), TODAY)["wellness_days"], 57)
+        self.assertEqual(Syncer(c, tmp / "R", log=lambda *a: None).run(dt.date(2026, 9, 1), TODAY)["wellness_days"], 4)
+        srv.shutdown()
+        srv.server_close()
+
+
 class NoStreamTest(unittest.TestCase):
     def test_missing_details_asked_once(self):
         srv = make_server(today=TODAY)
@@ -106,6 +122,24 @@ class NormalizeTest(unittest.TestCase):
         self.assertEqual(s["t"], [0, 5, 10])
         self.assertEqual(s["d"], [0, 15, 31])
         self.assertEqual(s["hr"], [120, 125, None])
+
+    def test_rhr_shapes(self):
+        self.assertEqual(rhr_by_date({"data": [{"calendarDate": "2026-10-26", "restingHeartRate": 52}]}),
+                         {"2026-10-26": 52})
+        self.assertEqual(rhr_by_date({"data": {"2026-10-26": {"restingHeartRateValue": 53}}}), {"2026-10-26": 53})
+        self.assertEqual(rhr_by_date([{"date": "2026-10-25", "wellness": {"rhr": 54, "maxHeartRate": 150}}]),
+                         {"2026-10-25": 54})
+        self.assertEqual(rhr_by_date({"data": [{"calendarDate": "2026-10-26", "restingHeartRate": 0}]}), {})
+
+    def test_sleep_rhr_and_hrv_none(self):
+        _, v = norm_sleep({"calendarDate": "2026-10-26", "sleepTimeSeconds": 22000, "restingHeartRate": 51})
+        self.assertEqual((v["sleep_s"], v["rhr_sleep"]), (22000, 51))
+        self.assertIsNone(norm_hrv({"calendarDate": "2026-10-26", "status": "NONE"})[1]["hrv_status"])
+
+    def test_key_tree_has_no_values(self):
+        tree = key_tree({"data": {"2026-10-26": {"restingHeartRate": 52, "x": [{"y": "rahasia"}]}}})
+        self.assertEqual(tree, [("data.<tanggal>.restingHeartRate", "int"), ("data.<tanggal>.x[].y", "str")])
+        self.assertNotIn("rahasia", str(tree))
 
     def test_stream_missing_distance(self):
         self.assertIsNone(norm_stream({"metricDescriptors": [{"metricsIndex": 0, "key": "sumDuration"}],

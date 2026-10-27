@@ -10,6 +10,7 @@ Field names are read defensively; `pacelab.py check` reports what was found.
 """
 import datetime as dt
 import json
+import re
 from pathlib import Path
 
 from .garmin import ApiError
@@ -25,6 +26,9 @@ WEIGHT = "/weight-service/weight/range/%s/%s"
 # max days per call reported by the community; longer ranges give HTTP 400
 CHUNK = {"sleep": 28, "hrv": 180, "bb": 28, "daily": 28, "weight": 180}
 REFETCH_DAYS = 3  # late-arriving sleep/HRV for the last nights
+SCHEMA = 2  # bump when wellness parsing changes: the full history is re-read once
+RHR_KEY = re.compile(r"resting_?heart_?rate(_?value)?$|^rhr$", re.I)
+DATE_KEY = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
 
 # ------------------------------------------------------------------ helpers
@@ -75,6 +79,42 @@ def chunks(start, end, days):
         stop = min(end, cur + dt.timedelta(days=days - 1))
         yield cur, stop
         cur = stop + dt.timedelta(days=1)
+
+
+def rhr_by_date(obj, date=None, out=None):
+    """{date: resting HR} from any nesting: lists of day records, dicts keyed
+    by date, or a value under restingHeartRate / restingHeartRateValue / rhr."""
+    out = {} if out is None else out
+    if isinstance(obj, dict):
+        date = str(obj.get("calendarDate") or obj.get("summaryDate") or obj.get("date") or date or "")[:10] or None
+        for k, v in obj.items():
+            if RHR_KEY.search(str(k)) and isinstance(v, (int, float)) and not isinstance(v, bool) and 25 < v < 120:
+                if date:
+                    out.setdefault(date, v)
+            elif isinstance(v, (dict, list)):
+                rhr_by_date(v, k[:10] if DATE_KEY.match(str(k)) else date, out)
+    elif isinstance(obj, list):
+        for v in obj:
+            rhr_by_date(v, date, out)
+    return out
+
+
+def key_tree(obj, prefix="", depth=0, out=None):
+    """Field paths and value types only (no values), for `pacelab.py inspect`."""
+    out = [] if out is None else out
+    if depth > 5:
+        return out
+    if isinstance(obj, dict):
+        for k, v in list(obj.items())[:60]:
+            name = "<tanggal>" if DATE_KEY.match(str(k)) else str(k)
+            path = prefix + "." + name if prefix else name
+            if isinstance(v, (dict, list)):
+                key_tree(v, path, depth + 1, out)
+            elif path not in [p for p, _ in out]:
+                out.append((path, type(v).__name__))
+    elif isinstance(obj, list) and obj:
+        key_tree(obj[0], prefix + "[]", depth + 1, out)
+    return out
 
 
 # ------------------------------------------------------------------ normalize
@@ -128,8 +168,10 @@ def norm_sleep(item):
     if secs is None:
         parts = [pick(item, k) for k in ("deepSleepSeconds", "lightSleepSeconds", "remSleepSeconds")]
         secs = sum(p for p in parts if p) or None
-    return pick(item, "calendarDate"), {
+    date = pick(item, "calendarDate")
+    return date, {
         "sleep_s": secs,
+        "rhr_sleep": rhr_by_date(item, date).get(str(date)[:10]) if date else None,
         "sleep_score": pick(item, "sleepScores.overall.value", "overallSleepScore.value", "sleepScore"),
     }
 
@@ -137,7 +179,7 @@ def norm_sleep(item):
 def norm_hrv(item):
     return pick(item, "calendarDate"), {
         "hrv": pick(item, "lastNightAvg"),
-        "hrv_status": (pick(item, "status") or "").upper() or None,
+        "hrv_status": ((pick(item, "status") or "").upper() or None) if (pick(item, "status") or "").upper() != "NONE" else None,
         "hrv_low": pick(item, "baseline.balancedLow"),
     }
 
@@ -215,7 +257,7 @@ class Syncer:
 
     # -------------------------------------------------------------- wellness
     def sync_wellness(self, since, until):
-        done = self.state.get("wellness_until")
+        done = self.state.get("wellness_until") if self.state.get("schema") == SCHEMA else None
         start = since
         if done:
             start = max(since, dt.date.fromisoformat(done) - dt.timedelta(days=REFETCH_DAYS))
@@ -229,11 +271,15 @@ class Syncer:
         self._ranged("bb", start, until, lambda a, b: self.c.get(BB, {"startDate": a, "endDate": b}),
                      lambda r: r if isinstance(r, list) else [], norm_bb)
         self._ranged("daily", start, until, lambda a, b: self.c.get(DAILY, {"startDate": a, "endDate": b}),
-                     lambda r: list(find_all(r, "restingHeartRate")),
-                     lambda it: (pick(it, "calendarDate", "date"), {"rhr": it.get("restingHeartRate")}))
+                     lambda r: list(rhr_by_date(r).items()),
+                     lambda kv: (kv[0], {"rhr": kv[1]}))
         self._ranged("weight", start, until, lambda a, b: self.c.get(WEIGHT % (a, b), {"includeAll": "true"}),
                      lambda r: pick(r, "dailyWeightSummaries") or [], norm_weight)
+        for day in self.well.values():
+            if day.get("hrv_status") == "NONE":
+                day.pop("hrv_status")
         self.state["wellness_until"] = until.isoformat()
+        self.state["schema"] = SCHEMA
         _write(self.dir / "wellness.json", dict(sorted(self.well.items())))
         return (until - start).days + 1
 

@@ -94,6 +94,12 @@ class LightTest(unittest.TestCase):
         self.set(bb=70, rhr=62)  # +7 over the 28-day median
         self.assertEqual(m.light(self.w, self.day)["level"], "merah")
 
+    def test_no_hrv_reading_and_sleep_rhr(self):
+        self.set(hrv_status="NONE")
+        self.assertEqual(m.light(self.w, self.day)["level"], "hijau")
+        self.set(rhr=None, rhr_sleep=62)  # falls back to the sleep record: +7
+        self.assertEqual(m.light(self.w, self.day)["level"], "merah")
+
     def test_hrv_low_streak(self):
         for i in range(3):
             self.w[(self.day - dt.timedelta(days=i)).isoformat()]["hrv_status"] = "LOW"

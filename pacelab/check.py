@@ -2,7 +2,7 @@
 import json
 from pathlib import Path
 
-FIELDS = ("sleep_s", "sleep_score", "hrv", "hrv_status", "bb", "rhr", "weight")
+FIELDS = ("sleep_s", "sleep_score", "hrv", "hrv_status", "bb", "rhr", "rhr_sleep", "weight")
 
 
 def report(folder, name):
@@ -24,9 +24,12 @@ def report(folder, name):
     lines.append("  stream        : %d/%d lari, %d dengan HR" % (len(streams), len(runs), with_hr))
     lines.append("  stream keys   : %s" % (", ".join(sorted(keys)) or "-"))
     lines.append("  wellness hari : %d (%s .. %s)" % (len(well), min(well, default="-"), max(well, default="-")))
+    last30 = sorted(well)[-30:]
+    lines.append("    %-12s %9s %14s" % ("", "semua", "30 hr terakhir"))
     for f in FIELDS:
         n = sum(1 for v in well.values() if v.get(f) is not None)
-        lines.append("    %-12s %4d hari%s" % (f, n, "   <-- tidak terbaca" if n == 0 else ""))
+        n30 = sum(1 for k in last30 if well[k].get(f) is not None)
+        lines.append("    %-12s %4d hari %9d hari%s" % (f, n, n30, "   <-- tidak terbaca" if n == 0 and f != "rhr_sleep" else ""))
     st = sorted({v.get("hrv_status") for v in well.values() if v.get("hrv_status")})
     lines.append("  status HRV    : %s" % (", ".join(st) or "-"))
     return "\n".join(lines)

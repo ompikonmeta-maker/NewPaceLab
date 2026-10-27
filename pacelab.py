@@ -6,6 +6,7 @@
   python pacelab.py build        hanya buat dist/dashboard.html dari data yang ada
   python pacelab.py check        laporkan field Garmin yang terbaca (tanpa nilai pribadi)
   python pacelab.py demo         dashboard dari data rekaan (tanpa key, tanpa internet)
+  python pacelab.py inspect      struktur respons Garmin (nama field saja, tanpa nilai)
 
 Opsi: --who TAOFIK|REZA|ALL   --since YYYY-MM-DD   --config config.json
 """
@@ -73,6 +74,34 @@ def cmd_check(cfg, athletes):
         print(report(Path(cfg["data_dir"]) / a["id"], a["name"]))
 
 
+def cmd_inspect(cfg, athletes):
+    from pacelab import sync as S
+    end = dt.date.today()
+    a, b = (end - dt.timedelta(days=2)).isoformat(), end.isoformat()
+    calls = [("sleep", S.SLEEP, {"startDate": a, "endDate": b}), ("hrv", S.HRV % (a, b), None),
+             ("bodybattery", S.BB, {"startDate": a, "endDate": b}), ("daily", S.DAILY, {"startDate": a, "endDate": b}),
+             ("weight", S.WEIGHT % (a, b), {"includeAll": "true"})]
+    for at in athletes:
+        key = load_key(at["id"], cfg["keys_dir"])
+        if not key:
+            print("[x] %s: key tidak ada" % at["name"])
+            continue
+        c = Client(at["id"], key, cache_dir=str(Path(cfg["data_dir"]).parent / ".token_cache"))
+        print("== %s (%s .. %s)" % (at["name"], a, b))
+        for name, path, params in calls:
+            try:
+                resp = c.get(path, params)
+            except (ApiError, AuthError) as e:
+                print("  %s: %s" % (name, e))
+                continue
+            if resp is None:
+                print("  %s: 404" % name)
+                continue
+            print("  %s:" % name)
+            for p, t in S.key_tree(resp):
+                print("    %s  (%s)" % (p, t))
+
+
 def cmd_build(cfg, athletes, today=None, out=None):
     from pacelab.build import build
     missing = [a["program"] for a in athletes if isinstance(a["program"], str) and not Path(a["program"]).is_file()]
@@ -105,7 +134,7 @@ def cmd_demo(cfg, athletes):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", nargs="?", default="all", choices=["all", "sync", "build", "check", "demo"])
+    ap.add_argument("command", nargs="?", default="all", choices=["all", "sync", "build", "check", "demo", "inspect"])
     ap.add_argument("--who", default="ALL")
     ap.add_argument("--since", help="tanggal awal (default dari config)")
     ap.add_argument("--config", default=str(ROOT / "config.json"))
@@ -119,6 +148,8 @@ def main(argv=None):
         cmd_check(cfg, athletes)
     if args.command in ("all", "build"):
         cmd_build(cfg, cfg["athletes"])
+    if args.command == "inspect":
+        cmd_inspect(cfg, athletes)
     if args.command == "demo":
         cmd_demo(cfg, cfg["athletes"])
 
