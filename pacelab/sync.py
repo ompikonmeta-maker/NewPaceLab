@@ -168,6 +168,7 @@ class Syncer:
         self.runs = {r["id"]: r for r in _read(self.dir / "runs.json", [])}
         self.well = _read(self.dir / "wellness.json", {})
         self.unavailable = []
+        self.no_stream = set(self.state.get("no_stream", []))
 
     def run(self, since, until):
         new_runs = self.sync_runs(since, until)
@@ -190,7 +191,8 @@ class Syncer:
                 r = norm_run(a)
                 if r["id"] is None or not r["date"]:
                     continue
-                if r["id"] not in self.runs or not (self.dir / "streams" / ("%s.json" % r["id"])).is_file():
+                has_stream = (self.dir / "streams" / ("%s.json" % r["id"])).is_file()
+                if r["id"] not in self.runs or not (has_stream or r["id"] in self.no_stream):
                     self._stream(r)
                     new += 1
                     if new % 25 == 0:
@@ -207,6 +209,8 @@ class Syncer:
         if s:
             _write(self.dir / "streams" / ("%s.json" % r["id"]), s)
         else:
+            self.no_stream.add(r["id"])  # asked once; not retried on later syncs
+            self.state["no_stream"] = sorted(self.no_stream)
             self.log("    ! %s %.1f km: data per detik tidak tersedia" % (r["date"], r["km"]))
 
     # -------------------------------------------------------------- wellness

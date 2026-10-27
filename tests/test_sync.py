@@ -77,6 +77,24 @@ class SyncTest(unittest.TestCase):
         self.assertTrue((self.tmp / "data" / "REZA" / "runs.json").is_file())
 
 
+class NoStreamTest(unittest.TestCase):
+    def test_missing_details_asked_once(self):
+        srv = make_server(today=TODAY)
+        tmp = Path(tempfile.mkdtemp())
+        c = Client("REZA", "demo-reza", base="http://127.0.0.1:%d" % srv.server_port,
+                   cache_dir=str(tmp / "tok"), delay=0, log=lambda *a: None)
+        s1 = Syncer(c, tmp / "R", log=lambda *a: None)
+        orig = s1.c.get
+        s1.c.get = lambda path, params=None, **kw: None if "/details" in path else orig(path, params, **kw)
+        r1 = s1.run(dt.date(2026, 10, 1), TODAY)
+        self.assertGreater(r1["new_runs"], 0)
+        s2 = Syncer(c, tmp / "R", log=lambda *a: None)
+        s2.c.get = s1.c.get
+        self.assertEqual(s2.run(dt.date(2026, 10, 1), TODAY)["new_runs"], 0)
+        srv.shutdown()
+        srv.server_close()
+
+
 class NormalizeTest(unittest.TestCase):
     def test_stream_from_timestamps(self):
         det = {"metricDescriptors": [{"metricsIndex": 0, "key": "directTimestamp"},
