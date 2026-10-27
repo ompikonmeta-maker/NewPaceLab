@@ -18,7 +18,7 @@ def _read(p, default):
 
 
 def athlete_data(a, data_dir, today):
-    prog = load_program(a["program"])
+    prog = a["program"] if isinstance(a["program"], dict) else load_program(a["program"])
     folder = Path(data_dir) / a["id"]
     runs = _read(folder / "runs.json", [])
     well = _read(folder / "wellness.json", {})

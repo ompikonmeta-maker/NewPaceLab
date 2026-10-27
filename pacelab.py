@@ -75,6 +75,13 @@ def cmd_check(cfg, athletes):
 
 def cmd_build(cfg, athletes, today=None, out=None):
     from pacelab.build import build
+    missing = [a["program"] for a in athletes if isinstance(a["program"], str) and not Path(a["program"]).is_file()]
+    if missing:
+        print("[x] File program Excel tidak ditemukan:")
+        for f in missing:
+            print("      %s" % f)
+        print("    Copy file Excel ke folder programs\\ dengan nama persis seperti di atas.")
+        return None
     path = build(cfg, athletes, today or dt.date.today(), out or cfg["output"])
     print("[i] Dashboard: %s" % path)
     return path
@@ -90,6 +97,9 @@ def cmd_demo(cfg, athletes):
              keys=keys, delay=0)
     srv.shutdown()
     srv.server_close()
+    # the demo must work before the real Excel files are in place
+    from mock_garmin import demo_program
+    athletes = [dict(a, program=a["program"] if Path(a["program"]).is_file() else demo_program()) for a in athletes]
     return cmd_build(demo, athletes, out=str(Path(cfg["output"]).with_name("dashboard-demo.html")))
 
 

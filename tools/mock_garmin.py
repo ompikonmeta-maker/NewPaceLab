@@ -32,6 +32,33 @@ def week_plan(ms):
     return km, max(8, round(km * .5))
 
 
+def demo_program():
+    """Synthetic 51-week program (same shape as pacelab.program.load_program)
+    so `pacelab.py demo` runs before the real Excel files are copied in."""
+    phases = [("Base", 7, 15), ("Support", 16, 21), ("Build", 22, 31), ("Absorb", 32, 33),
+              ("Ramadan", 34, 38), ("Rebuild", 39, 42), ("Marathon", 43, 48), ("Taper", 49, 51)]
+    down = {10, 14, 21, 25, 29, 34, 35, 36, 37, 38, 46, 49, 50}
+    event = {9, 16, 20, 31, 42, 51}
+    weeks = []
+    for ms in range(7, 52):
+        km = round(min(56, 26 + ms * .65) * (.7 if ms in down else 1))
+        lr = None if ms in event else round(min(24, km * .5))
+        weeks.append({"ms": ms, "start": (MS1 + dt.timedelta(weeks=ms - 1)).isoformat(),
+                      "phase": next(n for n, a, b in phases if a <= ms <= b),
+                      "km": float(km), "lr": float(lr) if lr else None,
+                      "down": ms in down, "event": ms in event, "note": ""})
+    return {
+        "name": "Demo", "ms1": MS1.isoformat(), "race_date": "2027-06-13", "total_weeks": 51, "weeks": weeks,
+        "events": [{"ms": 20, "date": "2026-11-07", "event": "LOMBA 10K"},
+                   {"ms": 31, "date": "2027-01-23", "event": "LOMBA HALF MARATHON"},
+                   {"ms": 42, "date": "2027-04-10", "event": "Tes 10K"},
+                   {"ms": 51, "date": "2027-06-13", "event": "MARATON"}],
+        "target": {"B": {"lo": 17100, "hi": 18900, "text": "4:45:00 - 5:15:00"}},
+        "sleep": {"min": 23400, "before_lr": 25200},
+        "weight": [],
+    }
+
+
 class Athlete:
     def __init__(self, key, today):
         p = PROFILES[key]
