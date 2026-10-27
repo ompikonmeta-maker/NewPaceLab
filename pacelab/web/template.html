@@ -1,0 +1,436 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PaceLab Duo</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f4f4f2; --surface:#fcfcfb; --line:#e6e5e1; --grid:#ecebe7;
+  --text:#0b0b0b; --text-2:#52514e; --muted:#8a8984;
+  --t:#2a78d6; --r:#eb6834;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --crit:#d03b3b;
+  --lock:#d9d8d3;
+  --font:"Segoe UI",Roboto,system-ui,sans-serif;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){color-scheme:dark;--bg:#111110;--surface:#1a1a19;--line:#2c2c2a;--grid:#262624;--text:#f0efec;--text-2:#c3c2b7;--muted:#8d8c85;--t:#3987e5;--r:#d95926;--lock:#3a3a37}
+}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111110;--surface:#1a1a19;--line:#2c2c2a;--grid:#262624;--text:#f0efec;--text-2:#c3c2b7;--muted:#8d8c85;--t:#3987e5;--r:#d95926;--lock:#3a3a37}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:14px/1.4 var(--font);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1120px;margin:0 auto;padding:24px 16px 40px}
+.num{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)} .sec{color:var(--text-2)}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;vertical-align:middle;flex:none}
+.dot.t{background:var(--t)} .dot.r{background:var(--r)}
+.who{display:flex;align-items:center;gap:6px;color:var(--text-2)}
+
+header{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:18px}
+.count{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.count b{font-size:56px;line-height:1;font-weight:650;letter-spacing:-.02em}
+.count span{color:var(--text-2);font-size:15px}
+.sub{color:var(--muted);margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--text-2)}
+.right{display:flex;gap:12px;align-items:center}
+.legend{display:flex;gap:14px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:8px;width:32px;height:32px;cursor:pointer;display:grid;place-items:center}
+
+.phases{display:flex;gap:2px;height:6px;margin:4px 0 4px}
+.phases i{display:block;height:100%;border-radius:3px;background:var(--grid);position:relative;overflow:hidden}
+.phases i b{position:absolute;inset:0 auto 0 0;background:var(--text-2);opacity:.55;border-radius:3px}
+.phases i.now b{background:var(--text);opacity:1}
+.phase-lab{display:flex;gap:2px;font-size:11px;color:var(--muted)}
+.phase-lab span{overflow:hidden;white-space:nowrap}
+@media (max-width:640px){.phase-lab span:not(.cur){visibility:hidden}.phase-lab span.cur{overflow:visible}}
+
+.grid{display:grid;gap:12px;grid-template-columns:repeat(12,1fr);margin-top:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px;min-width:0;
+  opacity:0;transform:translateY(12px);transition:opacity .6s var(--ease),transform .6s var(--ease)}
+.card.in{opacity:1;transform:none}
+.c12{grid-column:span 12}.c6{grid-column:span 6}.c4{grid-column:span 4}.c3{grid-column:span 3}.c7{grid-column:span 7}.c5{grid-column:span 5}
+@media (max-width:900px){.c3{grid-column:span 6}}
+@media (max-width:860px){.c6,.c4,.c7,.c5{grid-column:span 12}}
+@media (max-width:560px){.c3{grid-column:span 12}}
+h2{font-size:13px;font-weight:600;color:var(--text-2);margin:0 0 14px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+h2 small{font-weight:400;color:var(--muted)}
+.empty{color:var(--muted);font-size:13px;padding:24px 0;text-align:center}
+
+/* race to 42k */
+.track{display:grid;grid-template-columns:64px 1fr 112px;align-items:center;gap:12px;margin:12px 0}
+.track .bar{position:relative;height:8px;background:var(--grid);border-radius:4px}
+.track .fill{position:absolute;inset:0 auto 0 0;border-radius:4px;width:0;transition:width 1.4s var(--ease)}
+.track .knob{position:absolute;top:50%;left:0;width:16px;height:16px;border-radius:50%;transform:translate(-50%,-50%);border:3px solid var(--surface);transition:left 1.4s var(--ease)}
+.track .val{text-align:right} .track .val b{font-size:18px}
+.ticks{position:relative;height:18px;margin-left:76px;margin-right:124px;font-size:11px;color:var(--muted)}
+.ticks span{position:absolute;transform:translateX(-50%);white-space:nowrap}
+.ticks span::before{content:"";display:block;width:1px;height:5px;background:var(--line);margin:0 auto 2px}
+.est{display:flex;gap:8px 24px;flex-wrap:wrap;margin-top:6px}
+.est div{display:flex;align-items:baseline;gap:8px}
+.est b{font-size:22px;font-weight:600}
+
+/* week */
+.wk{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.ath{display:flex;flex-direction:column;gap:10px}
+.metric .row{display:flex;justify-content:space-between;align-items:baseline}
+.metric b{font-size:20px;font-weight:600}
+.mbar{height:6px;border-radius:3px;background:var(--grid);margin-top:6px;overflow:hidden}
+.mbar i{display:block;height:100%;border-radius:3px;width:0;transition:width 1.2s var(--ease)}
+.score{margin-top:16px;border-top:1px solid var(--line);padding-top:14px}
+.score .big{display:flex;justify-content:center;align-items:center;gap:14px;font-size:28px;font-weight:650;margin-bottom:10px}
+.score .big span{font-size:12px;font-weight:400;color:var(--muted)}
+.cats{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 12px;font-size:13px}
+.cats .l{text-align:right} .cats .c{color:var(--muted);text-align:center}
+.win{font-weight:650}
+
+/* lights */
+.lamp{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.lcard{border:1px solid var(--line);border-radius:12px;padding:14px}
+.status{display:inline-flex;align-items:center;gap:6px;font-weight:650;font-size:13px;padding:3px 10px 3px 4px;border-radius:999px;background:var(--bg);margin-top:10px}
+.status svg{width:18px;height:18px;display:block}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;margin:12px 0 0;font-size:13px}
+.kv dt{color:var(--muted)} .kv dd{margin:0;text-align:right}
+.sat{margin-top:12px;font-size:12px;color:var(--text-2);border-top:1px solid var(--line);padding-top:10px}
+
+/* charts */
+.chart{position:relative;min-height:60px}
+.chart svg{display:block;overflow:visible}
+.ln{stroke-dasharray:1;stroke-dashoffset:1}
+.in .ln{transition:stroke-dashoffset 1.2s var(--ease);stroke-dashoffset:0}
+.ar{opacity:0} .in .ar{transition:opacity .9s .45s var(--ease);opacity:1}
+.pt{opacity:0;transform:scale(.3);transform-box:fill-box;transform-origin:center}
+.in .pt{transition:opacity .4s var(--ease),transform .5s var(--ease);opacity:1;transform:none}
+.band{opacity:0} .in .band{transition:opacity .8s .2s var(--ease);opacity:1}
+.hd,.xh{transition:transform .25s var(--ease),opacity .2s}
+.tip{position:absolute;top:0;left:0;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;font-size:12px;
+  box-shadow:0 8px 24px rgba(0,0,0,.10);opacity:0;transition:opacity .2s var(--ease),transform .25s var(--ease);white-space:nowrap;z-index:2}
+.tip.on{opacity:1}
+.tip b{display:block;margin-bottom:4px;color:var(--text-2);font-weight:600}
+.tip div{display:flex;gap:6px;align-items:center}
+.pb{display:flex;gap:12px;font-size:13px;margin:-6px 0 8px;flex-wrap:wrap}
+.pb b{font-weight:650}
+
+/* badges */
+.badges{display:grid;grid-template-columns:72px repeat(9,1fr);gap:8px;align-items:center}
+.badges .h{font-size:11px;color:var(--muted);text-align:center}
+.bd{width:36px;height:36px;margin:0 auto;border-radius:50%;display:grid;place-items:center;border:2px solid var(--lock);color:var(--muted);
+  transform:scale(.6);opacity:0;transition:transform .5s var(--ease),opacity .4s var(--ease)}
+.in .bd{transform:none;opacity:1}
+.bd:not(.on){width:8px;height:8px;border:0;background:var(--lock)}
+.bd.on.t{border-color:var(--t);color:var(--text);background:color-mix(in srgb,var(--t) 14%,transparent)}
+.bd.on.r{border-color:var(--r);color:var(--text);background:color-mix(in srgb,var(--r) 14%,transparent)}
+footer{margin-top:20px;color:var(--muted);font-size:12px;display:flex;gap:16px;flex-wrap:wrap}
+@media (max-width:640px){
+  .badges{grid-template-columns:52px repeat(9,1fr);gap:4px}
+  .bd{width:24px;height:24px} .bd svg{width:12px;height:12px}
+  .badges .h{font-size:9px}
+  .track{grid-template-columns:52px 1fr 84px}
+  .ticks{margin-left:64px;margin-right:96px}
+  .count b{font-size:44px}
+  .wk,.lamp{grid-template-columns:1fr}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none!important;animation:none!important}
+  .card,.ar,.pt,.band,.bd{opacity:1;transform:none} .ln{stroke-dashoffset:0}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div>
+    <div class="count"><b class="num" id="days"></b><span id="race"></span></div>
+    <div class="sub" id="sub"></div>
+  </div>
+  <div class="right">
+    <div class="legend" id="legend"></div>
+    <button class="btn" id="theme" aria-label="Ganti tema" title="Ganti tema">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </div>
+</header>
+<div id="phases"></div>
+
+<div class="grid">
+  <section class="card c12" id="race42"><h2>Menuju 42K <small>long run terpanjang</small></h2>
+    <div id="tracks"></div><div class="ticks" id="ticks"></div><div class="est" id="est"></div></section>
+
+  <section class="card c7"><h2 id="wk-h"></h2><div class="wk" id="week"></div>
+    <div class="score" id="score"></div></section>
+
+  <section class="card c5"><h2>Hari ini <small id="lamp-d"></small></h2><div class="lamp" id="lamp"></div></section>
+
+  <section class="card c6"><h2>km / minggu</h2><div class="chart" id="ch-km"></div></section>
+  <section class="card c6"><h2>Long run (km)</h2><div class="chart" id="ch-lr"></div></section>
+  <section class="card c6"><h2>Decoupling (%) <small>&lt; 8</small></h2><div class="chart" id="ch-dec"></div></section>
+  <section class="card c6"><h2>Berat vs target (kg)</h2><div class="chart" id="ch-wt"></div></section>
+  <section class="card c4"><h2>Tidur (jam)</h2><div class="chart" id="ch-sleep"></div></section>
+  <section class="card c4"><h2>HRV (ms)</h2><div class="chart" id="ch-hrv"></div></section>
+  <section class="card c4"><h2>Body Battery</h2><div class="chart" id="ch-bb"></div></section>
+
+  <section class="card c3"><h2>5K</h2><div class="pb num" id="pb-5K"></div><div class="chart" id="ch-5K"></div></section>
+  <section class="card c3"><h2>10K</h2><div class="pb num" id="pb-10K"></div><div class="chart" id="ch-10K"></div></section>
+  <section class="card c3"><h2>Half</h2><div class="pb num" id="pb-Half"></div><div class="chart" id="ch-Half"></div></section>
+  <section class="card c3"><h2>Full <small>est.</small></h2><div class="pb num" id="pb-Full"></div><div class="chart" id="ch-Full"></div></section>
+
+  <section class="card c12"><h2>Badge <small id="bd-n"></small></h2><div class="badges" id="badges"></div></section>
+</div>
+<footer id="foot"></footer>
+</div>
+
+<script>
+const DATA = /*__DATA__*/null;
+const A = DATA.athletes;
+const $ = id => document.getElementById(id);
+const BULAN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const HARI = ["Min","Sen","Sel","Rab","Kam","Jum","Sab"];
+const D = s => new Date(s + "T00:00:00");
+const tgl = s => { const d = D(s); return d.getDate() + " " + BULAN[d.getMonth()]; };
+const hms = s => { if (s == null) return "–"; s = Math.round(s); const h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60;
+  return h ? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}` : `${m}:${String(x).padStart(2,"0")}`; };
+const hm = s => { if (s == null) return "–"; const h = Math.floor(s/3600), m = Math.round(s%3600/60); return `${h}:${String(m).padStart(2,"0")}`; };
+const f1 = v => v == null ? "–" : (Math.round(v*10)/10).toFixed(1);
+const pct = v => v == null ? "–" : Math.round(v*100) + "%";
+const who = a => `<span class="who"><i class="dot ${a.c}"></i>${a.name}</span>`;
+
+// ---------------------------------------------------------------- header
+(function(){
+  const days = Math.round((D(DATA.race_date) - D(DATA.today)) / 864e5);
+  $("days").textContent = days;
+  const rd = D(DATA.race_date);
+  $("race").textContent = `hari · Maraton ${HARI[rd.getDay()]} ${rd.getDate()} ${BULAN[rd.getMonth()]} ${rd.getFullYear()}`;
+  $("sub").innerHTML = `MS${DATA.ms_cur} / ${DATA.total_weeks} · ${DATA.phase || ""}` +
+    DATA.events.filter(e => !/maraton/i.test(e.event)).map(e => `<span class="chip">${e.event.replace(/^LOMBA /i,"").replace(/HALF MARATHON/i,"Half")} · ${tgl(e.date)}</span>`).join("");
+  $("legend").innerHTML = A.map(who).join("");
+  const tot = DATA.total_weeks, now = DATA.ms_cur;
+  let bar = '<div class="phases">', lab = '<div class="phase-lab">';
+  DATA.phases.forEach(p => {
+    const w = (p.b - p.a + 1) / tot * 100, cur = p.a <= now && now <= p.b;
+    const fill = now > p.b ? 100 : cur ? (now - p.a + .5) / (p.b - p.a + 1) * 100 : 0;
+    bar += `<i style="width:${w}%" class="${cur ? "now" : ""}" title="${p.name} MS${p.a}–${p.b}"><b style="width:${fill}%"></b></i>`;
+    lab += `<span style="width:${w}%" class="${cur ? "cur" : ""}">${w > 7 || cur ? p.name : ""}</span>`;
+  });
+  $("phases").innerHTML = bar + "</div>" + lab + "</div>";
+  $("foot").innerHTML = `<span>Dibuat ${DATA.generated.replace("T"," ")}</span>` +
+    A.map(a => `<span>${a.name}: ${a.sync ? "sync " + a.sync.replace("T"," ").slice(0,16) : "belum ada data"}</span>`).join("");
+})();
+
+// ---------------------------------------------------------------- race to 42K
+(function(){
+  const max = 42.195;
+  $("tracks").innerHTML = A.map(a => `
+    <div class="track"><span class="sec">${a.name}</span>
+      <div class="bar"><i class="fill" data-w="${Math.min(100, a.longest/max*100)}" style="background:var(--${a.c})"></i>
+        <i class="knob" data-w="${Math.min(100, a.longest/max*100)}" style="background:var(--${a.c})"></i></div>
+      <span class="val num"><b>${f1(a.longest)}</b> <span class="muted">/ 42.2</span></span></div>`).join("");
+  $("ticks").innerHTML = [[10,"10K"],[21.1,"HM"],[30,"30K"],[42.195,"42K"]].map(([v,l]) => `<span style="left:${v/max*100}%">${l}</span>`).join("");
+  $("est").innerHTML = A.map(a => {
+    const t = a.target || {}, txt = t.lo && t.hi && t.lo !== t.hi ? `${hm(t.lo)}–${hm(t.hi)}` : t.hi ? hms(t.hi) : "–";
+    return `<div><i class="dot ${a.c}"></i><span class="muted">est.</span><b class="num">${hm(a.est.sec)}</b><span class="muted num">target ${txt}</span></div>`;
+  }).join("");
+})();
+
+// ---------------------------------------------------------------- this week + score
+(function(){
+  $("wk-h").innerHTML = `MS${DATA.ms_cur} <small>berjalan</small>`;
+  const m = (lab, v, t, c) => { const p = v == null || !t ? 0 : Math.min(100, v/t*100);
+    return `<div class="metric"><div class="row"><span class="muted">${lab}</span><span class="num"><b>${v == null ? "–" : f1(v)}</b> <span class="muted">/ ${t == null ? "–" : t}</span></span></div>
+      <div class="mbar"><i data-w="${p}" style="background:var(--${c})"></i></div></div>`; };
+  $("week").innerHTML = A.map(a => { const w = a.weeks[a.weeks.length-1] || {};
+    return `<div class="ath">${who(a)}${m("km", w.km, w.km_t, a.c)}${m("long run", w.lr, w.lr_t, a.c)}</div>`; }).join("");
+  const S = DATA.score;
+  if (!S || A.length < 2) { $("score").innerHTML = ""; return; }
+  const [x, y] = A.map(a => a.week_stats);
+  const rows = [["km", pct(x.km_pct), pct(y.km_pct)], ["long run", pct(x.lr_pct), pct(y.lr_pct)],
+                ["tidur", hm(x.sleep_s), hm(y.sleep_s)], ["hari hijau", x.green, y.green]];
+  $("score").innerHTML = `<h2 style="margin-bottom:8px">Skor MS${S.ms}</h2>
+    <div class="big num"><i class="dot ${A[0].c}"></i>${S.a} <span>—</span> ${S.b}<i class="dot ${A[1].c}"></i></div>
+    <div class="cats num">${rows.map((r, i) => `<span class="l ${S.cats[i].win === 0 ? "win" : ""}">${r[1]}</span><span class="c">${r[0]}</span><span class="${S.cats[i].win === 1 ? "win" : ""}">${r[2]}</span>`).join("")}</div>`;
+})();
+
+// ---------------------------------------------------------------- lights
+(function(){
+  const L = {hijau:["good","HIJAU"], kuning:["warn","KUNING"], oranye:["serious","ORANYE"], merah:["crit","MERAH"]};
+  const ICON = {
+    good:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--good)"/><path d="M7 12.5l3.2 3.2L17 9" fill="none" stroke="#fff" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    warn:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--warn)"/><path d="M12 6.5v7M12 17.3v.2" stroke="#1a1a19" stroke-width="2.6" stroke-linecap="round"/></svg>',
+    serious:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--serious)"/><path d="M12 6.5v7M12 17.3v.2" stroke="#1a1a19" stroke-width="2.6" stroke-linecap="round"/></svg>',
+    crit:'<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="11" fill="var(--crit)"/><path d="M8 8l8 8M16 8l-8 8" stroke="#fff" stroke-width="2.6" stroke-linecap="round"/></svg>'};
+  const dates = A.map(a => a.today.date).filter(Boolean);
+  $("lamp-d").textContent = dates.length ? (() => { const d = D(dates.sort().pop()); return `${HARI[d.getDay()]} ${d.getDate()} ${BULAN[d.getMonth()]}`; })() : "";
+  $("lamp").innerHTML = A.map(a => {
+    const l = a.today.light;
+    if (!l) return `<div class="lcard">${who(a)}<div class="empty">belum ada data</div></div>`;
+    const [k, lab] = L[l.level];
+    const st = l.hrv_status ? l.hrv_status[0] + l.hrv_status.slice(1).toLowerCase() : "–";
+    return `<div class="lcard">${who(a)}<span class="status">${ICON[k]}${lab}</span>
+      <dl class="kv num"><dt>HRV</dt><dd>${l.hrv ?? "–"} <span class="muted">${st}</span></dd><dt>BB</dt><dd>${l.bb ?? "–"}</dd>
+      <dt>Tidur</dt><dd>${hm(l.sleep_s)}</dd><dt>RHR</dt><dd>${l.rhr ?? "–"}${l.notes.length ? ` <span class="muted">${l.notes.join(" ").replace("RHR ", "")}</span>` : ""}</dd></dl>
+      <div class="sat">Sabtu: <b>${a.today.saturday || "–"}</b></div></div>`;
+  }).join("");
+})();
+
+// ---------------------------------------------------------------- chart engine
+function niceTime(lo, hi, n = 4) {
+  const st = [30, 60, 120, 300, 600, 900, 1800, 3600].find(m => m >= (hi - lo) / n) || 3600;
+  return [Math.floor(lo / st) * st, Math.ceil(hi / st) * st, st];
+}
+function nice(lo, hi, n = 4) {
+  if (!isFinite(lo) || !isFinite(hi)) { lo = 0; hi = 1; }
+  if (lo === hi) { lo -= 1; hi += 1; }
+  const raw = (hi - lo) / n, mag = 10 ** Math.floor(Math.log10(raw)),
+        st = [1, 2, 2.5, 5, 10].map(m => m * mag).find(m => m >= raw);
+  return [Math.floor(lo / st) * st, Math.ceil(hi / st) * st, st];
+}
+// monotone cubic (Fritsch–Carlson): smooth, no overshoot
+function smooth(p) {
+  if (p.length < 2) return "";
+  if (p.length === 2) return `M${p[0][0]},${p[0][1]}L${p[1][0]},${p[1][1]}`;
+  const n = p.length, dx = [], m = [], t = [];
+  for (let i = 0; i < n - 1; i++) { dx[i] = p[i+1][0] - p[i][0]; m[i] = (p[i+1][1] - p[i][1]) / dx[i]; }
+  t[0] = m[0]; t[n-1] = m[n-2];
+  for (let i = 1; i < n - 1; i++) t[i] = m[i-1] * m[i] <= 0 ? 0 : 3 * (dx[i-1] + dx[i]) / ((2*dx[i] + dx[i-1]) / m[i-1] + (dx[i] + 2*dx[i-1]) / m[i]);
+  let d = `M${p[0][0]},${p[0][1]}`;
+  for (let i = 0; i < n - 1; i++) { const h = dx[i] / 3; d += `C${p[i][0]+h},${p[i][1]+t[i]*h} ${p[i+1][0]-h},${p[i+1][1]-t[i+1]*h} ${p[i+1][0]},${p[i+1][1]}`; }
+  return d;
+}
+const CHARTS = [];
+let UID = 0;
+function chart(id, o) { CHARTS.push([id, o]); draw(id, o); }
+function draw(id, {x, series, h = 200, ymin, ymax, invert = false, refs = [], bands = [], fmtY = v => v, fmtV = f1, gaps = true, xnum = false, xlab, time = false}) {
+  const el = $(id), W = Math.max(240, el.clientWidth), H = h, P = {l: 40, r: 12, t: 12, b: 24};
+  const val = p => xnum ? p[1] : p;
+  const all = series.flatMap(s => s.v.map(val)).filter(v => v != null).concat(refs.map(r => r.y), bands.flatMap(b => b.y));
+  if (!series.some(s => s.v.some(p => val(p) != null))) { el.innerHTML = '<div class="empty">belum ada data</div>'; return; }
+  let [lo, hi, st] = (time ? niceTime : nice)(ymin ?? Math.min(...all), ymax ?? Math.max(...all));
+  const xsAll = xnum ? series.flatMap(s => s.v.map(p => p[0])) : null;
+  const x0 = xnum ? Math.min(...xsAll) : 0, x1 = xnum ? Math.max(...xsAll) : x.length - 1;
+  const xs = v => P.l + (x1 === x0 ? .5 : (v - x0) / (x1 - x0)) * (W - P.l - P.r);
+  const ys = v => invert ? P.t + (v - lo) / (hi - lo) * (H - P.t - P.b) : P.t + (hi - v) / (hi - lo) * (H - P.t - P.b);
+  const uid = ++UID;
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img"><defs>`;
+  A.forEach(a => s += `<linearGradient id="g${uid}${a.c}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="var(--${a.c})" stop-opacity=".16"/><stop offset="1" stop-color="var(--${a.c})" stop-opacity="0"/></linearGradient>`);
+  s += "</defs>";
+  for (let v = lo; v <= hi + 1e-9; v += st) { const y = ys(v);
+    s += `<line x1="${P.l}" x2="${W-P.r}" y1="${y}" y2="${y}" stroke="var(--grid)"/><text x="${P.l-8}" y="${y+4}" text-anchor="end" font-size="10.5" fill="var(--muted)">${fmtY(Math.round(v*1000)/1000)}</text>`; }
+  // x labels
+  if (xnum) { const seen = new Set(); let lastX = -99;
+    [...new Set(xsAll)].sort((a, b) => a - b).forEach(t => { const d = new Date(t), k = d.getFullYear()*12 + d.getMonth(); if (seen.has(k) || xs(t) - lastX < 34) return; seen.add(k); lastX = xs(t);
+      s += `<text x="${xs(t)}" y="${H-6}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${BULAN[d.getMonth()]}</text>`; }); }
+  else { const every = Math.ceil(x.length / Math.max(3, Math.floor(W / 64)));
+    x.forEach((l, i) => { if (i % every === 0 || i === x.length - 1) s += `<text x="${xs(i)}" y="${H-6}" text-anchor="middle" font-size="10.5" fill="var(--muted)">${xlab ? xlab(l) : l}</text>`; }); }
+  bands.forEach(b => { const y1 = ys(b.y[0]), y2 = ys(b.y[1]), top = Math.min(y1, y2), hh = Math.max(2, Math.abs(y2 - y1));
+    s += `<rect class="band" x="${P.l}" y="${top - (hh === 2 ? 1 : 0)}" width="${W-P.l-P.r}" height="${hh}" rx="${Math.min(6, hh/2)}" fill="var(--${b.c})" style="opacity:.14"/>`; });
+  refs.forEach(r => s += `<line class="ar" x1="${P.l}" x2="${W-P.r}" y1="${ys(r.y)}" y2="${ys(r.y)}" stroke="${r.c ? `var(--${r.c})` : "var(--text-2)"}" stroke-dasharray="2 4" stroke-opacity=".6"/>`);
+  const segs = se => { const out = [[]];
+    se.v.forEach((p, i) => { const v = val(p); if (v == null) { if (gaps && out[out.length-1].length) out.push([]); return; }
+      out[out.length-1].push(xnum ? [xs(p[0]), ys(v)] : [xs(i), ys(v)]); });
+    return out.filter(g => g.length); };
+  series.forEach((se, j) => {
+    const c = se.c;
+    segs(se).forEach(g => {
+      const d = g.length === 1 ? "" : smooth(g);
+      if (se.target) { if (d) s += `<path class="ar" d="${d}" fill="none" stroke="var(--${c})" stroke-width="1.5" stroke-dasharray="4 4" stroke-opacity=".55"/>`; return; }
+      if (d && se.area !== false) s += `<path class="ar" d="${d}L${g[g.length-1][0]},${ys(invert ? hi : lo)}L${g[0][0]},${ys(invert ? hi : lo)}Z" fill="url(#g${uid}${c})"/>`;
+      if (d) s += `<path class="${se.dash ? "ar" : "ln"}" ${se.dash ? 'stroke-dasharray="5 4"' : 'pathLength="1"'} d="${d}" fill="none" stroke="var(--${c})" stroke-width="2" stroke-linecap="round" style="transition-delay:${j*120}ms"/>`;
+      if (se.dots || g.length === 1) g.forEach((q, i) => s += `<circle class="pt" style="transition-delay:${800 + i*60}ms" cx="${q[0]}" cy="${q[1]}" r="3.5" fill="var(--surface)" stroke="var(--${c})" stroke-width="2"/>`);
+    });
+    if (!se.target) { const gs = segs(se), last = gs.length ? gs[gs.length-1] : null, L = last && last[last.length-1];
+      if (L) s += `<circle class="pt" style="transition-delay:${1000 + j*120}ms" cx="${L[0]}" cy="${L[1]}" r="4.5" fill="var(--${c})" stroke="var(--surface)" stroke-width="2"/>`; }
+  });
+  s += `<line class="xh" x1="0" x2="0" y1="${P.t}" y2="${H-P.b}" stroke="var(--muted)" stroke-dasharray="2 3" opacity="0"/>`;
+  series.filter(se => !se.target).forEach(se => s += `<circle class="hd" data-c="${se.c}" r="5" fill="var(--${se.c})" stroke="var(--surface)" stroke-width="2" opacity="0"/>`);
+  s += `<rect x="${P.l}" y="0" width="${W-P.l-P.r}" height="${H}" fill="transparent"/></svg><div class="tip"></div>`;
+  el.innerHTML = s;
+
+  // hover: crosshair + dots + tooltip beside the crosshair (never over the active points)
+  const svg = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = svg.querySelector(".xh");
+  const keys = xnum ? [...new Set(series.filter(s => !s.target).flatMap(s => s.v.filter(p => p[1] != null).map(p => p[0])))].sort((a, b) => a - b) : x.map((_, i) => i);
+  const show = px => {
+    const k = keys.reduce((a, b) => Math.abs(xs(b) - px) < Math.abs(xs(a) - px) ? b : a);
+    const cx = xs(k);
+    xh.style.transform = `translateX(${cx}px)`; xh.setAttribute("opacity", ".6");
+    let html = `<b>${xnum ? tgl(new Date(k).toISOString().slice(0, 10)) : (xlab ? xlab(x[k]) : x[k])}</b>`;
+    series.filter(se => !se.target).forEach(se => {
+      const p = xnum ? se.v.find(q => q[0] === k) : se.v[k], v = p == null ? null : val(p);
+      const dot = svg.querySelector(`.hd[data-c="${se.c}"]`);
+      if (v != null) { dot.style.transform = `translate(${cx}px,${ys(v)}px)`; dot.dataset.v = v; dot.setAttribute("opacity", "1"); } else dot.setAttribute("opacity", "0");
+      const tg = series.find(t => t.target && t.c === se.c), tv = tg && !xnum ? tg.v[k] : null;
+      const a = A.find(a => a.c === se.c);
+      html += `<div><i class="dot ${se.c}"></i>${a.name}<span class="num" style="margin-left:auto;padding-left:14px">${v == null ? "–" : fmtV(v)}${tv != null ? ` <span class="muted">/ ${tv}</span>` : ""}</span></div>`;
+    });
+    tip.innerHTML = html; tip.classList.add("on");
+    const sc = svg.getBoundingClientRect().width / W, gap = 12, R = 8, tw = tip.offsetWidth, th = tip.offsetHeight, ew = el.clientWidth;
+    const qx = cx * sc, pys = [...svg.querySelectorAll('.hd[opacity="1"]')].map(c => ys(+c.dataset.v) * sc);
+    const top = pys.length ? Math.min(...pys) : H * sc / 2, bot = pys.length ? Math.max(...pys) : H * sc / 2;
+    const mid = Math.min(Math.max(0, qx - tw / 2), ew - tw);
+    const cands = [[qx + gap, 4], [qx - gap - tw, 4], [mid, top - R - gap - th], [mid, bot + R + gap]];
+    const clear = ([l, t]) => l >= 0 && l + tw <= ew && t >= -th / 2 && t + th <= H * sc + th / 2 &&
+      pys.every(y => qx + R < l || qx - R > l + tw || y + R < t || y - R > t + th);
+    const [l, t] = cands.find(clear) || cands[2];
+    tip.style.transform = `translate(${l}px,${t}px)`;
+  };
+  svg.onpointermove = e => { const r = svg.getBoundingClientRect(); show((e.clientX - r.left) / r.width * W); };
+  svg.onpointerleave = () => { tip.classList.remove("on"); xh.setAttribute("opacity", "0"); svg.querySelectorAll(".hd").forEach(c => c.setAttribute("opacity", "0")); };
+}
+
+// ---------------------------------------------------------------- charts
+(function(){
+  const done = A[0].weeks.filter(w => w.done);
+  const X = done.map(w => "MS" + w.ms);
+  const col = (a, k) => X.map((_, i) => { const w = a.weeks[i]; return w && w.done ? w[k] : null; });
+  chart("ch-km", {x: X, ymin: 0, series: [...A.map(a => ({c: a.c, v: col(a, "km_t"), target: 1})), ...A.map(a => ({c: a.c, v: col(a, "km")}))]});
+  chart("ch-lr", {x: X, ymin: 0, gaps: false, series: [...A.map(a => ({c: a.c, v: col(a, "lr_t"), target: 1})), ...A.map(a => ({c: a.c, v: col(a, "lr")}))]});
+  chart("ch-dec", {x: X, ymin: 0, gaps: false, refs: [{y: 8}], series: A.map(a => ({c: a.c, area: false, v: col(a, "dec")}))});
+  chart("ch-wt", {x: X, gaps: false, refs: [{y: 0}], fmtV: v => (v > 0 ? "+" : "") + f1(v),
+    series: A.map(a => ({c: a.c, area: false, v: X.map((_, i) => { const w = a.weeks[i]; return w && w.kg != null && w.kg_t != null ? Math.round((w.kg - w.kg_t)*10)/10 : null; })}))});
+  const DX = A[0].days.map(d => d.date), dl = s => String(D(s).getDate());
+  const fmtH = v => hm(v * 3600);
+  chart("ch-sleep", {x: DX, xlab: dl, h: 170, fmtV: fmtH, refs: A.filter(a => a.sleep_min).map(a => ({y: a.sleep_min/3600, c: a.c})), series: A.map(a => ({c: a.c, area: false, v: a.days.map(d => d.sleep_h)}))});
+  chart("ch-hrv", {x: DX, xlab: dl, h: 170, fmtV: v => String(v), series: A.map(a => ({c: a.c, area: false, v: a.days.map(d => d.hrv)}))});
+  chart("ch-bb", {x: DX, xlab: dl, h: 170, ymin: 0, ymax: 100, refs: [{y: 50}], fmtV: v => String(v), series: A.map(a => ({c: a.c, area: false, v: a.days.map(d => d.bb)}))});
+
+  // best efforts: y inverted (faster = higher)
+  ["5K", "10K", "Half"].forEach(k => {
+    $("pb-" + k).innerHTML = A.map(a => { const p = a.pb[k] || []; return `<span><i class="dot ${a.c}"></i> <b>${p.length ? hms(p[p.length-1].sec) : "–"}</b></span>`; }).join("");
+    chart("ch-" + k, {xnum: true, invert: true, time: true, h: 160, fmtY: hms, fmtV: hms,
+      series: A.map(a => ({c: a.c, dots: true, area: false, v: (a.pb[k] || []).map(p => [D(p.date).getTime(), p.sec])}))});
+  });
+  $("pb-Full").innerHTML = A.map(a => `<span><i class="dot ${a.c}"></i> <b>${hm(a.est.sec)}</b></span>`).join("");
+  chart("ch-Full", {xnum: true, invert: true, time: true, h: 160, fmtY: hm, fmtV: hm,
+    bands: A.filter(a => a.target && a.target.hi).map(a => ({c: a.c, y: [a.target.lo || a.target.hi - 600, a.target.hi]})),
+    series: A.map(a => ({c: a.c, dots: true, dash: true, area: false, v: a.est.series.map(p => [D(p.date).getTime(), p.sec])}))});
+})();
+
+// ---------------------------------------------------------------- badges
+(function(){
+  const ids = A[0].badges.map(b => b.id);
+  const tick = '<svg width="16" height="16" viewBox="0 0 24 24"><path d="M6 12.5l4 4L18 8" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+  let h = "<span></span>" + ids.map(i => `<span class="h">${i}</span>`).join(""), on = 0;
+  A.forEach(a => { h += who(a) + a.badges.map((b, i) => { on += b.on; return `<div class="bd ${b.on ? "on " + a.c : ""}" title="${b.id}" style="transition-delay:${i*50}ms">${b.on ? tick : ""}</div>`; }).join(""); });
+  $("badges").innerHTML = h;
+  $("bd-n").textContent = `${on} / ${ids.length * A.length}`;
+})();
+
+// ---------------------------------------------------------------- motion
+function grow(card) { card.querySelectorAll("[data-w]").forEach(e => { if (e.classList.contains("knob")) e.style.left = e.dataset.w + "%"; else e.style.width = e.dataset.w + "%"; }); }
+const io = new IntersectionObserver(es => es.forEach((e, i) => { if (!e.isIntersecting) return;
+  setTimeout(() => { e.target.classList.add("in"); grow(e.target); }, i * 80); io.unobserve(e.target); }), {threshold: .15});
+document.querySelectorAll(".card").forEach(c => io.observe(c));
+let rt; addEventListener("resize", () => { clearTimeout(rt); rt = setTimeout(() => CHARTS.forEach(([i, o]) => draw(i, o)), 150); });
+
+// ---------------------------------------------------------------- theme (remembered per browser)
+(function(){
+  const r = document.documentElement;
+  try { const t = localStorage.getItem("pacelab-theme"); if (t) r.dataset.theme = t; } catch (e) {}
+  $("theme").onclick = () => {
+    const dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme:dark)").matches;
+    r.dataset.theme = dark ? "light" : "dark";
+    try { localStorage.setItem("pacelab-theme", r.dataset.theme); } catch (e) {}
+  };
+})();
+</script>
+</body>
+</html>

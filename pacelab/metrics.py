@@ -105,7 +105,7 @@ def streaks(weeks):
     """Longest run of consecutive completed weeks with km >= 90% of target."""
     best = cur = 0
     for w in weeks:
-        if not w["done"] or not w["km_t"]:
+        if not w["done"] or not w["km_t"] or w["km"] is None:
             continue
         cur = cur + 1 if w["km"] >= STREAK_PCT * w["km_t"] else 0
         best = max(best, cur)
