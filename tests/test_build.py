@@ -48,7 +48,7 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(a["c"], "t")
         self.assertTrue(a["has_data"])
         self.assertGreater(a["longest"], 5)
-        self.assertEqual(len(a["days"]), 14)
+        self.assertEqual(len(a["days"]), 60)
         self.assertEqual(len(a["badges"]), 9)
         self.assertIn(a["today"]["light"]["level"], ("hijau", "kuning", "oranye", "merah"))
         self.assertTrue(a["pb"]["5K"])

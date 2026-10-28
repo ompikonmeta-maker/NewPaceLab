@@ -35,19 +35,36 @@ Python 3.8+ saja, tanpa `pip install`.
 
 ## Isi dashboard
 
+Urutan dari atas: hitung mundur dan **lintasan program** (22 Jun → hari maraton, satu garis per minggu,
+tanda lomba, kedua pelari berdiri di tanggal hari ini), lalu **Ringkasan** head-to-head, **Latihan**,
+**Pemulihan**, **Progres terbaik**, **Badge**. Tombol di kanan atas menyalakan/mematikan tiap pelari.
+
 | Bagian | Sumber |
 |---|---|
-| Hitung mundur, MS, fase, minggu ringan/lomba | Excel: Kalender, Checkpoint |
-| Menuju 42K | long run terpanjang sejak MS1 |
-| Est. finish | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir |
-| MS berjalan, km & long run vs target | Garmin + Kalender |
+| Hitung mundur, minggu program, fase, tanda lomba | Excel: Kalender, Checkpoint |
+| Ringkasan head-to-head | lampu hari ini, est. maraton, km & long run minggu ini, HRV, Body Battery, tidur, RHR, aturan Sabtu |
+| Est. maraton | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir |
+| Menuju 42K | long run terpanjang sejak awal program |
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
-| Lampu hari ini & aturan Sabtu | tabel "Tidur dan Pemulihan" di Excel (lihat di bawah) |
-| km / minggu, long run, decoupling, berat vs target | minggu yang sudah selesai |
-| Tidur, HRV, Body Battery | 14 hari terakhir |
+| Latihan (filter 4 / 12 minggu / semua) | km, long run, decoupling, berat vs target per minggu yang sudah selesai; sumbu = tanggal awal minggu |
+| Pemulihan (filter 7 / 14 / 30 / 60 hari) | lampu harian, tidur, HRV, Body Battery |
 | 5K / 10K / Half | segmen tercepat di dalam lari mana pun (data per detik), hanya saat rekor membaik |
 | Full | estimasi per akhir bulan, di atas pita target B |
 | Badge | 21/25/30/35K, 100 km/bulan, streak 7 & 14 minggu ≥90% target km, PR 5K/10K selama program |
+
+### Kesimpulan di tiap grafik
+
+| Metrik | Baik | Perlu perhatian | Buruk |
+|---|---|---|---|
+| km / long run vs target | ≥ 90% | 75–90% | < 75% |
+| Decoupling (long run terakhir) | < 8% | 8–12% | ≥ 12% |
+| Berat vs target | ± 0,5 kg | ± 1,5 kg | lebih dari itu |
+| Tidur (rata-rata periode) | ≥ target minimum | sampai 30 mnt kurang | lebih dari 30 mnt kurang |
+| HRV | status terakhir Balanced, ≤ 1 hari rendah | lainnya | ≥ 3 hari rendah |
+| Body Battery (rata-rata) | > 60 | 40–60 | < 40 |
+| Est. maraton | ≤ batas atas target B | ≤ 15 mnt di atasnya | lebih dari itu |
+
+Status selalu ditampilkan sebagai warna + ikon + kata. Animasi mati otomatis bila perangkat diatur "kurangi gerakan".
 
 ### Tafsiran aturan Excel
 

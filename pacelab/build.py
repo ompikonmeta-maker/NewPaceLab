@@ -7,6 +7,7 @@ from . import metrics as m
 from .program import load_program
 
 WEB = Path(__file__).parent / "web"
+DAYS = 60  # daily history shipped to the page (period filter: 7 / 14 / 30 / 60 days)
 COLORS = ["t", "r"]  # CSS series slots: first athlete blue, second orange
 
 
@@ -46,9 +47,9 @@ def athlete_data(a, data_dir, today):
     est_series = m.estimate_series(eff, m.d(prog["ms1"]), today)
     est_now, est_src = m.marathon_estimate(eff, today)
 
-    days = [today - dt.timedelta(days=i) for i in range(13, -1, -1)]
+    days = [today - dt.timedelta(days=i) for i in range(DAYS - 1, -1, -1)]
     lights = {}
-    for i in range(60, -1, -1):
+    for i in range(DAYS + 2, -1, -1):
         day = today - dt.timedelta(days=i)
         lights[day.isoformat()] = m.light(well, day)
     latest = next((day for day in sorted(well, reverse=True) if day <= today.isoformat()), None)
@@ -69,6 +70,9 @@ def athlete_data(a, data_dir, today):
             "sleep_h": round(well.get(day.isoformat(), {}).get("sleep_s", 0) / 3600, 2) or None,
             "hrv": well.get(day.isoformat(), {}).get("hrv"),
             "bb": well.get(day.isoformat(), {}).get("bb"),
+            "rhr": m.rhr(well.get(day.isoformat())),
+            "hrv_status": well.get(day.isoformat(), {}).get("hrv_status"),
+            "level": (lights.get(day.isoformat()) or {}).get("level"),
         } for day in days],
         "today": {"date": latest, "light": lights.get(latest) if latest else None,
                   "saturday": m.saturday_rule(well.get(latest)) if latest else None},
@@ -107,6 +111,7 @@ def build(cfg, athletes, today, out_path):
         "phase": next((ph["name"] for ph in phases if ph["a"] <= ms_cur <= ph["b"]), None),
         "phases": phases,
         "events": [e for e in p0["events"] if e["date"] >= today.isoformat()][:3],
+        "all_events": p0["events"],
         "score": score,
         "athletes": [_slim(x, COLORS[i]) for i, x in enumerate(data)],
     }
@@ -126,7 +131,7 @@ def _slim(x, color):
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
         "target": tgt, "sleep_min": prog["sleep"].get("min"),
-        "weeks": [{k: w[k] for k in ("ms", "km", "km_t", "lr", "lr_t", "dec", "kg", "kg_t", "done", "down", "event")}
+        "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],
         "badges": x["badges"], "week_stats": x["week_stats"], "sync": x["sync"],
