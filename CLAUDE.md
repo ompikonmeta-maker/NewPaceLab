@@ -13,7 +13,8 @@ Dashboard marathon Taofik & Reza (lihat README.md). Bahasa UI: Indonesia, ringka
 
 ## Cara kerja dengan omPik
 
-- Buat mockup dulu untuk perubahan tampilan; jangan eksekusi sebelum omPik bilang "gas".
+- **Setiap rencana baru selalu dibuat mockup-nya dulu** (juga saat omPik belum memilih opsi: mockup semua opsi).
+  Jangan eksekusi sebelum omPik bilang "gas".
 - Sertakan bukti (screenshot) saat melapor. Beri opsi dan tanya bila ragu; jangan berasumsi.
 - Jangan pernah mencetak atau commit key Garmin, `keys/`, `programs/*.xlsx`, `data/`, `.token_cache/`, `dist/`.
 - Tes: `python -m unittest discover -s tests` (Python 3.8+ tanpa library tambahan).
