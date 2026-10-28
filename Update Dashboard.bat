@@ -3,6 +3,7 @@ rem Klik dua kali: tarik data Garmin, buat dashboard, lalu buka di browser.
 cd /d "%~dp0"
 set PY=python
 where python >nul 2>nul || set PY=py
+if exist "%~dp0python\python.exe" set PY="%~dp0python\python.exe"
 echo Mengambil data Garmin...
 echo.
 %PY% pacelab.py

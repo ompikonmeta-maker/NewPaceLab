@@ -6,6 +6,10 @@ Dashboard marathon Taofik & Reza: satu file HTML offline dari data Garmin Person
 
 Paling mudah: klik dua kali **`Update Dashboard.bat`**. Data ditarik, dashboard dibuat, lalu terbuka di browser.
 
+**Versi portable** (Python sudah di dalamnya, tidak perlu install): unduh
+`NewPaceLab-portable-win-amd64.zip` (Intel/AMD) atau `-win-arm64.zip` (Windows ARM) dari
+halaman *Releases → portable*. Dibuat otomatis oleh GitHub Actions (`tools/make_portable.py`).
+
 Lewat PowerShell:
 
 ```

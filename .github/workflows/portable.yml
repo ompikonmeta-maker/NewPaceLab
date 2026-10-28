@@ -1,0 +1,67 @@
+name: Portable Windows package
+
+on:
+  push:
+    branches: ["claude/**", "main"]
+    paths: ["pacelab/**", "pacelab.py", "tools/**", "config.json", "*.bat", ".github/workflows/portable.yml"]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Unit tests
+        run: python -m unittest discover -s tests
+      - name: Build ZIPs (embeddable Python from python.org)
+        run: |
+          python tools/make_portable.py --arch amd64
+          python tools/make_portable.py --arch arm64
+      - uses: actions/upload-artifact@v4
+        with:
+          name: portable
+          path: dist-portable/*.zip
+
+  smoke-test-windows:
+    needs: build
+    runs-on: windows-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: portable
+      - name: Run the demo with the bundled Python only
+        shell: pwsh
+        run: |
+          Expand-Archive NewPaceLab-portable-win-amd64.zip -DestinationPath C:\t
+          cd C:\t\NewPaceLab
+          .\python\python.exe --version
+          .\python\python.exe pacelab.py demo
+          if ($LASTEXITCODE -ne 0) { exit 1 }
+          if (-not (Test-Path dist\dashboard-demo.html)) { throw "dashboard-demo.html missing" }
+          .\python\python.exe pacelab.py build
+          if ($LASTEXITCODE -eq 0) { throw "build without Excel should fail with a message" }
+          Get-ChildItem dist
+
+  release:
+    needs: smoke-test-windows
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: portable
+      - name: Publish as release "portable"
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          gh release delete portable --yes --cleanup-tag || true
+          gh release create portable NewPaceLab-portable-win-*.zip \
+            --target "${{ github.sha }}" --prerelease \
+            --title "NewPaceLab portable (${GITHUB_SHA::7})" \
+            --notes "ZIP berisi Python 3.12.10 + NewPaceLab. win-amd64 = laptop Intel/AMD, win-arm64 = Windows ARM. Baca BACA-SAYA.txt di dalam ZIP."
