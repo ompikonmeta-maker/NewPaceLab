@@ -51,6 +51,12 @@ def best_effort(stream, dist_m):
 def decoupling(stream):
     """Pa:HR decoupling in %: efficiency (speed/HR) of the 1st vs 2nd half of
     moving time. Positive = the 2nd half cost more heart rate per speed."""
+    r = decoupling_detail(stream)
+    return r and r["pct"]
+
+
+def decoupling_detail(stream):
+    """decoupling() with its working: per half [km, moving seconds, mean HR]."""
     t, x, hr = stream.get("t") or [], stream.get("d") or [], stream.get("hr") or []
     seg = []  # (dt, dd, hr) for moving samples with HR
     for i in range(1, min(len(t), len(x), len(hr))):
@@ -66,14 +72,14 @@ def decoupling(stream):
         halves[0 if acc < total / 2 else 1].append(s)
         acc += s[0]
 
-    def ef(h):
+    def half(h):
         tt = sum(s[0] for s in h)
-        speed = sum(s[1] for s in h) / tt
-        mean_hr = sum(s[0] * s[2] for s in h) / tt
-        return speed / mean_hr
+        return sum(s[1] for s in h), tt, sum(s[0] * s[2] for s in h) / tt  # metres, seconds, mean HR
 
-    e1, e2 = ef(halves[0]), ef(halves[1])
-    return round((e1 - e2) / e1 * 100, 1)
+    (d1, t1, h1), (d2, t2, h2) = half(halves[0]), half(halves[1])
+    e1, e2 = d1 / t1 / h1, d2 / t2 / h2
+    return {"pct": round((e1 - e2) / e1 * 100, 1),
+            "h": [[round(d1 / 1000, 3), round(t1), round(h1, 1)], [round(d2 / 1000, 3), round(t2), round(h2, 1)]]}
 
 
 # ---------------------------------------------------------------- weeks

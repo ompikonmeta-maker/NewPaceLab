@@ -233,6 +233,11 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .card h3 small{font-size:13px;font-weight:400;color:var(--muted)}
 .insight{display:flex;flex-direction:column;gap:6px;margin:10px 0 14px;font-size:14px;color:var(--text-2)}
 .insight div{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.sug{flex-basis:100%;padding-left:16px;margin-top:-2px;font-size:13.5px;color:var(--text-2);line-height:1.45}
+.sug b{color:var(--text);font-weight:650} .sug svg,.sa svg{width:14px;height:14px;vertical-align:-2px;margin-right:5px;color:var(--warn)}
+.h3t{display:inline-flex;align-items:center;gap:8px}
+.info{width:24px;height:24px;border-radius:50%;border:1px solid var(--line);background:none;color:var(--muted);display:grid;place-items:center;cursor:pointer;padding:0;transition:background .2s,color .2s,transform .2s cubic-bezier(.34,1.5,.64,1)}
+.info:hover,.info[aria-expanded="true"]{background:var(--text);color:var(--surface);transform:scale(1.08)} .info svg{width:14px;height:14px}
 .empty{color:var(--muted);font-size:14px;padding:28px 0;text-align:center}
 
 /* status chip: colour + icon + word */
@@ -380,6 +385,7 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .lpop li.warn{background:var(--warn-bg)} .lpop li.bad{background:var(--serious-bg)}
 .lpop li .v{font-weight:650;white-space:nowrap} .lpop li .th{display:block;font-size:12px;color:var(--muted)}
 .lpop li svg{width:16px;height:16px} .lpop li.ok svg{color:var(--good)} .lpop li.warn svg{color:var(--warn)} .lpop li.bad svg{color:var(--serious)} .lpop li.none svg{color:var(--muted)}
+.lpop .sa{display:block;margin-top:3px;font-size:12.5px;color:var(--text-2);line-height:1.4}
 .lpop .scale{display:flex;gap:4px;margin-top:12px}
 .lpop .scale span{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11.5px;font-weight:600;padding:3px 0;border-radius:999px;color:var(--muted);border:1px dashed var(--line);opacity:.6}
 .lpop .scale span i{width:6px;height:6px;border-radius:50%;background:var(--c);opacity:.35}
@@ -387,6 +393,45 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .lpop .scale span.me i{background:#fff;opacity:1}
 .lpop.on .scale span.me{animation:lit .6s .35s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes lit{from{transform:scale(.85);box-shadow:none}}
+
+/* explainer window (fixed height, own scrollbar) */
+.xwin{position:absolute;z-index:70;width:min(460px,calc(100vw - 16px));height:min(540px,calc(100vh - 120px));display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.2);
+  opacity:0;transform:translateY(-8px) scale(.97);transform-origin:top left;pointer-events:none;transition:opacity .25s,transform .45s cubic-bezier(.34,1.3,.64,1)}
+.xwin.on{opacity:1;transform:none;pointer-events:auto}
+.xh{flex:none;display:flex;align-items:center;gap:10px;padding:14px 16px 12px 18px;border-bottom:1px solid var(--line)} .xh h4{margin:0;flex:1;font-size:16px}
+.xb{flex:1 1 auto;min-height:0;overflow:auto;padding:14px 18px 18px;scrollbar-width:none;overscroll-behavior:contain;font-size:14px;color:var(--text-2)}
+.xb::-webkit-scrollbar{display:none}
+.xb p{margin:0 0 10px} .xb .sec{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:16px 0 6px}
+.ill{border:1px solid var(--line);border-radius:14px;padding:10px 12px 8px;background:var(--bg)} .ill svg{width:100%;height:96px;display:block;overflow:visible}
+.ill .half{fill:none;stroke:var(--line);stroke-dasharray:3 4}
+.ill .pace,.ill .hr{fill:none;stroke-width:2.5;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420} .ill .pace{stroke:var(--t)} .ill .hr{stroke:#d64545}
+.xwin.on .ill .pace{animation:draw 1.2s .25s var(--ease) forwards} .xwin.on .ill .hr{animation:draw 1.4s .45s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.ill text{font-size:11px;fill:var(--muted)} .ill .lp{fill:var(--t);font-weight:700} .ill .lh{fill:#d64545;font-weight:700}
+.ill .gap{fill:#d64545;opacity:0} .xwin.on .ill .gap{animation:gapin .5s 1.6s forwards} @keyframes gapin{to{opacity:.12}}
+.xtabs{position:relative;display:inline-flex;background:var(--bg);border-radius:11px;padding:3px;margin-bottom:10px}
+.xtabs button{position:relative;z-index:1;border:0;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--text-2);height:30px;padding:0 12px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px}
+.xtabs button[aria-selected="true"]{color:var(--text)}
+.xtabs .sl{position:absolute;top:3px;bottom:3px;left:0;border-radius:8px;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.1);transition:transform .45s cubic-bezier(.34,1.3,.64,1),width .45s cubic-bezier(.34,1.3,.64,1)}
+.calc{border:1px solid var(--line);border-radius:14px;padding:12px 14px;transition:opacity .2s} .calc.fade{opacity:0}
+.calc .run{font-size:13px;color:var(--muted);margin-bottom:8px} .calc .run b{color:var(--text);font-weight:650}
+.ct{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
+.ct th{white-space:nowrap;padding:0 0 6px 10px;font-size:12px;font-weight:600;color:var(--muted);text-align:right} .ct th:first-child{text-align:left;padding-left:0}
+.ct td{padding:5px 0 5px 10px;border-top:1px solid var(--line);text-align:right;color:var(--text);white-space:nowrap} .ct td:first-child{text-align:left;color:var(--text-2);white-space:normal;padding-left:0}
+.ct tr.ef td{font-weight:700} .ct tr.ef td:first-child{font-weight:400} .ct td small{display:block;font-size:11.5px;color:var(--muted);font-weight:400}
+.ct tr{opacity:0;transform:translateY(4px)} .xwin.on .ct tr{animation:rise .4s var(--ease) forwards;animation-delay:calc(var(--i) * 55ms + 150ms)}
+@keyframes rise{to{opacity:1;transform:none}}
+.ct .up{color:#d64545;font-size:11.5px;font-weight:600;margin-left:4px}
+.fx2{margin-top:10px;padding:10px 12px;border-radius:12px;background:var(--bg);font-size:13.5px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.fx2 .eq{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin-top:4px;font-size:15px;color:var(--text)} .fx2 .eq b{font-size:17px} .fx2 .chip{opacity:1;transform:none;animation:none}
+.scale3{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.scale3 div{border-radius:10px;padding:7px 9px;font-size:12.5px;color:var(--text-2)} .scale3 b{display:block;font-size:13.5px}
+.scale3 .g{background:var(--good-bg)} .scale3 .g b{color:var(--good)} .scale3 .w{background:var(--warn-bg)} .scale3 .w b{color:var(--warn)} .scale3 .s{background:var(--serious-bg)} .scale3 .s b{color:var(--serious)}
+.fix{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.fix li{display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:13.5px;opacity:0;transform:translateX(-6px)}
+.xwin.on .fix li{animation:slin .4s var(--ease) forwards;animation-delay:calc(var(--i) * 60ms + 300ms)}
+.fix li b{color:var(--text);display:block;font-size:14px} .fix i{width:28px;height:28px;border-radius:9px;background:var(--bg);display:grid;place-items:center;color:var(--text-2)} .fix i svg{width:16px;height:16px}
+.xb .src{font-size:12px;color:var(--muted);margin-top:12px}
 
 /* the two runners leave the track while scrolling and park at the left / right edge */
 .fr{position:fixed;left:0;top:0;z-index:40;pointer-events:none;visibility:hidden;will-change:transform}
@@ -426,7 +471,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
-  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2,.lpop li{opacity:1;transform:none} .ln{stroke-dashoffset:0}
+  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2,.lpop li,.ct tr,.fix li{opacity:1;transform:none} .ln{stroke-dashoffset:0} .ill .pace,.ill .hr{stroke-dashoffset:0}
   .tl .done{width:var(--p)} .tl .now{left:var(--p)}
   .cells i,.phases i b{transform:none}
 }
@@ -468,7 +513,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="grid">
   <section class="card c6"><h3>Jarak per minggu <small>km</small></h3><div class="insight" id="in-km"></div><div class="chart" id="ch-km"></div></section>
   <section class="card c6"><h3>Long run <small>km</small></h3><div class="insight" id="in-lr"></div><div class="chart" id="ch-lr"></div></section>
-  <section class="card c6"><h3>Decoupling <small>% · target &lt; 8</small></h3><div class="insight" id="in-dec"></div><div class="chart" id="ch-dec"></div></section>
+  <section class="card c6"><h3><span class="h3t">Decoupling<button class="info" id="dec-info" aria-expanded="false" aria-haspopup="dialog" aria-label="Apa itu decoupling?"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M12 11v7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></span><small>% · target &lt; 8</small></h3><div class="insight" id="in-dec"></div><div class="chart" id="ch-dec"></div></section>
   <section class="card c6"><h3>Berat vs target <small>kg</small></h3><div class="insight" id="in-wt"></div><div class="chart" id="ch-wt"></div></section>
 </div>
 
@@ -503,6 +548,11 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="hint" id="hint" role="tooltip"></div>
 <div class="ptip" id="ptip" aria-hidden="true"></div>
 <div class="lpop" id="lpop" role="dialog" aria-label="Rincian lampu"></div>
+<div class="xwin" id="xdec" role="dialog" aria-labelledby="xdec-t">
+  <div class="xh"><h4 id="xdec-t">Apa itu decoupling?</h4><button class="ib" id="xdec-x" aria-label="Tutup"><svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+  <div class="xb" id="xdec-b"><div id="xdec-in"></div></div>
+  <div class="sbar" id="xdec-sbar" aria-hidden="true"></div>
+</div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
   <div class="panel">
     <div class="pv-head">
@@ -546,6 +596,19 @@ const chip = (lvl, text) => `<span class="chip ${lvl}"><svg viewBox="0 0 24 24" 
 const LIGHT = {hijau: ["good", "Hijau", "siap latihan sesuai rencana"], kuning: ["warn", "Kuning", "latihan keras jadi easy"],
                oranye: ["serious", "Oranye", "easy/recovery saja"], merah: ["crit", "Merah", "istirahat"]};
 const line = (a, html) => `<div><i class="dot ${a.c}" aria-hidden="true"></i><span class="sr">${a.name}:</span>${html}</div>`;
+// one plain-language suggestion under every yellow / red status (green gets none)
+const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const TIPS = {
+  km: {warn: "Tambah satu lari santai pendek (3–5 km). Jangan dikejar sekaligus.", serious: "Kembali ikuti jadwal minggu ini. Pilih jam lari tetap supaya tidak bolong."},
+  lr: {warn: "Lari lebih pelan supaya kuat sampai selesai. Boleh jalan kaki sebentar tiap 3 km.", serious: "Jangan menambah jarak dulu. Ulangi jarak minggu lalu dengan tempo santai."},
+  dec: {warn: "Mulai long run lebih pelan dan minum tiap 20–30 menit.", serious: "Long run berikutnya lebih lambat dan cukup tidur malam sebelumnya. Jangan tambah jarak dulu."},
+  wtUp: {warn: "Kurangi gorengan dan minuman manis. Porsi makan malam sedikit lebih kecil.", serious: "Kurangi gorengan dan minuman manis, porsi malam lebih kecil. Jangan diet ketat di minggu long run."},
+  wtDown: {warn: "Makan lebih cukup, tambah nasi/roti dan protein setelah lari.", serious: "Makan lebih cukup, tambah nasi/roti dan protein setelah lari. Turun terlalu cepat bikin lemas."},
+  sleep: {warn: "Tidur 30 menit lebih awal. Jauhkan HP 30 menit sebelum tidur.", serious: "Buat jam tidur tetap, kamar gelap dan sejuk, stop kopi setelah jam 2 siang."},
+  hrv: {warn: "Tubuh sedang menyesuaikan beban latihan. Jaga tidur dan minum, sesi keras secukupnya.", serious: "Tubuh capek. 2–3 hari lari santai atau istirahat, tidur lebih lama, hindari alkohol."},
+  bb: {warn: "Energi belum penuh. Tidur lebih awal, ganti satu sesi keras dengan lari santai.", serious: "Energi rendah. Hari ini istirahat atau lari santai pendek; cek tidur, stres, dan makan."},
+  est: {warn: "Masih dekat. Jaga km mingguan dan jangan lewatkan long run serta sesi tempo.", serious: "Fokus konsisten dulu. Kalau 2–3 bulan tetap jauh, pakai target B/C di Excel."}};
+const tip = (k, lvl) => TIPS[k] && TIPS[k][lvl] ? `<span class="sug">${BULB}<b>Saran:</b> ${TIPS[k][lvl]}</span>` : "";
 
 // hover hint for non-chart elements (badges, light cells, chips)
 const hint = $("hint");
@@ -825,21 +888,21 @@ function weekly() {
   const flag = w => w.event ? " · minggu lomba/tes" : w.down ? " · minggu ringan" : "";
 
   $("in-km").innerHTML = V().map(a => { const ps = idx.map(i => a.weeks[i]).filter(w => w && w.km != null && w.km_t).map(w => w.km / w.km_t);
-    const p = mean(ps); return line(a, `${chip(lvlPct(p), p == null ? "Belum ada target" : p >= .9 ? "Sesuai rencana" : p >= .75 ? "Sedikit di bawah" : "Jauh di bawah")}<span>rata-rata <b>${pct(p)}</b> dari target</span>`); }).join("");
+    const p = mean(ps); return line(a, `${chip(lvlPct(p), p == null ? "Belum ada target" : p >= .9 ? "Sesuai rencana" : p >= .75 ? "Sedikit di bawah" : "Jauh di bawah")}<span>rata-rata <b>${pct(p)}</b> dari target</span>${tip("km", lvlPct(p))}`); }).join("");
   chart("ch-km", {x: X, xlab: wl, ymin: 0, label: "Jarak per minggu dibanding target",
     detail: (a, k, v, tv) => { const w = wkOf(a, k); return (tv ? `${pct(v / tv)} dari target` : "") + flag(w); },
     series: [...V().map(a => ({c: a.c, v: col(a, "km_t"), target: 1})), ...V().map(a => ({c: a.c, v: col(a, "km")}))]});
 
   $("in-lr").innerHTML = V().map(a => { const ws = idx.map(i => a.weeks[i]).filter(w => w && w.lr_t && w.lr != null);
     const w = ws[ws.length - 1]; const p = w ? w.lr / w.lr_t : null;
-    return line(a, `${chip(lvlPct(p), w ? (p >= .9 ? "Tercapai" : "Kurang") : "Belum ada")}<span>${w ? `terakhir <b>${f1(w.lr)}</b> dari ${w.lr_t} km (${range(w.start)})` : ""}</span>`); }).join("");
+    return line(a, `${chip(lvlPct(p), w ? (p >= .9 ? "Tercapai" : "Kurang") : "Belum ada")}<span>${w ? `terakhir <b>${f1(w.lr)}</b> dari ${w.lr_t} km (${range(w.start)})` : ""}</span>${w ? tip("lr", lvlPct(p)) : ""}`); }).join("");
   chart("ch-lr", {x: X, xlab: wl, ymin: 0, gaps: false, label: "Long run per minggu dibanding target",
     detail: (a, k, v, tv) => { const w = wkOf(a, k); return (tv && v != null ? `${pct(v / tv)} dari target` : "") + flag(w); },
     series: [...V().map(a => ({c: a.c, v: col(a, "lr_t"), target: 1})), ...V().map(a => ({c: a.c, v: col(a, "lr")}))]});
 
   $("in-dec").innerHTML = V().map(a => { const vs = col(a, "dec").filter(v => v != null); const v = vs[vs.length - 1], prev = mean(vs.slice(-4, -1));
     const trend = v == null || prev == null ? "" : v < prev - .5 ? " · membaik" : v > prev + .5 ? " · memburuk" : " · stabil";
-    return line(a, `${chip(lvlDec(v), DECTXT[lvlDec(v)])}<span>${v == null ? "belum ada long run ≥ 10 km" : `terakhir <b>${f1(v)}%</b>${trend}`}</span>`); }).join("");
+    return line(a, `${chip(lvlDec(v), DECTXT[lvlDec(v)])}<span>${v == null ? "belum ada long run ≥ 10 km" : `terakhir <b>${f1(v)}%</b>${trend}`}</span>${tip("dec", lvlDec(v))}`); }).join("");
   chart("ch-dec", {x: X, xlab: wl, ymin: 0, gaps: false, refs: [{y: 8}], label: "Decoupling long run, target di bawah 8 persen",
     fmtV: v => f1(v) + "%", detail: (a, k, v) => v == null ? "" : DECTXT[lvlDec(v)] + " · < 8 baik, ≥ 12 buruk",
     series: V().map(a => ({c: a.c, area: false, v: col(a, "dec")}))});
@@ -847,7 +910,7 @@ function weekly() {
   const diff = a => idx.map(i => { const w = a.weeks[i] || {}; return w.kg != null && w.kg_t != null ? Math.round((w.kg - w.kg_t)*10)/10 : null; });
   $("in-wt").innerHTML = V().map(a => { const ds = diff(a).filter(v => v != null), v = ds[ds.length - 1];
     const lvl = v == null ? "none" : Math.abs(v) <= .5 ? "good" : Math.abs(v) <= 1.5 ? "warn" : "serious";
-    return line(a, `${chip(lvl, v == null ? "Belum ditimbang" : Math.abs(v) <= .5 ? "Sesuai rencana" : v > 0 ? "Di atas target" : "Di bawah target")}<span>${v == null ? "timbang Minggu pagi" : `selisih <b>${v > 0 ? "+" : ""}${f1(v)} kg</b>`}</span>`); }).join("");
+    return line(a, `${chip(lvl, v == null ? "Belum ditimbang" : Math.abs(v) <= .5 ? "Sesuai rencana" : v > 0 ? "Di atas target" : "Di bawah target")}<span>${v == null ? "timbang Minggu pagi" : `selisih <b>${v > 0 ? "+" : ""}${f1(v)} kg</b>`}</span>${v == null ? "" : tip(v > 0 ? "wtUp" : "wtDown", lvl)}`); }).join("");
   chart("ch-wt", {x: X, xlab: wl, gaps: false, refs: [{y: 0}], minSpan: 3, label: "Selisih berat terhadap target mingguan",
     fmtV: v => (v > 0 ? "+" : "") + f1(v) + " kg", detail: (a, k) => { const w = wkOf(a, k); return w.kg != null ? `${f1(w.kg)} kg · target ${f1(w.kg_t)}` : ""; },
     series: V().map(a => ({c: a.c, area: false, v: diff(a)}))});
@@ -869,20 +932,20 @@ function daily() {
   $("in-sleep").innerHTML = V().map(a => { const m = mean(pick(a, "sleep_h")), t = a.sleep_min ? a.sleep_min / 3600 : null;
     const gap = m != null && t ? Math.round((m - t) * 60) : null;
     const lvl = gap == null ? "none" : gap >= 0 ? "good" : gap >= -30 ? "warn" : "serious";
-    return line(a, `${chip(lvl, gap == null ? "Belum ada" : gap >= 0 ? "Cukup" : "Kurang")}<span>rata <b>${hm(m == null ? null : m * 3600)}</b>${gap == null ? "" : ` · ${gap >= 0 ? "+" : "−"}${Math.abs(gap)} mnt vs target ${hm(a.sleep_min)}`}</span>`); }).join("");
+    return line(a, `${chip(lvl, gap == null ? "Belum ada" : gap >= 0 ? "Cukup" : "Kurang")}<span>rata <b>${hm(m == null ? null : m * 3600)}</b>${gap == null ? "" : ` · ${gap >= 0 ? "+" : "−"}${Math.abs(gap)} mnt vs target ${hm(a.sleep_min)}`}</span>${tip("sleep", lvl)}`); }).join("");
   chart("ch-sleep", {x: DX, xlab: dl, h: 200, fmtV: v => hm(v * 3600), refs: V().filter(a => a.sleep_min).map(a => ({y: a.sleep_min/3600, c: a.c})),
     label: "Durasi tidur harian dibanding target minimum", detail: (a, k, v) => v == null ? "" : v * 3600 >= (a.sleep_min || 0) ? "≥ target" : `${Math.round((a.sleep_min - v * 3600) / 60)} mnt di bawah target`,
     series: V().map(a => ({c: a.c, area: false, v: pick(a, "sleep_h")}))});
 
   $("in-hrv").innerHTML = V().map(a => { const st = pick(a, "hrv_status").filter(Boolean), low = st.filter(s => s === "LOW" || s === "POOR").length, last = st[st.length - 1];
     const lvl = !last ? "none" : last === "BALANCED" && low <= 1 ? "good" : low >= 3 ? "serious" : "warn";
-    return line(a, `${chip(lvl, !last ? "Belum ada" : last === "BALANCED" ? "Seimbang" : last === "UNBALANCED" ? "Tidak seimbang" : "Rendah")}<span><b>${low}</b> hari rendah dalam ${DAYN} hari</span>`); }).join("");
+    return line(a, `${chip(lvl, !last ? "Belum ada" : last === "BALANCED" ? "Seimbang" : last === "UNBALANCED" ? "Tidak seimbang" : "Rendah")}<span><b>${low}</b> hari rendah dalam ${DAYN} hari</span>${tip("hrv", lvl)}`); }).join("");
   chart("ch-hrv", {x: DX, xlab: dl, h: 200, minSpan: 20, fmtV: v => v + " ms", label: "HRV semalam",
     detail: (a, k) => { const s = a.days.slice(-DAYN)[k].hrv_status; return s ? s[0] + s.slice(1).toLowerCase() : ""; },
     series: V().map(a => ({c: a.c, area: false, v: pick(a, "hrv")}))});
 
   $("in-bb").innerHTML = V().map(a => { const m = mean(pick(a, "bb")); const lvl = m == null ? "none" : m > 60 ? "good" : m >= 40 ? "warn" : "serious";
-    return line(a, `${chip(lvl, m == null ? "Belum ada" : m > 60 ? "Pulih" : m >= 40 ? "Sedang" : "Rendah")}<span>rata <b>${m == null ? "–" : Math.round(m)}</b> · > 60 hijau, < 40 oranye</span>`); }).join("");
+    return line(a, `${chip(lvl, m == null ? "Belum ada" : m > 60 ? "Pulih" : m >= 40 ? "Sedang" : "Rendah")}<span>rata <b>${m == null ? "–" : Math.round(m)}</b> · > 60 hijau, < 40 oranye</span>${tip("bb", lvl)}`); }).join("");
   chart("ch-bb", {x: DX, xlab: dl, h: 200, ymin: 0, ymax: 100, refs: [{y: 60}, {y: 40}], fmtV: v => String(v), label: "Body Battery pagi",
     detail: (a, k, v) => v == null ? "" : v > 60 ? "> 60: syarat hijau" : v >= 40 ? "40–60: kuning" : "< 40: oranye",
     series: V().map(a => ({c: a.c, area: false, v: pick(a, "bb")}))});
@@ -898,7 +961,7 @@ function renderPB() {
       series: V().map(a => ({c: a.c, dots: true, area: false, v: (a.pb[k] || []).map(p => [D(p.date).getTime(), p.sec])}))});
   });
   $("pb-Full").innerHTML = V().map(a => `<span><i class="dot ${a.c}"></i> <b>${num(a.est.sec, "hm")}</b></span>`).join("");
-  $("in-Full").innerHTML = V().map(a => { const s = estStatus(a); return line(a, `${chip(s[0], s[1])}<span class="muted">${targetTxt(a.target)}</span>`); }).join("");
+  $("in-Full").innerHTML = V().map(a => { const s = estStatus(a); return line(a, `${chip(s[0], s[1])}<span class="muted">${targetTxt(a.target)}</span>${tip("est", s[0])}`); }).join("");
   chart("ch-Full", {xnum: true, invert: true, time: true, h: 180, fmtY: hm, fmtV: hm, label: "Estimasi waktu maraton per akhir bulan dibanding target",
     detail: (a, k) => { const p = a.est.series.find(q => D(q.date).getTime() === k); return p ? `dari usaha ${p.from}` : ""; },
     bands: V().filter(a => a.target && a.target.hi).map(a => ({c: a.c, y: [a.target.lo || a.target.hi - 600, a.target.hi]})),
@@ -1131,6 +1194,11 @@ function whyLine(l) { if (!l || !l.checks) return "";
   return `<span class="why ${bad.some(c => c.s === "bad") ? "bad" : "warn"}">${ckSvg("warn")}Kurang: ${bad.map(c => { const r = ckRow(c); return `<b>${r.n} ${r.v}</b> (${r.sh})`; }).join(", ")}</span>`;
 }
 const lchip = (a, L) => chip(L[0], L[1]).replace('<span class="chip', `<button type="button" data-lc="${a.c}" aria-expanded="false" aria-haspopup="dialog" aria-label="${a.name}: lampu ${L[1]}, lihat rincian" class="chip`).replace(/<\/span>$/, CV + "</button>");
+const LTIP = {
+  hrv: {warn: "Tubuh sedang menyesuaikan beban. Sesi keras jadi santai, tidur dan minum cukup.", bad: "Tubuh belum pulih. 1–2 hari lari santai saja, hindari kafein sore dan alkohol."},
+  bb: {warn: "Energi belum penuh. Tidur lebih awal malam ini, hari ini cukup lari santai.", bad: "Energi rendah. Hari ini istirahat atau lari santai pendek."},
+  sleep: {warn: "Malam ini tidur 30–60 menit lebih awal, jauhkan HP sebelum tidur."},
+  rhr: {bad: "Bisa tanda capek atau mau sakit. Minum cukup; kalau badan tidak enak, istirahat."}};
 const lpop = $("lpop"); let lpFor = null;
 function lpClose() { lpop.classList.remove("on"); lpFor = null; document.querySelectorAll("[data-lc]").forEach(x => x.setAttribute("aria-expanded", "false")); }
 document.addEventListener("click", e => {
@@ -1142,7 +1210,8 @@ document.addEventListener("click", e => {
   const bad = (l.checks || []).filter(c => c.s === "warn" || c.s === "bad").length;
   lpop.innerHTML = `<h4><i class="dot ${a.c}"></i>${a.name} · ${L[1]}</h4>
     <p class="lead">${l.level === "hijau" ? "Semua syarat Hijau terpenuhi." : bad ? `${bad} syarat belum terpenuhi → ${L[2]}.` : `Data belum lengkap → ${L[2]}.`}</p>
-    <ul>${(l.checks || []).map((c, i) => { const r = ckRow(c); return `<li class="${c.s || "none"}" style="--i:${i}">${ckSvg(c.s)}<span>${r.n}<span class="th">${r.need}</span></span><span class="v">${r.v}</span></li>`; }).join("")}</ul>
+    <ul>${(l.checks || []).map((c, i) => { const r = ckRow(c), t = (LTIP[c.k] || {})[c.s] || (c.s === "bad" && (LTIP[c.k] || {}).warn);
+      return `<li class="${c.s || "none"}" style="--i:${i}">${ckSvg(c.s)}<span>${r.n}<span class="th">${r.need}</span>${t ? `<span class="sa">${BULB}${t}</span>` : ""}</span><span class="v">${r.v}</span></li>`; }).join("")}</ul>
     <div class="scale">${Object.keys(LCOL).map(k => `<span class="${k === l.level ? "me" : ""}" style="--c:${LCOL[k]}"><i></i>${LIGHT[k][1]}</span>`).join("")}</div>`;
   const r = ch.getBoundingClientRect(), w = Math.min(300, innerWidth - 16);
   lpop.style.left = (scrollX + Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2))) + "px";
@@ -1188,7 +1257,7 @@ function bounce(scroller, content, bar) {
   const lim = () => Math.min(140, (page ? innerHeight : scroller.clientHeight) * .18);
   const atEnd = dir => { const st = page ? scrollY : scroller.scrollTop, h = page ? innerHeight : scroller.clientHeight, sh = page ? document.documentElement.scrollHeight : scroller.scrollHeight;
     return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
-  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov")));
+  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin")));
   const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
     content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
     if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
@@ -1211,25 +1280,84 @@ function bounce(scroller, content, bar) {
 document.documentElement.style.overscrollBehaviorY = "none";
 bounce(null, document.querySelector(".wrap"));
 
-// ---------------------------------------------------------------- schedule window scrollbar (own thumb, auto-hide)
-const pvBody = $("pv-body"), sbar = $("pv-sbar"); let sbarT = 0;
-function sbarSize() { const h = pvBody.clientHeight, sh = pvBody.scrollHeight;
-  if (sh <= h + 1) { sbar.style.display = "none"; return; } sbar.style.display = "";
-  const th = Math.max(36, h * h / sh); sbar.style.height = th + "px";
-  sbar.style.top = (pvBody.offsetTop + 4 + (h - 8 - th) * (pvBody.scrollTop / (sh - h))) + "px"; }
-function sbarFlash() { sbarSize(); sbar.classList.add("on"); clearTimeout(sbarT); sbarT = setTimeout(() => sbar.matches(":hover,.drag") || sbar.classList.remove("on"), 1000); }
-pvBody.addEventListener("scroll", sbarFlash, {passive: true});
-$("ov").querySelector(".panel").addEventListener("pointermove", e => { if (e.pointerType === "mouse" && e.currentTarget.getBoundingClientRect().right - e.clientX < 24) sbarFlash(); });
-sbar.addEventListener("pointerleave", sbarFlash);
-sbar.addEventListener("pointerdown", e => { e.preventDefault(); sbar.setPointerCapture(e.pointerId); sbar.classList.add("drag");
-  const y0 = e.clientY, s0 = pvBody.scrollTop, k = (pvBody.scrollHeight - pvBody.clientHeight) / Math.max(1, pvBody.clientHeight - 8 - sbar.offsetHeight);
-  const mv = ev => { pvBody.scrollTop = s0 + (ev.clientY - y0) * k; };
-  sbar.addEventListener("pointermove", mv);
-  sbar.addEventListener("pointerup", () => { sbar.classList.remove("drag"); sbar.removeEventListener("pointermove", mv); sbarFlash(); }, {once: true}); });
-addEventListener("resize", sbarSize);
-bounce(pvBody, $("pv-in"), sbar);
+// ---------------------------------------------------------------- own scrollbar for inner windows: thumb fades in while scrolling, hides when idle or not needed
+function ownScroll(body, bar, host) { let t = 0;
+  const size = () => { const h = body.clientHeight, sh = body.scrollHeight;
+    if (sh <= h + 1) { bar.style.display = "none"; return; } bar.style.display = "";
+    const th = Math.max(36, h * h / sh); bar.style.height = th + "px";
+    bar.style.top = (body.offsetTop + 4 + (h - 8 - th) * (body.scrollTop / (sh - h))) + "px"; };
+  const flash = () => { size(); bar.classList.add("on"); clearTimeout(t); t = setTimeout(() => bar.matches(":hover,.drag") || bar.classList.remove("on"), 1000); };
+  body.addEventListener("scroll", flash, {passive: true});
+  host.addEventListener("pointermove", e => { if (e.pointerType === "mouse" && host.getBoundingClientRect().right - e.clientX < 24) flash(); });
+  bar.addEventListener("pointerleave", flash);
+  bar.addEventListener("pointerdown", e => { e.preventDefault(); bar.setPointerCapture(e.pointerId); bar.classList.add("drag");
+    const y0 = e.clientY, s0 = body.scrollTop, k = (body.scrollHeight - body.clientHeight) / Math.max(1, body.clientHeight - 8 - bar.offsetHeight);
+    const mv = ev => { body.scrollTop = s0 + (ev.clientY - y0) * k; };
+    bar.addEventListener("pointermove", mv);
+    bar.addEventListener("pointerup", () => { bar.classList.remove("drag"); bar.removeEventListener("pointermove", mv); flash(); }, {once: true}); });
+  addEventListener("resize", size);
+  bounce(body, body.firstElementChild, bar);
+  return {size, flash};
+}
+const pvS = ownScroll($("pv-body"), $("pv-sbar"), $("ov").querySelector(".panel"));
+const sbarSize = pvS.size, sbarFlash = pvS.flash;
 
-function renderAll() { lpClose(); renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); flyBuild(); }
+// ---------------------------------------------------------------- decoupling: what it is, the working of the last long run, how to improve
+const xdec = $("xdec"), xS = ownScroll($("xdec-b"), $("xdec-sbar"), xdec); let xC = null;
+const SV = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
+const paceTx = (km, sec) => { const p = sec / km; return `${Math.floor(p / 60)}:${String(Math.round(p % 60)).padStart(2, "0")}/km`; };
+function decCalc(a) { const w = a.weeks.filter(x => x.decd).pop();
+  if (!w) return `<div class="calc"><div class="run">Belum ada long run ≥ 10 km dengan data per detik.</div></div>`;
+  const [h1, h2] = w.decd.h, mpm = h => h[0] * 1000 / (h[1] / 60), ef = h => mpm(h) / h[2], e1 = ef(h1), e2 = ef(h2), lv = lvlDec(w.dec);
+  return `<div class="calc" id="xdec-calc"><div class="run">Long run <b>${w.decd.date ? hari(w.decd.date) : range(w.start)}</b> · ${f1(h1[0] + h2[0])} km · ${hms(h1[1] + h2[1])} waktu bergerak, dibagi dua sama lama (berhenti tidak dihitung)</div>
+    <table class="ct"><tr><th></th><th>Separuh 1</th><th>Separuh 2</th></tr>
+    <tr style="--i:0"><td>Jarak</td><td>${h1[0].toFixed(2)} km</td><td>${h2[0].toFixed(2)} km</td></tr>
+    <tr style="--i:1"><td>Waktu</td><td>${hms(h1[1])}</td><td>${hms(h2[1])}</td></tr>
+    <tr style="--i:2"><td>Pace</td><td>${paceTx(h1[0], h1[1])}</td><td>${paceTx(h2[0], h2[1])}</td></tr>
+    <tr style="--i:3"><td>Kecepatan<small>meter per menit</small></td><td>${mpm(h1).toFixed(1)}</td><td>${mpm(h2).toFixed(1)}</td></tr>
+    <tr style="--i:4"><td>Detak jantung rata-rata</td><td>${Math.round(h1[2])}</td><td>${Math.round(h2[2])}${Math.round(h2[2] - h1[2]) ? `<span class="up">${h2[2] > h1[2] ? "+" : "−"}${Math.abs(Math.round(h2[2] - h1[2]))}</span>` : ""}</td></tr>
+    <tr class="ef" style="--i:5"><td>Meter per detak<small>kecepatan ÷ detak jantung</small></td><td>${e1.toFixed(4)}</td><td>${e2.toFixed(4)}</td></tr></table>
+    <div class="fx2">${w.dec >= 0 ? `Separuh kedua lebih boros ${f1(w.dec)}% (meter per detak turun):` : `Separuh kedua malah lebih hemat ${f1(-w.dec)}%:`}
+      <div class="eq">(${e1.toFixed(4)} − ${e2.toFixed(4)}) ÷ ${e1.toFixed(4)} = <b>${f1(w.dec)}%</b>${chip(lv, DECTXT[lv])}</div></div></div>`; }
+function xdecRender() { const vis = V(); if (!vis.some(a => a.c === xC)) xC = vis[0].c;
+  $("xdec-in").innerHTML = `<p>Di lari panjang dengan kecepatan yang sama, detak jantung pelan-pelan naik. Decoupling mengukur <b>seberapa besar kenaikan itu</b>: separuh pertama lari dibanding separuh kedua.</p>
+    <div class="ill"><svg viewBox="0 0 300 96" aria-hidden="true"><path class="gap" d="M150 40 L290 22 L290 40 Z"/><line class="half" x1="150" y1="4" x2="150" y2="80"/>
+      <path class="pace" d="M10 56 C60 56 100 56 150 56 S250 56 290 56"/><path class="hr" d="M10 42 C60 41 100 40 150 40 S240 30 290 22"/>
+      <text class="lp" x="10" y="72">kecepatan tetap</text><text class="lh" x="200" y="16">detak jantung naik</text><text x="58" y="92">separuh pertama</text><text x="196" y="92">separuh kedua</text></svg></div>
+    <div class="sec">Hitungan long run terakhir</div>
+    ${vis.length > 1 ? `<div class="xtabs" role="tablist" id="xdec-tabs"><span class="sl"></span>${vis.map(a => `<button role="tab" aria-selected="${a.c === xC}" data-c="${a.c}"><i class="dot ${a.c}"></i>${a.name}</button>`).join("")}</div>` : ""}
+    <div id="xdec-calcw">${decCalc(vis.find(a => a.c === xC))}</div>
+    <p style="margin-top:10px">Makin kecil angkanya, makin kuat daya tahan untuk jarak itu. Jantung tidak perlu "kerja lembur" di akhir lari.</p>
+    <div class="sec">Arti angka</div>
+    <div class="scale3"><div class="g"><b>&lt; 8%</b>Baik. Siap untuk jarak ini.</div><div class="w"><b>8–12%</b>Mulai kelelahan di akhir.</div><div class="s"><b>≥ 12%</b>Jarak/tempo ini masih terlalu berat.</div></div>
+    <div class="sec">Cara memperbaiki</div>
+    <ul class="fix">${[
+      ['<path d="M4 15a8 8 0 1 1 16 0"/><path d="M12 15l-3.5-4"/>', "Mulai lebih pelan", "10–15 menit pertama sengaja lambat. Jaga detak jantung di zona santai dari program."],
+      ['<path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/>', "Minum sebelum haus", "Minum tiap 20–30 menit, tambah elektrolit kalau lebih dari 1 jam atau cuaca panas."],
+      ['<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', "Pilih jam yang sejuk", "Lari pagi. Panas membuat detak jantung naik walau kecepatan sama."],
+      ['<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>', "Tidur cukup sebelum long run", "Ikuti aturan Sabtu: tidur kurang dan Body Battery rendah bikin angka ini memburuk."],
+      ['<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>', "Tambah jarak pelan-pelan", "Perbanyak lari santai. Naikkan long run sedikit demi sedikit sesuai program (aturan 110%)."]]
+      .map(([ic, b, t], i) => `<li style="--i:${i}"><i>${SV(ic)}</i><span><b>${b}</b>${t}</span></li>`).join("")}</ul>
+    <p class="src">Dihitung dari lari terpanjang tiap minggu (≥ 10 km). Tanjakan, sering berhenti, dan angin bisa membuat angka ikut naik.</p>`;
+}
+function xdecSlider() { const t = $("xdec-tabs"); if (!t) return; const b = t.querySelector('[aria-selected="true"]'), sl = t.querySelector(".sl");
+  if (b && b.offsetWidth) { sl.style.width = b.offsetWidth + "px"; sl.style.transform = `translateX(${b.offsetLeft - 3}px)`; } }
+function xdecClose() { xdec.classList.remove("on"); $("dec-info").setAttribute("aria-expanded", "false"); }
+$("dec-info").onclick = e => { e.stopPropagation(); if (xdec.classList.contains("on")) return xdecClose();
+  lpClose(); xdecRender(); $("xdec-b").scrollTop = 0;
+  const r = e.currentTarget.getBoundingClientRect(), w = Math.min(460, innerWidth - 16);
+  xdec.style.left = (scrollX + Math.max(8, Math.min(innerWidth - w - 8, r.left - 12))) + "px"; xdec.style.top = (scrollY + r.bottom + 10) + "px";
+  xdec.classList.remove("on"); $("dec-info").setAttribute("aria-expanded", "true");
+  requestAnimationFrame(() => requestAnimationFrame(() => { xdec.classList.add("on"); xdecSlider(); xS.size(); })); };
+$("xdec-x").onclick = xdecClose;
+xdec.addEventListener("click", e => { e.stopPropagation(); const b = e.target.closest("#xdec-tabs button"); if (!b || b.dataset.c === xC) return;
+  xC = b.dataset.c; $("xdec-tabs").querySelectorAll("button").forEach(x => x.setAttribute("aria-selected", x === b)); xdecSlider();
+  const c = $("xdec-calc") || $("xdec-calcw").firstElementChild; c.classList.add("fade");
+  setTimeout(() => { $("xdec-calcw").innerHTML = decCalc(A.find(a => a.c === xC)); xS.size(); }, 200); });
+document.addEventListener("click", e => { if (xdec.classList.contains("on") && !e.target.closest("#xdec")) xdecClose(); });
+addEventListener("keydown", e => { if (e.key === "Escape" && xdec.classList.contains("on")) xdecClose(); });
+
+function renderAll() { lpClose(); xdecClose(); renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); flyBuild(); }
 function filter(groupId, set, render, ids) {
   $(groupId).querySelectorAll("button").forEach(b => { if (!b.hasAttribute("aria-pressed")) b.setAttribute("aria-pressed", "false"); });
   $(groupId).onclick = e => { const b = e.target.closest("button"); if (!b || b.getAttribute("aria-pressed") === "true") return;

@@ -82,6 +82,9 @@ Tabel di Excel ditulis untuk manusia; ini cara program membacanya.
 - **Body Battery harian** = nilai tertinggi hari itu (setelah tidur).
 - **Aturan Sabtu**: tidur < 5 jam + BB < 30 + HRV di bawah normal → *Ganti easy 8 km*; tidur < 5 jam + BB < 40 → *Potong 40%*; tidur ≥ 6 jam + BB ≥ 50 → *Jalankan*; selain itu → *Potong 20%*.
 - **Decoupling** = efisiensi (kecepatan ÷ HR) separuh pertama vs kedua waktu bergerak, pada lari terpanjang minggu itu (≥ 10 km).
+  Tombol ⓘ di kartu Decoupling menampilkan penjelasan, hitungan lengkap long run terakhir (jarak, waktu, pace,
+  detak rata-rata, meter per detak tiap separuh) dan cara memperbaikinya.
+- **Saran**: setiap status kuning/merah diberi satu saran singkat berbahasa sederhana (juga di rincian lampu).
 - **Minggu ringan/lomba** dibaca dari warna baris Kalender (abu-abu / oranye muda).
 
 ## Struktur

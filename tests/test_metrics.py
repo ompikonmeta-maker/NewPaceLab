@@ -37,6 +37,11 @@ class StreamTest(unittest.TestCase):
         drift = stream(540, 15, hr=lambda t: 140 if t < 4050 else 154)  # +10% HR in 2nd half
         self.assertAlmostEqual(m.decoupling(drift), 9.1, delta=0.3)
         self.assertIsNone(m.decoupling(stream(540, 2)))  # too short
+        r = m.decoupling_detail(drift)
+        (k1, s1, h1), (k2, s2, h2) = r["h"]
+        self.assertEqual(r["pct"], m.decoupling(drift))
+        e1, e2 = k1 / s1 / h1, k2 / s2 / h2  # the working shown in the dashboard gives the same result
+        self.assertAlmostEqual((e1 - e2) / e1 * 100, r["pct"], delta=0.06)
 
 
 PROGRAM = {"ms1": "2026-06-22", "total_weeks": 51, "weeks": [

@@ -33,8 +33,11 @@ def athlete_data(a, data_dir, today):
     if not runs:  # no sync yet: show targets only, not a row of zeros
         for w in weeks:
             w["km"] = None
+    run_date = {r["id"]: r["date"] for r in runs}
     for w in weeks:
-        w["dec"] = m.decoupling(streams[w["lr_id"]]) if w["lr_id"] in streams else None
+        dd = m.decoupling_detail(streams[w["lr_id"]]) if w["lr_id"] in streams else None
+        w["dec"] = dd and dd["pct"]
+        w["decd"] = dd and {"date": run_date.get(w["lr_id"]), "h": dd["h"]}
     weight_t = {x["ms"]: x["kg"] for x in prog["weight"]}
     for w in weeks:
         kgs = [well[k]["weight"] for k in well
@@ -140,7 +143,7 @@ def _slim(x, color):
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
         "target": tgt, "sleep_min": prog["sleep"].get("min"),
-        "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "kg", "kg_t", "done", "down", "event")}
+        "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],
         "badges": x["badges"], "week_stats": x["week_stats"], "sync": x["sync"],
