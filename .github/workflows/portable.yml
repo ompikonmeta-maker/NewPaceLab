@@ -47,6 +47,7 @@ jobs:
           .\python\python.exe pacelab.py build
           if ($LASTEXITCODE -eq 0) { throw "build without Excel should fail with a message" }
           Get-ChildItem dist
+          exit 0  # the expected failing build above leaves LASTEXITCODE=1
 
   release:
     needs: smoke-test-windows
