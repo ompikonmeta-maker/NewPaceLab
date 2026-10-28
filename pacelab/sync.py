@@ -26,7 +26,7 @@ WEIGHT = "/weight-service/weight/range/%s/%s"
 # max days per call reported by the community; longer ranges give HTTP 400
 CHUNK = {"sleep": 28, "hrv": 180, "bb": 28, "daily": 28, "weight": 180}
 REFETCH_DAYS = 3  # late-arriving sleep/HRV for the last nights
-SCHEMA = 2  # bump when wellness parsing changes: the full history is re-read once
+SCHEMA = 3  # bump when wellness parsing changes: the full history is re-read once
 RHR_KEY = re.compile(r"resting_?heart_?rate(_?value)?$|^rhr$", re.I)
 DATE_KEY = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -188,7 +188,15 @@ def norm_bb(item):
     vals = [v[1] for v in pick(item, "bodyBatteryValuesArray") or []
             if isinstance(v, (list, tuple)) and len(v) > 1 and isinstance(v[1], (int, float))]
     # the day's peak is the reading after the night's recharge
-    return pick(item, "date", "calendarDate"), {"bb": max(vals) if vals else pick(item, "charged")}
+    return pick(item, "date", "calendarDate"), {"bb": max(vals) if vals else None}
+
+
+def norm_daily(item):
+    """v2 daily summary: data[].heartRate.restingValue, data[].bodyBattery.maxValue."""
+    date = pick(item, "calendarDate")
+    rhr = pick(item, "heartRate.restingValue") or rhr_by_date(item, date).get(str(date)[:10])
+    return date, {"rhr": rhr if rhr and 25 < rhr < 120 else None,
+                  "bb": pick(item, "bodyBattery.maxValue")}
 
 
 def norm_weight(item):
@@ -258,6 +266,8 @@ class Syncer:
     # -------------------------------------------------------------- wellness
     def sync_wellness(self, since, until):
         done = self.state.get("wellness_until") if self.state.get("schema") == SCHEMA else None
+        if done is None and self.state.get("schema") != SCHEMA:
+            self.well = {}  # parsing changed: rebuild from scratch, not on top of old values
         start = since
         if done:
             start = max(since, dt.date.fromisoformat(done) - dt.timedelta(days=REFETCH_DAYS))
@@ -271,8 +281,8 @@ class Syncer:
         self._ranged("bb", start, until, lambda a, b: self.c.get(BB, {"startDate": a, "endDate": b}),
                      lambda r: r if isinstance(r, list) else [], norm_bb)
         self._ranged("daily", start, until, lambda a, b: self.c.get(DAILY, {"startDate": a, "endDate": b}),
-                     lambda r: list(rhr_by_date(r).items()),
-                     lambda kv: (kv[0], {"rhr": kv[1]}))
+                     lambda r: pick(r, "data") if isinstance(pick(r, "data"), list) else (r if isinstance(r, list) else []),
+                     norm_daily)
         self._ranged("weight", start, until, lambda a, b: self.c.get(WEIGHT % (a, b), {"includeAll": "true"}),
                      lambda r: pick(r, "dailyWeightSummaries") or [], norm_weight)
         for day in self.well.values():

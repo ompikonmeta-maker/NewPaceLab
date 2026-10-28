@@ -12,7 +12,7 @@ sys.path[:0] = [str(ROOT), str(ROOT / "tools")]
 
 from mock_garmin import make_server  # noqa: E402
 from pacelab.garmin import AuthError, Client  # noqa: E402
-from pacelab.sync import Syncer, key_tree, norm_hrv, norm_sleep, norm_stream, rhr_by_date  # noqa: E402
+from pacelab.sync import Syncer, key_tree, norm_bb, norm_daily, norm_hrv, norm_sleep, norm_stream, rhr_by_date  # noqa: E402
 
 TODAY = dt.date(2026, 10, 27)
 
@@ -135,6 +135,15 @@ class NormalizeTest(unittest.TestCase):
         _, v = norm_sleep({"calendarDate": "2026-10-26", "sleepTimeSeconds": 22000, "restingHeartRate": 51})
         self.assertEqual((v["sleep_s"], v["rhr_sleep"]), (22000, 51))
         self.assertIsNone(norm_hrv({"calendarDate": "2026-10-26", "status": "NONE"})[1]["hrv_status"])
+
+    def test_daily_summary_real_shape(self):
+        # field paths reported by `pacelab.py inspect` on a real account (2026-10-28)
+        item = {"calendarDate": "2026-10-27", "heartRate": {"minValue": 48, "maxValue": 171, "restingValue": 52},
+                "bodyBattery": {"minValue": 12, "maxValue": 78, "chargedValue": 55, "latestValue": 40}}
+        self.assertEqual(norm_daily(item), ("2026-10-27", {"rhr": 52, "bb": 78}))
+
+    def test_bb_report_without_values_is_not_charged(self):
+        self.assertIsNone(norm_bb({"date": "2026-10-27", "charged": 55, "drained": 60})[1]["bb"])
 
     def test_key_tree_has_no_values(self):
         tree = key_tree({"data": {"2026-10-26": {"restingHeartRate": 52, "x": [{"y": "rahasia"}]}}})

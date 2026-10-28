@@ -140,11 +140,12 @@ class Athlete:
                  "baseline": {"balancedLow": self.p["hrv"] - 4, "balancedUpper": self.p["hrv"] + 8}}
                 for k, v in self.days(m.group(1), m.group(2))]}
         if path == "/wellness-service/wellness/bodyBattery/reports/daily":
-            return [{"date": k, "charged": v["bb"] - 20, "drained": 50,
-                     "bodyBatteryValuesArray": [[0, v["bb"] - 25], [1, v["bb"]], [2, v["bb"] - 40]]}
+            return [{"date": k, "charged": v["bb"] - 20, "drained": 50}
                     for k, v in self.days(q["startDate"], q["endDate"])]
         if path == "/usersummary-service/v2/dailysummaries":
-            return {"data": [{"calendarDate": k, "restingHeartRate": v["rhr"]} for k, v in self.days(q["startDate"], q["endDate"])]}
+            return {"data": [{"calendarDate": k, "heartRate": {"minValue": v["rhr"] - 3, "maxValue": 160, "restingValue": v["rhr"]},
+                              "bodyBattery": {"minValue": 10, "maxValue": v["bb"], "chargedValue": 40}}
+                             for k, v in self.days(q["startDate"], q["endDate"])]}
         m = re.match(r"/weight-service/weight/range/([\d-]+)/([\d-]+)$", path)
         if m:
             return {"dailyWeightSummaries": [{"summaryDate": k, "latestWeight": {"weight": v["kg"] * 1000}}
