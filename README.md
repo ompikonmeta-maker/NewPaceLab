@@ -4,6 +4,10 @@ Dashboard marathon Taofik & Reza: satu file HTML offline dari data Garmin Person
 
 ## Pakai
 
+Paling mudah: klik dua kali **`Update Dashboard.bat`**. Data ditarik, dashboard dibuat, lalu terbuka di browser.
+
+Lewat PowerShell:
+
 ```
 python pacelab.py            # tarik data Garmin kedua atlet, lalu buat dist/dashboard.html
 python pacelab.py build      # buat ulang dashboard dari data yang sudah ada
@@ -31,7 +35,7 @@ Python 3.8+ saja, tanpa `pip install`.
 |---|---|
 | Hitung mundur, MS, fase, minggu ringan/lomba | Excel: Kalender, Checkpoint |
 | Menuju 42K | long run terpanjang sejak MS1 |
-| Est. finish | Riegel (eksponen 1.06) dari usaha terbaik 120 hari terakhir: Half → 10K → 5K |
+| Est. finish | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir |
 | MS berjalan, km & long run vs target | Garmin + Kalender |
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
 | Lampu hari ini & aturan Sabtu | tabel "Tidur dan Pemulihan" di Excel (lihat di bawah) |

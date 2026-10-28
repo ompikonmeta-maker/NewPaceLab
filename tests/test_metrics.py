@@ -67,8 +67,11 @@ class EffortTest(unittest.TestCase):
         pb = m.pb_progress(eff)
         self.assertEqual([p["sec"] for p in pb["5K"]], [1900, 1800])
         sec, src = m.marathon_estimate(eff, dt.date(2026, 9, 1))
-        self.assertEqual(src, "10K")
+        self.assertEqual(src, "10K")  # the 10K predicts a faster marathon than the 5K
         self.assertAlmostEqual(sec, 3700 * 4.2195 ** 1.06, delta=1)
+        # a slow 10K inside an easy long run must not hide a fast 5K race
+        eff["10K"] = [("2026-08-10", 5000, 4)]
+        self.assertEqual(m.marathon_estimate(eff, dt.date(2026, 9, 1))[1], "5K")
         self.assertEqual(m.marathon_estimate(eff, dt.date(2027, 6, 1)), (None, None))
 
 

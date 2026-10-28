@@ -239,7 +239,7 @@ const who = a => `<span class="who"><i class="dot ${a.c}"></i>${a.name}</span>`;
     return `<div class="metric"><div class="row"><span class="muted">${lab}</span><span class="num"><b>${v == null ? "–" : f1(v)}</b> <span class="muted">/ ${t == null ? "–" : t}</span></span></div>
       <div class="mbar"><i data-w="${p}" style="background:var(--${c})"></i></div></div>`; };
   $("week").innerHTML = A.map(a => { const w = a.weeks[a.weeks.length-1] || {};
-    return `<div class="ath">${who(a)}${m("km", w.km, w.km_t, a.c)}${m("long run", w.lr, w.lr_t, a.c)}</div>`; }).join("");
+    return `<div class="ath">${who(a)}${m("km", w.km, w.km_t, a.c)}${m("long run", w.lr >= 10 ? w.lr : null, w.lr_t, a.c)}</div>`; }).join("");
   const S = DATA.score;
   if (!S || A.length < 2) { $("score").innerHTML = ""; return; }
   const [x, y] = A.map(a => a.week_stats);

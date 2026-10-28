@@ -142,17 +142,19 @@ def main(argv=None):
     cfg = load_config(args.config)
     athletes = pick_athletes(cfg, args.who)
     since = dt.date.fromisoformat(args.since or cfg["since"])
+    ok = True
     if args.command in ("all", "sync"):
-        cmd_sync(cfg, athletes, since)
+        ok = cmd_sync(cfg, athletes, since)
     if args.command == "check":
         cmd_check(cfg, athletes)
     if args.command in ("all", "build"):
-        cmd_build(cfg, cfg["athletes"])
+        ok = bool(cmd_build(cfg, cfg["athletes"])) and ok
     if args.command == "inspect":
         cmd_inspect(cfg, athletes)
     if args.command == "demo":
         cmd_demo(cfg, cfg["athletes"])
+    return 0 if ok else 1
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

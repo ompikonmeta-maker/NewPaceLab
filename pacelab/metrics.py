@@ -146,14 +146,19 @@ def riegel(sec, from_m, to_m=DIST["Full"]):
 
 
 def marathon_estimate(eff, on_date):
-    """Riegel estimate from the longest distance with an effort in the last
-    120 days (Half > 10K > 5K). Returns (sec, source) or (None, None)."""
+    """Best (fastest) Riegel estimate over the 5K / 10K / Half efforts of the
+    last 120 days. Most long efforts sit inside easy long runs, so the best
+    prediction is the one closest to a real race effort.
+    Returns (sec, source) or (None, None)."""
     lo = on_date - dt.timedelta(days=EST_WINDOW_DAYS)
+    best = (None, None)
     for k in ("Half", "10K", "5K"):
         recent = [s for date, s, _ in eff.get(k, []) if lo <= d(date) <= on_date]
         if recent:
-            return round(riegel(min(recent), DIST[k])), k
-    return None, None
+            est = round(riegel(min(recent), DIST[k]))
+            if best[0] is None or est < best[0]:
+                best = (est, k)
+    return best
 
 
 def estimate_series(eff, start, today):
@@ -222,7 +227,7 @@ def light(wellness, day):
         level = "hijau"
     else:
         level = "kuning"
-    if rhr_up:
+    if abs(round(rhr_up)) >= 1:
         why.append("RHR %+d" % round(rhr_up))
     return {"level": level, "hrv": w.get("hrv"), "hrv_status": st, "bb": bb,
             "sleep_s": sl, "rhr": rhr(w), "notes": why}
