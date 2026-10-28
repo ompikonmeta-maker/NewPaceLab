@@ -37,7 +37,9 @@ def athlete_data(a, data_dir, today):
     for w in weeks:
         dd = m.decoupling_detail(streams[w["lr_id"]]) if w["lr_id"] in streams else None
         w["dec"] = dd and dd["pct"]
-        w["decd"] = dd and {"date": run_date.get(w["lr_id"]), "h": dd["h"]}
+        # rated only for steady long runs >= 20 km (not race weeks), docs §6
+        w["decd"] = dd and {"date": run_date.get(w["lr_id"]), "km": w["lr"], "h": dd["h"], "full": dd["full"], "hf": dd["hf"],
+                            "rated": bool(w["lr"] and w["lr"] >= 20 and not w["event"])}
     weight_t = {x["ms"]: x["kg"] for x in prog["weight"]}
     for w in weeks:
         kgs = [well[k]["weight"] for k in well
@@ -62,7 +64,7 @@ def athlete_data(a, data_dir, today):
     last_done = done[-1] if done else None
     return {
         "id": a["id"], "name": a["name"],
-        "program": prog,
+        "program": prog, "weight_floor": a.get("weight_floor"),
         "has_data": bool(runs or well),
         "longest": max([r["km"] for r in in_program] or [0]),
         "weeks": weeks,
@@ -142,7 +144,7 @@ def _slim(x, color):
     return {
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
-        "target": tgt, "sleep_min": prog["sleep"].get("min"),
+        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "sleep_min": prog["sleep"].get("min"),
         "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],

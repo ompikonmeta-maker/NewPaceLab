@@ -34,14 +34,24 @@ class StreamTest(unittest.TestCase):
     def test_decoupling(self):
         flat = stream(540, 15, hr=145)
         self.assertAlmostEqual(m.decoupling(flat), 0.0, delta=0.2)
-        drift = stream(540, 15, hr=lambda t: 140 if t < 4050 else 154)  # +10% HR in 2nd half
-        self.assertAlmostEqual(m.decoupling(drift), 9.1, delta=0.3)
-        self.assertIsNone(m.decoupling(stream(540, 2)))  # too short
+        drift = stream(540, 15, hr=lambda t: 140 if t < 4050 else 154)  # +10% HR in the 2nd half
         r = m.decoupling_detail(drift)
-        (k1, s1, h1), (k2, s2, h2) = r["h"]
+        self.assertAlmostEqual(r["full"], 9.1, delta=0.3)  # all records: halves split exactly at the HR step
+        # rated version drops the first 3 km, so its 1st half already holds some 154-bpm records
+        self.assertTrue(0 < r["pct"] < r["full"])
         self.assertEqual(r["pct"], m.decoupling(drift))
-        e1, e2 = k1 / s1 / h1, k2 / s2 / h2  # the working shown in the dashboard gives the same result
+        self.assertIsNone(m.decoupling(stream(540, 2)))  # too short
+        (n1, k1, v1, h1), (n2, k2, v2, h2) = r["h"]
+        self.assertLessEqual(abs(n1 - n2), 1)  # split by record count
+        e1, e2 = v1 / h1, v2 / h2  # the working shown in the dashboard gives the same result
         self.assertAlmostEqual((e1 - e2) / e1 * 100, r["pct"], delta=0.06)
+
+    def test_decoupling_filters_records(self):
+        s = stream(540, 15, hr=lambda t: 70 if t < 1000 else 150)  # HR <= 80 is dropped
+        self.assertAlmostEqual(m.decoupling(s), 0.0, delta=0.2)
+        s = stream(540, 15, hr=150)
+        s["d"][200:260] = [s["d"][199]] * 60  # standing still (speed 0) is dropped
+        self.assertAlmostEqual(m.decoupling(s), 0.0, delta=0.3)
 
 
 PROGRAM = {"ms1": "2026-06-22", "total_weeks": 51, "weeks": [
@@ -105,10 +115,16 @@ class LightTest(unittest.TestCase):
     def test_checks_explain_the_level(self):
         s = lambda: {c["k"]: c["s"] for c in m.light(self.w, self.day)["checks"]}
         self.assertEqual(s(), {"hrv": "ok", "bb": "ok", "sleep": "ok", "rhr": "ok"})
-        self.set(sleep_s=5.5 * 3600, bb=55)
+        self.set(sleep_s=5.5 * 3600, bb=45)
         self.assertEqual(s(), {"hrv": "ok", "bb": "warn", "sleep": "warn", "rhr": "ok"})
         self.set(bb=35, rhr=60, hrv_status="NONE")
         self.assertEqual(s(), {"hrv": None, "bb": "bad", "sleep": "warn", "rhr": "bad"})
+
+    def test_green_needs_body_battery_50(self):  # morning gate, docs §7
+        self.set(bb=50)
+        self.assertEqual(m.light(self.w, self.day)["level"], "hijau")
+        self.set(bb=49)
+        self.assertEqual(m.light(self.w, self.day)["level"], "kuning")
 
     def test_no_hrv_reading_and_sleep_rhr(self):
         self.set(hrv_status="NONE")

@@ -414,7 +414,12 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .xtabs button[aria-selected="true"]{color:var(--text)}
 .xtabs .sl{position:absolute;top:3px;bottom:3px;left:0;border-radius:8px;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.1);transition:transform .45s cubic-bezier(.34,1.3,.64,1),width .45s cubic-bezier(.34,1.3,.64,1)}
 .calc{border:1px solid var(--line);border-radius:14px;padding:12px 14px;transition:opacity .2s} .calc.fade{opacity:0}
-.calc .run{font-size:13px;color:var(--muted);margin-bottom:8px} .calc .run b{color:var(--text);font-weight:650}
+.calc .run{font-size:13px;color:var(--muted);margin-bottom:8px}
+.vseg{display:inline-flex;background:var(--bg);border-radius:10px;padding:3px;margin-bottom:8px;flex-wrap:wrap}
+.vseg button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;color:var(--text-2);padding:4px 10px;border-radius:7px;cursor:pointer;transition:background .2s}
+.vseg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.both{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px} .both div{border:1px solid var(--line);border-radius:10px;padding:6px 10px;font-size:12.5px;transition:border-color .3s}
+.both b{display:block;font-size:15px;color:var(--text)} .both .on{border-color:var(--text)} .calc .run b{color:var(--text);font-weight:650}
 .ct{width:100%;border-collapse:collapse;font-size:13.5px;font-variant-numeric:tabular-nums}
 .ct th{white-space:nowrap;padding:0 0 6px 10px;font-size:12px;font-weight:600;color:var(--muted);text-align:right} .ct th:first-child{text-align:left;padding-left:0}
 .ct td{padding:5px 0 5px 10px;border-top:1px solid var(--line);text-align:right;color:var(--text);white-space:nowrap} .ct td:first-child{text-align:left;color:var(--text-2);white-space:normal;padding-left:0}
@@ -513,8 +518,8 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="grid">
   <section class="card c6"><h3>Jarak per minggu <small>km</small></h3><div class="insight" id="in-km"></div><div class="chart" id="ch-km"></div></section>
   <section class="card c6"><h3>Long run <small>km</small></h3><div class="insight" id="in-lr"></div><div class="chart" id="ch-lr"></div></section>
-  <section class="card c6"><h3><span class="h3t">Decoupling<button class="info" id="dec-info" aria-expanded="false" aria-haspopup="dialog" aria-label="Apa itu decoupling?"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M12 11v7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></span><small>% · target &lt; 8</small></h3><div class="insight" id="in-dec"></div><div class="chart" id="ch-dec"></div></section>
-  <section class="card c6"><h3>Berat vs target <small>kg</small></h3><div class="insight" id="in-wt"></div><div class="chart" id="ch-wt"></div></section>
+  <section class="card c6"><h3><span class="h3t">Decoupling<button class="info" id="dec-info" aria-expanded="false" aria-haspopup="dialog" aria-label="Apa itu decoupling?"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M12 11v7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></span><small>% tanpa 3 km pertama · target &lt; 8</small></h3><div class="insight" id="in-dec"></div><div class="chart" id="ch-dec"></div></section>
+  <section class="card c6"><h3>Berat vs target <small>kg · selisih dari target Excel</small></h3><div class="insight" id="in-wt"></div><div class="chart" id="ch-wt"></div></section>
 </div>
 
 <div class="section"><div><h2>Pemulihan</h2><p>Data harian dari jam Garmin.</p></div>
@@ -523,7 +528,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="grid">
   <section class="card c12"><h3>Lampu harian <small>aturan "Tidur dan Pemulihan" di Excel</small></h3><div class="strip" id="strip"></div>
     <div class="lgd">
-      <div><b><i style="background:var(--good)"></i>Hijau</b>Siap latihan sesuai rencana. Syarat: HRV seimbang, Body Battery &gt; 60, tidur ≥ 6 jam.</div>
+      <div><b><i style="background:var(--good)"></i>Hijau</b>Siap latihan sesuai rencana. Syarat: HRV seimbang, Body Battery ≥ 50, tidur ≥ 6 jam.</div>
       <div><b><i style="background:#e9b949"></i>Kuning</b>Latihan keras jadi easy. Muncul bila ada syarat Hijau yang tidak terpenuhi.</div>
       <div><b><i style="background:#e98a5c"></i>Oranye</b>Easy/recovery saja. HRV rendah 2 hari, Body Battery &lt; 40, atau detak istirahat naik +5.</div>
       <div><b><i style="background:var(--crit)"></i>Merah</b>Istirahat. HRV rendah 3 hari, atau detak istirahat naik +7.</div></div>
@@ -599,15 +604,15 @@ const line = (a, html) => `<div><i class="dot ${a.c}" aria-hidden="true"></i><sp
 // one plain-language suggestion under every yellow / red status (green gets none)
 const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const TIPS = {
-  km: {warn: "Tambah satu lari santai pendek (3–5 km). Jangan dikejar sekaligus.", serious: "Kembali ikuti jadwal minggu ini. Pilih jam lari tetap supaya tidak bolong."},
-  lr: {warn: "Lari lebih pelan supaya kuat sampai selesai. Boleh jalan kaki sebentar tiap 3 km.", serious: "Jangan menambah jarak dulu. Ulangi jarak minggu lalu dengan tempo santai."},
-  dec: {warn: "Mulai long run lebih pelan dan minum tiap 20–30 menit.", serious: "Long run berikutnya lebih lambat dan cukup tidur malam sebelumnya. Jangan tambah jarak dulu."},
-  wtUp: {warn: "Kurangi gorengan dan minuman manis. Porsi makan malam sedikit lebih kecil.", serious: "Kurangi gorengan dan minuman manis, porsi malam lebih kecil. Jangan diet ketat di minggu long run."},
-  wtDown: {warn: "Makan lebih cukup, tambah nasi/roti dan protein setelah lari.", serious: "Makan lebih cukup, tambah nasi/roti dan protein setelah lari. Turun terlalu cepat bikin lemas."},
-  sleep: {warn: "Tidur 30 menit lebih awal. Jauhkan HP 30 menit sebelum tidur.", serious: "Buat jam tidur tetap, kamar gelap dan sejuk, stop kopi setelah jam 2 siang."},
-  hrv: {warn: "Tubuh sedang menyesuaikan beban latihan. Jaga tidur dan minum, sesi keras secukupnya.", serious: "Tubuh capek. 2–3 hari lari santai atau istirahat, tidur lebih lama, hindari alkohol."},
-  bb: {warn: "Energi belum penuh. Tidur lebih awal, ganti satu sesi keras dengan lari santai.", serious: "Energi rendah. Hari ini istirahat atau lari santai pendek; cek tidur, stres, dan makan."},
-  est: {warn: "Masih dekat. Jaga km mingguan dan jangan lewatkan long run serta sesi tempo.", serious: "Fokus konsisten dulu. Kalau 2–3 bulan tetap jauh, pakai target B/C di Excel."}};
+  km: {warn: "Jangan dikejar sekaligus. Naik lebih dari 30% dalam 2 minggu menaikkan risiko cedera.", serious: "Kembali ke jadwal. Libur ≤ 7 hari: ulangi minggu sebelumnya. Libur 8–21 hari: mundur 2–3 minggu."},
+  lr: {warn: "Buka pelan: 3 km pertama di pace recovery. Berhenti di 210 menit, berapa pun km-nya.", serious: "Jangan kejar jarak. Long run paling jauh 1,1 × lari terpanjang 30 hari terakhir."},
+  dec: {warn: "Buka pelan: 3 km pertama di pace recovery, pindah ke easy di km 4–6. HR mengalahkan pace."},
+  wtFast: {warn: "Kurangi defisit. Turun pelan menjaga otot; paling banyak 0,5 kg per minggu."},
+  wtFloor: {serious: "Tambah porsi makan sampai rata-rata 4 minggu kembali di atas batas bawah."},
+  sleep: {warn: "Kejar target tidur minimal. Malam sebelum long run tidur 7 jam.", serious: "Tidur kurang: ikuti gerbang pagi, long run dipotong 20–40%."},
+  hrv: {warn: "HRV di bawah normal: latihan keras hari ini jadi lari santai.", serious: "HRV rendah berhari-hari: lari santai saja sampai kembali normal."},
+  bb: {warn: "Body Battery di bawah 50: long run dipotong 20%, pace recovery.", serious: "Di bawah 40 dan tidur kurang dari 5 jam: long run dipotong 40%."},
+  est: {warn: "Masih di target C. Jaga km mingguan dan long run; pace dikunci lagi setelah Half 23 Jan.", serious: "Di luar target C. Fokus konsisten dulu; target dievaluasi ulang setelah lomba kalibrasi."}};
 const tip = (k, lvl) => TIPS[k] && TIPS[k][lvl] ? `<span class="sug">${BULB}<b>Saran:</b> ${TIPS[k][lvl]}</span>` : "";
 
 // hover hint for non-chart elements (badges, light cells, chips)
@@ -658,12 +663,15 @@ function countUp(el) {
 }
 
 // ---------------------------------------------------------------- level 1: summary per athlete
+// status = which Excel target zone (A/B/C) the plain estimate falls in; the +5% heat figure is shown, not rated (docs §3)
+const HEAT = 1.05;
 function estStatus(a) {
-  const t = a.target || {}, e = a.est.sec;
-  if (e == null || !t.hi) return ["none", "Belum ada estimasi"];
-  if (e <= t.hi) return ["good", "Sesuai target"];
-  if (e <= t.hi + 900) return ["warn", "Mendekati target"];
-  return ["serious", "Di luar target"];
+  const T = a.targets || {}, e = a.est.sec, hi = k => (T[k] || {}).hi;
+  if (e == null || !hi("B")) return ["none", "Belum ada estimasi"];
+  if (hi("A") && e <= hi("A")) return ["good", "Masuk target A"];
+  if (e <= hi("B")) return ["good", "Masuk target B"];
+  if (hi("C") && e <= hi("C")) return ["warn", "Masuk target C"];
+  return ["serious", hi("C") ? "Di luar target C" : "Di luar target B"];
 }
 const targetTxt = t => !t || !t.hi ? "–" : t.lo && t.lo !== t.hi ? `${hm(t.lo)}–${hm(t.hi)}` : hms(t.hi);
 function renderSummary() {
@@ -676,7 +684,7 @@ function renderSummary() {
     const lr = w.lr >= 10 ? w.lr : null;
     const st = l && l.hrv_status ? l.hrv_status[0] + l.hrv_status.slice(1).toLowerCase() : "–";
     const head = !a.has_data ? "Belum ada data. Jalankan Update Dashboard." :
-      `${L ? `Hari ini ${L[1].toLowerCase()}: ${L[2]}.` : ""} Est. maraton ${hm(a.est.sec)}, ${es[1].toLowerCase()}.`;
+      `${L ? `Hari ini ${L[1].toLowerCase()}: ${L[2]}.` : ""} Est. maraton ${hm(a.est.sec)}, ${es[1][0].toLowerCase() + es[1].slice(1)}.`;
     return `<section class="card ${span} sum" aria-label="Ringkasan ${a.name}">
       <div class="top">${who(a)}${L ? lchip(a, L) : chip("none", "Tidak ada data")}</div>
       <p class="headline">${head}${whyLine(l)}</p>
@@ -875,8 +883,10 @@ function draw(id, {x, series, h = 220, ymin, ymax, invert = false, refs = [], ba
 // ---------------------------------------------------------------- level 3: training (weekly, period filter)
 let WK = 12, DAYN = 14;
 const lvlPct = p => p == null ? "none" : p >= .9 ? "good" : p >= .75 ? "warn" : "serious";
-const lvlDec = v => v == null ? "none" : v < 8 ? "good" : v < 12 ? "warn" : "serious";
-const DECTXT = {good: "Baik", warn: "Perlu diperbaiki", serious: "Buruk", none: "Belum ada"};
+// docs §6: < 5% good aerobic endurance [Friel], target < 8% for long runs >= 20 km [coach]
+const lvlDec = v => v == null ? "none" : v < 8 ? "good" : "warn";
+const decTxt = v => v == null ? "Belum ada" : v < 5 ? "Bagus" : v < 8 ? "Sesuai target" : "Belum sampai target";
+const decWhyNot = d => !d ? "" : d.rated ? "" : d.km < 20 ? "dinilai hanya ≥ 20 km" : "minggu lomba";
 function weekly() {
   const done = A[0].weeks.filter(w => w.done);
   const from = WK ? Math.max(0, done.length - WK) : 0;
@@ -900,17 +910,26 @@ function weekly() {
     detail: (a, k, v, tv) => { const w = wkOf(a, k); return (tv && v != null ? `${pct(v / tv)} dari target` : "") + flag(w); },
     series: [...V().map(a => ({c: a.c, v: col(a, "lr_t"), target: 1})), ...V().map(a => ({c: a.c, v: col(a, "lr")}))]});
 
-  $("in-dec").innerHTML = V().map(a => { const vs = col(a, "dec").filter(v => v != null); const v = vs[vs.length - 1], prev = mean(vs.slice(-4, -1));
-    const trend = v == null || prev == null ? "" : v < prev - .5 ? " · membaik" : v > prev + .5 ? " · memburuk" : " · stabil";
-    return line(a, `${chip(lvlDec(v), DECTXT[lvlDec(v)])}<span>${v == null ? "belum ada long run ≥ 10 km" : `terakhir <b>${f1(v)}%</b>${trend}`}</span>${tip("dec", lvlDec(v))}`); }).join("");
-  chart("ch-dec", {x: X, xlab: wl, ymin: 0, gaps: false, refs: [{y: 8}], label: "Decoupling long run, target di bawah 8 persen",
-    fmtV: v => f1(v) + "%", detail: (a, k, v) => v == null ? "" : DECTXT[lvlDec(v)] + " · < 8 baik, ≥ 12 buruk",
+  $("in-dec").innerHTML = V().map(a => { const ws = idx.map(i => a.weeks[i]).filter(w => w && w.dec != null), w = ws[ws.length - 1], v = w && w.dec;
+    const rated = ws.filter(x => x.decd && x.decd.rated).map(x => x.dec), prev = mean(rated.slice(-4, -1)), why = w ? decWhyNot(w.decd) : "";
+    const trend = !w || why || prev == null ? "" : v < prev - .5 ? " · membaik" : v > prev + .5 ? " · memburuk" : " · stabil";
+    if (!w) return line(a, `${chip("none", "Belum ada")}<span>belum ada long run ≥ 10 km</span>`);
+    if (why) return line(a, `${chip("none", "Tidak dinilai")}<span>terakhir <b>${f1(v)}%</b> · ${f1(w.lr)} km <span class="muted">(${why})</span></span>`);
+    return line(a, `${chip(lvlDec(v), decTxt(v))}<span>terakhir <b>${f1(v)}%</b> · ${f1(w.lr)} km${trend}</span>${tip("dec", lvlDec(v))}`); }).join("");
+  chart("ch-dec", {x: X, xlab: wl, ymin: 0, gaps: false, refs: [{y: 8}, {y: 5}], label: "Decoupling long run tanpa 3 km pertama, target di bawah 8 persen",
+    fmtV: v => f1(v) + "%", detail: (a, k, v) => { if (v == null) return ""; const d = wkOf(a, k).decd, why = decWhyNot(d);
+      return (why ? `tidak dinilai (${why})` : decTxt(v)) + (d && d.full != null ? ` · data penuh ${f1(d.full)}%` : ""); },
     series: V().map(a => ({c: a.c, area: false, v: col(a, "dec")}))});
 
   const diff = a => idx.map(i => { const w = a.weeks[i] || {}; return w.kg != null && w.kg_t != null ? Math.round((w.kg - w.kg_t)*10)/10 : null; });
-  $("in-wt").innerHTML = V().map(a => { const ds = diff(a).filter(v => v != null), v = ds[ds.length - 1];
-    const lvl = v == null ? "none" : Math.abs(v) <= .5 ? "good" : Math.abs(v) <= 1.5 ? "warn" : "serious";
-    return line(a, `${chip(lvl, v == null ? "Belum ditimbang" : Math.abs(v) <= .5 ? "Sesuai rencana" : v > 0 ? "Di atas target" : "Di bawah target")}<span>${v == null ? "timbang Minggu pagi" : `selisih <b>${v > 0 ? "+" : ""}${f1(v)} kg</b>`}</span>${v == null ? "" : tip(v > 0 ? "wtUp" : "wtDown", lvl)}`); }).join("");
+  // docs §9: lose at most 0.5 kg/week; 4-week average must stay above the floor (config weight_floor)
+  $("in-wt").innerHTML = V().map(a => { const kg = a.weeks.filter(w => w.done && w.kg != null).slice(-4).map(w => w.kg);
+    if (!kg.length) return line(a, `${chip("none", "Belum ditimbang")}<span>timbang Minggu pagi</span>`);
+    const avg = mean(kg), n = kg.length, xm = (n - 1) / 2;
+    const rate = n >= 3 ? kg.reduce((s, y, i) => s + (i - xm) * (y - avg), 0) / kg.reduce((s, y, i) => s + (i - xm) ** 2, 0) : null;
+    const floor = a.weight_floor, lvl = floor && avg < floor ? "serious" : rate != null && rate < -.5 ? "warn" : "good";
+    return line(a, `${chip(lvl, lvl === "serious" ? "Di bawah batas" : lvl === "warn" ? "Turun terlalu cepat" : "Aman")}<span>rata ${n} mgg <b>${f1(avg)}</b>${rate == null ? "" :
+      Math.abs(rate) < .05 ? " · stabil" : ` · ${rate < 0 ? "turun" : "naik"} <b>${Math.abs(rate).toFixed(1)} kg/mgg</b>`}${floor ? ` · batas bawah ${floor}` : ""}</span>${tip(lvl === "serious" ? "wtFloor" : "wtFast", lvl)}`); }).join("");
   chart("ch-wt", {x: X, xlab: wl, gaps: false, refs: [{y: 0}], minSpan: 3, label: "Selisih berat terhadap target mingguan",
     fmtV: v => (v > 0 ? "+" : "") + f1(v) + " kg", detail: (a, k) => { const w = wkOf(a, k); return w.kg != null ? `${f1(w.kg)} kg · target ${f1(w.kg_t)}` : ""; },
     series: V().map(a => ({c: a.c, area: false, v: diff(a)}))});
@@ -944,10 +963,10 @@ function daily() {
     detail: (a, k) => { const s = a.days.slice(-DAYN)[k].hrv_status; return s ? s[0] + s.slice(1).toLowerCase() : ""; },
     series: V().map(a => ({c: a.c, area: false, v: pick(a, "hrv")}))});
 
-  $("in-bb").innerHTML = V().map(a => { const m = mean(pick(a, "bb")); const lvl = m == null ? "none" : m > 60 ? "good" : m >= 40 ? "warn" : "serious";
-    return line(a, `${chip(lvl, m == null ? "Belum ada" : m > 60 ? "Pulih" : m >= 40 ? "Sedang" : "Rendah")}<span>rata <b>${m == null ? "–" : Math.round(m)}</b> · > 60 hijau, < 40 oranye</span>${tip("bb", lvl)}`); }).join("");
-  chart("ch-bb", {x: DX, xlab: dl, h: 200, ymin: 0, ymax: 100, refs: [{y: 60}, {y: 40}], fmtV: v => String(v), label: "Body Battery pagi",
-    detail: (a, k, v) => v == null ? "" : v > 60 ? "> 60: syarat hijau" : v >= 40 ? "40–60: kuning" : "< 40: oranye",
+  $("in-bb").innerHTML = V().map(a => { const m = mean(pick(a, "bb")); const lvl = m == null ? "none" : m >= 50 ? "good" : m >= 40 ? "warn" : "serious";
+    return line(a, `${chip(lvl, m == null ? "Belum ada" : m >= 50 ? "Pulih" : m >= 40 ? "Sedang" : "Rendah")}<span>rata <b>${m == null ? "–" : Math.round(m)}</b> · ≥ 50 hijau, < 40 oranye</span>${tip("bb", lvl)}`); }).join("");
+  chart("ch-bb", {x: DX, xlab: dl, h: 200, ymin: 0, ymax: 100, refs: [{y: 50}, {y: 40}], fmtV: v => String(v), label: "Body Battery pagi",
+    detail: (a, k, v) => v == null ? "" : v >= 50 ? "≥ 50: syarat hijau" : v >= 40 ? "40–49: kuning" : "< 40: oranye",
     series: V().map(a => ({c: a.c, area: false, v: pick(a, "bb")}))});
 }
 
@@ -961,7 +980,8 @@ function renderPB() {
       series: V().map(a => ({c: a.c, dots: true, area: false, v: (a.pb[k] || []).map(p => [D(p.date).getTime(), p.sec])}))});
   });
   $("pb-Full").innerHTML = V().map(a => `<span><i class="dot ${a.c}"></i> <b>${num(a.est.sec, "hm")}</b></span>`).join("");
-  $("in-Full").innerHTML = V().map(a => { const s = estStatus(a); return line(a, `${chip(s[0], s[1])}<span class="muted">${targetTxt(a.target)}</span>${tip("est", s[0])}`); }).join("");
+  $("in-Full").innerHTML = V().map(a => { const s = estStatus(a), T = a.targets || {};
+    return line(a, `${chip(s[0], s[1])}<span>${a.est.sec ? `+ panas <b>${hm(a.est.sec * HEAT)}</b> · ` : ""}<span class="muted">${["A", "B", "C"].filter(k => T[k] && T[k].hi).map(k => `${k} ≤ ${hm(T[k].hi)}`).join(" · ")}</span></span>${tip("est", s[0])}`); }).join("");
   chart("ch-Full", {xnum: true, invert: true, time: true, h: 180, fmtY: hm, fmtV: hm, label: "Estimasi waktu maraton per akhir bulan dibanding target",
     detail: (a, k) => { const p = a.est.series.find(q => D(q.date).getTime() === k); return p ? `dari usaha ${p.from}` : ""; },
     bands: V().filter(a => a.target && a.target.hi).map(a => ({c: a.c, y: [a.target.lo || a.target.hi - 600, a.target.hi]})),
@@ -1182,7 +1202,7 @@ const ckSvg = s => `<svg viewBox="0 0 24 24" aria-hidden="true">${CK[s || "none"
 const HRVT = {BALANCED: "Seimbang", UNBALANCED: "Tidak seimbang", LOW: "Rendah", POOR: "Buruk"};
 function ckRow(c) { const no = "tidak ada data";
   if (c.k === "hrv") return {n: "HRV", v: c.v ? HRVT[c.v] || c.v : no, need: c.low >= 2 ? `rendah ${c.low} hari berturut-turut` : "harus seimbang", sh: c.low >= 2 ? `rendah ${c.low} hari` : "harus seimbang"};
-  if (c.k === "bb") return {n: "Body Battery", v: c.v == null ? no : Math.round(c.v), need: c.s === "bad" ? "di bawah 40" : "harus > 60", sh: c.s === "bad" ? "< 40" : "> 60"};
+  if (c.k === "bb") return {n: "Body Battery", v: c.v == null ? no : Math.round(c.v), need: c.s === "bad" ? "di bawah 40" : "harus ≥ 50", sh: c.s === "bad" ? "< 40" : "≥ 50"};
   if (c.k === "sleep") return {n: "Tidur", v: c.v ? hm(c.v).replace(":", " j ") + " m" : no, need: "minimal 6 jam", sh: "≥ 6 jam"};
   return {n: "Detak istirahat", v: c.v == null ? no : `${c.v > 0 ? "+" : c.v < 0 ? "−" : "±"}${Math.abs(Math.round(c.v))} bpm`, need: "vs median 28 hari, aman bila < +5", sh: "aman < +5"};
 }
@@ -1195,10 +1215,10 @@ function whyLine(l) { if (!l || !l.checks) return "";
 }
 const lchip = (a, L) => chip(L[0], L[1]).replace('<span class="chip', `<button type="button" data-lc="${a.c}" aria-expanded="false" aria-haspopup="dialog" aria-label="${a.name}: lampu ${L[1]}, lihat rincian" class="chip`).replace(/<\/span>$/, CV + "</button>");
 const LTIP = {
-  hrv: {warn: "Tubuh sedang menyesuaikan beban. Sesi keras jadi santai, tidur dan minum cukup.", bad: "Tubuh belum pulih. 1–2 hari lari santai saja, hindari kafein sore dan alkohol."},
-  bb: {warn: "Energi belum penuh. Tidur lebih awal malam ini, hari ini cukup lari santai.", bad: "Energi rendah. Hari ini istirahat atau lari santai pendek."},
-  sleep: {warn: "Malam ini tidur 30–60 menit lebih awal, jauhkan HP sebelum tidur."},
-  rhr: {bad: "Bisa tanda capek atau mau sakit. Minum cukup; kalau badan tidak enak, istirahat."}};
+  hrv: {warn: "Latihan keras hari ini jadi lari santai.", bad: "HRV rendah berhari-hari: lari santai saja."},
+  bb: {warn: "Di bawah 50: long run dipotong 20%, pace recovery.", bad: "Di bawah 40 dan tidur kurang dari 5 jam: long run dipotong 40%."},
+  sleep: {warn: "Di bawah 6 jam: long run dipotong 20%. Malam ini kejar target tidur."},
+  rhr: {bad: "Naik 5 atau lebih: latihan keras jadi lari santai."}};
 const lpop = $("lpop"); let lpFor = null;
 function lpClose() { lpop.classList.remove("on"); lpFor = null; document.querySelectorAll("[data-lc]").forEach(x => x.setAttribute("aria-expanded", "false")); }
 document.addEventListener("click", e => {
@@ -1306,39 +1326,44 @@ const sbarSize = pvS.size, sbarFlash = pvS.flash;
 const xdec = $("xdec"), xS = ownScroll($("xdec-b"), $("xdec-sbar"), xdec); let xC = null;
 const SV = d => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
 const paceTx = (km, sec) => { const p = sec / km; return `${Math.floor(p / 60)}:${String(Math.round(p % 60)).padStart(2, "0")}/km`; };
+let xV = "rated";
 function decCalc(a) { const w = a.weeks.filter(x => x.decd).pop();
   if (!w) return `<div class="calc"><div class="run">Belum ada long run ≥ 10 km dengan data per detik.</div></div>`;
-  const [h1, h2] = w.decd.h, mpm = h => h[0] * 1000 / (h[1] / 60), ef = h => mpm(h) / h[2], e1 = ef(h1), e2 = ef(h2), lv = lvlDec(w.dec);
-  return `<div class="calc" id="xdec-calc"><div class="run">Long run <b>${w.decd.date ? hari(w.decd.date) : range(w.start)}</b> · ${f1(h1[0] + h2[0])} km · ${hms(h1[1] + h2[1])} waktu bergerak, dibagi dua sama lama (berhenti tidak dihitung)</div>
-    <table class="ct"><tr><th></th><th>Separuh 1</th><th>Separuh 2</th></tr>
-    <tr style="--i:0"><td>Jarak</td><td>${h1[0].toFixed(2)} km</td><td>${h2[0].toFixed(2)} km</td></tr>
-    <tr style="--i:1"><td>Waktu</td><td>${hms(h1[1])}</td><td>${hms(h2[1])}</td></tr>
-    <tr style="--i:2"><td>Pace</td><td>${paceTx(h1[0], h1[1])}</td><td>${paceTx(h2[0], h2[1])}</td></tr>
-    <tr style="--i:3"><td>Kecepatan<small>meter per menit</small></td><td>${mpm(h1).toFixed(1)}</td><td>${mpm(h2).toFixed(1)}</td></tr>
-    <tr style="--i:4"><td>Detak jantung rata-rata</td><td>${Math.round(h1[2])}</td><td>${Math.round(h2[2])}${Math.round(h2[2] - h1[2]) ? `<span class="up">${h2[2] > h1[2] ? "+" : "−"}${Math.abs(Math.round(h2[2] - h1[2]))}</span>` : ""}</td></tr>
-    <tr class="ef" style="--i:5"><td>Meter per detak<small>kecepatan ÷ detak jantung</small></td><td>${e1.toFixed(4)}</td><td>${e2.toFixed(4)}</td></tr></table>
-    <div class="fx2">${w.dec >= 0 ? `Separuh kedua lebih boros ${f1(w.dec)}% (meter per detak turun):` : `Separuh kedua malah lebih hemat ${f1(-w.dec)}%:`}
-      <div class="eq">(${e1.toFixed(4)} − ${e2.toFixed(4)}) ÷ ${e1.toFixed(4)} = <b>${f1(w.dec)}%</b>${chip(lv, DECTXT[lv])}</div></div></div>`; }
+  const d = w.decd, H = xV === "full" && d.hf ? d.hf : d.h, [h1, h2] = H, mpm = h => h[2] * 60, ef = h => mpm(h) / h[3], e1 = ef(h1), e2 = ef(h2);
+  const pct = (e1 - e2) / e1 * 100, why = decWhyNot(d), lv = why ? "none" : lvlDec(d.pct);
+  return `<div class="calc" id="xdec-calc"><div class="run">Long run <b>${d.date ? hari(d.date) : range(w.start)}</b> · ${f1(d.km)} km. Dipakai record dengan HR &gt; 80 dan kecepatan &gt; 0,6 m/s, dibagi dua menurut <b>jumlah record</b>.</div>
+    ${d.hf ? `<div class="vseg" id="xdec-v"><button aria-pressed="${xV !== "full"}" data-v="rated">Tanpa 3 km pertama (dinilai)</button><button aria-pressed="${xV === "full"}" data-v="full">Data penuh</button></div>` : ""}
+    <table class="ct"><tr><th></th><th>Paruh 1</th><th>Paruh 2</th></tr>
+    <tr style="--i:0"><td>Jumlah record</td><td>${h1[0]}</td><td>${h2[0]}</td></tr>
+    <tr style="--i:1"><td>Jarak</td><td>${h1[1].toFixed(2)} km</td><td>${h2[1].toFixed(2)} km</td></tr>
+    <tr style="--i:2"><td>Kecepatan rata-rata<small>meter per menit</small></td><td>${mpm(h1).toFixed(1)}</td><td>${mpm(h2).toFixed(1)}</td></tr>
+    <tr style="--i:3"><td>Detak jantung rata-rata</td><td>${h1[3].toFixed(1)}</td><td>${h2[3].toFixed(1)}${Math.abs(h2[3] - h1[3]) >= .05 ? `<span class="up">${h2[3] > h1[3] ? "+" : "−"}${Math.abs(h2[3] - h1[3]).toFixed(1)}</span>` : ""}</td></tr>
+    <tr class="ef" style="--i:4"><td>Meter per detak<small>kecepatan ÷ detak jantung</small></td><td>${e1.toFixed(4)}</td><td>${e2.toFixed(4)}</td></tr></table>
+    <div class="fx2">${pct >= 0 ? "Paruh kedua lebih boros (meter per detak turun):" : "Paruh kedua malah lebih hemat:"}
+      <div class="eq">(${e1.toFixed(4)} − ${e2.toFixed(4)}) ÷ ${e1.toFixed(4)} = <b>${f1(pct)}%</b>${xV === "full" ? '<span class="muted" style="font-size:13px">info saja</span>' : chip(lv, why ? "Tidak dinilai" : decTxt(d.pct))}</div>
+      <div class="both"><div class="${xV !== "full" ? "on" : ""}">Tanpa 3 km pertama<b>${f1(d.pct)}%</b>${why ? `tidak dinilai: ${why}` : "dinilai"}</div><div class="${xV === "full" ? "on" : ""}">Data penuh<b>${d.full == null ? "–" : f1(d.full) + "%"}</b>info</div></div></div></div>`; }
 function xdecRender() { const vis = V(); if (!vis.some(a => a.c === xC)) xC = vis[0].c;
-  $("xdec-in").innerHTML = `<p>Di lari panjang dengan kecepatan yang sama, detak jantung pelan-pelan naik. Decoupling mengukur <b>seberapa besar kenaikan itu</b>: separuh pertama lari dibanding separuh kedua.</p>
+  $("xdec-in").innerHTML = `<p>Di lari panjang dengan kecepatan yang sama, detak jantung pelan-pelan naik. Decoupling mengukur <b>seberapa besar kenaikan itu</b>: paruh pertama lari dibanding paruh kedua.</p>
     <div class="ill"><svg viewBox="0 0 300 96" aria-hidden="true"><path class="gap" d="M150 40 L290 22 L290 40 Z"/><line class="half" x1="150" y1="4" x2="150" y2="80"/>
       <path class="pace" d="M10 56 C60 56 100 56 150 56 S250 56 290 56"/><path class="hr" d="M10 42 C60 41 100 40 150 40 S240 30 290 22"/>
-      <text class="lp" x="10" y="72">kecepatan tetap</text><text class="lh" x="200" y="16">detak jantung naik</text><text x="58" y="92">separuh pertama</text><text x="196" y="92">separuh kedua</text></svg></div>
+      <text class="lp" x="10" y="72">kecepatan tetap</text><text class="lh" x="200" y="16">detak jantung naik</text><text x="64" y="92">paruh pertama</text><text x="202" y="92">paruh kedua</text></svg></div>
     <div class="sec">Hitungan long run terakhir</div>
     ${vis.length > 1 ? `<div class="xtabs" role="tablist" id="xdec-tabs"><span class="sl"></span>${vis.map(a => `<button role="tab" aria-selected="${a.c === xC}" data-c="${a.c}"><i class="dot ${a.c}"></i>${a.name}</button>`).join("")}</div>` : ""}
     <div id="xdec-calcw">${decCalc(vis.find(a => a.c === xC))}</div>
     <p style="margin-top:10px">Makin kecil angkanya, makin kuat daya tahan untuk jarak itu. Jantung tidak perlu "kerja lembur" di akhir lari.</p>
     <div class="sec">Arti angka</div>
-    <div class="scale3"><div class="g"><b>&lt; 8%</b>Baik. Siap untuk jarak ini.</div><div class="w"><b>8–12%</b>Mulai kelelahan di akhir.</div><div class="s"><b>≥ 12%</b>Jarak/tempo ini masih terlalu berat.</div></div>
+    <div class="scale3"><div class="g"><b>&lt; 5%</b>Bagus. Daya tahan aerobik kuat (Friel).</div><div class="g"><b>5–8%</b>Sesuai target program, longgar karena panas.</div><div class="w"><b>≥ 8%</b>Belum sampai target.</div></div>
+    <p class="src" style="margin-top:6px">Dinilai hanya untuk long run ≥ 20 km dengan pace rata (bukan minggu lomba). Target: &lt; 8% sebelum MS43.</p>
     <div class="sec">Cara memperbaiki</div>
     <ul class="fix">${[
-      ['<path d="M4 15a8 8 0 1 1 16 0"/><path d="M12 15l-3.5-4"/>', "Mulai lebih pelan", "10–15 menit pertama sengaja lambat. Jaga detak jantung di zona santai dari program."],
-      ['<path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/>', "Minum sebelum haus", "Minum tiap 20–30 menit, tambah elektrolit kalau lebih dari 1 jam atau cuaca panas."],
-      ['<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', "Pilih jam yang sejuk", "Lari pagi. Panas membuat detak jantung naik walau kecepatan sama."],
-      ['<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>', "Tidur cukup sebelum long run", "Ikuti aturan Sabtu: tidur kurang dan Body Battery rendah bikin angka ini memburuk."],
-      ['<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>', "Tambah jarak pelan-pelan", "Perbanyak lari santai. Naikkan long run sedikit demi sedikit sesuai program (aturan 110%)."]]
+      ['<path d="M4 15a8 8 0 1 1 16 0"/><path d="M12 15l-3.5-4"/>', "Buka pelan", "3 km pertama di pace recovery (Taofik 9:15–9:45, Reza 9:20–9:50), pindah ke pace easy di km 4–6. HR mengalahkan pace."],
+      ['<path d="M12 3s-6 6.5-6 11a6 6 0 0 0 12 0c0-4.5-6-11-6-11z"/>', "Minum sesuai tes keringat", "Taofik ±0,74 L/jam, Reza ±0,77 L/jam. Berat badan jangan turun lebih dari 2%."],
+      ['<path d="M7 4h10l-1 16H8z"/><path d="M7.5 9h9"/>', "Karbo selama lari", "30–60 g/jam untuk lari 1–2,5 jam. Lebih dari 2,5 jam sampai 90 g/jam (campur glukosa dan fruktosa)."],
+      ['<circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/>', "Hati-hati panas", "Di atas 30°C perlambat 5–8%. Di atas 32°C jadikan lari santai."],
+      ['<path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/>', "Tidur sebelum long run", "Malam sebelumnya 7 jam. Ikuti gerbang pagi (tidur dan Body Battery)."],
+      ['<path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/>', "Naikkan jarak dengan aman", "Long run paling jauh 1,1 × lari terpanjang 30 hari terakhir. Berhenti di 210 menit."]]
       .map(([ic, b, t], i) => `<li style="--i:${i}"><i>${SV(ic)}</i><span><b>${b}</b>${t}</span></li>`).join("")}</ul>
-    <p class="src">Dihitung dari lari terpanjang tiap minggu (≥ 10 km). Tanjakan, sering berhenti, dan angin bisa membuat angka ikut naik.</p>`;
+    <p class="src">Rumus dan batas: docs/RUMUS-BATAS-SUMBER.md §6. Dihitung dari lari terpanjang tiap minggu (≥ 10 km). Tanjakan dan angin bisa membuat angka ikut naik.</p>`;
 }
 function xdecSlider() { const t = $("xdec-tabs"); if (!t) return; const b = t.querySelector('[aria-selected="true"]'), sl = t.querySelector(".sl");
   if (b && b.offsetWidth) { sl.style.width = b.offsetWidth + "px"; sl.style.transform = `translateX(${b.offsetLeft - 3}px)`; } }
@@ -1350,7 +1375,9 @@ $("dec-info").onclick = e => { e.stopPropagation(); if (xdec.classList.contains(
   xdec.classList.remove("on"); $("dec-info").setAttribute("aria-expanded", "true");
   requestAnimationFrame(() => requestAnimationFrame(() => { xdec.classList.add("on"); xdecSlider(); xS.size(); })); };
 $("xdec-x").onclick = xdecClose;
-xdec.addEventListener("click", e => { e.stopPropagation(); const b = e.target.closest("#xdec-tabs button"); if (!b || b.dataset.c === xC) return;
+xdec.addEventListener("click", e => { e.stopPropagation(); const v = e.target.closest("#xdec-v button");
+  if (v && v.dataset.v !== xV) { xV = v.dataset.v; $("xdec-calcw").innerHTML = decCalc(A.find(a => a.c === xC)); xS.size(); return; }
+  const b = e.target.closest("#xdec-tabs button"); if (!b || b.dataset.c === xC) return;
   xC = b.dataset.c; $("xdec-tabs").querySelectorAll("button").forEach(x => x.setAttribute("aria-selected", x === b)); xdecSlider();
   const c = $("xdec-calc") || $("xdec-calcw").firstElementChild; c.classList.add("fade");
   setTimeout(() => { $("xdec-calcw").innerHTML = decCalc(A.find(a => a.c === xC)); xS.size(); }, 200); });

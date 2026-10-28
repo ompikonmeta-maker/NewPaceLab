@@ -47,7 +47,7 @@ parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. 
 |---|---|
 | Hitung mundur, minggu program, fase, tanda lomba | Excel: Kalender, Checkpoint |
 | Ringkasan head-to-head | lampu hari ini, est. maraton, km & long run minggu ini, HRV, Body Battery, tidur, RHR, aturan Sabtu |
-| Est. maraton | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir |
+| Est. maraton | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir; ditampilkan juga + koreksi panas 5% |
 | Menuju 42K | long run terpanjang sejak awal program |
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
 | Latihan (filter 4 / 12 minggu / semua) | km, long run, decoupling, berat vs target per minggu yang sudah selesai; sumbu = tanggal awal minggu |
@@ -58,15 +58,18 @@ parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. 
 
 ### Kesimpulan di tiap grafik
 
-| Metrik | Baik | Perlu perhatian | Buruk |
-|---|---|---|---|
-| km / long run vs target | ≥ 90% | 75–90% | < 75% |
-| Decoupling (long run terakhir) | < 8% | 8–12% | ≥ 12% |
-| Berat vs target | ± 0,5 kg | ± 1,5 kg | lebih dari itu |
-| Tidur (rata-rata periode) | ≥ target minimum | sampai 30 mnt kurang | lebih dari 30 mnt kurang |
-| HRV | status terakhir Balanced, ≤ 1 hari rendah | lainnya | ≥ 3 hari rendah |
-| Body Battery (rata-rata) | > 60 | 40–60 | < 40 |
-| Est. maraton | ≤ batas atas target B | ≤ 15 mnt di atasnya | lebih dari itu |
+Rumus, batas angka, dan sumbernya ada di **[docs/RUMUS-BATAS-SUMBER.md](docs/RUMUS-BATAS-SUMBER.md)** (acuan tunggal).
+Batas bertanda **[keputusan dashboard]** tidak diatur dokumen itu.
+
+| Metrik | Baik | Perlu perhatian | Buruk | Dasar |
+|---|---|---|---|---|
+| km / long run vs target | ≥ 90% | 75–90% | < 75% | [keputusan dashboard] |
+| Decoupling (tanpa 3 km pertama, long run ≥ 20 km, bukan minggu lomba) | < 5% bagus, 5–8% sesuai target | ≥ 8% | – | dokumen §6 |
+| Berat | turun ≤ 0,5 kg/minggu, rata 4 minggu di atas batas bawah | turun > 0,5 kg/minggu | rata 4 minggu < batas bawah (65 / 73 kg, `config.json`) | dokumen §9 |
+| Tidur (rata-rata periode) | ≥ target minimum | sampai 30 mnt kurang | lebih dari 30 mnt kurang | target dari Excel; 30 mnt [keputusan dashboard] |
+| HRV | status terakhir Balanced, ≤ 1 hari rendah | lainnya | ≥ 3 hari rendah | status Garmin; 3 hari [keputusan dashboard] |
+| Body Battery (rata-rata) | ≥ 50 | 40–49 | < 40 | dokumen §7 (gerbang pagi) |
+| Est. maraton | masuk target A atau B | masuk target C | di luar target C | zona target A/B/C di Excel; dinilai dari estimasi tanpa koreksi panas |
 
 Status selalu ditampilkan sebagai warna + ikon + kata. Animasi mati otomatis bila perangkat diatur "kurangi gerakan".
 
@@ -76,15 +79,16 @@ Tabel di Excel ditulis untuk manusia; ini cara program membacanya.
 
 - **HRV normal** = status Garmin `BALANCED`. **Di bawah normal** = `LOW` atau `POOR`. Status `NONE` = tidak ada data malam itu (lampu dinilai dari BB dan tidur saja).
 - **Detak istirahat naik** = dibanding median 28 hari sebelumnya (minimal 7 hari data). RHR diambil dari ringkasan harian; kalau kosong, dari data tidur.
-- **Lampu**: MERAH (HRV di bawah normal 3 hari, atau RHR +7) → ORANYE (HRV di bawah normal 2 hari, BB < 40, atau RHR +5) → HIJAU (HRV balanced, BB > 60, tidur ≥ 6 jam) → selain itu KUNING.
+- **Lampu**: MERAH (HRV di bawah normal 3 hari, atau RHR +7) → ORANYE (HRV di bawah normal 2 hari, BB < 40, atau RHR +5) → HIJAU (HRV balanced, BB ≥ 50, tidur ≥ 6 jam; BB ≥ 50 dari gerbang pagi dokumen §7) → selain itu KUNING.
 - **Kenapa lampu tidak hijau**: di bawah kalimat ringkasan tertulis syarat yang kurang; klik lampunya untuk rincian
   empat syarat (HRV, Body Battery, tidur, detak istirahat) beserta nilai hari itu dan batasnya.
 - **Body Battery harian** = nilai tertinggi hari itu (setelah tidur).
 - **Aturan Sabtu**: tidur < 5 jam + BB < 30 + HRV di bawah normal → *Ganti easy 8 km*; tidur < 5 jam + BB < 40 → *Potong 40%*; tidur ≥ 6 jam + BB ≥ 50 → *Jalankan*; selain itu → *Potong 20%*.
-- **Decoupling** = efisiensi (kecepatan ÷ HR) separuh pertama vs kedua waktu bergerak, pada lari terpanjang minggu itu (≥ 10 km).
-  Tombol ⓘ di kartu Decoupling menampilkan penjelasan, hitungan lengkap long run terakhir (jarak, waktu, pace,
-  detak rata-rata, meter per detak tiap separuh) dan cara memperbaikinya.
-- **Saran**: setiap status kuning/merah diberi satu saran singkat berbahasa sederhana (juga di rincian lampu).
+- **Decoupling** (dokumen §6) = record dengan HR > 80 dan kecepatan > 0,6 m/s, dibagi dua menurut jumlah record;
+  rasio tiap paruh = kecepatan rata-rata ÷ HR rata-rata; (rasio 1 − rasio 2) ÷ rasio 1. Dua versi: data penuh dan
+  tanpa 3 km pertama (yang dinilai). Dihitung pada lari terpanjang tiap minggu (≥ 10 km); dinilai hanya bila ≥ 20 km
+  dan bukan minggu lomba. Tombol ⓘ di kartu Decoupling menampilkan hitungan lengkap kedua versi dan cara memperbaikinya.
+- **Saran**: setiap status kuning/merah diberi satu saran singkat dari dokumen (juga di rincian lampu).
 - **Minggu ringan/lomba** dibaca dari warna baris Kalender (abu-abu / oranye muda).
 
 ## Struktur

@@ -48,38 +48,49 @@ def best_effort(stream, dist_m):
     return best
 
 
+DEC_SKIP_M = 3000      # the rated version leaves out the first 3 km (docs/RUMUS-BATAS-SUMBER.md §6)
+
+
 def decoupling(stream):
-    """Pa:HR decoupling in %: efficiency (speed/HR) of the 1st vs 2nd half of
-    moving time. Positive = the 2nd half cost more heart rate per speed."""
+    """Pa:HR decoupling in % (rated version: without the first 3 km).
+    Positive = the 2nd half cost more heart rate per speed."""
     r = decoupling_detail(stream)
     return r and r["pct"]
 
 
 def decoupling_detail(stream):
-    """decoupling() with its working: per half [km, moving seconds, mean HR]."""
+    """Decoupling as in docs/RUMUS-BATAS-SUMBER.md §6:
+    records with HR > 80 and speed > 0.6 m/s, split in two by record count,
+    ratio = mean speed / mean HR per half, (r1 - r2) / r1 * 100.
+    Returns both versions; "pct" (the rated one) leaves out the first 3 km.
+    Each half: [records, km, mean speed m/s, mean HR]."""
     t, x, hr = stream.get("t") or [], stream.get("d") or [], stream.get("hr") or []
-    seg = []  # (dt, dd, hr) for moving samples with HR
+    rec = []  # (distance from start, speed, hr, dt)
     for i in range(1, min(len(t), len(x), len(hr))):
-        dtt, dd = t[i] - t[i - 1], x[i] - x[i - 1]
-        if dtt <= 0 or dtt > 30 or dd / dtt < 1.0 or not hr[i]:
-            continue  # pause, gap or walking-pace stop
-        seg.append((dtt, dd, hr[i]))
-    total = sum(s[0] for s in seg)
-    if total < 20 * 60:
+        dtt = t[i] - t[i - 1]
+        if dtt <= 0 or not hr[i]:
+            continue
+        v = (x[i] - x[i - 1]) / dtt
+        if hr[i] > 80 and v > 0.6:
+            rec.append((x[i] - x[0], v, hr[i], dtt))
+
+    def calc(r):
+        if len(r) < 20 or sum(q[3] for q in r) < 20 * 60:
+            return None
+        n = len(r) // 2
+
+        def half(h):
+            return [len(h), round((h[-1][0] - h[0][0]) / 1000, 3),
+                    sum(q[1] for q in h) / len(h), sum(q[2] for q in h) / len(h)]
+        a, b = half(r[:n]), half(r[n:])
+        r1, r2 = a[2] / a[3], b[2] / b[3]
+        return {"pct": round((r1 - r2) / r1 * 100, 1),
+                "h": [[a[0], a[1], round(a[2], 4), round(a[3], 2)], [b[0], b[1], round(b[2], 4), round(b[3], 2)]]}
+
+    full, rated = calc(rec), calc([q for q in rec if q[0] > DEC_SKIP_M])
+    if not rated:
         return None
-    halves, acc = ([], []), 0.0
-    for s in seg:
-        halves[0 if acc < total / 2 else 1].append(s)
-        acc += s[0]
-
-    def half(h):
-        tt = sum(s[0] for s in h)
-        return sum(s[1] for s in h), tt, sum(s[0] * s[2] for s in h) / tt  # metres, seconds, mean HR
-
-    (d1, t1, h1), (d2, t2, h2) = half(halves[0]), half(halves[1])
-    e1, e2 = d1 / t1 / h1, d2 / t2 / h2
-    return {"pct": round((e1 - e2) / e1 * 100, 1),
-            "h": [[round(d1 / 1000, 3), round(t1), round(h1, 1)], [round(d2 / 1000, 3), round(t2), round(h2, 1)]]}
+    return {"pct": rated["pct"], "h": rated["h"], "full": full and full["pct"], "hf": full and full["h"]}
 
 
 # ---------------------------------------------------------------- weeks
@@ -212,8 +223,9 @@ def light(wellness, day):
 
     MERAH : HRV below normal 3 days running, or RHR +7 vs 28-day median
     ORANYE: HRV below normal 2 days running, or Body Battery < 40, or RHR +5
-    HIJAU : HRV balanced (or no HRV reading that night), Body Battery > 60, sleep >= 6 h
-    KUNING: anything else (HRV slightly down, BB 40-60, sleep < 6 h)
+    HIJAU : HRV balanced (or no HRV reading that night), Body Battery >= 50, sleep >= 6 h
+            (BB threshold from the morning gate, docs/RUMUS-BATAS-SUMBER.md §7)
+    KUNING: anything else (HRV slightly down, BB 40-49, sleep < 6 h)
     Returns None when there is no data for the day.
     """
     w = wellness.get(day.isoformat())
@@ -229,7 +241,7 @@ def light(wellness, day):
         level = "merah"
     elif low_run >= 2 or (bb is not None and bb < 40) or rhr_up >= 5:
         level = "oranye"
-    elif st in ("BALANCED", None) and bb is not None and bb > 60 and sl and sl >= 6 * 3600:
+    elif st in ("BALANCED", None) and bb is not None and bb >= 50 and sl and sl >= 6 * 3600:
         level = "hijau"
     else:
         level = "kuning"
@@ -247,7 +259,7 @@ def _checks(st, low_run, bb, sl, rhr_up):
     hrv = "bad" if low_run >= 2 else None if st is None else "ok" if st == "BALANCED" else "warn"
     return [
         {"k": "hrv", "v": st, "low": low_run, "s": hrv},
-        {"k": "bb", "v": bb, "s": grade(bb, lambda v: v > 60, lambda v: v < 40)},
+        {"k": "bb", "v": bb, "s": grade(bb, lambda v: v >= 50, lambda v: v < 40)},
         {"k": "sleep", "v": sl, "s": grade(sl or None, lambda v: v >= 6 * 3600, lambda v: False)},
         {"k": "rhr", "v": None if rhr_up is None else round(rhr_up, 1), "s": grade(rhr_up, lambda v: v < 5, lambda v: v >= 5)},
     ]

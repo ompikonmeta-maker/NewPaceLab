@@ -1,7 +1,7 @@
 {
   "athletes": [
-    {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx"},
-    {"id": "REZA", "name": "Reza", "program": "programs/Program_Marathon_PRAMANA.xlsx"}
+    {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx", "weight_floor": 65},
+    {"id": "REZA", "name": "Reza", "program": "programs/Program_Marathon_PRAMANA.xlsx", "weight_floor": 73}
   ],
   "since": "2026-03-23",
   "data_dir": "data",
