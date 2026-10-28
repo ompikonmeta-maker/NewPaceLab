@@ -230,7 +230,21 @@ def light(wellness, day):
     if abs(round(rhr_up)) >= 1:
         why.append("RHR %+d" % round(rhr_up))
     return {"level": level, "hrv": w.get("hrv"), "hrv_status": st, "bb": bb,
-            "sleep_s": sl, "rhr": rhr(w), "notes": why}
+            "sleep_s": sl, "rhr": rhr(w), "notes": why,
+            "checks": _checks(st, low_run, bb, sl, rhr_up if rhr(w) and base else None)}
+
+
+def _checks(st, low_run, bb, sl, rhr_up):
+    """Each input of the light rule: ok, warn (keeps it from green) or bad (orange/red); None = no data."""
+    def grade(v, ok, bad):
+        return None if v is None else "bad" if bad(v) else "ok" if ok(v) else "warn"
+    hrv = "bad" if low_run >= 2 else None if st is None else "ok" if st == "BALANCED" else "warn"
+    return [
+        {"k": "hrv", "v": st, "low": low_run, "s": hrv},
+        {"k": "bb", "v": bb, "s": grade(bb, lambda v: v > 60, lambda v: v < 40)},
+        {"k": "sleep", "v": sl, "s": grade(sl or None, lambda v: v >= 6 * 3600, lambda v: False)},
+        {"k": "rhr", "v": None if rhr_up is None else round(rhr_up, 1), "s": grade(rhr_up, lambda v: v < 5, lambda v: v >= 5)},
+    ]
 
 
 def saturday_rule(w):

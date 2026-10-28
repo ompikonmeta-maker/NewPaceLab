@@ -147,10 +147,10 @@ body.ready .bk.cur .prg{animation:bkdraw 1.4s .5s var(--ease) forwards}
   background:rgba(17,17,16,0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);pointer-events:none;
   transition:background .4s ease,backdrop-filter .4s ease,-webkit-backdrop-filter .4s ease}
 .ov.open{background:rgba(17,17,16,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:auto}
-.panel{width:min(720px,100%);max-height:min(860px,calc(100vh - 48px));overflow:auto;background:var(--surface);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.3);
-  opacity:0;transform:scale(.94) translateY(16px);transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.34,1.3,.64,1);overscroll-behavior:contain}
+.panel{position:relative;display:flex;flex-direction:column;width:min(720px,100%);max-height:min(860px,calc(100vh - 48px));overflow:hidden;background:var(--surface);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.3);
+  opacity:0;transform:scale(.94) translateY(16px);transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.34,1.3,.64,1)}
 .ov.open .panel{opacity:1;transform:none}
-.pv-head{position:sticky;top:0;z-index:2;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.pv-head{flex:none;padding:18px 20px 12px;border-bottom:1px solid var(--line)}
 .pv-nav{display:flex;align-items:center;gap:10px}
 .pv-nav h2{margin:0;font-size:20px;letter-spacing:-.01em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .ib{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--text-2);transition:transform .2s cubic-bezier(.34,1.3,.64,1),background .2s}
@@ -163,7 +163,13 @@ body.ready .bk.cur .prg{animation:bkdraw 1.4s .5s var(--ease) forwards}
 .pv-tabs button{position:relative;z-index:1;border:0;background:none;font:inherit;font-weight:600;color:var(--text-2);height:32px;padding:0 14px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:7px}
 .pv-tabs button[aria-selected="true"]{color:var(--text)}
 .pv-tabs .slider{position:absolute;top:3px;bottom:3px;left:0;border-radius:9px;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.1);transition:transform .45s cubic-bezier(.34,1.3,.64,1),width .45s cubic-bezier(.34,1.3,.64,1)}
-.pv-body{padding:16px 20px 20px}
+.pv-body{flex:1 1 auto;min-height:0;overflow:auto;padding:16px 20px 20px;overscroll-behavior:contain;scrollbar-width:none}
+.pv-body::-webkit-scrollbar{display:none}
+/* own scrollbar: fades in while scrolling or near the right edge, fades out when idle; squeezes during the end bounce */
+.sbar{position:absolute;right:4px;top:0;width:12px;border-radius:6px;opacity:0;transition:opacity .45s;cursor:grab;touch-action:none;transform-origin:top;z-index:3}
+.sbar::before{content:"";position:absolute;right:2px;top:0;bottom:0;width:5px;border-radius:4px;background:color-mix(in srgb,var(--text) 32%,transparent);transition:width .2s,background .2s}
+.sbar.on{opacity:1} .sbar.sq-b{transform-origin:bottom}
+.sbar:hover::before,.sbar.drag::before{width:8px;background:color-mix(in srgb,var(--text) 50%,transparent)} .sbar.drag{cursor:grabbing}
 .slide{transition:opacity .25s ease,transform .35s var(--ease)}
 .slide.outL{opacity:0;transform:translateX(-24px)} .slide.outR{opacity:0;transform:translateX(24px)}
 .pv-sum{display:grid;grid-template-columns:auto 1fr 1fr;gap:16px;align-items:center;padding:14px;border-radius:16px;background:var(--bg)}
@@ -261,7 +267,7 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .dside.r .who{flex-direction:row-reverse}
 .vs{font-size:13px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:4px 10px}
 .dhead p{margin:0;color:var(--text-2);font-size:15px} .dhead p.r{text-align:right}
-.dhead p .dot,.action .dot{width:8px;height:8px}
+.dhead p .dot,.action .dot{width:8px;height:8px} .dhead p > span{display:inline-block;vertical-align:top}
 .drow{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);align-items:center;gap:16px;padding:12px 0;border-top:1px solid var(--line)}
 .dl{text-align:right}.dr{text-align:left}
 .dc{text-align:center;font-size:13px;color:var(--muted);line-height:1.25}
@@ -278,7 +284,7 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
   .dhead{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px 8px}
   .dside{flex-direction:column;align-items:flex-start;gap:4px} .dside.r{flex-direction:column;align-items:flex-end}
   .dside .who{font-size:17px}
-  .dhead p{grid-column:1/-1;text-align:left!important;font-size:14px;display:flex;gap:8px;align-items:center} .dhead p.r{flex-direction:row-reverse;justify-content:flex-end} .dhead .sp{display:none}
+  .dhead p{grid-column:1/-1;text-align:left!important;font-size:14px;display:flex;gap:8px;align-items:flex-start} .dhead p .dot{margin-top:.55em;flex:none} .dhead p.r{flex-direction:row-reverse;justify-content:flex-end} .dhead .sp{display:none}
   .dhead .vs{font-size:11px;padding:2px 7px}
   .drow{grid-template-columns:minmax(0,1fr) 80px minmax(0,1fr);gap:8px}
   .drow .val{font-size:20px} .drow.big .val{font-size:24px} .drow .val small{display:block;font-size:12px}
@@ -349,6 +355,48 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .cells i.hijau{background:var(--good)} .cells i.kuning{background:#e9b949} .cells i.oranye{background:#e98a5c} .cells i.merah{background:var(--crit)}
 .cells i:hover,.cells i:focus-visible{outline:2px solid var(--text);outline-offset:1px}
 .leg{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--text-2);margin-top:12px}
+.lgd{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:14px}
+.lgd > div{border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--text-2);line-height:1.45}
+.lgd b{display:flex;align-items:center;gap:7px;color:var(--text);font-size:14px;margin-bottom:2px} .lgd b i{width:10px;height:10px;border-radius:50%}
+.lgd-none{margin-top:8px;font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:6px} .lgd-none i{width:10px;height:10px;border-radius:3px;background:var(--grid)}
+@media (max-width:760px){.lgd{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* light chip: click for the four checks behind it */
+button.chip{border:0;font-family:inherit;cursor:pointer;transition:box-shadow .2s,translate .2s}
+button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
+.chip .cv{width:12px;height:12px;margin-left:1px;transition:transform .3s var(--ease)} .chip[aria-expanded="true"] .cv{transform:rotate(180deg)}
+.why{display:block;margin-top:3px;font-size:13.5px} .why b{font-weight:650}
+.why svg{width:15px;height:15px;vertical-align:-3px;margin-right:5px}
+.why.warn{color:var(--warn)} .why.good{color:var(--good)} .why.bad{color:var(--serious)} .why.none{color:var(--muted)}
+.lpop{position:absolute;z-index:70;width:300px;max-width:calc(100vw - 16px);background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:0 18px 50px rgba(0,0,0,.18);padding:14px 16px;
+  opacity:0;transform:translateY(-6px) scale(.97);transform-origin:top center;pointer-events:none;transition:opacity .25s,transform .4s cubic-bezier(.34,1.3,.64,1)}
+.lpop.on{opacity:1;transform:none;pointer-events:auto}
+.lpop h4{margin:0 0 2px;font-size:15px;display:flex;align-items:center;gap:8px} .lpop h4 .dot{width:10px;height:10px}
+.lpop .lead{margin:0 0 10px;color:var(--text-2);font-size:13.5px}
+.lpop ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.lpop li{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center;font-size:13.5px;padding:6px 8px;border-radius:10px;opacity:0;transform:translateX(-6px)}
+.lpop.on li{animation:slin .4s var(--ease) forwards;animation-delay:calc(var(--i) * 60ms + 80ms)}
+@keyframes slin{to{opacity:1;transform:none}}
+.lpop li.warn{background:var(--warn-bg)} .lpop li.bad{background:var(--serious-bg)}
+.lpop li .v{font-weight:650;white-space:nowrap} .lpop li .th{display:block;font-size:12px;color:var(--muted)}
+.lpop li svg{width:16px;height:16px} .lpop li.ok svg{color:var(--good)} .lpop li.warn svg{color:var(--warn)} .lpop li.bad svg{color:var(--serious)} .lpop li.none svg{color:var(--muted)}
+.lpop .scale{display:flex;gap:4px;margin-top:12px}
+.lpop .scale span{flex:1;display:flex;align-items:center;justify-content:center;gap:5px;font-size:11.5px;font-weight:600;padding:3px 0;border-radius:999px;color:var(--muted);border:1px dashed var(--line);opacity:.6}
+.lpop .scale span i{width:6px;height:6px;border-radius:50%;background:var(--c);opacity:.35}
+.lpop .scale span.me{opacity:1;color:#fff;font-weight:700;border:1px solid transparent;background:var(--c);box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent),0 4px 12px color-mix(in srgb,var(--c) 35%,transparent)}
+.lpop .scale span.me i{background:#fff;opacity:1}
+.lpop.on .scale span.me{animation:lit .6s .35s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes lit{from{transform:scale(.85);box-shadow:none}}
+
+/* the two runners leave the track while scrolling and park at the left / right edge */
+.fr{position:fixed;left:0;top:0;z-index:40;pointer-events:none;visibility:hidden;will-change:transform}
+.fr.on{visibility:visible}
+.fr svg{display:block;overflow:visible} .fr .rn path{fill:currentColor} .fr.t{color:var(--t)} .fr.r{color:var(--r)}
+.fr .wind line{stroke:currentColor;stroke-width:1.3;stroke-linecap:round;opacity:0;animation:wind .55s linear infinite}
+.fr .wind line:nth-child(2){animation-delay:-.18s}.fr .wind line:nth-child(3){animation-delay:-.36s}
+.fr .gnd{position:absolute;left:24%;right:6%;bottom:-3px;height:2px;background:repeating-linear-gradient(90deg,currentColor 0 7px,transparent 7px 14px);opacity:0;animation:ground .4s linear infinite;transition:opacity .3s}
+.fr .nm{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%) translateY(-4px);font-size:13px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity .25s,transform .35s var(--ease)}
+.fr.docked .nm{opacity:1;transform:translateX(-50%)} .fr.docked .gnd{opacity:.5}
 .leg span{display:inline-flex;align-items:center;gap:6px}
 .leg i{width:12px;height:12px;border-radius:3px;display:inline-block}
 
@@ -378,7 +426,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
-  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2{opacity:1;transform:none} .ln{stroke-dashoffset:0}
+  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2,.lpop li{opacity:1;transform:none} .ln{stroke-dashoffset:0}
   .tl .done{width:var(--p)} .tl .now{left:var(--p)}
   .cells i,.phases i b{transform:none}
 }
@@ -429,7 +477,12 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
     <button data-n="7">7 hr</button><button data-n="14" aria-pressed="true">14 hr</button><button data-n="30">30 hr</button><button data-n="60">60 hr</button></div></div>
 <div class="grid">
   <section class="card c12"><h3>Lampu harian <small>aturan "Tidur dan Pemulihan" di Excel</small></h3><div class="strip" id="strip"></div>
-    <div class="leg" aria-hidden="true"><span><i style="background:var(--good)"></i>Hijau · jalankan</span><span><i style="background:#e9b949"></i>Kuning · turunkan satu tingkat</span><span><i style="background:#e98a5c"></i>Oranye · easy/recovery</span><span><i style="background:var(--crit)"></i>Merah · istirahat</span><span><i style="background:var(--grid)"></i>Tidak ada data</span></div></section>
+    <div class="lgd">
+      <div><b><i style="background:var(--good)"></i>Hijau</b>Siap latihan sesuai rencana. Syarat: HRV seimbang, Body Battery &gt; 60, tidur ≥ 6 jam.</div>
+      <div><b><i style="background:#e9b949"></i>Kuning</b>Latihan keras jadi easy. Muncul bila ada syarat Hijau yang tidak terpenuhi.</div>
+      <div><b><i style="background:#e98a5c"></i>Oranye</b>Easy/recovery saja. HRV rendah 2 hari, Body Battery &lt; 40, atau detak istirahat naik +5.</div>
+      <div><b><i style="background:var(--crit)"></i>Merah</b>Istirahat. HRV rendah 3 hari, atau detak istirahat naik +7.</div></div>
+    <div class="lgd-none"><i></i>Tidak ada data · klik lampu di Ringkasan untuk melihat syarat yang belum terpenuhi</div></section>
   <section class="card c4"><h3>Tidur <small>jam</small></h3><div class="insight" id="in-sleep"></div><div class="chart" id="ch-sleep"></div></section>
   <section class="card c4"><h3>HRV <small>ms</small></h3><div class="insight" id="in-hrv"></div><div class="chart" id="ch-hrv"></div></section>
   <section class="card c4"><h3>Body Battery <small>pagi</small></h3><div class="insight" id="in-bb"></div><div class="chart" id="ch-bb"></div></section>
@@ -449,6 +502,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 </div>
 <div class="hint" id="hint" role="tooltip"></div>
 <div class="ptip" id="ptip" aria-hidden="true"></div>
+<div class="lpop" id="lpop" role="dialog" aria-label="Rincian lampu"></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
   <div class="panel">
     <div class="pv-head">
@@ -459,7 +513,8 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
       <div class="pv-meta" id="pv-meta"></div>
       <div class="pv-tabs" role="tablist" id="pv-tabs"></div>
     </div>
-    <div class="pv-body"><div class="slide" id="pv-slide"></div></div>
+    <div class="pv-body" id="pv-body"><div id="pv-in"><div class="slide" id="pv-slide"></div></div></div>
+    <div class="sbar" id="pv-sbar" aria-hidden="true"></div>
   </div>
 </div>
 
@@ -560,8 +615,8 @@ function renderSummary() {
     const head = !a.has_data ? "Belum ada data. Jalankan Update Dashboard." :
       `${L ? `Hari ini ${L[1].toLowerCase()}: ${L[2]}.` : ""} Est. maraton ${hm(a.est.sec)}, ${es[1].toLowerCase()}.`;
     return `<section class="card ${span} sum" aria-label="Ringkasan ${a.name}">
-      <div class="top">${who(a)}${L ? chip(L[0], L[1]) : chip("none", "Tidak ada data")}</div>
-      <p class="headline">${head}</p>
+      <div class="top">${who(a)}${L ? lchip(a, L) : chip("none", "Tidak ada data")}</div>
+      <p class="headline">${head}${whyLine(l)}</p>
       <div class="kpis">
         <div class="kpi"><div class="lab">Est. maraton</div><div class="val num">${num(a.est.sec, "hm")}</div><div class="note">target ${targetTxt(a.target)}</div></div>
         <div class="kpi"><div class="lab">Minggu ini</div><div class="val num">${num(w.km, "f1")}<small> / ${w.km_t ?? "–"} km</small></div>
@@ -582,8 +637,8 @@ function renderSummary() {
 function renderDuel(cur) {
   const [a, b] = V(), side = [a, b].map(x => ({x, w: cur(x), l: x.today.light}));
   const head = s => { const L = s.l ? LIGHT[s.l.level] : null, es = estStatus(s.x);
-    return { chip: L ? chip(L[0], L[1]) : chip("none", "Tidak ada data"),
-             txt: !s.x.has_data ? "Belum ada data." : `${L ? L[2][0].toUpperCase() + L[2].slice(1) + ". " : ""}${es[1]}.` }; };
+    return { chip: L ? lchip(s.x, L) : chip("none", "Tidak ada data"),
+             txt: (!s.x.has_data ? "Belum ada data." : `${L ? L[2][0].toUpperCase() + L[2].slice(1) + ". " : ""}${es[1]}.`) + whyLine(s.l) }; };
   const H = side.map(head);
   const st = s => s.l && s.l.hrv_status ? s.l.hrv_status[0] + s.l.hrv_status.slice(1).toLowerCase() : "";
   const lr = w => w.lr >= 10 ? w.lr : null;
@@ -593,7 +648,7 @@ function renderDuel(cur) {
   $("summary").innerHTML = `<section class="card c12 duel" aria-label="Ringkasan ${a.name} dan ${b.name}">
     <div class="dhead">
       <div class="dside">${who(a)}${H[0].chip}</div><span class="vs" aria-hidden="true">VS</span><div class="dside r">${who(b)}${H[1].chip}</div>
-      <p><i class="dot ${a.c}" aria-hidden="true"></i> ${H[0].txt}</p><span class="sp"></span><p class="r">${H[1].txt} <i class="dot ${b.c}" aria-hidden="true"></i></p>
+      <p><i class="dot ${a.c}" aria-hidden="true"></i> <span>${H[0].txt}</span></p><span class="sp"></span><p class="r"><span>${H[1].txt}</span> <i class="dot ${b.c}" aria-hidden="true"></i></p>
     </div>
     ${row("Est. maraton", v(num(a.est.sec, "hm"), "target " + targetTxt(a.target)), v(num(b.est.sec, "hm"), "target " + targetTxt(b.target)), true)}
     ${row(`Minggu ini<div class="dbars">${kmBar(side[0])}${kmBar(side[1])}</div>`, v(`${num(side[0].w.km, "f1")}<small> / ${side[0].w.km_t ?? "–"} km</small>`), v(`${num(side[1].w.km, "f1")}<small> / ${side[1].w.km_t ?? "–"} km</small>`))}
@@ -1006,7 +1061,7 @@ const pvAth = () => A.find(a => a.c === PV.c) || V()[0];
 function openWeek(m, c, from) { PV = {m, c: V().some(a => a.c === c) ? c : V()[0].c}; opener = from; pvRender(); ov.style.display = "flex";
   requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); pvSlider(); pvIn(); $("pv-close").focus({preventScroll: true}); })); }
 function closeWeek() { ov.classList.remove("open"); setTimeout(() => { ov.style.display = "none"; opener && opener.focus({preventScroll: true}); }, 460); }
-function pvIn() { slide.querySelectorAll(".pv-day").forEach(d => d.classList.add("in"));
+function pvIn() { slide.querySelectorAll(".pv-day").forEach(d => d.classList.add("in")); sbarSize();
   const v = slide.querySelector(".pv-ring .val"); if (v) requestAnimationFrame(() => v.style.strokeDasharray = v.dataset.to); }
 function pvSlider() { const sel = $("pv-tabs").querySelector(`button[data-c="${PV.c}"]`), sl = $("pv-slider"); if (!sel || !sel.offsetWidth) return;
   sl.style.width = sel.offsetWidth + "px"; sl.style.transform = `translateX(${sel.offsetLeft - 3}px)`; }
@@ -1035,7 +1090,8 @@ function pvRender() {
           ${d.rest.length ? `<div class="pv-more"><div><ul>${d.rest.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>` : ""}</div>
         <div class="pv-st">${st}</div></li>`; }).join("")}</ul>` : '<div class="empty">Jadwal harian tidak ada di file Excel untuk minggu ini.</div>'}
     ${(w.notes || []).length ? `<div class="pv-note"><b>Catatan coaching</b><ul>${w.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>` : ""}`;
-  slide.querySelectorAll(".pv-day").forEach(li => { li.onclick = () => li.classList.toggle("open"); li.onkeydown = ev => { if (ev.key === "Enter") li.classList.toggle("open"); }; });
+  slide.querySelectorAll(".pv-day").forEach(li => { const t = () => { li.classList.toggle("open"); setTimeout(sbarFlash, 360); };
+    li.onclick = t; li.onkeydown = ev => { if (ev.key === "Enter") t(); }; });
 }
 function pvGo(dm, dc) { const out = dm < 0 ? "outR" : "outL"; slide.classList.add(out);
   setTimeout(() => { PV.m += dm; if (dc) PV.c = dc; pvRender(); slide.classList.remove(out); slide.classList.add(dm < 0 ? "outL" : "outR");
@@ -1052,7 +1108,128 @@ $("terrain").addEventListener("click", e => { const wc = e.target.closest(".wkco
   ptip.classList.remove("on"); openWeek(+wc.dataset.ms, (e.target.dataset && e.target.dataset.c) || V()[0].c, wc); });
 $("terrain").addEventListener("keydown", e => { const wc = e.target.closest(".wkcol"); if (wc && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); wc.click(); } });
 
-function renderAll() { renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); }
+// ---------------------------------------------------------------- light: why this colour (four checks from metrics.light)
+const LCOL = {hijau: "var(--good)", kuning: "#e9b949", oranye: "#e98a5c", merah: "var(--crit)"};
+const CV = '<svg class="cv" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const CK = {ok: '<path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/>',
+  warn: '<circle cx="12" cy="12" r="9" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M12 7.5v5.5" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16.5" r="1.3" fill="currentColor"/>',
+  none: '<path d="M7 12h10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>'};
+CK.bad = CK.warn;
+const ckSvg = s => `<svg viewBox="0 0 24 24" aria-hidden="true">${CK[s || "none"]}</svg>`;
+const HRVT = {BALANCED: "Seimbang", UNBALANCED: "Tidak seimbang", LOW: "Rendah", POOR: "Buruk"};
+function ckRow(c) { const no = "tidak ada data";
+  if (c.k === "hrv") return {n: "HRV", v: c.v ? HRVT[c.v] || c.v : no, need: c.low >= 2 ? `rendah ${c.low} hari berturut-turut` : "harus seimbang", sh: c.low >= 2 ? `rendah ${c.low} hari` : "harus seimbang"};
+  if (c.k === "bb") return {n: "Body Battery", v: c.v == null ? no : Math.round(c.v), need: c.s === "bad" ? "di bawah 40" : "harus > 60", sh: c.s === "bad" ? "< 40" : "> 60"};
+  if (c.k === "sleep") return {n: "Tidur", v: c.v ? hm(c.v).replace(":", " j ") + " m" : no, need: "minimal 6 jam", sh: "≥ 6 jam"};
+  return {n: "Detak istirahat", v: c.v == null ? no : `${c.v > 0 ? "+" : c.v < 0 ? "−" : "±"}${Math.abs(Math.round(c.v))} bpm`, need: "vs median 28 hari, aman bila < +5", sh: "aman < +5"};
+}
+function whyLine(l) { if (!l || !l.checks) return "";
+  if (l.level === "hijau") return `<span class="why good">${ckSvg("ok")}Semua syarat Hijau terpenuhi</span>`;
+  const bad = l.checks.filter(c => c.s === "warn" || c.s === "bad");
+  if (!bad.length) { const miss = l.checks.filter(c => !c.s && c.k !== "hrv").map(c => ckRow(c).n);
+    return miss.length ? `<span class="why none">${ckSvg("none")}Data belum lengkap: ${miss.join(", ")}</span>` : ""; }
+  return `<span class="why ${bad.some(c => c.s === "bad") ? "bad" : "warn"}">${ckSvg("warn")}Kurang: ${bad.map(c => { const r = ckRow(c); return `<b>${r.n} ${r.v}</b> (${r.sh})`; }).join(", ")}</span>`;
+}
+const lchip = (a, L) => chip(L[0], L[1]).replace('<span class="chip', `<button type="button" data-lc="${a.c}" aria-expanded="false" aria-haspopup="dialog" aria-label="${a.name}: lampu ${L[1]}, lihat rincian" class="chip`).replace(/<\/span>$/, CV + "</button>");
+const lpop = $("lpop"); let lpFor = null;
+function lpClose() { lpop.classList.remove("on"); lpFor = null; document.querySelectorAll("[data-lc]").forEach(x => x.setAttribute("aria-expanded", "false")); }
+document.addEventListener("click", e => {
+  const ch = e.target.closest("[data-lc]");
+  if (!ch) { if (lpFor && !e.target.closest(".lpop")) lpClose(); return; }
+  const a = A.find(x => x.c === ch.dataset.lc), l = a.today.light, L = LIGHT[l.level];
+  if (lpFor === a.c) return lpClose();
+  lpClose(); lpFor = a.c; ch.setAttribute("aria-expanded", "true");
+  const bad = (l.checks || []).filter(c => c.s === "warn" || c.s === "bad").length;
+  lpop.innerHTML = `<h4><i class="dot ${a.c}"></i>${a.name} · ${L[1]}</h4>
+    <p class="lead">${l.level === "hijau" ? "Semua syarat Hijau terpenuhi." : bad ? `${bad} syarat belum terpenuhi → ${L[2]}.` : `Data belum lengkap → ${L[2]}.`}</p>
+    <ul>${(l.checks || []).map((c, i) => { const r = ckRow(c); return `<li class="${c.s || "none"}" style="--i:${i}">${ckSvg(c.s)}<span>${r.n}<span class="th">${r.need}</span></span><span class="v">${r.v}</span></li>`; }).join("")}</ul>
+    <div class="scale">${Object.keys(LCOL).map(k => `<span class="${k === l.level ? "me" : ""}" style="--c:${LCOL[k]}"><i></i>${LIGHT[k][1]}</span>`).join("")}</div>`;
+  const r = ch.getBoundingClientRect(), w = Math.min(300, innerWidth - 16);
+  lpop.style.left = (scrollX + Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2))) + "px";
+  lpop.style.top = (scrollY + r.bottom + 10) + "px";
+  requestAnimationFrame(() => requestAnimationFrame(() => lpop.classList.add("on")));
+});
+addEventListener("keydown", e => { if (e.key === "Escape" && lpFor) lpClose(); });
+
+// ---------------------------------------------------------------- runners leave the track on scroll and park at the edges
+const fly = {};
+function flyBuild() {
+  Object.values(fly).forEach(f => f.el.remove()); for (const k in fly) delete fly[k];
+  V().forEach(a => { const el = document.createElement("div"); el.className = "fr " + a.c; el.setAttribute("aria-hidden", "true");
+    el.innerHTML = `<svg viewBox="-8 0 32 24"><g class="wind"><line x1="3" y1="8" x2="-3" y2="8"/><line x1="2" y1="12.5" x2="-5" y2="12.5"/><line x1="3" y1="17" x2="-2" y2="17"/></g><g class="rn">${RUN}</g></svg><span class="gnd"></span><span class="nm">${a.name}</span>`;
+    document.body.appendChild(el); fly[a.c] = {el, off: null}; });
+  flyPlace();
+}
+const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+function flyPlace() {
+  const pair = document.querySelector(".tl .pair"), svg = pair && pair.querySelector("svg"); if (!svg) return;
+  const pr = pair.getBoundingClientRect(), k = svg.getBoundingClientRect().width / 52, W = document.documentElement.clientWidth, H = innerHeight;
+  const raw = Math.min(1, Math.max(0, (64 - pr.top) / 170)), t = easeIO(raw), small = W < 640, sc = small ? .8 : 1;
+  svg.style.visibility = raw > 0 ? "hidden" : "";
+  for (const c in fly) { const f = fly[c], el = f.el, s = el.firstChild;
+    s.setAttribute("width", 32 * k); s.setAttribute("height", 24 * k);
+    el.classList.toggle("on", raw > 0); el.classList.toggle("docked", raw > .85);
+    if (!raw) continue;
+    if (!f.off) { el.style.transform = "none"; const a = el.getBoundingClientRect(), b = el.querySelector(".rn").getBoundingClientRect(); f.off = [b.left - a.left, b.top - a.top, b.width, b.height]; }
+    const home = svg.querySelector(`.rn.${c}`).getBoundingClientRect();
+    const hx = home.left - f.off[0], hy = home.top - f.off[1], w = 32 * k * sc, pad = small ? 14 : 26;
+    const ex = c === "r" ? W - pad - w : pad, ey = H / 2 - 12 * k * sc;
+    const x = hx + (ex - hx) * t, y = hy + (ey - hy) * t - Math.sin(Math.PI * t) * 28, z = 1 + (sc - 1) * t;
+    el.style.transform = `translate(${x}px,${y}px) scale(${z})`; el.style.transformOrigin = "0 0";
+  }
+}
+let flyQ = 0;
+addEventListener("scroll", () => flyQ || (flyQ = requestAnimationFrame(() => { flyQ = 0; flyPlace(); })), {passive: true});
+addEventListener("resize", () => { for (const c in fly) fly[c].off = null; flyPlace(); });
+
+// ---------------------------------------------------------------- rubber-band bounce at both scroll ends (page + schedule window)
+function bounce(scroller, content, bar) {
+  const page = !scroller; let raw = 0, tm = 0, ty = null;
+  const lim = () => Math.min(140, (page ? innerHeight : scroller.clientHeight) * .18);
+  const atEnd = dir => { const st = page ? scrollY : scroller.scrollTop, h = page ? innerHeight : scroller.clientHeight, sh = page ? document.documentElement.scrollHeight : scroller.scrollHeight;
+    return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
+  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov")));
+  const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
+    content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
+    if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
+  const release = () => { if (!raw) return; raw = 0; const sp = "transform .55s cubic-bezier(.25,1.45,.45,1)";
+    content.style.transition = sp; content.style.transform = "translateY(0)";
+    if (bar) { bar.style.transition = sp + ",opacity .45s"; bar.style.transform = ""; }
+    setTimeout(() => { if (!raw) { content.style.transform = ""; content.style.transition = ""; } }, 600); };
+  const tgt = page ? window : scroller;
+  tgt.addEventListener("wheel", e => { if (REDUCED || e.ctrlKey || skip(e)) return;
+    const dir = Math.sign(e.deltaY); if (!dir) return;
+    if (raw && Math.sign(raw) !== dir) return release();
+    if (!atEnd(dir)) return;
+    e.preventDefault(); raw += e.deltaY * (e.deltaMode === 1 ? 16 : 1) * .6; set(); clearTimeout(tm); tm = setTimeout(release, 140);
+  }, {passive: false});
+  tgt.addEventListener("touchstart", e => { ty = skip(e) ? null : e.touches[0].clientY; }, {passive: true});
+  tgt.addEventListener("touchmove", e => { if (ty == null || REDUCED) return; const y = e.touches[0].clientY, dy = ty - y; ty = y;
+    if (!raw && !atEnd(Math.sign(dy))) return; e.preventDefault(); const was = Math.sign(raw); raw += dy; if (was && Math.sign(raw) !== was) raw = 0; set(); }, {passive: false});
+  tgt.addEventListener("touchend", () => { ty = null; release(); });
+}
+document.documentElement.style.overscrollBehaviorY = "none";
+bounce(null, document.querySelector(".wrap"));
+
+// ---------------------------------------------------------------- schedule window scrollbar (own thumb, auto-hide)
+const pvBody = $("pv-body"), sbar = $("pv-sbar"); let sbarT = 0;
+function sbarSize() { const h = pvBody.clientHeight, sh = pvBody.scrollHeight;
+  if (sh <= h + 1) { sbar.style.display = "none"; return; } sbar.style.display = "";
+  const th = Math.max(36, h * h / sh); sbar.style.height = th + "px";
+  sbar.style.top = (pvBody.offsetTop + 4 + (h - 8 - th) * (pvBody.scrollTop / (sh - h))) + "px"; }
+function sbarFlash() { sbarSize(); sbar.classList.add("on"); clearTimeout(sbarT); sbarT = setTimeout(() => sbar.matches(":hover,.drag") || sbar.classList.remove("on"), 1000); }
+pvBody.addEventListener("scroll", sbarFlash, {passive: true});
+$("ov").querySelector(".panel").addEventListener("pointermove", e => { if (e.pointerType === "mouse" && e.currentTarget.getBoundingClientRect().right - e.clientX < 24) sbarFlash(); });
+sbar.addEventListener("pointerleave", sbarFlash);
+sbar.addEventListener("pointerdown", e => { e.preventDefault(); sbar.setPointerCapture(e.pointerId); sbar.classList.add("drag");
+  const y0 = e.clientY, s0 = pvBody.scrollTop, k = (pvBody.scrollHeight - pvBody.clientHeight) / Math.max(1, pvBody.clientHeight - 8 - sbar.offsetHeight);
+  const mv = ev => { pvBody.scrollTop = s0 + (ev.clientY - y0) * k; };
+  sbar.addEventListener("pointermove", mv);
+  sbar.addEventListener("pointerup", () => { sbar.classList.remove("drag"); sbar.removeEventListener("pointermove", mv); sbarFlash(); }, {once: true}); });
+addEventListener("resize", sbarSize);
+bounce(pvBody, $("pv-in"), sbar);
+
+function renderAll() { lpClose(); renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); flyBuild(); }
 function filter(groupId, set, render, ids) {
   $(groupId).querySelectorAll("button").forEach(b => { if (!b.hasAttribute("aria-pressed")) b.setAttribute("aria-pressed", "false"); });
   $(groupId).onclick = e => { const b = e.target.closest("button"); if (!b || b.getAttribute("aria-pressed") === "true") return;

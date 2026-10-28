@@ -39,7 +39,8 @@ Urutan dari atas: hitung mundur dan **lintasan program** (22 Jun → hari marato
 tanda lomba, kedua pelari berdiri di tanggal hari ini). Di bawahnya **batang target km mingguan** kedua pelari
 dan **kurung fase** bertanggal (km & long run per fase, titik progres fase berjalan). Arahkan kursor ke batang
 untuk ringkasan; klik batang untuk **jadwal harian** minggu itu (Senin–Minggu dari sheet Kalender, ✓ km aktual,
-catatan coaching; ←/→ pindah minggu, Esc tutup). Lalu **Ringkasan** head-to-head, **Latihan**,
+catatan coaching; ←/→ pindah minggu, Esc tutup). Saat halaman di-scroll, kedua pelari lepas dari lintasan dan
+parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. Lalu **Ringkasan** head-to-head, **Latihan**,
 **Pemulihan**, **Progres terbaik**, **Badge**. Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 | Bagian | Sumber |
@@ -76,6 +77,8 @@ Tabel di Excel ditulis untuk manusia; ini cara program membacanya.
 - **HRV normal** = status Garmin `BALANCED`. **Di bawah normal** = `LOW` atau `POOR`. Status `NONE` = tidak ada data malam itu (lampu dinilai dari BB dan tidur saja).
 - **Detak istirahat naik** = dibanding median 28 hari sebelumnya (minimal 7 hari data). RHR diambil dari ringkasan harian; kalau kosong, dari data tidur.
 - **Lampu**: MERAH (HRV di bawah normal 3 hari, atau RHR +7) → ORANYE (HRV di bawah normal 2 hari, BB < 40, atau RHR +5) → HIJAU (HRV balanced, BB > 60, tidur ≥ 6 jam) → selain itu KUNING.
+- **Kenapa lampu tidak hijau**: di bawah kalimat ringkasan tertulis syarat yang kurang; klik lampunya untuk rincian
+  empat syarat (HRV, Body Battery, tidur, detak istirahat) beserta nilai hari itu dan batasnya.
 - **Body Battery harian** = nilai tertinggi hari itu (setelah tidur).
 - **Aturan Sabtu**: tidur < 5 jam + BB < 30 + HRV di bawah normal → *Ganti easy 8 km*; tidur < 5 jam + BB < 40 → *Potong 40%*; tidur ≥ 6 jam + BB ≥ 50 → *Jalankan*; selain itu → *Potong 20%*.
 - **Decoupling** = efisiensi (kecepatan ÷ HR) separuh pertama vs kedua waktu bergerak, pada lari terpanjang minggu itu (≥ 10 km).

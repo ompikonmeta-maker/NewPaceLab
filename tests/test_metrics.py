@@ -97,6 +97,14 @@ class LightTest(unittest.TestCase):
         self.set(bb=70, rhr=62)  # +7 over the 28-day median
         self.assertEqual(m.light(self.w, self.day)["level"], "merah")
 
+    def test_checks_explain_the_level(self):
+        s = lambda: {c["k"]: c["s"] for c in m.light(self.w, self.day)["checks"]}
+        self.assertEqual(s(), {"hrv": "ok", "bb": "ok", "sleep": "ok", "rhr": "ok"})
+        self.set(sleep_s=5.5 * 3600, bb=55)
+        self.assertEqual(s(), {"hrv": "ok", "bb": "warn", "sleep": "warn", "rhr": "ok"})
+        self.set(bb=35, rhr=60, hrv_status="NONE")
+        self.assertEqual(s(), {"hrv": None, "bb": "bad", "sleep": "warn", "rhr": "bad"})
+
     def test_no_hrv_reading_and_sleep_rhr(self):
         self.set(hrv_status="NONE")
         self.assertEqual(m.light(self.w, self.day)["level"], "hijau")
