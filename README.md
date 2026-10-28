@@ -36,7 +36,10 @@ Python 3.8+ saja, tanpa `pip install`.
 ## Isi dashboard
 
 Urutan dari atas: hitung mundur dan **lintasan program** (22 Jun → hari maraton, satu garis per minggu,
-tanda lomba, kedua pelari berdiri di tanggal hari ini), lalu **Ringkasan** head-to-head, **Latihan**,
+tanda lomba, kedua pelari berdiri di tanggal hari ini). Di bawahnya **batang target km mingguan** kedua pelari
+dan **kurung fase** bertanggal (km & long run per fase, titik progres fase berjalan). Arahkan kursor ke batang
+untuk ringkasan; klik batang untuk **jadwal harian** minggu itu (Senin–Minggu dari sheet Kalender, ✓ km aktual,
+catatan coaching; ←/→ pindah minggu, Esc tutup). Lalu **Ringkasan** head-to-head, **Latihan**,
 **Pemulihan**, **Progres terbaik**, **Badge**. Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 | Bagian | Sumber |

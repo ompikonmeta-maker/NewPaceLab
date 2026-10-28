@@ -15,6 +15,7 @@ EXCEL_EPOCH = dt.date(1899, 12, 30)
 # Kalender legend: grey row = down week, light orange row = race/test week
 FILL_DOWN = "F2F2F2"
 FILL_EVENT = "FCE4D6"
+DAYS_ID = ("SENIN", "SELASA", "RABU", "KAMIS", "JUMAT", "SABTU", "MINGGU")
 
 
 class ProgramError(ValueError):
@@ -127,6 +128,7 @@ def _kalender(rows, fill):
 
     c_date, c_phase, c_km, c_lr = col("TANGGAL"), col("FASE"), col("KM TOTAL"), col("LONG RUN")
     c_note = col("CATATAN")
+    day_cols = [i for i, c in enumerate(head) if c.split(" ")[0] in DAYS_ID]  # SENIN .. MINGGU
     weeks = []
     for ri in range(h + 1, len(rows)):
         r = rows[ri]
@@ -146,6 +148,8 @@ def _kalender(rows, fill):
             "down": color == FILL_DOWN and "bukan minggu ringan" not in note_l,
             "event": color == FILL_EVENT,
             "note": note.split("|")[0].strip(),
+            "notes": [n.strip() for n in note.split("|") if n.strip()],
+            "days": [str(_cell(r, i) or "").strip() for i in day_cols] if len(day_cols) == 7 else [],
         })
     return weeks
 

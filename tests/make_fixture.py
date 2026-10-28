@@ -26,7 +26,8 @@ rows = [(7, "03 Agu 2026", "1 Base", 28, 14, "Mulai", None),
         (9, "17 Agu 2026", "2 Support", 21, "-", "LOMBA 10K", ORANGE),
         (10, "24 Agu 2026", "2 Support", 35, 20, "DIUBAH. Bukan minggu ringan lagi", GREY)]
 for ms, date, phase, km, lr, note, fill in rows:
-    ws.append([ms, date, phase, "", "", "", "", "", "", "", km, lr, note])
+    ws.append([ms, date, phase, "ISTIRAHAT PENUH", "Lari santai 5 km\nDetak jantung 139 - 152", "", "Lari santai 5 km",
+               "", "LONG RUN %s km\nPerkiraan waktu: 2 jam" % lr, "Lari pemulihan 4 km", km, lr, note])
     if fill:
         ws.cell(ws.max_row, 1).fill = fill
 

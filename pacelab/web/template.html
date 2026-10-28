@@ -96,11 +96,106 @@ body.ready .tl .now{animation:tlgo 1.6s .3s var(--ease) forwards}
 .tl .tag{position:absolute;left:50%;top:-4px;transform:translateX(-50%);font-size:12px;font-weight:650;background:var(--text);color:var(--surface);border-radius:999px;padding:1px 9px;white-space:nowrap}
 .tl .tag::after{content:"";position:absolute;left:50%;bottom:-4px;margin-left:-4px;border:4px solid transparent;border-top-color:var(--text);border-bottom:0}
 .tl .pin{position:absolute;left:50%;bottom:-8px;width:2px;height:8px;background:var(--text);margin-left:-1px}
-.ph{display:flex;margin-top:6px;font-size:12px;color:var(--muted)}
-.ph span{overflow:hidden;white-space:nowrap;border-left:1px solid var(--line);padding-left:5px}
-.ph span.cur{color:var(--text);font-weight:650}
-@media (max-width:640px){.ph span:not(.cur){visibility:hidden}.ph span.cur{overflow:visible;border:0}
+@media (max-width:640px){
   .tl .ev span{font-size:10.5px}.tl .ev.mid span{display:none}.tl .pair{width:84px;height:42px}}
+
+/* program under the track: weekly target bars per athlete + phase brackets (C3) */
+.prog{position:relative;margin-top:4px}
+.terrain{position:relative;height:52px}
+.wkcol{position:absolute;bottom:0;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:1px;border-radius:4px;cursor:pointer;transition:background .2s,transform .25s cubic-bezier(.34,1.3,.64,1)}
+.wkcol:hover{background:color-mix(in srgb,var(--text) 7%,transparent);transform:translateY(-2px)}
+.wkcol i{display:block;flex:1;max-width:6px;border-radius:2px 2px 0 0;transform-origin:bottom;transform:scaleY(0)}
+body.ready .wkcol i{animation:up .7s var(--ease) forwards}
+@keyframes up{to{transform:none}}
+.wkcol .t{background:var(--t)}.wkcol .r{background:var(--r)}
+.wkcol.future i{opacity:.28}.wkcol.down i{filter:grayscale(.6)}
+.wkcol.now{outline:1.5px solid var(--text);outline-offset:1px}
+.wkcol .race{position:absolute;top:-2px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--text);box-shadow:0 0 0 2px var(--bg)}
+.wkcol .ghost{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--line)}
+.prog .nowline{position:absolute;top:0;height:52px;width:2px;background:var(--text);margin-left:-1px;pointer-events:none}
+.brk{display:flex;margin-top:6px}
+.bk{position:relative;padding-top:14px;text-align:center;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;border-radius:8px;transition:background .2s;cursor:default}
+.bk:hover{background:color-mix(in srgb,var(--text) 4%,transparent)}
+.bk::before{content:"";position:absolute;top:2px;left:3px;right:3px;height:9px;border:1.5px solid var(--line);border-top:0;border-radius:0 0 7px 7px}
+.bk.past::before{border-color:var(--muted)} .bk.future::before{border-style:dashed}
+.bk b{display:inline-flex;align-items:center;gap:4px;font-size:13px;color:var(--text-2);font-weight:600;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.bk.past b{color:var(--muted);font-weight:500}
+.bk .ok{width:13px;height:13px;color:var(--good);flex:none}
+.bk small,.bk .vol{display:block;font-size:11.5px;overflow:hidden;text-overflow:ellipsis}
+.bk .vol{color:var(--text-2)}
+.bk.cur::before{border:0}
+.bk.cur svg.bkt{position:absolute;top:1px;left:3px;width:calc(100% - 6px);height:12px;overflow:visible}
+.bk.cur svg.bkt path{fill:none;stroke-width:2.2;stroke-linecap:round}
+.bk.cur .base{stroke:var(--grid)} .bk.cur .prg{stroke:var(--text);stroke-dasharray:1;stroke-dashoffset:1}
+body.ready .bk.cur .prg{animation:bkdraw 1.4s .5s var(--ease) forwards}
+@keyframes bkdraw{to{stroke-dashoffset:var(--off)}}
+.bk.cur b{color:var(--text);font-size:14px;font-weight:700}
+.bk.cur b span{font-weight:400;font-size:12px;color:var(--muted)}
+.wdots{display:flex;justify-content:center;gap:4px;margin:4px 0 1px}
+.wdots i{width:7px;height:7px;flex:none;border-radius:50%;background:var(--grid)}
+.wdots i.d{background:var(--text)} .wdots i.n{background:var(--surface);box-shadow:inset 0 0 0 2px var(--text);animation:wpulse 1.6s ease-in-out infinite}
+@keyframes wpulse{50%{transform:scale(1.35)}}
+.leg2{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:10px}
+.leg2 span{display:inline-flex;align-items:center;gap:6px}.leg2 i{display:inline-block;width:8px;height:8px;border-radius:2px}
+.ptip{position:fixed;pointer-events:none;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:13px;box-shadow:0 10px 28px rgba(0,0,0,.14);opacity:0;transition:opacity .15s;z-index:60;min-width:220px;max-width:300px}
+.ptip.on{opacity:1} .ptip b{display:block;font-size:14px;margin-bottom:4px} .ptip .r2{display:flex;justify-content:space-between;gap:12px} .ptip .r2 span:first-child{color:var(--muted)}
+.ptip .dot{width:8px;height:8px;margin-right:5px}
+@media (max-width:640px){.bk:not(.cur) b,.bk:not(.cur) small,.bk:not(.cur) .vol{visibility:hidden}.bk.cur{overflow:visible}.bk.cur b,.bk.cur small,.bk.cur .vol{overflow:visible}.terrain,.prog .nowline{height:40px}}
+
+/* weekly schedule overlay: dim + blur, spring pop-in; bottom sheet on phones */
+.ov{position:fixed;inset:0;z-index:100;display:none;align-items:center;justify-content:center;padding:24px;
+  background:rgba(17,17,16,0);backdrop-filter:blur(0);-webkit-backdrop-filter:blur(0);pointer-events:none;
+  transition:background .4s ease,backdrop-filter .4s ease,-webkit-backdrop-filter .4s ease}
+.ov.open{background:rgba(17,17,16,.4);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);pointer-events:auto}
+.panel{width:min(720px,100%);max-height:min(860px,calc(100vh - 48px));overflow:auto;background:var(--surface);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.3);
+  opacity:0;transform:scale(.94) translateY(16px);transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .5s cubic-bezier(.34,1.3,.64,1);overscroll-behavior:contain}
+.ov.open .panel{opacity:1;transform:none}
+.pv-head{position:sticky;top:0;z-index:2;background:color-mix(in srgb,var(--surface) 90%,transparent);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:18px 20px 12px;border-bottom:1px solid var(--line)}
+.pv-nav{display:flex;align-items:center;gap:10px}
+.pv-nav h2{margin:0;font-size:20px;letter-spacing:-.01em;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;cursor:pointer;color:var(--text-2);transition:transform .2s cubic-bezier(.34,1.3,.64,1),background .2s}
+.ib:hover{background:var(--bg)} .ib:active{transform:scale(.9)} .ib:disabled{opacity:.35;cursor:default}
+.pv-meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:13px}
+.pv-meta span{border-radius:999px;padding:2px 10px;background:var(--bg);color:var(--text-2)}
+.pv-meta .dark{background:var(--text);color:var(--surface);font-weight:600}
+.pv-meta .warn{background:var(--warn-bg);color:var(--warn);font-weight:600} .pv-meta .race{background:var(--serious-bg);color:var(--serious);font-weight:600}
+.pv-tabs{position:relative;display:inline-flex;margin-top:12px;background:var(--bg);border-radius:12px;padding:3px}
+.pv-tabs button{position:relative;z-index:1;border:0;background:none;font:inherit;font-weight:600;color:var(--text-2);height:32px;padding:0 14px;border-radius:9px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.pv-tabs button[aria-selected="true"]{color:var(--text)}
+.pv-tabs .slider{position:absolute;top:3px;bottom:3px;left:0;border-radius:9px;background:var(--surface);box-shadow:0 1px 4px rgba(0,0,0,.1);transition:transform .45s cubic-bezier(.34,1.3,.64,1),width .45s cubic-bezier(.34,1.3,.64,1)}
+.pv-body{padding:16px 20px 20px}
+.slide{transition:opacity .25s ease,transform .35s var(--ease)}
+.slide.outL{opacity:0;transform:translateX(-24px)} .slide.outR{opacity:0;transform:translateX(24px)}
+.pv-sum{display:grid;grid-template-columns:auto 1fr 1fr;gap:16px;align-items:center;padding:14px;border-radius:16px;background:var(--bg)}
+.pv-ring{width:74px;height:74px} .pv-ring .trk{stroke:var(--grid)} .pv-ring .val{stroke-dasharray:0 999;transition:stroke-dasharray 1.1s var(--ease) .15s}
+.pv-ring text{font:700 15px var(--font);fill:var(--text)}
+.pv-kv .lab{font-size:12.5px;color:var(--muted)} .pv-kv .v{font-size:22px;font-weight:650;letter-spacing:-.01em} .pv-kv .v small{font-size:13px;font-weight:400;color:var(--muted)}
+.pv-days{list-style:none;margin:14px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}
+.pv-day{display:grid;grid-template-columns:52px 36px 1fr auto;gap:12px;align-items:start;padding:10px 12px;border-radius:14px;border:1px solid var(--line);cursor:pointer;opacity:0;transform:translateY(10px);transition:background .2s}
+.ov.open .pv-day.in{animation:rowin .5s var(--ease) forwards;animation-delay:calc(var(--i) * 55ms + 120ms)}
+@keyframes rowin{to{opacity:1;transform:none}}
+.pv-day:hover{background:var(--bg)} .pv-day.today{border-color:var(--text);box-shadow:0 0 0 1px var(--text) inset} .pv-day.rest{background:color-mix(in srgb,var(--bg) 60%,transparent)}
+.pv-dn{font-size:12px;color:var(--muted);line-height:1.2} .pv-dn b{display:block;font-size:18px;color:var(--text);font-weight:650}
+.pv-ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center} .pv-ico svg{width:19px;height:19px}
+.k-rest .pv-ico{background:var(--grid);color:var(--muted)} .k-easy .pv-ico{background:color-mix(in srgb,var(--t) 14%,var(--surface));color:var(--t)}
+.k-hard .pv-ico{background:var(--serious-bg);color:var(--serious)} .k-long .pv-ico{background:var(--text);color:var(--surface)}
+.k-str .pv-ico{background:color-mix(in srgb,#6a4fc4 14%,var(--surface));color:#7a62d0} .k-rec .pv-ico{background:var(--good-bg);color:var(--good)} .k-race .pv-ico{background:var(--serious);color:#fff}
+.pv-ttl{font-weight:650;font-size:15px;line-height:1.3}
+.pv-chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px} .pv-chips span{font-size:12px;border-radius:999px;padding:1px 8px;background:var(--bg);color:var(--text-2);border:1px solid var(--line)}
+.pv-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .35s var(--ease)} .pv-more > div{overflow:hidden}
+.pv-day.open .pv-more{grid-template-rows:1fr} .pv-more ul{margin:8px 0 2px;padding-left:16px;color:var(--text-2);font-size:13.5px} .pv-more li{margin:2px 0}
+.pv-st{font-size:12.5px;text-align:right;white-space:nowrap;color:var(--muted);padding-top:4px}
+.pv-st .ok{color:var(--good);font-weight:650} .pv-st .tag{background:var(--text);color:var(--surface);border-radius:999px;padding:1px 8px;font-weight:600}
+.caret{display:inline-block;margin-left:4px;transition:transform .3s var(--ease)} .pv-day.open .caret{transform:rotate(180deg)}
+.pv-note{margin-top:14px;padding:12px 14px;border-radius:14px;background:var(--bg);font-size:14px;color:var(--text-2)}
+.pv-note b{color:var(--text)} .pv-note ul{margin:4px 0 0;padding-left:16px}
+@media (max-width:640px){
+  .ov{padding:0;align-items:flex-end}
+  .panel{width:100%;max-height:92vh;border-radius:22px 22px 0 0;transform:translateY(60px)}
+  .panel::before{content:"";display:block;width:40px;height:5px;border-radius:3px;background:var(--grid);margin:8px auto 0}
+  .pv-sum{grid-template-columns:auto 1fr}.pv-sum .pv-kv:last-child{grid-column:1/-1}
+  .pv-day{grid-template-columns:44px 32px 1fr;gap:10px}.pv-st{grid-column:3;text-align:left;padding-top:0}
+}
 
 /* sections + grid */
 .section{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;margin:36px 0 12px}
@@ -114,9 +209,9 @@ body.ready .tl .now{animation:tlgo 1.6s .3s var(--ease) forwards}
 body.switching .card{opacity:.25;transform:scale(.99);transition:opacity .25s,transform .25s}
 body,.btn,.pill,.seg,.tog,.tip{transition:background-color .4s,color .4s,border-color .4s}
 /* header entrance */
-.hero,.sub,.right,#tl,#ph{opacity:0;transform:translateY(10px)}
-body.ready .hero,body.ready .sub,body.ready .right,body.ready #tl,body.ready #ph{animation:rise .8s var(--ease) forwards}
-body.ready .sub{animation-delay:.12s} body.ready .right{animation-delay:.2s} body.ready #tl,body.ready #ph{animation-delay:.28s}
+.hero,.sub,.right,#tl,#prog,#leg2{opacity:0;transform:translateY(10px)}
+body.ready .hero,body.ready .sub,body.ready .right,body.ready #tl,body.ready #prog,body.ready #leg2{animation:rise .8s var(--ease) forwards}
+body.ready .sub{animation-delay:.12s} body.ready .right{animation-delay:.2s} body.ready #tl,body.ready #prog,body.ready #leg2{animation-delay:.28s}
 @keyframes rise{to{opacity:1;transform:none}}
 .phases i b{transform-origin:left;transform:scaleX(0)}
 body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
@@ -283,7 +378,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
-  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#ph{opacity:1;transform:none} .ln{stroke-dashoffset:0}
+  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2{opacity:1;transform:none} .ln{stroke-dashoffset:0}
   .tl .done{width:var(--p)} .tl .now{left:var(--p)}
   .cells i,.phases i b{transform:none}
 }
@@ -307,7 +402,8 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
   </div>
 </header>
 <div class="tl" id="tl" role="img"></div>
-<div class="ph" id="ph" aria-hidden="true"></div>
+<div class="prog" id="prog"><div class="terrain" id="terrain"></div><span class="nowline" id="prog-now"></span><div class="brk" id="brk"></div></div>
+<div class="leg2" id="leg2" aria-hidden="true"></div>
 
 <div class="section"><div><h2>Ringkasan</h2><p id="sum-p"></p></div></div>
 <div class="grid" id="summary"></div>
@@ -352,6 +448,20 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <footer id="foot"></footer>
 </div>
 <div class="hint" id="hint" role="tooltip"></div>
+<div class="ptip" id="ptip" aria-hidden="true"></div>
+<div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
+  <div class="panel">
+    <div class="pv-head">
+      <div class="pv-nav"><button class="ib" id="pv-prev" aria-label="Minggu sebelumnya"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <h2 id="pv-title"></h2>
+        <button class="ib" id="pv-next" aria-label="Minggu berikutnya"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+        <button class="ib" id="pv-close" aria-label="Tutup"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></button></div>
+      <div class="pv-meta" id="pv-meta"></div>
+      <div class="pv-tabs" role="tablist" id="pv-tabs"></div>
+    </div>
+    <div class="pv-body"><div class="slide" id="pv-slide"></div></div>
+  </div>
+</div>
 
 <script>
 const DATA = /*__DATA__*/null;
@@ -789,9 +899,7 @@ function renderTrack() {
     <div class="ev fin" style="left:100%"><i></i><span>42K</span></div>
     <div class="now" style="--p:${p}"><span class="tag">Hari ini · ${tgl(DATA.today)}</span><div class="ground"></div><div class="pair${duel ? " duel" : ""}">${pair}</div><span class="pin"></span></div>
     <div class="dates"><span>${tgl(S)} ${D(S).getFullYear()}</span><span>${tgl(R)} ${D(R).getFullYear()}</span></div>`;
-  $("ph").innerHTML = DATA.phases.map(ph => { const a = addDays(S, (ph.a - 1) * 7), b = addDays(S, ph.b * 7);
-    const w = pos(b) - pos(a), cur = ph.a <= DATA.ms_cur && DATA.ms_cur <= ph.b;
-    return `<span style="width:${w}%" class="${cur ? "cur" : ""}" title="${ph.name}: ${tgl(a)} – ${tgl(addDays(b, -1))}">${w > 6 || cur ? ph.name : ""}</span>`; }).join("");
+  renderProgram();
   dodgeLabels();
 }
 function dodgeLabels() {  // a race label that would touch its left neighbour drops one row
@@ -801,6 +909,148 @@ function dodgeLabels() {  // a race label that would touch its left neighbour dr
     if (r.width && r.left < last + 8) e.classList.add("low"); else last = r.right; });
 }
 addEventListener("resize", () => { clearTimeout(dodgeLabels._t); dodgeLabels._t = setTimeout(dodgeLabels, 100); });
+
+// ---------------------------------------------------------------- program (C3): weekly target bars + phase brackets
+const PROG = { S: DATA.ms1, R: DATA.race_date, MS: DATA.ms_cur, N: DATA.total_weeks };
+const progPos = s => (D(s) - D(PROG.S)) / (D(PROG.R) - D(PROG.S)) * 100;
+const planOf = (a, m) => (a.plan || []).find(w => w.ms === m) || null;
+const phaseOf = m => DATA.phases.find(p => p.a <= m && m <= p.b);
+const rngTxt = a => a.length ? (Math.min(...a) === Math.max(...a) ? `${Math.max(...a)}` : `${Math.min(...a)}–${Math.max(...a)}`) : "–";
+const evName = n => n.replace(/^LOMBA /i, "").replace(/HALF MARATHON/i, "Half");
+const actualWeek = (a, m) => { const w = a.weeks.find(x => x.ms === m); return w && w.km != null && (w.done || m === PROG.MS) ? w.km : null; };
+const OK = '<svg class="ok" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+function phaseInfo(p) {
+  const s = addDays(PROG.S, (p.a - 1) * 7), e = addDays(PROG.S, p.b * 7 - 1), ws = [];
+  for (let m = p.a; m <= p.b; m++) ws.push(m);
+  const km = a => ws.map(m => (planOf(a, m) || {}).km).filter(Boolean);
+  const lr = Math.max(0, ...ws.flatMap(m => A.map(a => (planOf(a, m) || {}).lr || 0)));
+  const st = PROG.MS > p.b ? "past" : PROG.MS < p.a ? "future" : "cur";
+  return {...p, s, e, ws, km, lr, st, wk: PROG.MS - p.a + 1, of: p.b - p.a + 1,
+    down: ws.filter(m => (planOf(A[0], m) || {}).down).length,
+    ev: (DATA.all_events || []).filter(x => x.ms >= p.a && x.ms <= p.b && !/keringat|maraton/i.test(x.event))};
+}
+function renderProgram() {
+  const vis = V(), MAXKM = Math.max(1, ...A.flatMap(a => (a.plan || []).map(w => w.km || 0)));
+  let h = "";
+  for (let m = 1; m <= PROG.N; m++) {
+    const s = addDays(PROG.S, (m - 1) * 7), x = progPos(s), w = progPos(addDays(s, 7)) - x;
+    const has = vis.some(a => planOf(a, m) && planOf(a, m).km), p0 = planOf(A[0], m) || {};
+    const bars = vis.map((a, j) => { const pw = planOf(a, m); return pw && pw.km ? `<i class="${a.c}" data-c="${a.c}" style="height:${pw.km / MAXKM * 100}%;animation-delay:${400 + m * 12 + j * 6}ms"></i>` : ""; }).join("");
+    h += `<div class="wkcol ${m < PROG.MS ? "past" : m === PROG.MS ? "now" : "future"}${p0.down ? " down" : ""}" data-ms="${m}" tabindex="${has ? 0 : -1}"
+      ${has ? `role="button" aria-label="Jadwal minggu ${tgl(s)}"` : ""} style="left:calc(${x}% + 1px);width:calc(${w}% - 2px)">${has ? bars : '<span class="ghost"></span>'}${p0.event ? '<span class="race"></span>' : ""}</div>`;
+  }
+  $("terrain").innerHTML = h;
+  $("prog-now").style.left = progPos(DATA.today) + "%";
+  $("brk").innerHTML = DATA.phases.map(raw => { const p = phaseInfo(raw), w = progPos(addDays(p.e, 1)) - progPos(p.s);
+    const km = p.km(vis[0]), vol = km.length ? `<span class="vol">${rngTxt(km)} km${p.lr ? ` · LR ${p.lr}` : ""}</span>` : "";
+    const dates = `<small>${tgl(p.s)} – ${tgl(p.e)}</small>`;
+    if (p.st !== "cur") return `<div class="bk ${p.st}" data-ph="${p.a}" style="width:${w}%"><b>${p.st === "past" ? OK : ""}${p.name}</b>${w > 8 ? dates + vol : ""}</div>`;
+    const frac = (p.wk - .5) / p.of;
+    return `<div class="bk cur" data-ph="${p.a}" style="width:${w}%">
+      <svg class="bkt" viewBox="0 0 100 12" preserveAspectRatio="none" aria-hidden="true"><path class="base" d="M1 1 V6 Q1 11 6 11 H94 Q99 11 99 6 V1" vector-effect="non-scaling-stroke"/>
+        <path class="prg" pathLength="1" style="--off:${(1 - frac).toFixed(3)}" d="M1 1 V6 Q1 11 6 11 H94 Q99 11 99 6 V1" vector-effect="non-scaling-stroke"/></svg>
+      <b>${p.name} <span>${p.wk}/${p.of}</span></b><div class="wdots">${p.ws.map(m => `<i class="${m < PROG.MS ? "d" : m === PROG.MS ? "n" : ""}"></i>`).join("")}</div>${dates}${vol}</div>`; }).join("");
+  $("leg2").innerHTML = vis.map(a => `<span><i style="background:var(--${a.c})"></i>target km ${a.name}</span>`).join("") +
+    `<span>pudar = belum dijalani</span><span>abu = minggu ringan</span><span><i style="background:var(--text);border-radius:50%"></i>minggu lomba/tes</span><span>klik batang = jadwal minggu itu</span>`;
+}
+// rich hover detail for phases and week bars
+const ptip = $("ptip");
+function ptipShow(e, html) { ptip.innerHTML = html; ptip.classList.add("on");
+  ptip.style.left = Math.min(e.clientX + 14, innerWidth - ptip.offsetWidth - 8) + "px";
+  ptip.style.top = (e.clientY + 18 + ptip.offsetHeight > innerHeight ? e.clientY - ptip.offsetHeight - 12 : e.clientY + 18) + "px"; }
+document.addEventListener("pointermove", e => {
+  const bk = e.target.closest(".bk"), wc = e.target.closest(".wkcol");
+  if (bk) { const p = phaseInfo(DATA.phases.find(x => x.a === +bk.dataset.ph));
+    ptipShow(e, `<b>${p.name} · ${p.st === "cur" ? `minggu ${p.wk} dari ${p.of}` : p.st === "past" ? "selesai" : "akan datang"}</b>
+      <div class="r2"><span>Tanggal</span><span>${tgl(p.s)} – ${tgl(p.e)}</span></div><div class="r2"><span>Lama</span><span>${p.of} minggu</span></div>
+      ${V().map(a => `<div class="r2"><span><i class="dot ${a.c}"></i>${a.name}</span><span>${rngTxt(p.km(a))} km/mgg</span></div>`).join("")}
+      <div class="r2"><span>Long run maks</span><span>${p.lr || "–"} km</span></div><div class="r2"><span>Minggu ringan</span><span>${p.down}</span></div>
+      ${p.ev.length ? `<div class="r2"><span>Lomba/tes</span><span>${p.ev.map(x => evName(x.event) + " " + tgl(x.date)).join(", ")}</span></div>` : ""}`); return; }
+  if (wc) { const m = +wc.dataset.ms, s = addDays(PROG.S, (m - 1) * 7), p0 = planOf(A[0], m) || {};
+    ptipShow(e, `<b>${tgl(s)} – ${tgl(addDays(s, 6))}${p0.down ? " · ringan" : p0.event ? " · lomba/tes" : ""}</b>
+      ${V().map(a => { const pw = planOf(a, m) || {}, act = actualWeek(a, m); return `<div class="r2"><span><i class="dot ${a.c}"></i>${a.name}</span><span>${act != null ? f1(act) + " / " : ""}${pw.km ?? "–"} km</span></div>`; }).join("")}
+      ${p0.lr ? `<div class="r2"><span>Long run</span><span>${V().map(a => (planOf(a, m) || {}).lr || "–").join(" / ")} km</span></div>` : ""}
+      ${(planOf(A[0], m) || {}).days ? `<div style="color:var(--muted);margin-top:4px">klik untuk jadwal harian</div>` : ""}`); return; }
+  ptip.classList.remove("on");
+});
+
+// ---------------------------------------------------------------- weekly schedule overlay
+const HR7 = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"];
+const SICON = {
+  rest: '<path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>',
+  easy: RUN.replace("<path ", '<path fill="currentColor" '),
+  hard: '<path d="M13 2L4 14h7l-1 8 9-12h-7z" fill="currentColor"/>',
+  long: '<path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round"/>',
+  race: '<path d="M12 2l2.6 6.3 6.8.5-5.2 4.4 1.6 6.6L12 16.3 6.2 19.8l1.6-6.6L2.6 8.8l6.8-.5z" fill="currentColor"/>',
+  str: '<path d="M6 8v8M18 8v8M3 10v4M21 10v4M6 12h12" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/>',
+  rec: '<path d="M5 19c8 0 13-5 14-14-9 1-14 6-14 14zm0 0l6-6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'};
+function sessionKind(t) { t = t.toLowerCase();
+  if (/istirahat/.test(t)) return "rest"; if (/lomba|race|maraton|^tes /.test(t)) return "race"; if (/long run/.test(t)) return "long";
+  if (/latihan keras|tempo|interval/.test(t)) return "hard"; if (/kekuatan|perut|pinggul|beban|atas \+/.test(t)) return "str";
+  if (/pemulihan/.test(t)) return "rec"; return "easy"; }
+function calm(t) { const L = t.replace(/[^A-Za-z]/g, ""), up = L.replace(/[^A-Z]/g, "").length;  // Excel titles are often ALL CAPS
+  if (L.length < 4 || up / L.length < .6) return t; const s = t.toLowerCase(); return s.charAt(0).toUpperCase() + s.slice(1); }
+const esc = s => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;");
+function session(cell) {
+  const L = String(cell || "").split("\n").map(s => s.trim()).filter(Boolean), chips = [], rest = [];
+  L.slice(1).forEach(l => { let m;
+    if ((m = l.match(/detak jantung\s*(di bawah\s*)?(\d+)\s*(?:-|–)?\s*(\d+)?/i))) chips.push("HR " + (m[1] ? "< " + m[2] : m[2] + (m[3] ? "–" + m[3] : "")));
+    else if ((m = l.match(/pace[^\d]*(\d+:\d+)\s*(?:-|–)\s*(\d+:\d+)/i))) chips.push(m[1] + "–" + m[2] + "/km");
+    else if ((m = l.match(/perkiraan waktu:\s*(.*)/i))) chips.push("± " + m[1]);
+    else rest.push(l); });
+  return {title: calm(L[0] || "–"), chips, rest, k: sessionKind(L[0] || "")};
+}
+const ov = $("ov"), slide = $("pv-slide");
+let PV = {m: PROG.MS, c: A[0].c}, opener = null;
+const pvAth = () => A.find(a => a.c === PV.c) || V()[0];
+function openWeek(m, c, from) { PV = {m, c: V().some(a => a.c === c) ? c : V()[0].c}; opener = from; pvRender(); ov.style.display = "flex";
+  requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); pvSlider(); pvIn(); $("pv-close").focus({preventScroll: true}); })); }
+function closeWeek() { ov.classList.remove("open"); setTimeout(() => { ov.style.display = "none"; opener && opener.focus({preventScroll: true}); }, 460); }
+function pvIn() { slide.querySelectorAll(".pv-day").forEach(d => d.classList.add("in"));
+  const v = slide.querySelector(".pv-ring .val"); if (v) requestAnimationFrame(() => v.style.strokeDasharray = v.dataset.to); }
+function pvSlider() { const sel = $("pv-tabs").querySelector(`button[data-c="${PV.c}"]`), sl = $("pv-slider"); if (!sel || !sel.offsetWidth) return;
+  sl.style.width = sel.offsetWidth + "px"; sl.style.transform = `translateX(${sel.offsetLeft - 3}px)`; }
+function pvRender() {
+  const a = pvAth(), m = PV.m, w = planOf(a, m) || {}, s = addDays(PROG.S, (m - 1) * 7), e = addDays(s, 6), p = phaseOf(m) || {name: "–", a: m, b: m};
+  $("pv-title").textContent = `${tgl(s)} – ${tgl(e)} ${D(e).getFullYear()}`;
+  const ev = (DATA.all_events || []).filter(x => x.ms === m && !/keringat/i.test(x.event));
+  $("pv-meta").innerHTML = `<span class="dark">${p.name} · minggu ${m - p.a + 1}/${p.b - p.a + 1}</span>${m === PROG.MS ? '<span class="dark">minggu ini</span>' : ""}` +
+    (w.down ? '<span class="warn">minggu ringan</span>' : "") + ev.map(x => `<span class="race">${evName(x.event)} · ${tgl(x.date)}</span>`).join("");
+  $("pv-prev").disabled = !planOf(a, m - 1); $("pv-next").disabled = !planOf(a, m + 1);
+  $("pv-tabs").innerHTML = `<span class="slider" id="pv-slider"></span>` + V().map(x => `<button role="tab" aria-selected="${x.c === PV.c}" data-c="${x.c}"><i class="dot ${x.c}"></i>${x.name}</button>`).join("");
+  pvSlider();
+  const act = actualWeek(a, m), frac = act != null && w.km ? Math.min(1, act / w.km) : 0, C = 2 * Math.PI * 30;
+  const days = (w.days || []).map(session), runs = days.filter(d => !["rest", "str"].includes(d.k)).length;
+  slide.innerHTML = `<div class="pv-sum">
+      <svg class="pv-ring" viewBox="0 0 74 74" aria-hidden="true"><circle class="trk" cx="37" cy="37" r="30" fill="none" stroke-width="8"/>
+        <circle class="val" data-to="${(frac * C).toFixed(1)} ${C.toFixed(1)}" cx="37" cy="37" r="30" fill="none" stroke="var(--${a.c})" stroke-width="8" stroke-linecap="round" transform="rotate(-90 37 37)"/>
+        <text x="37" y="42" text-anchor="middle">${act != null && w.km ? Math.round(frac * 100) + "%" : "–"}</text></svg>
+      <div class="pv-kv"><div class="lab">${act != null ? "Aktual / target" : "Target"} km</div><div class="v">${act != null ? f1(act) + "<small> / " + (w.km ?? "–") + " km</small>" : (w.km ?? "–") + "<small> km</small>"}</div></div>
+      <div class="pv-kv"><div class="lab">Long run · sesi lari</div><div class="v">${w.lr ?? "–"}<small> km · ${runs} sesi</small></div></div></div>
+    ${days.length ? `<ul class="pv-days">${days.map((d, i) => { const day = addDays(s, i), isT = day === DATA.today, km = (a.run_days || {})[day];
+      const st = d.k === "rest" ? "" : day < DATA.today ? (km != null ? `<span class="ok">✓ ${f1(km)} km</span>` : (d.k === "str" ? "" : "–")) : isT ? '<span class="tag">hari ini</span>' : "";
+      return `<li class="pv-day k-${d.k}${isT ? " today" : ""}${d.k === "rest" ? " rest" : ""}" style="--i:${i}" tabindex="0">
+        <div class="pv-dn">${HR7[i]}<b>${D(day).getDate()}</b></div><div class="pv-ico"><svg viewBox="0 0 24 24" aria-hidden="true">${SICON[d.k]}</svg></div>
+        <div><div class="pv-ttl">${esc(d.title)}${d.rest.length ? '<span class="caret">▾</span>' : ""}</div>${d.chips.length ? `<div class="pv-chips">${d.chips.map(x => `<span>${esc(x)}</span>`).join("")}</div>` : ""}
+          ${d.rest.length ? `<div class="pv-more"><div><ul>${d.rest.map(x => `<li>${esc(x)}</li>`).join("")}</ul></div></div>` : ""}</div>
+        <div class="pv-st">${st}</div></li>`; }).join("")}</ul>` : '<div class="empty">Jadwal harian tidak ada di file Excel untuk minggu ini.</div>'}
+    ${(w.notes || []).length ? `<div class="pv-note"><b>Catatan coaching</b><ul>${w.notes.map(n => `<li>${esc(n)}</li>`).join("")}</ul></div>` : ""}`;
+  slide.querySelectorAll(".pv-day").forEach(li => { li.onclick = () => li.classList.toggle("open"); li.onkeydown = ev => { if (ev.key === "Enter") li.classList.toggle("open"); }; });
+}
+function pvGo(dm, dc) { const out = dm < 0 ? "outR" : "outL"; slide.classList.add(out);
+  setTimeout(() => { PV.m += dm; if (dc) PV.c = dc; pvRender(); slide.classList.remove(out); slide.classList.add(dm < 0 ? "outL" : "outR");
+    requestAnimationFrame(() => requestAnimationFrame(() => { slide.classList.remove("outL", "outR"); pvIn(); })); }, 200); }
+$("pv-close").onclick = closeWeek;
+$("pv-prev").onclick = () => pvGo(-1); $("pv-next").onclick = () => pvGo(1);
+$("pv-tabs").onclick = e => { const b = e.target.closest("button"); if (b && b.dataset.c !== PV.c) pvGo(0, b.dataset.c); };
+ov.addEventListener("click", e => { if (e.target === ov) closeWeek(); });
+addEventListener("keydown", e => { if (!ov.classList.contains("open")) return;
+  if (e.key === "Escape") closeWeek();
+  if (e.key === "ArrowLeft" && !$("pv-prev").disabled) pvGo(-1);
+  if (e.key === "ArrowRight" && !$("pv-next").disabled) pvGo(1); });
+$("terrain").addEventListener("click", e => { const wc = e.target.closest(".wkcol"); if (!wc || wc.tabIndex < 0) return;
+  ptip.classList.remove("on"); openWeek(+wc.dataset.ms, (e.target.dataset && e.target.dataset.c) || V()[0].c, wc); });
+$("terrain").addEventListener("keydown", e => { const wc = e.target.closest(".wkcol"); if (wc && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); wc.click(); } });
 
 function renderAll() { renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); }
 function filter(groupId, set, render, ids) {

@@ -39,6 +39,13 @@ class ProgramTest(unittest.TestCase):
         self.assertTrue(w[9]["event"])
         self.assertFalse(w[10]["down"], "grey row whose note says it is no longer a down week")
 
+    def test_daily_sessions(self):
+        w = {x["ms"]: x for x in self.p["weeks"]}
+        self.assertEqual(len(w[7]["days"]), 7)
+        self.assertEqual(w[7]["days"][0], "ISTIRAHAT PENUH")
+        self.assertTrue(w[7]["days"][5].startswith("LONG RUN 14 km"))
+        self.assertEqual(w[7]["days"][2], "")
+
     def test_targets(self):
         t = self.p["target"]
         self.assertEqual((t["A"]["lo"], t["A"]["hi"]), (None, 17100))

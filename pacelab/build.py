@@ -80,7 +80,16 @@ def athlete_data(a, data_dir, today):
         "week_stats": m.week_stats(last_done, well, lights, prog["sleep"].get("min")) if last_done and runs else None,
         "last_done_ms": last_done["ms"] if last_done else None,
         "sync": _read(folder / "state.json", {}).get("last_sync"),
+        "run_days": _run_days(in_program),
     }
+
+
+def _run_days(runs):
+    """{date: km run that day} for the overlay's per-day ticks."""
+    out = {}
+    for r in runs:
+        out[r["date"]] = round(out.get(r["date"], 0) + r["km"], 1)
+    return out
 
 
 def build(cfg, athletes, today, out_path):
@@ -135,4 +144,8 @@ def _slim(x, color):
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],
         "badges": x["badges"], "week_stats": x["week_stats"], "sync": x["sync"],
+        # full program for the track and the weekly schedule overlay
+        "plan": [{k: w.get(k) for k in ("ms", "start", "phase", "km", "lr", "down", "event", "notes", "days")}
+                 for w in prog["weeks"]],
+        "run_days": x["run_days"],
     }
