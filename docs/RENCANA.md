@@ -9,6 +9,13 @@ Hasil `inspect` (29 Okt, kedua pelari): splits / typedsplits / split_summaries =
 metricDescriptors (data per detik), tanpa daftar lap. Pengganti yang mungkin: B1 segmen dari rencana Excel (pemanasan /
 tempo / pendinginan, per km di dalamnya); B2 lap ditebak dari perubahan kecepatan di data per detik; cek dulu nama metrik
 di `python pacelab.py check` (baris "stream keys") — bila ada indeks lap, lap asli bisa dibangun ulang.
+Hasil `check` (29 Okt): tidak ada metrik lap. Saran: B1 utama, per km cadangan — menunggu pilihan omPik.
+
+## 10. Lari tanpa data per detik — perlu dicek
+
+`check` 29 Okt: Taofik 71/90 lari punya data per detik, Reza 65/89. 19 + 24 lari tanpa data per detik tidak punya
+per km, segmen 5K/10K, decoupling. Penyebab belum diketahui (lari manual, treadmill tanpa GPS, atau detail kosong
+saat sync pertama dan tidak diminta ulang). Usul: `check` menampilkan daftar lari tanpa data per detik (tanggal, km, tipe).
 
 omPik: 27 Okt di Garmin 12 lap, dashboard 9 batang. Dashboard tidak memakai lap Garmin: batang = potongan tiap 1000 m dari
 data per detik (`metrics.per_km`), sisa < 300 m dibuang (9,1 km → 9 batang). Lap Garmin mengikuti setelan jam (auto-lap,
