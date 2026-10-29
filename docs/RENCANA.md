@@ -3,7 +3,7 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## Daftar perbaikan — dicatat, belum dikerjakan (omPik: jangan langsung mockup)
+## Daftar perbaikan 1–5 — mockup siap, menunggu pilihan
 
 1. **Penanda minggu aktif di batang target km mingguan** (kotak panjang di sekeliling batang minggu ini, di bawah
    lintasan) terlalu tegas. Buat lebih tenang, atau beri beberapa opsi garis yang lebih tenang. Sekarang:
@@ -26,6 +26,9 @@ Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 4. **Bayangan abu-abu saat hari diklik** (kartu sesi yang dibuka, mis. Reza Kamis 29 Okt) dihilangkan. Asalnya dari
    fokus F3: `.ss-box.fx2 .ss-fr.on .ss-sc{box-shadow:0 12px 32px …}`, ditambah warna gradasi kartu yang ikut terlihat
    seperti bayangan di sisi luar.
+5. **Linimasa: kotak setinggi 10 minggu** (sebelumnya 8; di HP tetap maksimal 78% layar).
+
+Mockup semua nomor: [`docs/mockup/perbaikan-1.html`](mockup/perbaikan-1.html) — menunggu pilihan dan "gas".
 
 ## 0c. Penilaian pelatih v2 + ikon transparan — **sudah dibuat** (29 Okt)
 

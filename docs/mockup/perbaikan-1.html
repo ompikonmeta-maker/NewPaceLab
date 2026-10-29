@@ -1,0 +1,166 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: perbaikan 1–5</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:40px 0 4px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.opt{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.04em;text-transform:uppercase;margin:16px 0 6px}
+.row{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px}
+.panel .cap{font-size:12.5px;color:var(--muted);margin-top:8px}
+/* 1. weekly bars */
+.terrain{position:relative;height:52px;display:flex;align-items:flex-end;gap:3px}
+.wk{position:relative;flex:1;height:100%;display:flex;align-items:flex-end;justify-content:center;gap:1px;border-radius:4px}
+.wk i{display:block;flex:1;max-width:6px;border-radius:2px 2px 0 0}
+.wk .t{background:var(--t)} .wk .r{background:var(--r)} .wk.f i{opacity:.28}
+.M0 .wk.now{outline:1.5px solid var(--text);outline-offset:1px}
+.M1 .wk.now{outline:1px solid color-mix(in srgb,var(--text) 22%,transparent);outline-offset:1px}
+.M2 .wk.now{background:color-mix(in srgb,var(--text) 7%,transparent)}
+.M3 .wk.now::after{content:"";position:absolute;bottom:-9px;left:50%;width:5px;height:5px;margin-left:-2.5px;border-radius:50%;background:var(--text);opacity:.55}
+.M4 .wk.now{background:linear-gradient(color-mix(in srgb,var(--text) 0%,transparent),color-mix(in srgb,var(--text) 8%,transparent))}
+.M4 .wk.now::after{content:"";position:absolute;bottom:-4px;left:2px;right:2px;height:2px;border-radius:1px;background:var(--text);opacity:.45}
+.terrain-w{padding-bottom:12px}
+/* 2/3. best-progress cards */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch}
+.pc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;display:flex;flex-direction:column}
+.pc h3{margin:0 0 8px;font-size:15px} .pc .big{display:flex;gap:14px;font-size:20px;font-weight:700} .pc .big i{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:4px;vertical-align:2px}
+.pc .ln{font-size:13px;color:var(--text-2);margin-top:6px} .pc .ln i{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px}
+.pc .ch{margin-top:auto} .pc.grow .ch{flex:1;min-height:150px;margin-top:10px}
+.pc svg{display:block;width:100%;overflow:visible} .pc svg text{font-size:10.5px;fill:var(--muted)}
+.chip{display:inline-flex;align-items:center;gap:5px;border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600}
+.chip.ok{background:var(--good-bg);color:var(--good)} .chip.wn{background:var(--warn-bg);color:var(--warn)}
+.chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.ghostc{opacity:.35} .ghostc text{display:none}
+.empty{margin:auto 0 0;text-align:center;color:var(--muted);font-size:13px}
+.empty b{display:block;color:var(--text);font-size:14px;margin-bottom:2px}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:560px){.cards{grid-template-columns:1fr}.pc{min-height:0}}
+/* 4. opened day */
+.fr{display:grid;grid-template-columns:1fr 150px 1fr;gap:14px;align-items:center}
+.sc{display:flex;align-items:center;gap:12px;border-radius:16px;padding:10px 14px}
+.sc.L{flex-direction:row-reverse;text-align:right;background:linear-gradient(90deg,color-mix(in srgb,var(--t) 22%,var(--surface)),var(--surface) 75%)}
+.sc.R{background:linear-gradient(270deg,color-mix(in srgb,var(--r) 22%,var(--surface)),var(--surface) 75%)}
+.sc .km{font-size:20px;font-weight:700} .sc .km small{font-size:12px;font-weight:400;color:var(--muted)} .sc .meta{font-size:12.5px;color:var(--muted)} .sc .sp2{flex:1}
+.sc.shadow{box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.sc.flat{box-shadow:none;outline:1.5px solid color-mix(in srgb,var(--text) 14%,transparent)}
+.mid{text-align:center} .mid b{display:block;font-size:13px} .mid span{font-size:11.5px;color:var(--muted)}
+.ring{width:40px;height:40px;flex:none}
+/* 5. ten weeks */
+.box10{height:420px;overflow-y:auto;border-radius:14px;border:1px dashed var(--line);padding:4px 10px;scrollbar-width:none}
+.box10::-webkit-scrollbar{display:none}
+.w10{display:grid;grid-template-columns:1fr 150px 1fr;gap:12px;align-items:center;height:42px}
+.w10 .L{text-align:right} .w10 b{font-size:14px} .w10 span{color:var(--muted);font-size:12px}
+.w10 .c{background:var(--surface);border:1px solid var(--line);border-radius:12px;text-align:center;font-size:12.5px;padding:3px 6px}
+.w10 .n{position:absolute}
+.w10.dim{opacity:.35;filter:grayscale(1);transform:scale(.97)}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:4px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+</style></head><body><div class="wrap">
+
+<h1>Mockup: perbaikan 1–5</h1>
+<p class="sub">Data rekaan. Belum diterapkan ke dashboard. Pilih opsi per nomor.</p>
+
+<h2>1. Penanda minggu aktif yang lebih tenang</h2>
+<p class="sub">Batang target km mingguan di bawah lintasan; minggu ini = kolom ke-19.</p>
+<div class="row" id="m1"></div>
+
+<h2>2. Kartu Progres terbaik: tinggi sama, tanpa ruang kosong</h2>
+<p class="sub">Keempat kartu tetap sama tinggi (ikut kartu Full). Pilih cara mengisi ruangnya.</p>
+<div class="pills" id="p2" role="group" aria-label="Opsi kartu">
+  <button class="pill" aria-pressed="true" data-o="A">A Grafik mengisi sisa tinggi</button>
+  <button class="pill" aria-pressed="false" data-o="B">B Full dipadatkan jadi chip</button>
+  <button class="pill" aria-pressed="false" data-o="AB">A + B + C (kartu kosong diisi)</button>
+</div>
+<div class="cards" id="cards"></div>
+
+<h2>3. Semua usaha 5K / 10K / Half, titik tercepat di-highlight</h2>
+<p class="sub">Setiap titik = segmen tercepat di dalam satu lari. Titik besar berlabel = tercepat (rekor). Terlihat di kartu 5K dan 10K di atas.</p>
+<div class="pills" id="p3" role="group" aria-label="Opsi titik">
+  <button class="pill" aria-pressed="true" data-o="dots">3a Titik saja + garis rekor tipis bertangga</button>
+  <button class="pill" aria-pressed="false" data-o="line">3b Titik disambung garis tipis</button>
+</div>
+
+<h2>4. Hari yang dibuka tanpa bayangan</h2>
+<div class="row">
+  <div class="panel"><div class="opt">Sekarang</div><div id="d0"></div></div>
+  <div class="panel"><div class="opt">Usulan: rata, tanpa bayangan</div><div id="d1"></div><div class="cap">Kartu tetap berwarna gradasi; penanda terbuka cukup dari detail di bawahnya. Hari lain tetap pudar abu-abu.</div></div>
+</div>
+
+<h2>5. Linimasa: kotak setinggi 10 minggu</h2>
+<p class="sub">Sebelumnya 8. Di HP tetap dibatasi 78% layar.</p>
+<div class="panel"><div class="box10" id="b10"></div></div>
+
+<script>
+const $ = id => document.getElementById(id);
+// ---- 1
+const M = [["M0", "Sekarang", "garis hitam tegas"], ["M1", "M1 Garis tipis pudar", "garis 1px abu-abu muda"], ["M2", "M2 Latar lembut", "tanpa garis, kolom sedikit lebih gelap"],
+  ["M3", "M3 Titik di bawah", "tanpa kotak, titik kecil di bawah kolom"], ["M4", "M4 Latar gradasi + garis bawah", "kolom memudar ke bawah, garis pendek di dasar"]];
+const bars = () => { let h = ""; for (let i = 0; i < 30; i++) { const t = 30 + (i * 37) % 55, r = 28 + (i * 29) % 58;
+  h += `<div class="wk${i === 18 ? " now" : ""}${i > 18 ? " f" : ""}"><i class="t" style="height:${t}%"></i><i class="r" style="height:${r}%"></i></div>`; } return h; };
+$("m1").innerHTML = M.map(([c, n, d]) => `<div class="panel ${c}"><div class="opt">${n}</div><div class="terrain-w"><div class="terrain">${bars()}</div></div><div class="cap">${d}</div></div>`).join("");
+
+// ---- 2 + 3: cards
+const T0 = Date.UTC(2026, 6, 1), DAY = 864e5, fmt = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+function effs(seed, base, drift, n, noise) { const o = []; for (let i = 0; i < n; i++) { const d = 2 + i * (118 / n) + (seed * i) % 3; o.push([d, base - drift * d / 120 + (((i * 7919 * seed) % 97) / 97 - .5) * noise]); } return o; }
+const D5 = {t: effs(3, 2550, 500, 26, 300).concat([[118, 1877]]), r: effs(5, 2390, 140, 22, 260)};
+const HALF = {t: effs(2, 9000, 300, 6, 200), r: effs(4, 9300, 200, 6, 200)};
+const D10 = {t: effs(7, 5480, 450, 14, 260), r: effs(11, 5420, 80, 10, 200)};
+let MODE = "A", DOTS = "dots";
+function chart(data, h, mode) { const W = 260, H = h, all = Object.values(data).flat(), lo = Math.min(...all.map(p => p[1])) - 60, hi = Math.max(...all.map(p => p[1])) + 60;
+  const X = d => 34 + d / 120 * (W - 44), Y = v => 8 + (v - lo) / (hi - lo) * (H - 30);   // faster = higher
+  let g = ""; for (let k = 0; k < 4; k++) { const v = lo + (hi - lo) * k / 3; g += `<line x1="34" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="0" y="${Y(v) + 3}">${fmt(v)}</text>`; }
+  ["Jul", "Agu", "Sep", "Okt"].forEach((m, i) => g += `<text x="${X(i * 31 + 4)}" y="${H - 4}" text-anchor="middle">${m}</text>`);
+  for (const c of Object.keys(data)) { const P = data[c].slice().sort((a, b) => a[0] - b[0]), best = P.reduce((a, b) => b[1] < a[1] ? b : a);
+    if (DOTS === "line") g += `<path d="${P.map((p, i) => (i ? "L" : "M") + X(p[0]).toFixed(1) + " " + Y(p[1]).toFixed(1)).join(" ")}" fill="none" stroke="var(--${c})" stroke-width="1.2" opacity=".45"/>`;
+    else { let run = Infinity, d = ""; P.forEach((p, i) => { const prev = run; run = Math.min(run, p[1]); d += i ? ` L${X(p[0]).toFixed(1)} ${Y(prev).toFixed(1)} L${X(p[0]).toFixed(1)} ${Y(run).toFixed(1)}` : `M${X(p[0]).toFixed(1)} ${Y(run).toFixed(1)}`; });
+      d += ` L${X(120)} ${Y(run)}`; g += `<path d="${d}" fill="none" stroke="var(--${c})" stroke-width="1.6" opacity=".5"/>`; }
+    P.forEach(p => g += `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="2.6" fill="var(--${c})" opacity="${p === best ? 0 : .45}"/>`);
+    g += `<circle cx="${X(best[0])}" cy="${Y(best[1])}" r="6" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.5"/><circle cx="${X(best[0])}" cy="${Y(best[1])}" r="2.5" fill="var(--${c})"/>
+      <text x="${X(best[0]) + (best[0] > 90 ? -9 : 9)}" y="${Y(best[1]) - 8}" text-anchor="${best[0] > 90 ? "end" : "start"}" style="fill:var(--${c});font-weight:700;font-size:11.5px">${fmt(best[1])}</text>`; }
+  return `<svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="height:${H}px">${g}</svg>`; }
+function pbCard(k, data, gain) { const b = c => Math.min(...data[c].map(p => p[1]));
+  return `<section class="pc${MODE !== "B" ? " grow" : ""}"><h3>${k}</h3><div class="big num"><span><i style="background:var(--t)"></i>${fmt(b("t"))}</span><span><i style="background:var(--r)"></i>${fmt(b("r"))}</span></div>
+    <div class="ln"><i style="background:var(--t)"></i><b>−${gain[0]}</b> sejak 2 Jul · ${data.t.length} lari</div><div class="ln"><i style="background:var(--r)"></i><b>−${gain[1]}</b> sejak 2 Jul · ${data.r.length} lari</div>
+    <div class="ch" data-k="${k}">${chart(data, 180)}</div></section>`; }
+function halfCard() { if (MODE !== "AB") return `<section class="pc"><h3>Half</h3><div class="big num"><span><i style="background:var(--t)"></i>–</span><span><i style="background:var(--r)"></i>–</span></div><div class="ln"><i style="background:var(--t)"></i>belum ada</div><div class="ln"><i style="background:var(--r)"></i>belum ada</div><div class="empty" style="margin-top:auto">Belum ada data di periode ini</div></section>`;
+  return `<section class="pc grow"><h3>Half</h3><div class="big num"><span><i style="background:var(--t)"></i>–</span><span><i style="background:var(--r)"></i>–</span></div>
+    <div class="ln">Belum ada lari ≥ 21,1 km.</div><div class="ch ghostc" data-k="Half">${chart(HALF, 160)}</div>
+    <div class="empty"><b>Tes Half · 23 Jan</b>86 hari lagi · titik pertama muncul setelah lari ≥ 21,1 km</div></section>`; }
+function fullCard() { const est = `<div class="ch">${(() => { const W = 260, H = MODE === "B" ? 180 : 170; return `<svg viewBox="0 0 ${W} ${H}" style="height:${H}px"><rect x="34" y="30" width="${W - 34}" height="26" rx="6" fill="var(--t)" opacity=".15"/>
+      <path d="M40 120 L110 118 L180 118 L250 40" fill="none" stroke="var(--t)" stroke-width="2" stroke-dasharray="5 4"/><path d="M40 70 L110 70 L180 70 L250 70" fill="none" stroke="var(--r)" stroke-width="2" stroke-dasharray="5 4"/>
+      <circle cx="250" cy="40" r="4" fill="var(--t)"/><circle cx="250" cy="70" r="4" fill="var(--r)"/>${["4:30", "5:00", "5:30", "6:00", "6:30"].map((v, i) => `<text x="0" y="${22 + i * 28}">${v}</text>`).join("")}</svg>`; })()}</div>`;
+  if (MODE === "B" || MODE === "AB") return `<section class="pc${MODE === "AB" ? " grow" : ""}"><h3>Full <span style="float:right;font-size:12px;font-weight:400;color:var(--muted)">estimasi</span></h3><div class="big num"><span><i style="background:var(--t)"></i>5:00</span><span><i style="background:var(--r)"></i>5:29</span></div>
+    <div class="chips"><span class="chip ok" title="+ panas 5:15 · A ≤ 4:45 · B ≤ 5:15 · C ≤ 5:45">✓ Target B</span><span class="chip wn" title="+ panas 5:45 · A ≤ 5:06 · B ≤ 5:16 · C ≤ 5:45. Saran: jaga km mingguan dan long run.">! Target C</span></div>
+    <div class="ln" style="color:var(--muted)">+ panas 5:15 / 5:45 · sentuh chip untuk batas dan saran</div>${est}</section>`;
+  return `<section class="pc"><h3>Full <span style="float:right;font-size:12px;font-weight:400;color:var(--muted)">estimasi</span></h3><div class="big num"><span><i style="background:var(--t)"></i>5:00</span><span><i style="background:var(--r)"></i>5:29</span></div>
+    <div class="chips"><span class="chip ok">✓ Masuk target B</span></div><div class="ln">+ panas <b>5:15</b> · A ≤ 4:45 · B ≤ 5:15 · C ≤ 5:45</div>
+    <div class="chips"><span class="chip wn">! Masuk target C</span></div><div class="ln">+ panas <b>5:45</b> · A ≤ 5:06 · B ≤ 5:16 · C ≤ 5:45</div>
+    <div class="ln">💡 <b>Saran:</b> Masih di target C. Jaga km mingguan dan long run; pace dikunci lagi setelah Half 23 Jan.</div>${est}</section>`; }
+function cards() { $("cards").innerHTML = pbCard("5K", D5, ["18:52", "9:25"]) + pbCard("10K", D10, ["11:44", "0:50"]) + halfCard() + fullCard();
+  // option A: each chart takes whatever height is left in its card (cards stay equal height)
+  const DS = {"5K": D5, "10K": D10, Half: HALF};
+  $("cards").querySelectorAll(".pc.grow .ch[data-k]").forEach(c => { c.innerHTML = ""; const h = c.clientHeight; c.innerHTML = chart(DS[c.dataset.k], Math.max(150, h)); }); }
+addEventListener("resize", cards);
+cards();
+const pills = (id, set) => $(id).addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return;
+  $(id).querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); set(b.dataset.o); cards(); });
+pills("p2", o => MODE = o); pills("p3", o => DOTS = o);
+
+// ---- 4
+const ring = (c, v) => `<svg class="ring" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="var(--grid)" stroke-width="6"/><circle cx="25" cy="25" r="20" fill="none" stroke="var(--${c})" stroke-width="6" stroke-dasharray="${v * 1.257} 200" transform="rotate(-90 25 25)" stroke-linecap="round"/><text x="25" y="29.5" text-anchor="middle" style="font:700 12.5px sans-serif;fill:var(--text)">${v}</text></svg>`;
+const day = cls => `<div class="fr"><div></div><div class="mid"><b>Kamis 29 Okt</b><span>Lari santai 7 km</span></div><div class="sc R ${cls}">${ring("r", 78)}<div class="sp2"><div class="km num">8.0<small> km</small></div><div class="meta num">8:42/km · 147 bpm</div></div></div></div>`;
+$("d0").innerHTML = day("shadow"); $("d1").innerHTML = day("");
+
+// ---- 5
+let h = ""; for (let ms = 19; ms >= 1; ms--) h += `<div class="w10${ms < 19 ? " dim" : ""}"><div class="L"><b>${20 + (ms * 7) % 19} km</b> <span>4/4 sesi</span></div><div class="c">MS${ms}</div><div><span>4/4 sesi</span> <b>${19 + (ms * 5) % 21} km</b></div></div>`;
+$("b10").innerHTML = h;
+</script>
+</div></body></html>
