@@ -3,6 +3,21 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
+## 0c. Penilaian pelatih v2 + ikon transparan — menunggu "gas"
+
+Mockup: [`docs/mockup/penilaian-pelatih-v2.html`](mockup/penilaian-pelatih-v2.html).
+Diputuskan 29 Okt: jarak 95–110% (potongan gerbang tidur dihitung patuh, aturan betis diabaikan); HR hanya dinilai
+di atas batas atas; long run opsi B (lewat batas hanya di 25% akhir + decoupling < 8%, cadangan A ≥ 75% km bila
+decoupling tidak ada); pace santai tidak dinilai, hanya km lebih cepat dari batas cepat ditandai; tempo/interval per km
+±5 dtk, km 1 tempo tidak dihitung untuk HR; pemanasan ≥ batas cepat pace santai dan HR ≤ batas atas Z2. Semua angka
+dari profil pelari di `config.json`. Dicatat di README sebagai [keputusan omPik]. Ikon pelari memudar saat menutupi data.
+
+## 0d. Linimasa 8 minggu + fokus + lompatan pelari — menunggu pilihan
+
+Mockup: [`docs/mockup/linimasa-fokus.html`](mockup/linimasa-fokus.html). Kotak setinggi 8 minggu dengan scrollbar
+yang hilang sendiri; buka satu minggu = yang lain tertutup. Fokus: F1 buram · F2 pudar abu-abu · F3 sorotan.
+Lompatan pelari: J1 ikuti scroll diperhalus · J2 lompat otomatis (pegas) · J3 lompat melengkung + mendarat.
+
 ## 0b. Tab "Sesi" — T3 + A versi 7, Long run A + Cadence A — **sudah dibuat** (29 Okt)
 
 Sudah ada di dashboard (lihat README, bagian Tab Sesi). Sisa: cek cadence/elevasi pada data Garmin asli

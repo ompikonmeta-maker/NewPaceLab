@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: linimasa fokus</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:36px 0 4px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 12px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.note{font-size:13px;color:var(--text-2);margin:-4px 0 12px;min-height:20px}
+/* timeline box: 8 weeks tall, own auto-hide scrollbar */
+.box{position:relative;height:640px;overflow-y:auto;overscroll-behavior:contain;border-radius:16px;scrollbar-width:thin;scrollbar-color:transparent transparent;transition:scrollbar-color .3s}
+.box.sc{scrollbar-color:color-mix(in srgb,var(--text) 25%,transparent) transparent}
+.box::-webkit-scrollbar{width:8px} .box::-webkit-scrollbar-thumb{background:transparent;border-radius:8px} .box.sc::-webkit-scrollbar-thumb{background:color-mix(in srgb,var(--text) 25%,transparent)}
+.box .in{position:relative;padding:4px 0 10px;transition:transform .45s cubic-bezier(.34,1.4,.64,1)}
+.box .in::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:1px;background:var(--line)}
+.fade{position:sticky;left:0;right:0;height:28px;pointer-events:none;z-index:3;transition:opacity .3s}
+.fade.top{top:0;margin-bottom:-28px;background:linear-gradient(var(--bg),transparent)}
+.fade.bot{bottom:0;margin-top:-28px;background:linear-gradient(transparent,var(--bg))}
+.wk{position:relative;margin-bottom:8px;transition:filter .4s var(--ease),opacity .4s var(--ease),transform .4s var(--ease)}
+.wh{display:grid;grid-template-columns:1fr 170px 1fr;gap:14px;align-items:center;cursor:pointer;padding:6px 0}
+.wh .L{text-align:right} .wh b{font-size:18px} .wh span{color:var(--muted);font-size:12.5px;margin:0 6px}
+.wh .c{background:var(--surface);border:1px solid var(--line);border-radius:14px;text-align:center;padding:6px 8px;position:relative;z-index:1}
+.wh .c b{font-size:14px;display:block} .wh .c small{color:var(--muted);font-size:12px}
+.wk.open .wh .c{border-color:var(--text)}
+.days{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)} .days>div{overflow:hidden}
+.wk.open .days{grid-template-rows:1fr}
+.day{display:grid;grid-template-columns:1fr 170px 1fr;gap:14px;align-items:center;padding:6px 0;cursor:pointer;transition:filter .4s var(--ease),opacity .4s var(--ease),transform .4s var(--ease)}
+.day .sc2{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13.5px}
+.day .L .sc2{text-align:right}
+.day .m{text-align:center;position:relative;z-index:1} .day .m b{display:block;font-size:13px} .day .m span{font-size:11.5px;color:var(--muted)}
+.det{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)} .det>div{overflow:hidden}
+.day.on+.det{grid-template-rows:1fr}
+.dd{margin:4px 0 12px;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 18px;position:relative;z-index:1}
+.bar{height:8px;border-radius:4px;margin:9px 0;background:var(--t);opacity:.85} .bar.r{background:var(--r);margin-left:auto}
+.dd .g{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.dd p{margin:6px 0 0;color:var(--muted);font-size:12.5px;text-align:center}
+/* focus options: everything that is NOT the expanded part */
+.F1 .box.fx .wk:not(.open), .F1 .box.fx2 .wk.open .day:not(.on){filter:blur(2px);opacity:.45}
+.F2 .box.fx .wk:not(.open), .F2 .box.fx2 .wk.open .day:not(.on){opacity:.3;filter:grayscale(1)}
+.F3 .box.fx .wk:not(.open), .F3 .box.fx2 .wk.open .day:not(.on){filter:blur(1.5px) grayscale(.6);opacity:.4;transform:scale(.97)}
+.F3 .box.fx .wk.open .wh .c, .F3 .box.fx2 .day.on .sc2{box-shadow:0 10px 30px rgba(0,0,0,.10)}
+.F1 .box.fx .wk:not(.open):hover, .F2 .box.fx .wk:not(.open):hover, .F3 .box.fx .wk:not(.open):hover,
+.F1 .box.fx2 .day:not(.on):hover, .F2 .box.fx2 .day:not(.on):hover, .F3 .box.fx2 .day:not(.on):hover{filter:none;opacity:1;transform:none}
+/* runner jump demo */
+.jbox{position:relative;height:380px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:var(--bg)}
+.jsc{position:absolute;inset:0;overflow-y:auto;scrollbar-width:none} .jsc::-webkit-scrollbar{display:none}
+.jsc .pg{height:1500px;padding:26px 30px}
+.trk{height:56px;border-bottom:2px solid var(--line);position:relative;margin:0 20px}
+.trk i{position:absolute;bottom:-5px;width:8px;height:8px;border-radius:50%;background:var(--muted)}
+.blkj{height:60px;border-radius:12px;background:var(--surface);border:1px solid var(--line);margin:22px 60px}
+.run{position:absolute;left:0;top:0;width:42px;pointer-events:none;will-change:transform;text-align:center;transform-origin:50% 100%}
+.run svg{width:42px;height:34px;display:block} .run b{display:block;font-size:12px;opacity:0;transition:opacity .3s}
+.run.dk b{opacity:1}
+.hint{position:absolute;right:12px;top:10px;font-size:12px;color:var(--muted);pointer-events:none}
+@media (max-width:640px){.wh,.day{grid-template-columns:1fr 92px 1fr;gap:8px}.wh b{font-size:15px}.wh span{display:block;margin:0}.box{height:560px}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><div class="wrap">
+
+<h1>Mockup: linimasa 8 minggu, fokus, dan lompatan pelari</h1>
+<p class="sub">Data rekaan. Belum diterapkan ke dashboard.</p>
+
+<h2>1. Linimasa: 8 minggu terlihat, sisanya di-scroll</h2>
+<p class="sub">Kotak setinggi 8 minggu; scrollbar muncul saat dipakai lalu hilang, memantul di ujung. Buka satu minggu = minggu lain otomatis tertutup. Klik hari = detail; yang lain dibuat kurang menonjol. Arahkan kursor ke yang buram = jelas sementara.</p>
+<div class="pills" id="fopt" role="group" aria-label="Opsi fokus">
+  <button class="pill" aria-pressed="true" data-f="F1">F1 Buram</button>
+  <button class="pill" aria-pressed="false" data-f="F2">F2 Pudar abu-abu</button>
+  <button class="pill" aria-pressed="false" data-f="F3">F3 Sorotan (buram + mengecil + bayangan)</button>
+</div>
+<p class="note" id="fnote"></p>
+<div id="tlw" class="F1"><div class="box" id="box"><div class="fade top"></div><div class="in" id="tl"></div><div class="fade bot"></div></div></div>
+
+<h2>2. Lompatan pelari dari lintasan ke tepi</h2>
+<p class="sub">Scroll kotak di bawah (roda mouse / touchpad). Bandingkan dengan cara sekarang.</p>
+<div class="pills" id="jopt" role="group" aria-label="Opsi lompatan">
+  <button class="pill" aria-pressed="false" data-j="J0">Sekarang</button>
+  <button class="pill" aria-pressed="true" data-j="J1">J1 Ikuti scroll, diperhalus</button>
+  <button class="pill" aria-pressed="false" data-j="J2">J2 Lompat otomatis (pegas)</button>
+  <button class="pill" aria-pressed="false" data-j="J3">J3 Lompat melengkung + mendarat</button>
+</div>
+<p class="note" id="jnote"></p>
+<div class="jbox" id="jbox"><div class="jsc" id="jsc"><div class="pg">
+  <div class="trk"><i style="left:12%"></i><i style="left:37%"></i><i style="left:62%"></i><i style="left:88%"></i></div>
+  <div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div><div class="blkj"></div>
+</div></div><span class="hint">scroll ↓</span></div>
+
+<script>
+const $ = id => document.getElementById(id);
+const RUN = '<path fill="currentColor" d="M11 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM8 5l3 .5 2 3 3 .5-.3 1.4-3.6-.6-1-1.4-1 3 2.4 2-.8 3.6-1.5-.3.6-2.7-2.6-1.8L7 15H5.3l2.2-6.2L6.4 9 5 11 3.8 10.2 5.7 7z"/>';
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+// ---------- timeline
+const HARI = ["Selasa", "Kamis", "Sabtu", "Minggu"], BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const ms1 = new Date(2026, 5, 22), fmt = d => `${d.getDate()} ${BLN[d.getMonth()]}`;
+let html = "";
+for (let ms = 19; ms >= 1; ms--) { const a = new Date(ms1); a.setDate(a.getDate() + (ms - 1) * 7); const b = new Date(a); b.setDate(b.getDate() + 6);
+  const kt = 20 + (ms * 7) % 19, kr = 19 + (ms * 5) % 21, ph = ms > 16 ? "Support" : ms > 8 ? "Base" : "Awal";
+  let days = ""; [1, 3, 5, 6].forEach((o, i) => { const d = new Date(a); d.setDate(d.getDate() + o);
+    const t = (5 + (ms + i) % 4 * 2.3).toFixed(1), r = (5 + (ms + i + 1) % 4 * 2.1).toFixed(1);
+    days += `<div class="day"><div class="L"><div class="sc2 num"><b>${t}</b> km · 7:${10 + i * 7}/km</div></div><div class="m"><b>${HARI[i]} ${fmt(d)}</b><span>${["Easy", "Tempo", "Long run", "Recovery"][i]}</span></div><div><div class="sc2 num"><b>${r}</b> km · 8:${10 + i * 6}/km</div></div></div>
+      <div class="det"><div><div class="dd"><div class="g"><div><div class="bar" style="width:80%"></div><div class="bar" style="width:62%"></div><div class="bar" style="width:90%"></div></div><div><div class="bar r" style="width:70%"></div><div class="bar r" style="width:66%"></div><div class="bar r" style="width:84%"></div></div></div><p>detail duel (angka, penilaian pelatih, per km, zona)</p></div></div></div>`; });
+  html += `<div class="wk${ms === 19 ? " open" : ""}"><div class="wh"><div class="L num"><b>${kt} km</b><span>4/4 sesi</span></div><div class="c"><b>MS${ms} · ${ms === 19 ? "minggu ini" : ph}</b><small>${fmt(a)} – ${fmt(b)}</small></div><div class="num"><b>${kr} km</b><span>4/4 sesi</span></div></div><div class="days"><div>${days}</div></div></div>`; }
+$("tl").innerHTML = html;
+const box = $("box");
+function focusState() { const w = box.querySelector(".wk.open"), d = box.querySelector(".day.on");
+  box.classList.toggle("fx", !!w); box.classList.toggle("fx2", !!d); }
+focusState();
+function scrollInBox(el, delay) { setTimeout(() => box.scrollTo({top: el.offsetTop - 6, behavior: REDUCED ? "auto" : "smooth"}), delay); }
+$("tl").addEventListener("click", e => {
+  const wh = e.target.closest(".wh");
+  if (wh) { const w = wh.parentElement, o = !w.classList.contains("open"), had = box.querySelector(".wk.open");
+    box.querySelectorAll(".wk.open").forEach(x => { x.classList.remove("open"); x.querySelectorAll(".day.on").forEach(d => d.classList.remove("on")); });
+    if (o) { w.classList.add("open"); scrollInBox(w, had ? 460 : 60); }
+    focusState(); return; }
+  const day = e.target.closest(".day"); if (!day) return;
+  const on = !day.classList.contains("on"), had = box.querySelector(".day.on");
+  box.querySelectorAll(".day.on").forEach(d => d.classList.remove("on"));
+  if (on) { day.classList.add("on"); scrollInBox(day, had && had !== day ? 460 : 60); }
+  focusState(); });
+// auto-hide scrollbar + bounce at both ends
+let hideT, lastTop = 0;
+box.addEventListener("scroll", () => { box.classList.add("sc"); clearTimeout(hideT); hideT = setTimeout(() => box.classList.remove("sc"), 900);
+  box.querySelector(".fade.top").style.opacity = box.scrollTop > 4 ? 1 : 0;
+  box.querySelector(".fade.bot").style.opacity = box.scrollTop + box.clientHeight < box.scrollHeight - 4 ? 1 : 0; lastTop = box.scrollTop; }, {passive: true});
+box.addEventListener("wheel", e => { const atTop = box.scrollTop <= 0 && e.deltaY < 0, atBot = box.scrollTop + box.clientHeight >= box.scrollHeight - 1 && e.deltaY > 0;
+  if (!(atTop || atBot) || REDUCED) return; const i = $("tl"); i.style.transition = "none"; i.style.transform = `translateY(${atTop ? 14 : -14}px)`;
+  requestAnimationFrame(() => requestAnimationFrame(() => { i.style.transition = ""; i.style.transform = ""; })); }, {passive: true});
+box.dispatchEvent(new Event("scroll"));
+const FN = {F1: "Yang tidak aktif diburamkan 2px dan dipudarkan. Paling jelas memisahkan fokus.",
+  F2: "Tanpa blur: yang tidak aktif jadi abu-abu pudar. Paling ringan untuk HP lama dan teks tetap tajam.",
+  F3: "Blur tipis + sedikit mengecil, yang aktif terangkat dengan bayangan. Paling dramatis."};
+$("fopt").addEventListener("click", e => { const b = e.target.closest("[data-f]"); if (!b) return;
+  $("fopt").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); $("tlw").className = b.dataset.f; $("fnote").textContent = FN[b.dataset.f]; });
+$("fnote").textContent = FN.F1;
+
+// ---------- runner jump
+const jbox = $("jbox"), jsc = $("jsc");
+const R = ["t", "r"].map(c => { const el = document.createElement("div"); el.className = "run"; el.style.color = `var(--${c})`;
+  el.innerHTML = `<svg viewBox="0 0 20 16">${RUN}</svg><b>${c === "t" ? "Taofik" : "Reza"}</b>`; jbox.appendChild(el);
+  return {c, el, x: 0, y: 0, vx: 0, vy: 0, anim: null, docked: false}; });
+let MODE = "J1";
+const easeIO = t => t < .5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2;
+const home = (c) => { const W = jbox.clientWidth; return [W * .37 + (c === "t" ? -26 : 4), 26 + 56 - 34 - jsc.scrollTop]; };
+const park = (c) => { const W = jbox.clientWidth; return [c === "t" ? 14 : W - 56, jbox.clientHeight / 2 - 20]; };
+const lerp = (a, b, t) => a + (b - a) * t;
+function target(c, p) { const t = easeIO(p), [hx, hy] = home(c), [px, py] = park(c);
+  return [lerp(hx, px, t), lerp(hy, py, t) - Math.sin(Math.PI * t) * 28]; }
+const prog = () => Math.min(1, Math.max(0, (jsc.scrollTop - 10) / 170));
+function put(r, x, y, sx = 1, sy = 1) { r.el.style.transform = `translate(${x}px,${y}px) scale(${sx},${sy})`; }
+// J2/J3: time-based jump, independent of how fast the wheel turns
+function jump(r, toPark) { const [x0, y0] = [r.x, r.y], dur = MODE === "J3" ? 760 : 620, t0 = performance.now(); r.docked = toPark;
+  cancelAnimationFrame(r.anim); r.el.classList.toggle("dk", toPark);
+  const step = now => { const k = Math.min(1, (now - t0) / dur), [tx, ty] = toPark ? park(r.c) : home(r.c);
+    let x, y, sx = 1, sy = 1;
+    if (MODE === "J2") { const e = 1 - Math.pow(1 - k, 3) * Math.cos(k * 4.2) ; x = lerp(x0, tx, e); y = lerp(y0, ty, e); }
+    else { const e = easeIO(k), cx = (x0 + tx) / 2, cy = Math.min(y0, ty) - 70; // quadratic arc over the top
+      x = (1 - e) ** 2 * x0 + 2 * (1 - e) * e * cx + e * e * tx; y = (1 - e) ** 2 * y0 + 2 * (1 - e) * e * cy + e * e * ty;
+      if (k < .15) { sy = 1 - k * 1.2; sx = 1 + k * .8; } else if (k > .88) { const q = (k - .88) / .12, s = Math.sin(q * Math.PI) * .16; sy = 1 - s; sx = 1 + s; } }
+    r.x = x; r.y = y; put(r, x, y, sx, sy); if (k < 1) r.anim = requestAnimationFrame(step); else r.anim = null; };
+  r.anim = requestAnimationFrame(step); }
+let raf = 0;
+function frame() { raf = 0; const p = prog();
+  for (const r of R) {
+    if (MODE === "J0") { [r.x, r.y] = target(r.c, p); put(r, r.x, r.y); r.el.classList.toggle("dk", p > .85); }
+    else if (MODE === "J1") { const [tx, ty] = target(r.c, p); // spring that chases the scroll position: no steps on a mouse wheel
+      r.vx = (r.vx + (tx - r.x) * .12) * .72; r.vy = (r.vy + (ty - r.y) * .12) * .72; r.x += r.vx; r.y += r.vy; put(r, r.x, r.y);
+      r.el.classList.toggle("dk", p > .85); if (Math.abs(tx - r.x) + Math.abs(ty - r.y) + Math.abs(r.vx) + Math.abs(r.vy) > .3) raf = raf || requestAnimationFrame(frame); }
+    else { const want = p > .25; if (want !== r.docked) jump(r, want); else if (!r.anim) { [r.x, r.y] = want ? park(r.c) : home(r.c); put(r, r.x, r.y); } } } }
+jsc.addEventListener("scroll", () => { raf = raf || requestAnimationFrame(frame); }, {passive: true});
+const JN = {J0: "Posisi langsung mengikuti scroll. Dengan roda mouse gerakannya patah-patah per putaran.",
+  J1: "Masih mengikuti scroll (scroll balik = pelari ikut balik), tapi posisinya dikejar pegas, jadi tiap putaran roda menjadi gerakan halus.",
+  J2: "Begitu scroll lewat batas, pelari melompat sendiri ke tepi dalam 0,6 dtk dengan sedikit pantulan. Scroll balik = lompat pulang. Tidak tergantung cepat-lambat scroll.",
+  J3: "Seperti J2, tapi lintasan melengkung tinggi, ada ancang-ancang (jongkok) dan mendarat (sedikit gepeng lalu kembali)."};
+$("jopt").addEventListener("click", e => { const b = e.target.closest("[data-j]"); if (!b) return;
+  $("jopt").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); MODE = b.dataset.j; $("jnote").textContent = JN[MODE];
+  R.forEach(r => { cancelAnimationFrame(r.anim); r.anim = null; r.docked = prog() > .25; r.el.classList.toggle("dk", r.docked); [r.x, r.y] = MODE < "J2" ? target(r.c, prog()) : r.docked ? park(r.c) : home(r.c); put(r, r.x, r.y); }); });
+$("jnote").textContent = JN.J1; R.forEach(r => { [r.x, r.y] = target(r.c, 0); put(r, r.x, r.y); });
+</script>
+</div></body></html>

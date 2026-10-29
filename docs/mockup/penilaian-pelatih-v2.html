@@ -75,14 +75,14 @@ code,pre{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px} pre{ba
     <div class="hd"><b>Sabtu 25 Okt · Long run 20 km</b><span>HR 139–152 · easy 8:45–9:20 (Reza) · 8:40–9:15 (Taofik) · suhu 31–34°C</span></div>
     <div class="row"><div class="L"><span class="val num">20.1 / 20 km<small>101%</small></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Jarak 95–110% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">20.0 / 20 km<small>100%</small></span></div></div>
     <div class="row"><div class="L"><span class="val num">9:31/km</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Buka 3 km pelan</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">9:44/km</span></div></div>
-    <div class="row" id="lrA"><div class="L"><span class="val num">95% km<small>1 km di atas 152</small></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">HR tidak lewat batas<br>≥ 75% km <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">75% km<small>km 16–20 di atas 152</small></span></div></div>
-    <div class="row" id="lrB" hidden><div class="L"><span class="val num">km 13 lewat<small>bukan di 25% akhir</small></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">HR lewat batas hanya di 25% akhir, decoupling &lt; 8% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">km 16–20 · dec 5,0%<small>boleh: drift karena panas</small></span></div></div>
+    <div class="row" id="lrA" hidden><div class="L"><span class="val num">95% km<small>1 km di atas 152</small></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">HR tidak lewat batas<br>≥ 75% km <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">75% km<small>km 16–20 di atas 152</small></span></div></div>
+    <div class="row" id="lrB"><div class="L"><span class="val num">km 13 lewat<small>bukan di 25% akhir</small></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">HR lewat batas hanya di 25% akhir, decoupling &lt; 8% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">km 16–20 · dec 5,0%<small>boleh: drift karena panas</small></span></div></div>
     <div class="row"><div class="L"><span class="val num">9:24/km</span><svg class="ic na"><use href="#na"/></svg></div><div class="C">Pace rata <span class="new">tidak dinilai</span></div><div class="R"><svg class="ic na"><use href="#na"/></svg><span class="val num">9:37/km<small>dulu: gagal (70% di rentang)</small></span></div></div>
     <div class="row"><div class="L"><span class="val num">6,2%</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Decoupling &lt; 8%</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">5,0%</span></div></div>
     <div class="row"><div class="L"><span class="val num">−2 spm</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Cadence bertahan</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">−3 spm</span></div></div>
     <div class="row"><div class="L"><span class="val num">3:11:20</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Di bawah 210 mnt</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">3:12:40</span></div></div>
   </div>
-  <div class="pills" role="group" aria-label="Aturan HR long run"><button class="pill" aria-pressed="true" data-o="A">Opsi A: ≥ 75% km</button><button class="pill" aria-pressed="false" data-o="B">Opsi B: lewat hanya di 25% akhir + dec &lt; 8%</button></div>
+  <div class="pills" role="group" aria-label="Aturan HR long run"><button class="pill" aria-pressed="false" data-o="A">Cadangan A: ≥ 75% km (decoupling tidak ada)</button><button class="pill" aria-pressed="true" data-o="B">Dipilih B: lewat hanya di 25% akhir + dec &lt; 8%</button></div>
 </div>
 
 <!-- tempo -->
@@ -129,9 +129,10 @@ code,pre{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px} pre{ba
   "pace": {"rec": ["9:20","9:50"], "easy": ["8:45","9:20"], "mp": ["7:45","7:45"],
            "tempo": ["7:10","7:20"], "interval": ["6:20","6:30"], "hr_leads": true}}]</pre></div>
 
-<h2>4. Yang perlu omPik putuskan</h2>
-<div class="q"><b>Q1 · HR long run</b><span>A: lulus kalau ≥ 75% km di rentang. B: HR boleh lewat batas hanya di 25% bagian akhir, asalkan decoupling &lt; 8% (lihat tombol di kartu long run).</span></div>
-<div class="q"><b>Q2 · Potongan yang disengaja</b><span>Gerbang tidur −20% / −40% bisa dihitung otomatis dari data tidur dan Body Battery pagi itu. "Aturan betis" belum ada di <code>RUMUS-BATAS-SUMBER.md</code> dan tidak ada datanya di Garmin. Bagaimana dashboard tahu? (mis. tulis "betis" di judul aktivitas Garmin, atau abaikan dulu)</span></div>
+<h2>4. Keputusan omPik (29 Okt)</h2>
+<div class="q"><b>Q1 · HR long run: opsi B</b><span>HR boleh lewat batas atas hanya di 25% bagian akhir, asalkan decoupling &lt; 8%. Kalau decoupling tidak bisa dihitung (data terlalu sedikit / banyak berhenti) → cadangan opsi A (≥ 75% km tidak lewat batas atas). Yang dinilai hanya HR di atas batas atas; di bawah rentang tetap aman.</span></div>
+<div class="q"><b>Q2 · Aturan betis: diabaikan</b><span>Potongan yang dihitung patuh hanya dari gerbang tidur −20% / −40% (otomatis).</span></div>
+<div class="q"><b>Q3 · Dicatat di README</b><span>Sebagai [keputusan omPik], tidak menambah dokumen rumus.</span></div>
 
 <svg width="0" height="0" style="position:absolute"><defs>
 <symbol id="ok" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.2 10.3l2.6 2.5 5-5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
