@@ -9,11 +9,14 @@ Mockup: [`docs/mockup/linimasa-ringkas.html`](mockup/linimasa-ringkas.html). Min
 tinggi kotak = 10 minggu (1 terbuka + 9 tertutup) atau sisa layar di bawah header ringkas bila lebih kecil; begitu kotak
 dipakai (klik / scroll), halaman bergeser sampai kotak pas di bawah header ringkas.
 
-## 7. Lari 5K Reza 10 Okt tidak muncul — perlu cek data asli
+## 7. Tes 5K 10 Okt tidak ada di grafik 5K — menunggu keputusan omPik
 
-Kemungkinan (dari kode): (a) tipe aktivitas di Garmin bukan "running" (mis. treadmill/track/lainnya) sehingga tidak
-ikut filter `activityType=running`; (b) data per detik tidak tersedia (ditandai sekali, tidak diminta ulang);
-(c) jarak GPS < 5000 m, sehingga segmen 5K tidak bisa dihitung (butuh 5000 m penuh). Menunggu hasil cek omPik.
+Hasil cek data asli (29 Okt): 10 Okt Reza 4,718 km, Taofik 4,735 km; 11 Okt Reza 4,996 km, Taofik 5,024 km.
+Segmen 5K butuh 5000 m penuh, jadi tes 10 Okt (keduanya) dan lari Reza 11 Okt (kurang 4 m) tidak punya titik 5K.
+Penyebabnya jarak GPS, bukan sync. Opsi: A toleransi (mis. ≥ 4,9 km dihitung, waktu diskalakan ke 5000 m, ditandai ≈);
+B hari tes di Checkpoint Excel selalu dihitung (waktu diskalakan ke 5000 m); C tetap ketat.
+Bug terkait yang sudah diperbaiki: tanggal di tooltip grafik (dan akhir minggu) mundur satu hari di WIB karena
+`toISOString()` memakai UTC — titik tercepat Taofik kini tertulis 11 Okt.
 
 ## Daftar perbaikan 1–5 — **sudah dibuat** (29 Okt): M4, A+B+C, 3a, tanpa bayangan, 10 minggu
 

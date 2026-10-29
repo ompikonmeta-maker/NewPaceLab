@@ -884,7 +884,7 @@ function renderDuel(cur) {
 }
 
 // ---------------------------------------------------------------- race to 42K + score
-const weekEnd = s => { const d = D(s); d.setDate(d.getDate() + 6); return d.toISOString().slice(0, 10); };
+const weekEnd = s => addDays(s, 6);   // local dates: toISOString() would shift a day east of UTC (WIB)
 const range = s => { const a = D(s), b = D(weekEnd(s)); return a.getMonth() === b.getMonth() ? `${a.getDate()}–${b.getDate()} ${BULAN[b.getMonth()]}` : `${tgl(s)} – ${tgl(weekEnd(s))}`; };
 function renderRace() {
   const max = 42.195;
@@ -1006,7 +1006,7 @@ function draw(id, {x, series, h = 220, ymin, ymax, invert = false, refs = [], ba
   const show = k => {
     const cx = xs(k);
     xh.style.transform = `translateX(${cx}px)`; xh.setAttribute("opacity", ".7");
-    let html = `<b>${xnum ? tgl(new Date(k).toISOString().slice(0, 10)) : (xlab ? xlab(x[k], true) : x[k])}</b>`;
+    let html = `<b>${xnum ? tgl(iso(new Date(k))) : (xlab ? xlab(x[k], true) : x[k])}</b>`;
     series.filter(se => !se.target && !se.step).forEach(se => {
       const p = xnum ? se.v.find(q => q[0] === k) : se.v[k], v = p == null ? null : val(p);
       const dot = svg.querySelector(`.hd[data-c="${se.c}"]`);
