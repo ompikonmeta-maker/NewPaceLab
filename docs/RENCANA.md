@@ -3,13 +3,21 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
+## 8. Kartu Progres terbaik bisa dibuka — menunggu pilihan
+
+Mockup: [`docs/mockup/progres-detail.html`](mockup/progres-detail.html). Isi detail sama untuk semua opsi: grafik besar
+(hover ke titik terdekat dalam 28 px), filter 4 mgg / 12 mgg / semua, ringkasan per pelari (tercepat, pertama, membaik,
+median 4 minggu, jumlah, prediksi maraton Riegel), 5 tercepat (sorot titiknya saat disentuh), tab 5K · 10K · Half · Full.
+Opsi: E1 membesar di tempat · E2 jendela di tengah (kartu terbang ke tengah, latar redup) · E3 panel dari kanan ·
+E4 pita di bawah baris kartu.
+
 ## 6. Linimasa ringkas (ide 1 + 2 + 3) — mockup siap, menunggu "gas"
 
 Mockup: [`docs/mockup/linimasa-ringkas.html`](mockup/linimasa-ringkas.html). Minggu tertutup jadi satu baris tipis (±46 px);
 tinggi kotak = 10 minggu (1 terbuka + 9 tertutup) atau sisa layar di bawah header ringkas bila lebih kecil; begitu kotak
 dipakai (klik / scroll), halaman bergeser sampai kotak pas di bawah header ringkas.
 
-## 7. Tes 5K 10 Okt tidak ada di grafik 5K — menunggu keputusan omPik
+## 7. Tes 5K 10 Okt tidak ada di grafik 5K — dipilih A + B, menunggu "gas"
 
 Hasil cek data asli (29 Okt): 10 Okt Reza 4,718 km, Taofik 4,735 km; 11 Okt Reza 4,996 km, Taofik 5,024 km.
 Segmen 5K butuh 5000 m penuh, jadi tes 10 Okt (keduanya) dan lari Reza 11 Okt (kurang 4 m) tidak punya titik 5K.

@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: detail progres terbaik</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.2,.64,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:20px;margin:28px 0 2px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.note{font-size:13px;color:var(--text-2);margin:4px 0 0;min-height:20px}
+/* cards */
+.cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:stretch;transition:gap .3s}
+.pc{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px;display:flex;flex-direction:column;cursor:pointer;
+  transition:transform .3s var(--spring),box-shadow .3s,border-color .2s;min-width:0}
+.pc:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(0,0,0,.08);border-color:color-mix(in srgb,var(--text) 22%,transparent)}
+.pc .hint{position:absolute;right:16px;top:16px;width:26px;height:26px;border-radius:9px;display:grid;place-items:center;color:var(--muted);opacity:0;transition:opacity .2s,transform .3s var(--spring)}
+.pc:hover .hint{opacity:1;transform:scale(1.08)}
+.pc h3{margin:0;font-size:16px} .big{display:flex;gap:14px;font-size:21px;font-weight:700;margin:8px 0 4px} .big i,.dt{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px;vertical-align:2px}
+.ln{font-size:13px;color:var(--text-2);margin-top:4px}
+.pc .ch{margin-top:12px;flex:1;min-height:150px}
+.pc svg{display:block;width:100%;overflow:visible} svg text{font-size:10.5px;fill:var(--muted)}
+/* detail content (shared by all options) */
+.det{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px}
+.dhead{display:flex;align-items:center;gap:12px;margin-bottom:10px} .dhead h3{margin:0;font-size:20px}
+.x{margin-left:auto;width:34px;height:34px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;display:grid;place-items:center;font-size:18px;line-height:1}
+.x:hover{background:var(--bg)}
+.nav{display:flex;gap:4px} .nav button{border:0;background:none;color:var(--muted);font:inherit;font-size:13px;padding:4px 10px;border-radius:9px;cursor:pointer} .nav button[aria-current=true]{background:var(--bg);color:var(--text);font-weight:600}
+.per{display:flex;gap:4px;margin:2px 0 8px} .per button{border:1px solid var(--line);background:var(--surface);color:var(--text-2);font:inherit;font-size:12px;padding:2px 10px;border-radius:999px;cursor:pointer} .per button[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.bigch{position:relative} .bigch svg{display:block;width:100%}
+.bigch .hl{pointer-events:none}
+.tt{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 28px rgba(0,0,0,.12);border-radius:12px;padding:8px 12px;font-size:12.5px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s}
+.tt.on{opacity:1;transform:none} .tt b{font-size:14px} .tt small{display:block;color:var(--muted)}
+.side{display:flex;flex-direction:column;gap:10px}
+.stat{background:var(--bg);border-radius:14px;padding:12px 14px}
+.stat .who{display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:6px}
+.stat dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:12.5px} .stat dt{color:var(--muted)} .stat dd{margin:0;text-align:right;font-weight:600}
+.top{font-size:12.5px} .top h4{margin:4px 0 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
+.top ol{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:3px}
+.top li{display:grid;grid-template-columns:16px 1fr auto auto;gap:8px;align-items:center;padding:3px 6px;border-radius:8px;cursor:default}
+.top li:hover,.top li.on{background:var(--bg)} .top li .n{color:var(--muted)} .top li b{font-variant-numeric:tabular-nums}
+.est{color:var(--warn);font-weight:700}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);margin-top:6px} .legend span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+/* E1 in place: chosen card spans the row, the others become a slim strip */
+.E1 .cards.focus{grid-template-columns:repeat(3,minmax(0,1fr))}
+.E1 .cards.focus .pc.mini{padding:10px 14px;flex-direction:row;align-items:center;gap:12px} .E1 .cards.focus .pc.mini .ch,.E1 .cards.focus .pc.mini .ln{display:none}
+.E1 .cards.focus .pc.mini .big{font-size:15px;margin:0} .E1 .cards.focus .pc.mini .hint{display:none}
+.E1 .cards.focus .pc.open{grid-column:1/-1;order:-1;cursor:default;transform:none;animation:grow .45s var(--ease)}
+@keyframes grow{from{opacity:.4;transform:scale(.97)}to{opacity:1;transform:none}}
+/* E2 modal: the card flies to the centre (FLIP), background dims and blurs */
+.ov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(8,6,18,0);backdrop-filter:blur(0);transition:background .4s,backdrop-filter .4s}
+.ov.open{background:rgba(8,6,18,.42);backdrop-filter:blur(6px)}
+.ov .win{width:min(1080px,100%);max-height:calc(100vh - 48px);overflow:auto;background:var(--surface);border-radius:22px;padding:20px 24px;box-shadow:0 30px 80px rgba(0,0,0,.25);transform-origin:0 0}
+/* E3 drawer from the right */
+.dr{position:fixed;inset:0;z-index:50;display:none}
+.dr .bd{position:absolute;inset:0;background:rgba(8,6,18,0);transition:background .35s} .dr.open .bd{background:rgba(8,6,18,.3)}
+.dr .pane{position:absolute;top:0;right:0;bottom:0;width:min(760px,94vw);background:var(--surface);box-shadow:-20px 0 60px rgba(0,0,0,.18);padding:22px 24px;overflow:auto;transform:translateX(100%);transition:transform .45s var(--ease)}
+.dr.open .pane{transform:none} .dr .det{grid-template-columns:1fr}
+/* E4 band under the row with a caret pointing at the card */
+.band{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease);margin-top:0} .band>div{overflow:hidden} .band.open{grid-template-rows:1fr;margin-top:14px}
+.band .in{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 22px;margin-top:10px}
+.band .caret{position:absolute;top:-9px;width:16px;height:16px;background:var(--surface);border-left:1px solid var(--line);border-top:1px solid var(--line);transform:rotate(45deg);transition:left .4s var(--ease)}
+.E4 .cards .pc.open{border-color:var(--text)} .E4 .cards.focus .pc:not(.open){opacity:.5}
+@media (max-width:900px){.cards{grid-template-columns:repeat(2,minmax(0,1fr))}.det{grid-template-columns:1fr}.E1 .cards.focus{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media (max-width:560px){.cards{grid-template-columns:1fr}.E1 .cards.focus .pc.mini .big span:last-child{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style></head><body><div class="wrap" id="wrap">
+
+<h1>Mockup: kartu Progres terbaik yang bisa dibuka</h1>
+<p class="sub">Data rekaan. Klik kartu 5K / 10K / Half / Full. Titik bergaris putus = jarak GPS kurang dari 5 km, waktunya disetarakan ke 5000 m (aturan A + B, ditandai ≈).</p>
+<div class="pills" id="opt" role="group" aria-label="Opsi">
+  <button class="pill" aria-pressed="true" data-o="E1">E1 Membesar di tempat</button>
+  <button class="pill" aria-pressed="false" data-o="E2">E2 Jendela di tengah</button>
+  <button class="pill" aria-pressed="false" data-o="E3">E3 Panel dari kanan</button>
+  <button class="pill" aria-pressed="false" data-o="E4">E4 Pita di bawah baris</button>
+</div>
+<p class="note" id="note"></p>
+
+<h2>Progres terbaik</h2>
+<p class="sub">Segmen tercepat di dalam setiap lari. Grafik naik = makin cepat. Klik kartu untuk detail.</p>
+<div id="host" class="E1"><div class="cards" id="cards"></div><div class="band" id="band"><div><div class="in"><span class="caret" id="caret"></span><div id="bandc"></div></div></div></div></div>
+</div>
+<div class="ov" id="ov"><div class="win" id="win"></div></div>
+<div class="dr" id="dr"><div class="bd"></div><div class="pane" id="pane"></div></div>
+
+<script>
+const $ = id => document.getElementById(id), REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"], DAY0 = new Date(2026, 5, 1);
+const tgl = d => { const x = new Date(DAY0); x.setDate(x.getDate() + Math.round(d)); return `${x.getDate()} ${BLN[x.getMonth()]}`; };
+const fmt = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return (h ? h + ":" + String(m).padStart(2, "0") : m) + ":" + String(x).padStart(2, "0"); };
+const NAME = {t: "Taofik", r: "Reza"};
+// rekaan: [day since 1 Jun, seconds, km of the run, estimated?]
+function effs(seed, base, drift, n, noise, kmv) { const o = []; for (let i = 0; i < n; i++) { const d = 3 + i * (148 / n) + (seed * i) % 3;
+  o.push([d, base - drift * d / 150 + (((i * 7919 * seed) % 97) / 97 - .5) * noise, +(kmv + ((i * 31 * seed) % 9)).toFixed(1), false]); } return o; }
+const DATA = {
+  "5K": {t: effs(3, 2700, 760, 40, 330, 6).concat([[131, 1877, 5.02, false], [130, 1905, 4.74, true]]), r: effs(5, 2560, 300, 44, 300, 6).concat([[130, 2057, 4.72, true], [131, 2100, 4.99, true]])},
+  "10K": {t: effs(7, 5500, 520, 15, 260, 11), r: effs(11, 5450, 160, 15, 220, 11)},
+  "Half": {t: [], r: []},
+  "Full": {t: [[30, 22900], [61, 22700], [92, 22690], [122, 18000]].map(p => [...p, 0, false]), r: [[30, 25400], [61, 24500], [92, 24400], [122, 19700]].map(p => [...p, 0, false])}};
+const KS = ["5K", "10K", "Half", "Full"];
+let MODE = "E1", OPEN = null, PER = 150;
+
+function svgChart(k, W, H, big) { const D = DATA[k], all = [...D.t, ...D.r].filter(p => p[0] >= 150 - PER);
+  if (!all.length) return `<div style="height:${H}px;display:grid;place-items:center;color:var(--muted);font-size:13px;text-align:center">Belum ada lari ≥ 21,1 km.<br><b style="color:var(--text)">Lomba Half Marathon · 23 Jan</b></div>`;
+  const lo = Math.min(...all.map(p => p[1])) - 60, hi = Math.max(...all.map(p => p[1])) + 60, x0 = 150 - PER, L = big ? 52 : 36;
+  const X = d => L + (d - x0) / PER * (W - L - 12), Y = v => 10 + (v - lo) / (hi - lo) * (H - 34);
+  let g = ""; for (let i = 0; i < 5; i++) { const v = lo + (hi - lo) * i / 4; g += `<line x1="${L}" x2="${W}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${L - 6}" y="${Y(v) + 3}" text-anchor="end">${fmt(v)}</text>`; }
+  for (let m = 0; m < 6; m++) { const d = [0, 30, 61, 92, 122, 153][m]; if (d >= x0 && d <= 150) g += `<text x="${X(d)}" y="${H - 4}" text-anchor="middle">${BLN[5 + m]}</text>`; }
+  const pts = [];
+  for (const c of ["t", "r"]) { const P = D[c].filter(p => p[0] >= x0).sort((a, b) => a[0] - b[0]); if (!P.length) continue; const best = P.reduce((a, b) => b[1] < a[1] ? b : a);
+    if (k !== "Full") { let run = Infinity, d = ""; P.forEach((p, i) => { const prev = run; run = Math.min(run, p[1]); d += i ? ` H${X(p[0]).toFixed(1)} V${Y(run).toFixed(1)}` : `M${X(p[0]).toFixed(1)} ${Y(run).toFixed(1)}`; });
+      g += `<path d="${d} H${X(150)}" fill="none" stroke="var(--${c})" stroke-width="1.6" opacity=".5"/>`; }
+    else g += `<path d="${P.map((p, i) => (i ? "L" : "M") + X(p[0]) + " " + Y(p[1])).join(" ")}" fill="none" stroke="var(--${c})" stroke-width="2" stroke-dasharray="5 4"/>`;
+    P.forEach(p => { const r = big ? 4.2 : 2.8; pts.push({c, p, x: X(p[0]), y: Y(p[1])});
+      if (p === best) return;
+      g += p[3] ? `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${r}" fill="var(--surface)" stroke="var(--${c})" stroke-width="1.4" stroke-dasharray="2 1.6"/>` : `<circle cx="${X(p[0])}" cy="${Y(p[1])}" r="${r}" fill="var(--${c})" opacity=".5"/>`; });
+    const rt = X(best[0]) > W - 80;
+    g += `<circle cx="${X(best[0])}" cy="${Y(best[1])}" r="${big ? 8 : 6.5}" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.5"/><circle cx="${X(best[0])}" cy="${Y(best[1])}" r="3" fill="var(--${c})"/>
+      <text x="${X(best[0]) + (rt ? -11 : 11)}" y="${Y(best[1]) - 9}" text-anchor="${rt ? "end" : "start"}" style="fill:var(--${c});font-weight:700;font-size:${big ? 13 : 11.5}px">${best[3] ? "≈" : ""}${fmt(best[1])}</text>`; }
+  if (big) g += `<circle class="hl" id="hl" r="9" fill="none" stroke-width="2.5" opacity="0"/>`;
+  return `<svg viewBox="0 0 ${W} ${H}" style="height:${H}px" data-k="${k}">${g}</svg>` + (big ? `<script type="application/json" class="pts">${JSON.stringify(pts.map(q => [q.c, q.x, q.y, q.p]))}<\/script>` : ""); }
+
+function card(k) { const D = DATA[k], b = c => D[c].length ? Math.min(...D[c].map(p => p[1])) : null, n = c => D[c].length;
+  return `<section class="pc" data-k="${k}" tabindex="0" role="button" aria-label="Buka detail ${k}"><span class="hint"><svg width="16" height="16" viewBox="0 0 24 24"><path d="M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>
+    <h3>${k}${k === "Full" ? ' <small style="font-weight:400;color:var(--muted);font-size:12px">estimasi</small>' : ""}</h3>
+    <div class="big num">${["t", "r"].map(c => `<span><i style="background:var(--${c})"></i>${b(c) ? fmt(b(c)) : "–"}</span>`).join("")}</div>
+    ${["t", "r"].map(c => `<div class="ln"><span class="dt" style="background:var(--${c})"></span>${n(c) ? `${n(c)} ${k === "Full" ? "estimasi" : "lari"}` : "belum ada"}</div>`).join("")}
+    <div class="ch">${svgChart(k, 260, 170, false)}</div></section>`; }
+
+function stats(k, c) { const P = DATA[k][c]; if (!P.length) return `<div class="stat"><div class="who"><span class="dt" style="background:var(--${c})"></span>${NAME[c]}</div><span style="color:var(--muted);font-size:12.5px">belum ada data</span></div>`;
+  const s = P.slice().sort((a, b) => a[0] - b[0]), best = s.reduce((a, b) => b[1] < a[1] ? b : a), l4 = s.filter(p => p[0] > 122).map(p => p[1]), med = l4.length ? l4.slice().sort((a, b) => a - b)[l4.length >> 1] : null;
+  const riegel = k === "Full" ? null : best[1] * Math.pow(42195 / ({"5K": 5000, "10K": 10000, Half: 21097}[k]), 1.06);
+  return `<div class="stat"><div class="who"><span class="dt" style="background:var(--${c})"></span>${NAME[c]}</div><dl class="num">
+    <dt>tercepat</dt><dd>${best[3] ? '<span class="est">≈</span>' : ""}${fmt(best[1])} · ${tgl(best[0])}</dd>
+    <dt>pertama</dt><dd>${fmt(s[0][1])} · ${tgl(s[0][0])}</dd><dt>membaik</dt><dd>−${fmt(s[0][1] - best[1])}</dd>
+    ${med ? `<dt>median 4 mgg</dt><dd>${fmt(med)}</dd>` : ""}<dt>jumlah</dt><dd>${s.length} ${k === "Full" ? "estimasi" : "lari"}</dd>
+    ${riegel ? `<dt>prediksi maraton</dt><dd>${fmt(riegel)}</dd>` : ""}</dl></div>`; }
+function top5(k) { const all = ["t", "r"].flatMap(c => DATA[k][c].map(p => [c, p])).sort((a, b) => a[1][1] - b[1][1]).slice(0, 5); if (!all.length || k === "Full") return "";
+  return `<div class="top"><h4>5 tercepat</h4><ol>${all.map(([c, p], i) => `<li data-i="${c}-${p[0]}"><span class="n">${i + 1}</span><span><span class="dt" style="background:var(--${c})"></span>${tgl(p[0])} · ${p[2]} km</span><b>${p[3] ? '<span class="est">≈</span>' : ""}${fmt(p[1])}</b><span></span></li>`).join("")}</ol></div>`; }
+function detail(k, wide) { const W = wide ? 760 : 680;
+  return `<div class="dhead"><h3>${k}</h3><nav class="nav">${KS.map(x => `<button data-go="${x}" aria-current="${x === k}">${x}</button>`).join("")}</nav><button class="x" data-close aria-label="Tutup">×</button></div>
+    <div class="det"><div><div class="per">${[[28, "4 mgg"], [84, "12 mgg"], [150, "semua"]].map(([d, l]) => `<button data-per="${d}" aria-pressed="${PER === d}">${l}</button>`).join("")}</div>
+      <div class="bigch">${svgChart(k, W, 340, true)}<div class="tt" id="tt"></div></div>
+      <div class="legend"><span><svg width="12" height="12"><circle cx="6" cy="6" r="4" fill="var(--muted)" opacity=".6"/></svg>satu lari</span><span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--muted)" stroke-width="2"/><circle cx="8" cy="8" r="2.4" fill="var(--muted)"/></svg>tercepat</span>
+        <span><svg width="12" height="12"><circle cx="6" cy="6" r="4" fill="none" stroke="var(--muted)" stroke-dasharray="2 1.6"/></svg>≈ jarak GPS &lt; 5 km, disetarakan</span><span><svg width="18" height="8"><path d="M0 6H8V2H18" fill="none" stroke="var(--muted)"/></svg>rekor berjalan</span></div></div>
+    <div class="side">${stats(k, "t")}${stats(k, "r")}${top5(k)}</div></div>`; }
+
+// hover: nearest point within 28 px wins, so small dots are easy to catch
+function wire(root) { const box = root.querySelector(".bigch"); if (!box) return; const svg = box.querySelector("svg"), tt = box.querySelector(".tt"), js = box.querySelector(".pts"); if (!svg || !js) return;
+  const P = JSON.parse(js.textContent), hl = svg.querySelector("#hl"), vb = svg.viewBox.baseVal;
+  const show = q => { if (!q) { tt.classList.remove("on"); hl.setAttribute("opacity", 0); root.querySelectorAll(".top li").forEach(l => l.classList.remove("on")); return; }
+    const [c, x, y, p] = q, r = svg.getBoundingClientRect(), k = r.width / vb.width;
+    hl.setAttribute("cx", x); hl.setAttribute("cy", y); hl.setAttribute("stroke", `var(--${c})`); hl.setAttribute("opacity", 1);
+    tt.innerHTML = `<span class="dt" style="background:var(--${c})"></span>${NAME[c]} · ${tgl(p[0])}<br><b class="num">${p[3] ? "≈" : ""}${fmt(p[1])}</b>${p[2] ? `<small>${p[2]} km${p[3] ? " · disetarakan ke 5000 m" : ""}</small>` : ""}`;
+    const px = x * k, left = px > r.width - 170 ? px - 160 : px + 14; tt.style.left = left + "px"; tt.style.top = Math.max(0, y * k - 60) + "px"; tt.classList.add("on");
+    root.querySelectorAll(".top li").forEach(l => l.classList.toggle("on", l.dataset.i === `${c}-${p[0]}`)); };
+  svg.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), k = vb.width / r.width, mx = (e.clientX - r.left) * k, my = (e.clientY - r.top) * k;
+    let best = null, bd = 28 * k; P.forEach(q => { const d = Math.hypot(q[1] - mx, q[2] - my); if (d < bd) { bd = d; best = q; } }); show(best); });
+  svg.addEventListener("pointerleave", () => show(null));
+  root.querySelectorAll(".top li").forEach(l => l.addEventListener("pointerenter", () => show(P.find(q => `${q[0]}-${q[3][0]}` === l.dataset.i)))); }
+
+function render() { $("cards").innerHTML = KS.map(card).join(""); $("cards").classList.remove("focus"); }
+function open(k, from) { OPEN = k;
+  if (MODE === "E1") { $("cards").classList.add("focus"); $("cards").querySelectorAll(".pc").forEach(p => { p.classList.toggle("open", p.dataset.k === k); p.classList.toggle("mini", p.dataset.k !== k);
+      if (p.dataset.k === k) { p.innerHTML = detail(k, true); wire(p); } else p.innerHTML = card(p.dataset.k).replace(/^<section[^>]*>|<\/section>$/g, ""); }); }
+  if (MODE === "E2") { const ov = $("ov"), win = $("win"); win.innerHTML = detail(k, true); wire(win); ov.style.display = "flex";
+    const a = from.getBoundingClientRect(); requestAnimationFrame(() => { const b = win.getBoundingClientRect();
+      win.style.transition = "none"; win.style.transform = `translate(${a.left - b.left}px,${a.top - b.top}px) scale(${a.width / b.width},${a.height / b.height})`; win.style.opacity = ".4";
+      requestAnimationFrame(() => { win.style.transition = REDUCED ? "none" : "transform .5s var(--ease),opacity .3s"; win.style.transform = ""; win.style.opacity = ""; ov.classList.add("open"); }); }); }
+  if (MODE === "E3") { $("pane").innerHTML = detail(k, false); wire($("pane")); $("dr").style.display = "block"; requestAnimationFrame(() => requestAnimationFrame(() => $("dr").classList.add("open"))); }
+  if (MODE === "E4") { $("cards").classList.add("focus"); $("cards").querySelectorAll(".pc").forEach(p => p.classList.toggle("open", p.dataset.k === k));
+    $("bandc").innerHTML = detail(k, true); wire($("bandc")); $("band").classList.add("open");
+    const c = from.getBoundingClientRect(), h = $("host").getBoundingClientRect(); $("caret").style.left = (c.left - h.left + c.width / 2 - 8) + "px";
+    setTimeout(() => $("band").scrollIntoView({behavior: REDUCED ? "auto" : "smooth", block: "nearest"}), 300); } }
+function close() { OPEN = null;
+  if (MODE === "E2") { $("ov").classList.remove("open"); setTimeout(() => { $("ov").style.display = "none"; $("win").innerHTML = ""; }, 420); }
+  if (MODE === "E3") { $("dr").classList.remove("open"); setTimeout(() => { $("dr").style.display = "none"; $("pane").innerHTML = ""; }, 460); }
+  if (MODE === "E4") $("band").classList.remove("open");
+  render(); }
+document.addEventListener("click", e => { if (e.target.closest("[data-close]") || e.target === $("ov") || e.target.classList.contains("bd")) return close();
+  const go = e.target.closest("[data-go]"); if (go) { const k = go.dataset.go, m = MODE; if (m === "E1") { render(); open(k, $("cards").querySelector(`[data-k="${k}"]`)); }
+    else { const host = m === "E2" ? $("win") : m === "E3" ? $("pane") : $("bandc"); host.innerHTML = detail(k, m !== "E3"); wire(host); OPEN = k;
+      if (m === "E4") { const c = $("cards").querySelector(`[data-k="${k}"]`).getBoundingClientRect(), h = $("host").getBoundingClientRect(); $("caret").style.left = (c.left - h.left + c.width / 2 - 8) + "px";
+        $("cards").querySelectorAll(".pc").forEach(p => p.classList.toggle("open", p.dataset.k === k)); } } return; }
+  const per = e.target.closest("[data-per]"); if (per) { PER = +per.dataset.per; const k = OPEN; const host = per.closest(".pc, #win, #pane, #bandc"); host.innerHTML = detail(k, host.id !== "pane"); wire(host); return; }
+  const pc = e.target.closest(".pc"); if (pc && !pc.classList.contains("open")) { if (MODE === "E1" && OPEN) render(); open(pc.dataset.k, $("cards").querySelector(`[data-k="${pc.dataset.k}"]`)); } });
+document.addEventListener("keydown", e => { if (e.key === "Escape" && OPEN) close(); if ((e.key === "Enter" || e.key === " ") && e.target.classList && e.target.classList.contains("pc") && !e.target.classList.contains("open")) { e.preventDefault(); e.target.click(); } });
+const NOTE = {E1: "Kartu yang diklik melebar sepanjang baris; tiga kartu lain jadi kartu kecil di bawahnya (tetap bisa diklik untuk pindah). Tidak menutupi halaman.",
+  E2: "Kartu terbang ke tengah dan membesar menjadi jendela; latar redup dan buram. Fokus penuh, ←/→ lewat tab 5K · 10K · Half · Full, Esc menutup.",
+  E3: "Panel masuk dari kanan; halaman tetap terlihat di kiri. Cocok untuk membandingkan dengan kartu lain sambil membaca detail.",
+  E4: "Detail terbuka sebagai pita di bawah baris kartu, dengan panah ke kartu yang dipilih (seperti linimasa Sesi). Kartu lain sedikit pudar."};
+$("opt").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; if (OPEN) close();
+  $("opt").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); MODE = b.dataset.o; $("host").className = MODE; $("note").textContent = NOTE[MODE]; });
+$("note").textContent = NOTE.E1; render();
+</script>
+</body></html>
