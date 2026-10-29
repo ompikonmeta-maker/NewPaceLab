@@ -3,12 +3,15 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0b. Tab "Sesi" — dipilih T3 + A, versi 7 menunggu "gas"
+## 0b. Tab "Sesi" — T3 + A versi 7, Long run A + Cadence A — **sudah dibuat** (29 Okt)
+
+Sudah ada di dashboard (lihat README, bagian Tab Sesi). Sisa: cek cadence/elevasi pada data Garmin asli
+(kalau kosong: `python pacelab.py inspect`).
 
 Versi 7: garis HR / cadence / elevasi ditumpuk jadi satu di jalur luar (batang pace terpisah); angka kartu Arah
 opsi B (berwarna biru/oranye); setiap ▲▼ punya penjelasan bahasa sederhana saat disentuh; opsi grafik Long run
 (A menuju 42K · B batang per minggu · C garis per minggu) dan Cadence (A pita target · B garis + pita ·
-C jarum metronom) menunggu pilihan.
+C jarum metronom): dipilih Long run A + Cadence A.
 
 
 Versi 6 (hanya yang dikomentari): nama hari lengkap; tooltip per km satu baris per pelari; garis HR / cadence /

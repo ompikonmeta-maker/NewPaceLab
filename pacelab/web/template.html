@@ -15,13 +15,14 @@
   --lock:#d6d5d0; --focus:#2a78d6;
   --font:"Segoe UI",Roboto,system-ui,sans-serif;
   --ease:cubic-bezier(.22,1,.36,1);
+  --z1:#dcdcd6; --z2:#b4b3ab; --z3:#8a8981; --z4:#5c5b55; --z5:#2c2b28;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){color-scheme:dark;--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
-    --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318;--crit:#ff7b7b;--crit-bg:#3d1c1c;--lock:#3a3a37;--focus:#6aa8f0}
+    --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318;--crit:#ff7b7b;--crit-bg:#3d1c1c;--lock:#3a3a37;--focus:#6aa8f0;--z1:#3a3a37;--z2:#5a5a55;--z3:#86857e;--z4:#b5b4ac;--z5:#e6e5df}
 }
 :root[data-theme="dark"]{color-scheme:dark;--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
-  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318;--crit:#ff7b7b;--crit-bg:#3d1c1c;--lock:#3a3a37;--focus:#6aa8f0}
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318;--crit:#ff7b7b;--crit-bg:#3d1c1c;--lock:#3a3a37;--focus:#6aa8f0;--z1:#3a3a37;--z2:#5a5a55;--z3:#86857e;--z4:#b5b4ac;--z5:#e6e5df}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding:28px 20px 48px}
@@ -394,6 +395,120 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .lpop.on .scale span.me{animation:lit .6s .35s cubic-bezier(.34,1.56,.64,1) both}
 @keyframes lit{from{transform:scale(.85);box-shadow:none}}
 
+/* ===== tabs (header stays) + compact sticky header ===== */
+.st-tabs{position:relative;display:flex;gap:28px;align-items:flex-end;border-bottom:1px solid var(--line);margin:34px 0 14px}
+.st-tabs button{border:0;background:none;font:inherit;font-size:24px;font-weight:700;letter-spacing:-.02em;color:var(--muted);padding:0 0 10px;cursor:pointer;transition:color .3s}
+.st-tabs button[aria-selected="true"]{color:var(--text)} .st-tabs button:hover{color:var(--text-2)} .st-tabs button:focus-visible{outline:2px solid var(--focus);outline-offset:4px;border-radius:4px}
+.st-ul{position:absolute;left:0;bottom:-1px;height:3px;border-radius:2px;background:var(--text);transition:transform .45s cubic-bezier(.34,1.4,.64,1),width .45s cubic-bezier(.34,1.4,.64,1)}
+.st-cnt{font-size:12px;font-weight:700;vertical-align:super;margin-left:3px;color:var(--muted)}
+.st-sub{margin:-4px 0 12px;color:var(--muted);font-size:14px}
+.st-pane{transition:opacity .28s,transform .45s var(--ease)} .st-hide{display:none} .st-out{opacity:0;transform:translateX(-24px)} .st-in0{opacity:0;transform:translateX(24px)}
+.st-mini{position:fixed;left:0;right:0;top:0;z-index:55;background:color-mix(in srgb,var(--surface) 86%,transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);transform:translateY(-110%);transition:transform .45s var(--ease)}
+.st-mini.on{transform:none}
+.st-mini .st-in{max-width:1180px;margin:0 auto;padding:8px 20px;display:flex;align-items:center;gap:18px}
+.st-cd{font-weight:750;font-size:20px;letter-spacing:-.02em;white-space:nowrap} .st-cd small{font-size:12.5px;font-weight:500;color:var(--muted);margin-left:5px}
+.st-bar{flex:1;max-width:360px;height:6px;border-radius:3px;background:var(--grid);position:relative}
+.st-bar i{position:absolute;left:0;top:0;bottom:0;border-radius:3px;background:linear-gradient(90deg,var(--t),var(--r))}
+.st-dots{position:absolute;top:-13px;display:flex;gap:3px;transform:translateX(-50%)} .st-dots b{width:9px;height:9px;border-radius:50%} .st-dots .t{background:var(--t)} .st-dots .r{background:var(--r)}
+.st-mtabs{display:flex;gap:4px;margin-left:auto} .st-mtabs button{border:0;background:none;font:inherit;font-weight:700;color:var(--muted);padding:6px 12px;border-radius:9px;cursor:pointer}
+.st-mtabs button[aria-selected="true"]{color:var(--text);background:var(--bg)}
+@media (max-width:640px){.st-tabs button{font-size:20px}.st-bar{display:none}.st-cd{font-size:17px}}
+
+/* ===== Sesi tab ===== */
+.ss-h h3{margin:0;font-size:19px} .ss-h p{margin:2px 0 12px;color:var(--muted);font-size:13.5px} .ss-up{color:var(--good)} .ss-dn{color:var(--serious)}
+.ss-tip{position:fixed;z-index:80;pointer-events:none;max-width:300px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--text-2);
+  box-shadow:0 14px 40px rgba(0,0,0,.16);opacity:0;transform:translateY(4px) scale(.98);transition:opacity .15s,transform .25s cubic-bezier(.34,1.4,.64,1)}
+.ss-tip.on{opacity:1;transform:none} .ss-tip b{color:var(--text)} .ss-tip .t1{display:block;font-weight:650;color:var(--text);font-size:13.5px;margin-bottom:2px}
+.ss-tip .f{display:block;margin-top:6px;padding:6px 8px;border-radius:8px;background:var(--bg);color:var(--text);font-variant-numeric:tabular-nums}
+.ss-tip .r2{display:flex;justify-content:space-between;gap:14px} .ss-tip .r2 span:first-child{color:var(--muted)}
+.ss-tip.wide{max-width:none} .ss-tip .kmt{display:grid;grid-template-columns:repeat(5,max-content);column-gap:14px;row-gap:3px;white-space:nowrap;font-variant-numeric:tabular-nums;align-items:baseline}
+.ss-tip .kmt .kn{display:flex;align-items:center;gap:6px;color:var(--muted)} .ss-tip .kmt b{text-align:right} .ss-tip .kmt small{font-weight:400;color:var(--muted)} .ss-tip .dot{width:8px;height:8px}
+.ss-term{border-bottom:1.5px dotted var(--muted);cursor:help}
+/* feed: weeks, days on a centre spine */
+.ss-feed{position:relative}
+.ss-feed::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--grid)}
+.ss-wg{position:relative;margin-bottom:6px}
+.ss-wgh{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:minmax(0,1fr) 210px minmax(0,1fr);align-items:center;gap:14px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:8px 0}
+.ss-wgh .wm{justify-self:center;display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:5px 16px;transition:border-color .2s,box-shadow .2s}
+.ss-wgh:hover .wm,.ss-wgh:focus-visible .wm{border-color:var(--text-2);box-shadow:0 4px 14px rgba(0,0,0,.06)} .ss-wgh .wm b{font-size:13.5px} .ss-wgh .wm span{font-size:12px;color:var(--muted)}
+.ss-wgh .cv{margin-top:2px;color:var(--muted);transition:transform .35s var(--ease)} .ss-wg.open .ss-wgh .cv{transform:rotate(180deg)}
+.ss-wgh .ws{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--muted)} .ss-wgh .ws.L{justify-content:flex-end} .ss-wgh .ws b{font-size:16px;color:var(--text)}
+.ss-wg.open .ss-wgh .ws{opacity:.55}
+.ss-wgb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease)} .ss-wg.open .ss-wgb{grid-template-rows:1fr} .ss-wgb > div{overflow:hidden}
+.ss-fr{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);align-items:center;gap:14px;padding:6px 0;cursor:pointer}
+.ss-fr .sp{text-align:center;position:relative;z-index:1} .ss-fr .sp b{display:block;font-size:13px;white-space:nowrap} .ss-fr .sp span{font-size:11.5px;color:var(--muted)}
+.ss-fr .sp .ic{width:34px;height:34px;margin:0 auto 2px;border-radius:12px;background:var(--surface);border:1px solid var(--line);display:grid;place-items:center;color:var(--text-2);transition:transform .3s cubic-bezier(.34,1.4,.64,1)}
+.ss-fr .sp .ic svg{width:17px;height:17px} .ss-fr:hover .sp .ic{transform:scale(1.1)}
+.ss-sc{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 14px;transition:box-shadow .3s;opacity:0;transform:translateY(8px)}
+.ss-wg.open .ss-sc{animation:ssrise .5s var(--ease) forwards;animation-delay:calc(var(--i) * 40ms)} @keyframes ssrise{to{opacity:1;transform:none}}
+.ss-fr:hover .ss-sc{box-shadow:0 8px 24px rgba(0,0,0,.07)}
+.ss-sc.L{flex-direction:row-reverse;text-align:right} .ss-sc .km{font-size:20px;font-weight:700;letter-spacing:-.01em} .ss-sc .km small{font-size:12px;font-weight:400;color:var(--muted)}
+.ss-sc .meta{font-size:12.5px;color:var(--muted);line-height:1.35} .ss-sc .sp2{flex:1}
+.ss-sc.ghost{border-style:dashed;background:transparent;color:var(--muted);font-size:13px;justify-content:center}
+.ss-sc.none{visibility:hidden}
+.ss-fr.today .sp .ic{border-color:var(--text);box-shadow:0 0 0 3px color-mix(in srgb,var(--text) 10%,transparent)}
+.ss-pln{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;padding:0 14px} .ss-pln.L{text-align:right}
+.ss-fr.plan{padding:0;cursor:default} .ss-fr.plan .sp{display:flex;align-items:center;justify-content:center;gap:6px;padding:3px 0;white-space:nowrap}
+.ss-fr.plan .sp .ic{width:22px;height:22px;border-radius:8px;margin:0;border-style:dashed} .ss-fr.plan .sp .ic svg{width:12px;height:12px}
+.ss-fr.plan .sp b{display:inline;font-size:12.5px;font-weight:600;color:var(--text-2)} .ss-fr.plan .sp span{display:none}
+.ss-fr.plan.today .sp b{color:var(--text);font-weight:700} .ss-fr.plan.today .sp b::after{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text);margin-left:6px;vertical-align:2px;animation:sspl 1.6s ease-in-out infinite}
+@keyframes sspl{50%{opacity:.25}}
+.ss-ringc .tr{stroke:var(--grid)} .ss-ringc .v{stroke-dasharray:0 200;transition:stroke-dasharray 1.1s var(--ease)} .ss-ringc text{font:700 12.5px var(--font);fill:var(--text)}
+.ss-fx{grid-column:1/-1;position:relative;z-index:1;background:var(--bg)}
+/* duel detail */
+.ss-det{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease)} .ss-det.open{grid-template-rows:1fr} .ss-det > div{overflow:hidden}
+.ss-dd{padding:14px 0 6px;opacity:0;transform:translateY(8px);transition:opacity .35s .1s,transform .5s .1s var(--ease)} .ss-det.open .ss-dd{opacity:1;transform:none}
+.ss-dtop{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.ss-dtop .who{display:flex;align-items:center;gap:12px} .ss-dtop .who.R{justify-content:flex-end;text-align:right}
+.ss-dtop .who b{font-size:17px} .ss-dtop .who small{display:block;color:var(--muted);font-size:12.5px} .ss-dtop .mid{text-align:center} .ss-dtop .mid b{display:block;font-size:16px} .ss-dtop .mid span{font-size:13px;color:var(--muted)}
+.ss-vt{display:grid;grid-template-columns:minmax(0,1fr) max-content 116px max-content minmax(0,1fr);column-gap:12px;margin-top:12px}
+.ss-vt > span{display:flex;align-items:center;height:42px;border-top:1px solid var(--line)}
+.ss-vt .c{justify-content:center;text-align:center;font-size:12.5px;color:var(--muted)} .ss-vt .v{font-size:18px;font-weight:650;white-space:nowrap} .ss-vt .v.L{justify-content:flex-end}
+.ss-vt .v small{font-size:12px;font-weight:400;color:var(--muted);margin-left:2px}
+.ss-vt .bb{position:relative} .ss-vt .bb.L{border-right:1.5px dashed var(--line)} .ss-vt .bb.R{border-left:1.5px dashed var(--line)}
+.ss-vt .bb i{position:absolute;top:50%;height:6px;margin-top:-3px;width:0;transition:width .9s var(--ease)} .ss-vt .bb.L i{right:0;border-radius:3px 0 0 3px} .ss-vt .bb.R i{left:0;border-radius:0 3px 3px 0}
+.ss-sec{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px;text-align:center} .ss-sec .s2{font-weight:400;text-transform:none;letter-spacing:0}
+.ss-mir{display:grid;grid-template-columns:minmax(0,1fr) 116px minmax(0,1fr);align-items:center;column-gap:10px} .ss-mir > .c{text-align:center;font-size:12.5px;color:var(--muted)}
+.ss-ck .crow{padding:6px 0;border-top:1px solid var(--line)} .ss-ck .L,.ss-ck .R{display:flex;align-items:center;gap:8px;font-size:13.5px} .ss-ck .L{justify-content:flex-end;text-align:right}
+.ss-ck .val{color:var(--text-2);font-variant-numeric:tabular-nums} .ss-ck svg{width:18px;height:18px;flex:none} .ss-ok{color:var(--good)} .ss-wn{color:var(--warn)} .ss-na{color:var(--muted)}
+.ss-lt{display:flex;justify-content:center;gap:6px;margin:-2px 0 10px;flex-wrap:wrap}
+.ss-lt button{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 12px 3px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .25s}
+.ss-lt button::before{content:"";width:16px;height:0;border-top:2px solid currentColor;opacity:.45;transition:opacity .25s} .ss-lt button[data-lane="cad"]::before{border-top-style:dashed} .ss-lt button[data-lane="el"]::before{border-top-style:dotted;border-top-width:3px}
+.ss-lt button[aria-pressed="true"]{color:var(--text);border-color:var(--text)} .ss-lt button[aria-pressed="true"]::before{opacity:1} .ss-lt button:disabled{opacity:.4;cursor:default}
+.ss-bfs{display:block;overflow:visible} .ss-bfs text{font-size:10.5px;fill:var(--muted)}
+.ss-bfs .b{transform-box:fill-box;transform:scaleX(0)} .ss-det.open .ss-bfs .b{animation:ssgx .7s var(--ease) forwards} @keyframes ssgx{to{transform:scaleX(1)}}
+.ss-bfs .l{fill:none;stroke-linejoin:round} .ss-bfs .a{fill:var(--muted);opacity:.12} .ss-bfs .h{fill:transparent} .ss-bfs .h:hover{fill:color-mix(in srgb,var(--text) 5%,transparent)}
+.ss-zb{display:flex;height:20px;border-radius:6px;overflow:hidden;gap:2px} .ss-zb.L{flex-direction:row-reverse}
+.ss-zb span{width:0;transition:width 1s var(--ease);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden}
+.ss-verdict{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:16px}
+.ss-vd{border-radius:14px;padding:10px 14px;background:var(--surface);border:1px solid var(--line);font-size:13.5px;color:var(--text-2)} .ss-vd.L{text-align:right} .ss-vd b{color:var(--text)}
+.ss-vd svg{width:14px;height:14px;vertical-align:-2px;margin:0 5px;color:var(--warn)}
+/* Arah cards */
+.ss-tg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.ss-tc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px 12px;opacity:0;transform:translateY(10px)}
+.ss-tc.in{animation:ssrise .6s var(--ease) forwards;animation-delay:calc(var(--i) * 70ms)}
+.ss-tc h4{margin:0 0 6px;font-size:14px;text-align:center}
+.ss-tc .mx{display:grid;grid-template-columns:1fr 1fr;gap:14px} .ss-tc .sT,.ss-tc .sR{display:flex;flex-direction:column} .ss-tc .sT{align-items:flex-end;text-align:right}
+.ss-tc .nv{font-size:20px;font-weight:700;letter-spacing:-.01em} .ss-tc .sT .nv{color:var(--t)} .ss-tc .sR .nv{color:var(--r)} .ss-tc .nv small{font-size:12px;font-weight:500;opacity:.7}
+.ss-tc .dlt{font-size:12px;font-weight:700;border-bottom:1.5px dotted currentColor;cursor:help} .ss-tc .dlt.up{color:var(--good)} .ss-tc .dlt.dn{color:var(--serious)} .ss-tc .dlt.eq{color:var(--muted)}
+.ss-tc svg{display:block;width:100%;height:auto;overflow:visible;margin-top:8px} .ss-tc svg text{font-size:10.5px;fill:var(--muted)}
+.ss-tc .nodata{font-size:13px;color:var(--muted);text-align:center;padding:18px 6px}
+.ss-trk{stroke:var(--grid);stroke-width:6;stroke-linecap:round} .ss-ghost{fill:var(--surface);stroke-width:2;stroke-dasharray:2 2}
+.ss-travel{stroke-width:2.5;stroke-linecap:round;opacity:.5;stroke-dasharray:300;stroke-dashoffset:300} .ss-tc.in .ss-travel{animation:ssdr 1.2s .3s var(--ease) forwards} @keyframes ssdr{to{stroke-dashoffset:0}}
+.ss-mover{transform:translateX(var(--dx))} .ss-tc.in .ss-mover{animation:ssmv 1.2s .3s var(--ease) forwards} @keyframes ssmv{to{transform:none}}
+.ss-slope{stroke-width:2.5;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300} .ss-tc.in .ss-slope{animation:ssdr 1.1s .25s var(--ease) forwards}
+.ss-pop{transform-box:fill-box;transform-origin:center;transform:scale(0)} .ss-tc.in .ss-pop{animation:sspop .5s 1.1s cubic-bezier(.34,1.4,.64,1) forwards} @keyframes sspop{to{transform:scale(1)}}
+.ss-sky{transform-box:fill-box;transform:scaleY(0)} .ss-tc.in .ss-sky{animation:sssk .6s var(--ease) forwards} @keyframes sssk{to{transform:scaleY(1)}}
+.ss-grow{transform-box:fill-box;transform-origin:left;transform:scaleX(var(--from))} .ss-tc.in .ss-grow{animation:ssgw 1.2s .3s var(--ease) forwards} @keyframes ssgw{to{transform:scaleX(1)}}
+.ss-nd,.ss-gn{transform:translate(150px,66px) rotate(-180deg)} .ss-nd{transition:transform 1.3s cubic-bezier(.34,1.4,.64,1)} .ss-tc.in .ss-nd,.ss-tc.in .ss-gn{transform:translate(150px,66px) rotate(var(--deg))}
+@media (max-width:900px){.ss-tg{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){.ss-tg,.ss-verdict{grid-template-columns:minmax(0,1fr)}.ss-vd.L{text-align:left}
+  .ss-fr,.ss-wgh{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.ss-sc{padding:8px 10px;gap:8px}.ss-sc .meta{display:none}.ss-sc .km{font-size:17px}.ss-sc .ss-ringc{display:none}
+  .ss-wgh .ws{flex-direction:column;gap:0}.ss-wgh .ws.L{align-items:flex-end}.ss-wgh .wm{padding:5px 8px}
+  .ss-vt{grid-template-columns:0 minmax(0,1fr) 84px minmax(0,1fr) 0;column-gap:6px}.ss-vt .bb{visibility:hidden;border:0!important}.ss-vt .v{font-size:16px}
+  .ss-mir{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr)}.ss-dtop{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ss-dtop .mid{grid-column:1/-1;order:-1}}
+
 /* explainer window (fixed height, own scrollbar) */
 .xwin{position:absolute;z-index:70;width:min(460px,calc(100vw - 16px));height:min(540px,calc(100vh - 120px));display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:18px;box-shadow:0 22px 60px rgba(0,0,0,.2);
   opacity:0;transform:translateY(-8px) scale(.97);transform-origin:top left;pointer-events:none;transition:opacity .25s,transform .45s cubic-bezier(.34,1.3,.64,1)}
@@ -476,7 +591,8 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 }
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important}
-  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2,.lpop li,.ct tr,.fix li{opacity:1;transform:none} .ln{stroke-dashoffset:0} .ill .pace,.ill .hr{stroke-dashoffset:0}
+  .card,.ar,.pt,.band,.bd,.area,.gl,.chip,.hero,.sub,.right,#tl,#prog,#leg2,.lpop li,.ct tr,.fix li,.ss-sc,.ss-tc,.ss-dd{opacity:1;transform:none}
+  .ss-travel,.ss-slope{stroke-dashoffset:0} .ss-mover,.ss-pop,.ss-sky,.ss-grow,.ss-bfs .b{transform:none} .ss-nd,.ss-gn{transform:translate(150px,66px) rotate(var(--deg))} .ln{stroke-dashoffset:0} .ill .pace,.ill .hr{stroke-dashoffset:0}
   .tl .done{width:var(--p)} .tl .now{left:var(--p)}
   .cells i,.phases i b{transform:none}
 }
@@ -503,7 +619,9 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="prog" id="prog"><div class="terrain" id="terrain"></div><span class="nowline" id="prog-now"></span><div class="brk" id="brk"></div></div>
 <div class="leg2" id="leg2" aria-hidden="true"></div>
 
-<div class="section"><div><h2>Ringkasan</h2><p id="sum-p"></p></div></div>
+<div class="st-tabs" id="tabs" role="tablist" aria-label="Halaman"><button role="tab" data-t="ring" aria-selected="true">Ringkasan</button><button role="tab" data-t="sesi" aria-selected="false">Sesi<span class="st-cnt" id="tab-cnt"></span></button><span class="st-ul"></span></div>
+<div class="st-pane" id="p-ring">
+<p class="st-sub" id="sum-p"></p>
 <div class="grid" id="summary"></div>
 
 <div class="grid" style="margin-top:16px">
@@ -548,9 +666,19 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 
 <div class="section"><div><h2>Badge</h2><p id="bd-n"></p></div></div>
 <div class="grid"><section class="card c12"><div class="badges" id="badges"></div></section></div>
+</div>
+<div class="st-pane st-hide" id="p-sesi">
+  <div class="ss-h"><div><h3>Linimasa sesi</h3><p>Taofik di kiri, Reza di kanan. Klik minggu untuk buka/tutup, klik hari untuk melihat duel sesi.</p></div></div>
+  <div class="ss-feed" id="ss-feed"></div>
+  <div class="ss-h" style="margin-top:36px"><div><h3>Arah</h3><p>Dibanding 8 minggu lalu. <b class="ss-up">▲▼ hijau</b> = membaik, <b class="ss-dn">▲▼ merah</b> = memburuk. Sentuh angka perubahan untuk penjelasannya.</p></div></div>
+  <div class="ss-tg" id="ss-trends"></div>
+</div>
 <footer id="foot"></footer>
 </div>
 <div class="hint" id="hint" role="tooltip"></div>
+<div class="st-mini" id="st-mini" aria-hidden="true"><div class="st-in"><span class="st-cd num" id="st-cd"></span><span class="st-bar"><i id="st-barfill"></i><span class="st-dots"><b class="t"></b><b class="r"></b></span></span>
+  <span class="st-mtabs" id="st-mtabs"><button data-t="ring" tabindex="-1">Ringkasan</button><button data-t="sesi" tabindex="-1">Sesi</button></span></div></div>
+<div class="ss-tip" id="ss-tip" aria-hidden="true"></div>
 <div class="ptip" id="ptip" aria-hidden="true"></div>
 <div class="lpop" id="lpop" role="dialog" aria-label="Rincian lampu"></div>
 <div class="xwin" id="xdec" role="dialog" aria-labelledby="xdec-t">
@@ -1384,7 +1512,306 @@ xdec.addEventListener("click", e => { e.stopPropagation(); const v = e.target.cl
 document.addEventListener("click", e => { if (xdec.classList.contains("on") && !e.target.closest("#xdec")) xdecClose(); });
 addEventListener("keydown", e => { if (e.key === "Escape" && xdec.classList.contains("on")) xdecClose(); });
 
-function renderAll() { lpClose(); xdecClose(); renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); flyBuild(); }
+// ================================================================ Sesi tab: mirrored session timeline, duel detail, Arah
+const HARIF = ["Minggu", "Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu"];
+const hariF = s => { const d = D(s); return `${HARIF[d.getDay()]} ${d.getDate()} ${BULAN[d.getMonth()]}`; };
+const paceS = s => s == null || !isFinite(s) ? "–" : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+const sstip = $("ss-tip");
+function ssShow(h, x, y) { sstip.innerHTML = h; sstip.classList.toggle("wide", h.includes("kmt")); sstip.classList.add("on");
+  const w = sstip.offsetWidth, hh = sstip.offsetHeight; let L = x + 14, T = y + 14;
+  if (L + w > innerWidth - 8) L = x - w - 14; if (T + hh > innerHeight - 8) T = y - hh - 14;
+  sstip.style.left = Math.max(8, L) + "px"; sstip.style.top = Math.max(8, T) + "px"; }
+const SSG = {
+  dec: ["Decoupling", "Seberapa boros detak jantung di paruh kedua dibanding paruh pertama, pada kecepatan yang sama. Kecil = daya tahan kuat.", "(meter per detak paruh 1 − paruh 2) ÷ paruh 1 × 100%<br>tanpa 3 km pertama · target &lt; 8%"],
+  ef: ["Meter per detak", "Jarak yang ditempuh setiap satu detak jantung. Naik = jantung makin hemat = makin bugar.", "kecepatan (meter/menit) ÷ detak jantung rata-rata"],
+  pz2: ["Pace di zona 2", "Pace lari santai saat detak jantung di zona 2. Makin cepat di detak yang sama = makin bugar.", "rata-rata pace pada km dengan HR di zona 2 (lari santai dan long run)"],
+  cad: ["Cadence", "Langkah per menit. Sedikit lebih tinggi = beban lutut lebih ringan.", "target Taofik 168–172, Reza 172–176 · waspada bila paruh 2 turun ≥ 5"],
+  comp: ["Kepatuhan rencana", "Seberapa dekat sesi dengan jadwal Excel.", "rata-rata dari: jarak ÷ rencana, % km pace di rentang, % km detak jantung di rentang"],
+  zone: ["Zona detak jantung", "5 tingkat usaha. Z1–Z2 santai (masih bisa ngobrol), Z3 sedang, Z4 keras, Z5 maksimal.", "batas per pelari: docs/RUMUS-BATAS-SUMBER.md §2"]};
+const ssTerm = (k, t) => `<span class="ss-term" data-g="${k}">${t || SSG[k][0]}</span>`;
+document.addEventListener("pointermove", e => { if (!e.target.closest) return; const g = e.target.closest("[data-g]"), h = e.target.closest("[data-sh]");
+  if (g) { const G = SSG[g.dataset.g]; return ssShow(`<span class="t1">${G[0]}</span>${G[1]}${G[2] ? `<span class="f">${G[2]}</span>` : ""}`, e.clientX, e.clientY); }
+  if (h) return ssShow(h.dataset.sh, e.clientX, e.clientY); sstip.classList.remove("on"); });
+
+// plan of one day, read from the Excel schedule text (Mon-first)
+function planCell(a, s) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, w = (a.plan || []).find(x => x.ms === ms);
+  return w && w.days && w.days.length === 7 ? w.days[(D(s).getDay() + 6) % 7] : null; }
+function parsePlan(cell, ev) { if (!cell) return null;
+  const L = cell.split("\n").map(x => x.trim()).filter(Boolean), t = L[0] || "", k = sessionKind(t), txt = L.join("\n"), num = x => +String(x).replace(",", ".");
+  if (k === "rest" || k === "str") return {k, title: calm(t)};
+  const tot = txt.match(/total\s+(\d+(?:[.,]\d+)?)\s*km/i), first = t.match(/(\d+(?:[.,]\d+)?)\s*km/i);
+  const ps = [...txt.matchAll(/(\d+):(\d+)\s*[-–]\s*(\d+):(\d+)\s*\/\s*km/gi)].map(m => [+m[1] * 60 + +m[2], +m[3] * 60 + +m[4]]);
+  const open = /3 km pertama/i.test(txt) && ps.length > 1 ? ps[0] : null, main = open ? ps[1] : (ps[0] || null);
+  const h = txt.match(/detak jantung\s*(di bawah\s*)?(\d+)\s*(?:[-–]\s*(\d+))?/i);
+  const warm = txt.match(/pemanasan[^\d\n]*(\d+(?:[.,]\d+)?)\s*km/i), tk = t.match(/(?:tempo|interval)[^\d]*(\d+(?:[.,]\d+)?)\s*km/i);
+  return {k: ev ? "race" : k, title: calm(t), km: tot ? num(tot[1]) : first ? num(first[1]) : null, open, main,
+    hr: h ? (h[1] ? [0, +h[2]] : [+h[2], +(h[3] || h[2])]) : null, warm: warm ? num(warm[1]) : 0, tempo: tk ? num(tk[1]) : null}; }
+const RUNK = k => k && !["rest", "str"].includes(k);
+const zoneOf = (a, h) => (a.zones || []).filter(b => h >= b).length;      // 0..4 = Z1..Z5
+const spPace = sp => sp[1] / sp[0];
+function sessOf(a, s) { const xs = (a.sessions || []).filter(x => x.date === s); return xs.length ? xs.reduce((p, q) => q.km > p.km ? q : p) : null; }
+const ssCad = x => { const v = x.splits.filter(p => p[3]); return v.length ? v.reduce((q, p) => q + p[3] * p[1], 0) / v.reduce((q, p) => q + p[1], 0) : null; };
+const ssEf = x => x.hr ? (x.km * 1000 / (x.sec / 60)) / x.hr : null;
+// which km count for pace / HR checks: tempo block for hard days, after the 3 slow km on long runs, else all
+function segOf(x, pl) { const sp = x.splits; if (!pl) return sp;
+  if (pl.k === "hard" && pl.tempo) return sp.slice(Math.round(pl.warm || 0), Math.round((pl.warm || 0) + pl.tempo));
+  if (pl.k === "long" && pl.open) return sp.slice(3); return sp; }
+const inRng = (v, r, tol) => r && v != null && v >= r[0] - tol && v <= r[1] + tol;
+function ssComp(a, x, pl) { if (!x || !pl) return null; const parts = [], seg = segOf(x, pl).filter(p => p[0] >= .5);
+  if (pl.km) parts.push(Math.min(1, x.km / pl.km));
+  if (pl.main && seg.length) parts.push(seg.filter(p => inRng(spPace(p), pl.main, 5)).length / seg.length);
+  const hs = seg.filter(p => p[2]); if (pl.hr && hs.length) parts.push(hs.filter(p => p[2] >= pl.hr[0] && p[2] <= pl.hr[1]).length / hs.length);
+  return parts.length ? Math.round(mean(parts) * 100) : null; }
+// what a coach looks at, per kind of session  [label, ok|wn|na, value]   (thresholds: [keputusan dashboard] in README)
+function ssChecks(a, x, pl, wkEvent) { if (!x) return null; const k = pl ? pl.k : "easy", seg = segOf(x, pl), hs = seg.filter(p => p[2]);
+  const hrIn = pl && pl.hr && hs.length ? hs.filter(p => p[2] >= pl.hr[0] && p[2] <= pl.hr[1]).length / hs.length : null, out = [];
+  if (pl && pl.km) out.push(["Jarak", x.km >= pl.km * .95 ? "ok" : "wn", `${f1(x.km)} / ${pl.km} km`]);
+  if (k === "long") {
+    if (pl.open) { const o = x.splits.slice(0, 3), op = o.reduce((q, p) => q + p[1], 0) / o.reduce((q, p) => q + p[0], 0); out.push(["Buka 3 km pelan", op >= pl.open[0] - 10 ? "ok" : "wn", `${paceS(op)}/km`]); }
+    if (hrIn != null) out.push(["HR di rentang", hrIn >= .8 ? "ok" : "wn", `${Math.round(hrIn * 100)}% km`]);
+    if (x.dec != null) out.push([ssTerm("dec"), x.km < 20 || wkEvent ? "na" : x.dec < 8 ? "ok" : "wn", `${f1(x.dec)}%${x.km < 20 || wkEvent ? " · tidak dinilai" : ""}`]);
+    const c = x.splits.map(p => p[3]).filter(Boolean); if (c.length >= 6) { const h = c.length >> 1, dr = mean(c.slice(0, h)) - mean(c.slice(h)); out.push(["Cadence bertahan", dr < 5 ? "ok" : "wn", `${dr >= 0 ? "−" : "+"}${Math.abs(Math.round(dr))} spm`]); }
+    out.push(["Di bawah 210 mnt", x.sec <= 210 * 60 ? "ok" : "wn", hms(x.sec)]); }
+  else if (k === "hard") {
+    if (pl.main && seg.length) { const tp = seg.reduce((q, p) => q + p[1], 0) / seg.reduce((q, p) => q + p[0], 0); out.push(["Pace tempo di rentang", inRng(tp, pl.main, 5) ? "ok" : "wn", `${paceS(tp)}/km`]); }
+    if (pl.hr && hs.length) { const mx = Math.max(...hs.map(p => p[2])); out.push([`HR tidak lewat ${pl.hr[1]}`, mx <= pl.hr[1] ? "ok" : "wn", `maks ${mx} bpm`]); }
+    if (pl.warm) { const w = x.splits.slice(0, Math.round(pl.warm)), wp = w.length ? w.reduce((q, p) => q + p[1], 0) / w.reduce((q, p) => q + p[0], 0) : null;
+      out.push([`Pemanasan ${pl.warm} km`, wp && pl.main && wp > pl.main[1] + 30 ? "ok" : "wn", wp ? `${paceS(wp)}/km` : "–"]); } }
+  else if (k === "rec") { if (hrIn != null) out.push([`HR di bawah ${pl.hr[1]}`, hrIn >= .8 ? "ok" : "wn", `${Math.round(hrIn * 100)}% km`]); }
+  else if (k !== "race") { if (hrIn != null) out.push(["HR di rentang", hrIn >= .8 ? "ok" : "wn", `${Math.round(hrIn * 100)}% km`]);
+    if (pl && pl.main && seg.length) { const v = seg.filter(p => inRng(spPace(p), pl.main, 5)).length / seg.length; out.push(["Pace santai", v >= .7 ? "ok" : "wn", `${paceS(x.sec / x.km)}/km`]); } }
+  return out; }
+const SSTIP = {"Jarak": "Jangan dikejar sekaligus minggu ini.", "Buka 3 km pelan": "3 km pertama di pace recovery, pindah ke easy di km 4–6.",
+  "HR di rentang": "Perlambat sampai detak jantung kembali di rentang. HR mengalahkan pace.", "Decoupling": "Buka pelan, minum sesuai tes keringat.",
+  "Cadence bertahan": "Jaga langkah pendek dan cepat di paruh kedua.", "Di bawah 210 mnt": "Berhenti di 3 jam 30 menit, berapa pun km-nya.",
+  "Pace tempo di rentang": "Km pertama tempo di pace paling lambat dari rentang.", "Pace santai": "Lari santai benar-benar santai; HR mengalahkan pace."};
+function ssVerdict(a, x, pl) { if (!x) return `<b>${a.name}</b> tidak lari. Libur ≤ 7 hari: ulangi minggu sebelumnya.`;
+  const bad = (ssChecks(a, x, pl) || []).filter(c => c[1] === "wn").map(c => c[0].replace(/<[^>]+>/g, ""));
+  if (!bad.length) return `<b>${a.name}:</b> sesi bersih, semua sesuai rencana.`;
+  const k = bad[0].startsWith("HR tidak lewat") ? "Turunkan pace tempo sedikit." : bad[0].startsWith("HR di bawah") ? "Lebih pelan lagi; tujuannya memulihkan." : bad[0].startsWith("Pemanasan") ? "Pemanasan benar-benar santai sebelum tempo." : SSTIP[bad[0]] || "";
+  return `<b>${a.name}:</b> ${bad.join(", ").toLowerCase()} perlu perhatian.${BULB}${k}`; }
+function ssRing(c, v, sz) { const C = 2 * Math.PI * 20; return `<svg class="ss-ringc" width="${sz || 50}" height="${sz || 50}" viewBox="0 0 50 50" data-g="comp"><circle class="tr" cx="25" cy="25" r="20" fill="none" stroke-width="6"/>
+  ${v == null ? "" : `<circle class="v" data-to="${(v / 100 * C).toFixed(1)} ${C.toFixed(1)}" cx="25" cy="25" r="20" fill="none" stroke="var(--${c})" stroke-width="6" stroke-linecap="round" transform="rotate(-90 25 25)"/>`}
+  <text x="25" y="29.5" text-anchor="middle">${v == null ? "–" : v}</text></svg>`; }
+const wellOf = (a, s) => (a.days || []).find(d => d.date === s);
+
+// ---------------- per-km butterfly: inner bars = speed (+ plan band); outer lane = HR / cadence / elevation stacked, told apart by line style
+const SSL = {hr: {n: "Detak jantung", u: "bpm", i: 2, da: "none", w: 2}, cad: {n: "Cadence", u: "spm", i: 3, da: "5 3", w: 1.8}, el: {n: "Elevasi", u: "m", i: 4, da: "1 3", w: 2}};
+const SSLON = {hr: true, cad: true, el: true};
+function ssBf(s, host) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x => x.c === "r")], vis = V().map(a => a.c);
+  const T = vis.includes("t") ? sessOf(ta, s) : null, R = vis.includes("r") ? sessOf(ra, s) : null;
+  const W = Math.max(300, host.clientWidth || 900), small = W < 600, n = Math.max(T ? T.splits.length : 0, R ? R.splits.length : 0);
+  if (!n) return `<p class="muted" style="text-align:center">Data per km belum ada untuk sesi ini.</p>`;
+  const RH = 17, top = 26, H = top + n * RH + 6, mid = small ? 40 : 116, sw = (W - mid) / 2;
+  const has = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), on = Object.keys(SSL).filter(k => SSLON[k] && has(k));
+  const laneW = on.length ? sw * .3 : 0, gap = 16, inner = sw - (on.length ? laneW + gap : 0) - 4;
+  const PL = {t: T && parsePlan(planCell(ta, s)), r: R && parsePlan(planCell(ra, s))};
+  const all = [T, R].filter(Boolean).flatMap(x => x.splits.map(spPace)).concat(...Object.values(PL).map(q => q && q.main || [])), slow = Math.max(...all) + 25, fast = Math.min(...all) - 10, len = v => Math.max(2, (slow - v) / (slow - fast) * inner);
+  const rng = k => { const v = [T, R].filter(Boolean).flatMap(x => x.splits.map(p => p[SSL[k].i]).filter(q => q != null)); return [Math.min(...v) - 1, Math.max(...v) + 1]; };
+  let g = "";
+  for (const [a, x, L] of [[ta, T, true], [ra, R, false]]) { if (!x) continue; const c = a.c, x0 = L ? sw : sw + mid, dir = L ? -1 : 1, xb = d => x0 + dir * d;
+    const pl = PL[c], bnd = pl && pl.main;
+    if (bnd) { const bA = len(bnd[1]), bB = len(bnd[0]); g += `<rect x="${Math.min(xb(bA), xb(bB))}" y="${top - 4}" width="${Math.abs(bB - bA)}" height="${n * RH + 4}" rx="4" fill="var(--${c})" opacity=".1"/>`; }
+    x.splits.forEach((p, j) => { const w = len(spPace(p)); g += `<rect class="b" style="transform-origin:${L ? "right" : "left"};animation-delay:${j * 22}ms" x="${L ? x0 - w : x0}" y="${top + j * RH + 2}" width="${w}" height="${RH - 5}" rx="3" fill="var(--${c})"/>`; });
+    const l0 = inner + 4 + gap, lx = d => x0 + dir * (l0 + d), cy = j => top + j * RH + RH / 2;
+    // legend above the lane only when each item has room; the toggles below already show the line styles
+    if (on.length && laneW / on.length >= 44) { g += `<line x1="${lx(0)}" x2="${lx(laneW)}" y1="${top - 7}" y2="${top - 7}" stroke="var(--line)"/>`;
+      on.forEach((k, i) => { const cx = lx(laneW * (i + .5) / on.length); g += `<line x1="${cx - 14}" x2="${cx - 2}" y1="${top - 14}" y2="${top - 14}" stroke="${k === "el" ? "var(--muted)" : `var(--${c})`}" stroke-width="2" stroke-dasharray="${SSL[k].da === "none" ? "" : SSL[k].da}"/><text x="${cx + 1}" y="${top - 10}">${SSL[k].u}</text>`; }); }
+    on.forEach(k => { const [lo, hi] = rng(k), pts = x.splits.map((p, j) => [p[SSL[k].i], j]).filter(q => q[0] != null), px = v => lx((v - lo) / (hi - lo || 1) * laneW), col = k === "el" ? "var(--muted)" : `var(--${c})`;
+      if (!pts.length) return; const d = pts.map(([v, j], i) => `${i ? "L" : "M"}${px(v).toFixed(1)} ${cy(j).toFixed(1)}`).join(" ");
+      if (k === "el") g += `<path class="a" d="M${lx(0)} ${cy(pts[0][1])} ${pts.map(([v, j]) => `L${px(v).toFixed(1)} ${cy(j).toFixed(1)}`).join(" ")} L${lx(0)} ${cy(pts[pts.length - 1][1])}Z"/>`;
+      g += `<path class="l" d="${d}" stroke="${col}" stroke-width="${SSL[k].w}" ${SSL[k].da === "none" ? "" : `stroke-dasharray="${SSL[k].da}"`} stroke-linecap="round"/>`;
+      if (k === "hr") pts.forEach(([v, j]) => g += `<circle cx="${px(v)}" cy="${cy(j)}" r="2.4" fill="var(--surface)" stroke="${col}" stroke-width="1.5"/>`); }); }
+  for (let j = 0; j < n; j++) { const y = top + j * RH;
+    g += `<text x="${W / 2}" y="${y + RH / 2 + 4}" text-anchor="middle">${j + 1}</text>`;
+    const tt = [[ta, T], [ra, R]].filter(q => q[1] && q[1].splits[j]).map(([a, x]) => { const p = x.splits[j];
+      return `<span class='kn'><i class='dot ${a.c}'></i>${a.name}</span><b>${paceS(spPace(p))}<small>/km</small></b><b>${p[2] ?? "–"}<small> bpm</small></b><b>${p[3] ?? "–"}<small> spm</small></b><b>${p[4] ?? "–"}<small> m</small></b>`; }).join("");
+    g += `<rect class="h" x="0" y="${y}" width="${W}" height="${RH}" data-sh="<span class='t1'>km ${j + 1}</span><span class='kmt'>${tt}</span>"/>`; }
+  return `<svg class="ss-bfs" viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`; }
+
+// ---------------- duel detail of one day
+function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c === "r"), vis = V().map(a => a.c);
+  const T = vis.includes("t") ? sessOf(ta, s) : null, R = vis.includes("r") ? sessOf(ra, s) : null;
+  const ev = (DATA.all_events || []).some(e => Math.floor((D(e.date) - D(DATA.ms1)) / 864e5 / 7) === Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7));
+  const PT = parsePlan(planCell(ta, s)), PR = parsePlan(planCell(ra, s)), pl0 = PT || PR;
+  const morn = (a, x) => { if (!x) return vis.includes(a.c) ? "tidak lari" : ""; const w = wellOf(a, s); return w ? `${w.sleep_h ? f1(w.sleep_h).replace(".", ",") + " j tidur" : ""}${w.bb != null ? " · Body Battery " + w.bb : ""}` : ""; };
+  const M = [["Jarak", x => x.km, v => `${f1(v)}<small>km</small>`, 1], ["Pace", x => x.sec / x.km, v => `${paceS(v)}<small>/km</small>`, -1], ["HR rata", x => x.hr, v => `${v}<small>bpm</small>`, 0],
+    [ssTerm("cad"), ssCad, v => `${Math.round(v)}<small>spm</small>`, 1], [ssTerm("ef"), ssEf, v => `${v.toFixed(2)}<small>m</small>`, 1]];
+  if ((T && T.dec != null) || (R && R.dec != null)) M.push([ssTerm("dec"), x => x.dec, v => `${f1(v)}<small>%</small>`, -1]);
+  const rows = `<div class="ss-vt num">${M.map(([lab, f, fmt, dir]) => { const a = T ? f(T) : null, b = R ? f(R) : null; if (a == null && b == null) return "";
+    const mx = Math.max(a || 0, b || 0) || 1, w = v => v == null ? 0 : dir < 0 ? Math.min(a ?? v, b ?? v) / v : v / mx;
+    return `<span class="bb L"><i style="background:var(--t)" data-w="${w(a) * 100}"></i></span><span class="v L">${a == null ? "–" : fmt(a)}</span><span class="c">${lab}</span><span class="v R">${b == null ? "–" : fmt(b)}</span><span class="bb R"><i style="background:var(--r)" data-w="${w(b) * 100}"></i></span>`; }).join("")}</div>`;
+  const ct = ssChecks(ta, T, PT, ev), cr = ssChecks(ra, R, PR, ev), base = (ct && ct.length >= (cr || []).length ? ct : cr) || [];
+  const CK = {ok: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    wn: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.4" fill="currentColor"/></svg>',
+    na: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>'};
+  const find = (L, lab) => (L || []).find(c => c[0] === lab || c[0].replace(/\d+/g, "") === lab.replace(/\d+/g, ""));
+  const ck = base.map(([lab]) => { const a = find(ct, lab), b = find(cr, lab);
+    return `<div class="ss-mir crow"><div class="L">${a ? `<span class="val">${a[2]}</span><span class="ss-${a[1]}">${CK[a[1]]}</span>` : '<span class="ss-na">–</span>'}</div><div class="c">${lab.replace(/HR tidak lewat \d+/, "HR tidak lewat batas").replace(/HR di bawah \d+/, "HR tetap rendah")}</div>
+      <div class="R">${b ? `<span class="ss-${b[1]}">${CK[b[1]]}</span><span class="val">${b[2]}</span>` : '<span class="ss-na">–</span>'}</div></div>`; }).join("");
+  const ZC = ["var(--z1)", "var(--z2)", "var(--z3)", "var(--z4)", "var(--z5)"];
+  const zs = (a, x) => { const z = [0, 0, 0, 0, 0]; let t = 0; x.splits.forEach(p => { if (p[2] && a.zones) { z[zoneOf(a, p[2])] += p[1]; t += p[1]; } }); return t ? z.map(v => v / t) : null; };
+  const zbar = (a, x, side) => { const z = x && zs(a, x); return `<div class="ss-zb ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-sh="<span class='t1'>${a.name} · Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .15 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`; };
+  const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null));
+  return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small></div>` : ""}</div>
+      <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span></div>
+      <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR)) : ""}</div></div>
+    ${rows}
+    ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
+    <div class="ss-sec">Per km <span class="s2">· batang = kecepatan, lebih panjang lebih cepat · pita = rentang pace rencana</span></div>
+    <div class="ss-lt">${Object.keys(SSL).map(k => `<button data-lane="${k}" aria-pressed="${!!SSLON[k] && hasL(k)}" ${hasL(k) ? "" : "disabled title='belum ada data'"}>${SSL[k].n}</button>`).join("")}</div>
+    <div class="ss-bfw" data-d="${s}"></div>
+    <div class="ss-sec">${ssTerm("zone", "Waktu di zona")}</div>
+    <div class="ss-mir"><div>${zbar(ta, T, "L")}</div><div class="c">Z1–5</div><div>${zbar(ra, R, "R")}</div></div>
+    <div class="ss-verdict">${vis.includes("t") ? `<div class="ss-vd L">${ssVerdict(ta, T, PT)}</div>` : "<div></div>"}${vis.includes("r") ? `<div class="ss-vd">${ssVerdict(ra, R, PR)}</div>` : ""}</div></div>`; }
+
+// ---------------- feed: program weeks (newest first), the active week open
+function ssFeed() { const vis = V().map(a => a.c), today = DATA.today, ta = A.find(x => x.c === "t"), ra = A.find(x => x.c === "r");
+  const first = A.flatMap(a => (a.sessions || []).map(x => x.date)).sort()[0] || DATA.ms1, weeks = [];
+  const msOf = s => Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, curMs = msOf(today);
+  for (let ms = curMs; ms >= Math.max(1, msOf(first)); ms--) { const st = addDays(DATA.ms1, (ms - 1) * 7), days = [];
+    for (let i = 6; i >= 0; i--) { const s = addDays(st, i), pT = parsePlan(planCell(ta, s)), pR = parsePlan(planCell(ra, s));
+      const run = RUNK((pT || {}).k) || RUNK((pR || {}).k), xT = sessOf(ta, s), xR = sessOf(ra, s);
+      if (!run && !xT && !xR) continue; if (s > today && !run) continue; days.push({s, pT, pR, xT, xR}); }
+    if (days.length) weeks.push({ms, st, days}); }
+  let i = 0;
+  const card = (a, x, pl, side, d) => { if (!vis.includes(a.c)) return `<div class="ss-sc none"></div>`;
+    if (!x && d.s >= DATA.today) return `<div class="ss-pln ${side}">${pl && pl.km ? pl.km + " km" : ""}</div>`;
+    if (!x) return `<div class="ss-sc ghost" style="--i:${i}">tidak lari</div>`;
+    return `<div class="ss-sc ${side}" style="--i:${i}">${ssRing(a.c, ssComp(a, x, pl), 40)}<div class="sp2"><div class="km num">${f1(x.km)}<small> km</small></div>
+      <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? ` · dec ${f1(x.dec)}%` : ""}</div></div></div>`; };
+  const sum = (a, W) => { if (!vis.includes(a.c)) return ""; const pl = W.days.filter(d => d.s < DATA.today && RUNK(((a.c === "t" ? d.pT : d.pR) || {}).k));
+    const done = pl.filter(d => a.c === "t" ? d.xT : d.xR), km = W.days.reduce((q, d) => q + ((a.c === "t" ? d.xT : d.xR) || {km: 0}).km, 0);
+    return `<b class="num">${Math.round(km)} km</b><span class="num">${done.length}/${pl.length} sesi</span>`; };
+  $("ss-feed").innerHTML = weeks.map(W => { const cur = W.ms === curMs, en = addDays(W.st, 6), ph = (phaseOf(W.ms) || {}).name;
+    return `<section class="ss-wg${cur ? " open" : ""}"><button class="ss-wgh" aria-expanded="${cur}"><span class="ws L">${sum(ta, W)}</span>
+        <span class="wm"><b>MS${W.ms}${cur ? " · minggu ini" : ph ? " · " + ph : ""}</b><span>${tgl(W.st)} – ${tgl(en)}</span><svg class="cv" viewBox="0 0 24 24" width="14" height="14"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
+        <span class="ws R">${sum(ra, W)}</span></button>
+      <div class="ss-wgb"><div>${W.days.map(d => { i++; const pl = d.pT || d.pR, fut = d.s >= DATA.today && !d.xT && !d.xR, k = pl ? pl.k : "easy";
+        return `<div class="ss-fr${d.s === DATA.today ? " today" : ""}${fut ? " plan" : ""}" data-d="${d.s}">${card(ta, d.xT, d.pT, "L", d)}
+          <div class="sp"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">${SICON[k] || SICON.easy}</svg></div><b>${hariF(d.s)}</b><span>${pl ? esc(pl.title) : "di luar jadwal"}</span></div>${card(ra, d.xR, d.pR, "R", d)}
+          ${fut ? "" : `<div class="ss-fx ss-det"><div></div></div>`}</div>`; }).join("")}</div></div></section>`; }).join("") || `<p class="muted" style="text-align:center">Belum ada sesi.</p>`;
+  $("tab-cnt").textContent = A.filter(a => vis.includes(a.c)).reduce((q, a) => q + (a.sessions || []).filter(x => x.date > addDays(DATA.today, -7)).length, 0) || "";
+}
+let SSOPEN = null;
+function ssAnimate(host) { requestAnimationFrame(() => requestAnimationFrame(() => { host.classList.add("open");
+  setTimeout(() => { host.querySelectorAll("[data-w]").forEach(i => i.style.width = i.dataset.w + "%"); host.querySelectorAll(".ss-ringc .v").forEach(v => v.style.strokeDasharray = v.dataset.to); }, 150); })); }
+$("p-sesi").addEventListener("click", e => {
+  const lane = e.target.closest(".ss-lt [data-lane]");
+  if (lane) { SSLON[lane.dataset.lane] = !SSLON[lane.dataset.lane]; lane.setAttribute("aria-pressed", SSLON[lane.dataset.lane]);
+    const w = lane.closest(".ss-dd").querySelector(".ss-bfw"); w.innerHTML = ssBf(w.dataset.d, w); w.querySelectorAll(".b").forEach(r => { r.style.animation = "none"; r.style.transform = "none"; }); return; }
+  const wh = e.target.closest(".ss-wgh");
+  if (wh) { const g = wh.parentElement, o = !g.classList.contains("open"); g.classList.toggle("open", o); wh.setAttribute("aria-expanded", o); return; }
+  const fr = e.target.closest(".ss-fr"); if (!fr || fr.classList.contains("plan") || e.target.closest(".ss-det")) return;
+  const host = fr.querySelector(".ss-det"), s = fr.dataset.d, was = SSOPEN && SSOPEN !== host && SSOPEN.classList.contains("open");
+  if (SSOPEN && SSOPEN !== host) SSOPEN.classList.remove("open");
+  if (SSOPEN === host && host.classList.contains("open")) { host.classList.remove("open"); SSOPEN = null; return; }
+  host.firstElementChild.innerHTML = ssDetail(s); SSOPEN = host;
+  const w = host.querySelector(".ss-bfw"); w.innerHTML = ssBf(s, host.firstElementChild); ssAnimate(host);
+  // move the day to the top of the screen, under the compact header (after a closing day above has settled)
+  setTimeout(() => scrollTo({top: fr.getBoundingClientRect().top + scrollY - ($("st-mini").offsetHeight + 10), behavior: REDUCED ? "auto" : "smooth"}), was ? 580 : 80);
+});
+$("p-sesi").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest(".ss-fr:not(.plan)") && !e.target.closest(".ss-det")) { e.preventDefault(); e.target.closest(".ss-fr").click(); } });
+
+// ---------------- Arah: 8 weeks, one picture per question, numbers in the runner's colour, every arrow explained
+function ssArah() { const vis = V(), W = 300, end = DATA.today;
+  const wk = (a, f) => { const o = []; for (let w = 7; w >= 0; w--) { const hi = addDays(end, -7 * w), lo = addDays(hi, -7); o.push(f((a.sessions || []).filter(x => x.date > lo && x.date <= hi))); } return o; };
+  const first = a => a.find(v => v != null), last = a => [...a].reverse().find(v => v != null);
+  const kindOf = (a, x) => (parsePlan(planCell(a, x.date)) || {k: "easy"}).k;
+  const dl = (d, good, txt, say) => { const eq = !d; return `<span class="dlt ${eq ? "eq" : good ? "up" : "dn"}" data-sh="<span class='t1'>${eq ? "Tetap" : good ? "Membaik" : "Memburuk"}</span>${say}">${eq ? "tetap" : txt}</span>`; };
+  const pair = (fT, fR) => { const t = vis.find(a => a.c === "t"), r = vis.find(a => a.c === "r");
+    return `<div class="mx num"><div class="sT">${t ? fT(t) : ""}</div><div class="sR">${r ? fR(r) : ""}</div></div>`; };
+  const series = f => vis.map(a => [a, wk(a, f)]), ok = S => S.some(([, s]) => s.some(v => v != null));
+  const cards = [];
+  // 1. pace in zone 2: a track, ghost = 8 weeks ago, dot travels to now (right = faster)
+  { const f = a => xs => { const sp = xs.filter(x => ["easy", "long", "rec"].includes(kindOf(a, x))).flatMap(x => x.splits).filter(p => p[2] && a.zones && zoneOf(a, p[2]) === 1 && p[0] >= .5);
+      return sp.length ? sp.reduce((q, p) => q + p[1], 0) / sp.reduce((q, p) => q + p[0], 0) : null; };
+    const SS = vis.map(a => [a, wk(a, f(a))]);
+    if (ok(SS)) { const v = SS.flatMap(([, s]) => s).filter(x => x != null), slow = Math.max(...v) + 10, fast = Math.min(...v) - 10, X = q => 14 + (slow - q) / (slow - fast || 1) * (W - 28);
+      const lane = (a, s, y) => { const p0 = first(s), p1 = last(s); if (p1 == null) return "";
+        return `<line x1="14" x2="${W - 14}" y1="${y}" y2="${y}" class="ss-trk"/><circle cx="${X(p0)}" cy="${y}" r="5" class="ss-ghost" stroke="var(--${a.c})"/>
+          <line class="ss-travel" x1="${X(p0)}" x2="${X(p1)}" y1="${y}" y2="${y}" stroke="var(--${a.c})"/><circle class="ss-mover" cx="${X(p1)}" cy="${y}" r="6.5" fill="var(--${a.c})" style="--dx:${X(p0) - X(p1)}px"
+          data-sh="<span class='t1'>${a.name}</span>8 minggu lalu <b>${paceS(p0)}/km</b> → sekarang <b>${paceS(p1)}/km</b>"/>`; };
+      const side = a => { const s = SS.find(q => q[0] === a)[1]; if (last(s) == null) return `<span class="nv">–</span>`; const d = Math.round(last(s) - first(s)), n = Math.abs(d);
+        return `<span class="nv">${paceS(last(s))}<small>/km</small></span>${dl(d, d < 0, `${d < 0 ? "▲" : "▼"} ${n} dtk/km`, d < 0
+          ? `${a.name} lari santai ${n} detik per km lebih cepat dibanding 8 minggu lalu, dengan detak jantung yang sama (zona 2). Artinya makin bugar.`
+          : `${a.name} lari santai ${n} detik per km lebih lambat dibanding 8 minggu lalu pada detak jantung yang sama. Bisa karena capek, panas, atau kurang tidur.`)}`; };
+      cards.push(`<h4>${ssTerm("pz2")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 70">${SS.map(([a, s], i) => lane(a, s, 18 + i * 28)).join("")}<text x="14" y="68">lebih lambat</text><text x="${W - 14}" y="68" text-anchor="end">lebih cepat →</text></svg>`); } }
+  // 2. metres per heartbeat: then → now
+  { const SS = vis.map(a => [a, wk(a, xs => mean(xs.filter(x => kindOf(a, x) !== "hard").map(ssEf)))]);
+    if (ok(SS)) { const v = SS.flatMap(([, s]) => s).filter(x => x != null), lo = Math.min(...v) - .01, hi = Math.max(...v) + .01, Y = q => 8 + (1 - (q - lo) / (hi - lo)) * 54;
+      const sl = (a, s) => last(s) == null ? "" : `<line class="ss-slope" x1="60" x2="${W - 60}" y1="${Y(first(s))}" y2="${Y(last(s))}" stroke="var(--${a.c})"/><circle cx="60" cy="${Y(first(s))}" r="4" class="ss-ghost" stroke="var(--${a.c})"/><circle class="ss-pop" cx="${W - 60}" cy="${Y(last(s))}" r="5.5" fill="var(--${a.c})"/>
+        <text x="52" y="${Y(first(s)) + 4}" text-anchor="end">${first(s).toFixed(2)}</text><text x="${W - 52}" y="${Y(last(s)) + 4}">${last(s).toFixed(2)} m</text>`;
+      const side = a => { const s = SS.find(q => q[0] === a)[1]; if (last(s) == null) return `<span class="nv">–</span>`; const d = last(s) - first(s), cm = Math.round(Math.abs(d) * 100);
+        return `<span class="nv">${last(s).toFixed(2)}<small> m</small></span>${dl(cm, d > 0, `${d > 0 ? "▲" : "▼"} ${Math.abs(d).toFixed(2)} m`,
+          `Setiap satu detak jantung, ${a.name} sekarang menempuh ${cm} cm ${d > 0 ? "lebih jauh" : "lebih pendek"} dibanding 8 minggu lalu. ${d > 0 ? "Jantung makin hemat." : "Jantung bekerja lebih keras untuk jarak yang sama."}`)}`; };
+      cards.push(`<h4>${ssTerm("ef")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 86">${SS.map(([a, s]) => sl(a, s)).join("")}<text x="60" y="84" text-anchor="middle">8 mgg lalu</text><text x="${W - 60}" y="84" text-anchor="middle">sekarang</text></svg>`); } }
+  // 3. km per week: mirrored skyline (Taofik up, Reza down)
+  { const SS = vis.map(a => [a, wk(a, xs => xs.reduce((q, x) => q + x.km, 0))]), mx = Math.max(1, ...SS.flatMap(([, s]) => s)), bw = (W - 20) / 8;
+    const bars = (a, s, up) => s.map((v, j) => { const h = v / mx * 30; return `<rect class="ss-sky" style="animation-delay:${j * 50}ms;transform-origin:${up ? "bottom" : "top"}" x="${10 + j * bw + 3}" y="${up ? 36 - h : 38}" width="${bw - 6}" height="${Math.max(h, .5)}" rx="3" fill="var(--${a.c})" opacity="${j === 7 ? 1 : .55}"
+      data-sh="<span class='t1'>${a.name} · ${j === 7 ? "7 hari terakhir" : (7 - j) + " minggu lalu"}</span>${Math.round(v)} km"/>`; }).join("");
+    const side = a => { const s = SS.find(q => q[0] === a)[1], d = Math.round(s[7] - s[0]);
+      return `<span class="nv">${Math.round(s[7])}<small> km</small></span>${dl(d, d > 0, `${d > 0 ? "▲" : "▼"} ${Math.abs(d)} km`, `7 hari terakhir ${a.name} lari ${Math.abs(d)} km ${d > 0 ? "lebih banyak" : "lebih sedikit"} dibanding minggu yang sama 8 minggu lalu.${d > 0 ? " Volume naik sesuai program." : " Cek apakah ada sesi bolong atau memang minggu ringan."}`)}`; };
+    cards.push(`<h4>Jarak per minggu</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 74"><line x1="10" x2="${W - 10}" y1="37" y2="37" stroke="var(--line)"/>${SS.map(([a, s]) => bars(a, s, a.c === "t" || vis.length === 1)).join("")}</svg>`); }
+  // 4. long run: progress toward 42K (option A)
+  { const SS = vis.map(a => [a, wk(a, xs => xs.length ? Math.max(...xs.map(x => x.km)) : null)]);
+    if (ok(SS)) { const X = q => 14 + Math.min(42, q) / 42 * (W - 28), best = s => Math.max(...s.filter(v => v != null)), then = s => first(s);
+      const row = (a, s, y) => `<rect x="14" y="${y - 7}" width="${W - 28}" height="14" rx="7" fill="var(--grid)"/>
+        <rect class="ss-grow" x="14" y="${y - 7}" width="${X(best(s)) - 14}" height="14" rx="7" fill="var(--${a.c})" style="--from:${Math.max(.02, (X(then(s)) - 14) / (X(best(s)) - 14 || 1))}"/>
+        <line x1="${X(then(s))}" x2="${X(then(s))}" y1="${y - 10}" y2="${y + 10}" stroke="var(--text)" stroke-width="1.5" stroke-dasharray="2 2"/>
+        <rect x="14" y="${y - 10}" width="${W - 28}" height="20" fill="transparent" data-sh="<span class='t1'>${a.name}</span>8 minggu lalu ${f1(then(s))} km → terjauh sekarang ${f1(best(s))} km"/>`;
+      const side = a => { const s = SS.find(q => q[0] === a)[1]; if (last(s) == null) return `<span class="nv">–</span>`; const d = Math.round(best(s) - then(s));
+        return `<span class="nv">${Math.round(best(s))}<small> km</small></span>${dl(d, d > 0, `${d > 0 ? "▲" : "▼"} ${Math.abs(d)} km`, `Long run terjauh ${a.name} ${d > 0 ? "bertambah" : "berkurang"} ${Math.abs(d)} km dalam 8 minggu. Tambah jarak tetap paling jauh 1,1 × lari terpanjang 30 hari terakhir.`)}`; };
+      cards.push(`<h4>Long run terjauh</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 74">${[21, 30, 35, 42].map(k => `<line x1="${X(k)}" x2="${X(k)}" y1="6" y2="54" stroke="var(--line)"/><text x="${X(k)}" y="68" text-anchor="middle">${k === 21 ? "21K" : k === 42 ? "42K" : k}</text>`).join("")}${SS.map(([a, s], i) => last(s) == null ? "" : row(a, s, 18 + i * 24)).join("")}</svg>`); } }
+  // 5. decoupling: gauge with the document's zones; dashed needle = 8 weeks ago
+  { const SS = vis.map(a => [a, wk(a, xs => mean(xs.filter(x => x.dec != null).map(x => x.dec)))]);
+    if (ok(SS)) { const M = 12, cx = W / 2, cy = 66, R = 52, ang = v => Math.PI * (1 - Math.min(M, Math.max(0, v)) / M), pt = (v, r) => [cx + r * Math.cos(ang(v)), cy - r * Math.sin(ang(v))];
+      const arc = (a, b, col) => { const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R); return `<path d="M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2}" stroke="${col}" stroke-width="9" fill="none"/>`; };
+      const nd = (v, c, gh) => v == null ? "" : `<g class="${gh ? "ss-gn" : "ss-nd"}" style="--deg:${-(180 - Math.min(M, Math.max(0, v)) / M * 180)}deg" transform="translate(${cx} ${cy})"><line x1="0" y1="0" x2="${R - 14}" y2="0" stroke="var(--${c})" stroke-width="${gh ? 1.5 : 3}" stroke-linecap="round" ${gh ? 'stroke-dasharray="2 3"' : ""}/></g>`;
+      const side = a => { const s = SS.find(q => q[0] === a)[1]; if (last(s) == null) return `<span class="nv">–</span>`; const d = last(s) - first(s), r1 = Math.round(d * 10);
+        return `<span class="nv">${f1(last(s))}<small>%</small></span>${dl(r1, d < 0, `${d > 0 ? "▲" : "▼"} ${f1(Math.abs(d))} poin`, `Decoupling ${a.name} ${d < 0 ? "turun" : "naik"} ${f1(Math.abs(d))} poin dibanding 8 minggu lalu. ${d < 0 ? "Turun = detak jantung lebih stabil sampai akhir lari, daya tahan membaik." : "Naik = detak jantung makin cepat naik di paruh kedua. Buka long run lebih pelan."}`)}`; };
+      cards.push(`<h4>${ssTerm("dec")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 74">${arc(0, 5, "color-mix(in srgb,var(--good) 45%,transparent)")}${arc(5, 8, "color-mix(in srgb,var(--good) 20%,transparent)")}${arc(8, M, "color-mix(in srgb,var(--warn) 35%,transparent)")}
+        ${SS.map(([a, s]) => nd(first(s), a.c, 1)).join("")}${SS.map(([a, s]) => nd(last(s), a.c)).join("")}<circle cx="${cx}" cy="${cy}" r="4" fill="var(--text)"/>
+        <text x="${pt(5, R + 9)[0]}" y="${pt(5, R + 9)[1]}" text-anchor="middle">5</text><text x="${pt(8, R + 9)[0]}" y="${pt(8, R + 9)[1]}" text-anchor="middle">8</text></svg>`); } }
+  // 6. cadence: each runner on a ruler with its target band (option A)
+  { const SS = vis.map(a => [a, wk(a, xs => { const v = xs.map(ssCad).filter(q => q != null); return v.length ? mean(v) : null; })]);
+    if (!ok(SS)) cards.push(`<h4>${ssTerm("cad")}</h4><div class="nodata">Belum ada data cadence. Jalankan Update Dashboard sekali lagi: data per detik diunduh ulang dengan cadence.</div>`);
+    else { const lo = 160, hi = 186, X = q => 14 + (Math.min(hi, Math.max(lo, q)) - lo) / (hi - lo) * (W - 28);
+      const row = (a, s, y) => { const t = a.cadence || [170, 176], v0 = first(s), v1 = last(s); if (v1 == null) return "";
+        return `<line x1="14" x2="${W - 14}" y1="${y}" y2="${y}" class="ss-trk"/><rect x="${X(t[0])}" y="${y - 9}" width="${X(t[1]) - X(t[0])}" height="18" rx="9" fill="var(--${a.c})" opacity=".16"/>
+          <text x="${(X(t[0]) + X(t[1])) / 2}" y="${y - 12}" text-anchor="middle" style="fill:var(--${a.c});font-weight:700">target</text>
+          <circle cx="${X(v0)}" cy="${y}" r="5" class="ss-ghost" stroke="var(--${a.c})"/><line class="ss-travel" x1="${X(v0)}" x2="${X(v1)}" y1="${y}" y2="${y}" stroke="var(--${a.c})"/>
+          <circle class="ss-mover" cx="${X(v1)}" cy="${y}" r="6.5" fill="var(--${a.c})" style="--dx:${X(v0) - X(v1)}px" data-sh="<span class='t1'>${a.name}</span>8 minggu lalu ${Math.round(v0)} → sekarang ${Math.round(v1)} spm · target ${t[0]}–${t[1]}"/>`; };
+      const side = a => { const s = SS.find(q => q[0] === a)[1], t = a.cadence || [170, 176]; if (last(s) == null) return `<span class="nv">–</span>`; const d = Math.round(last(s) - first(s)), v = Math.round(last(s));
+        return `<span class="nv">${v}<small> spm</small></span>${dl(d, d > 0, `${d > 0 ? "▲" : "▼"} ${Math.abs(d)} spm`, `${a.name} sekarang ${v} langkah per menit (${d === 0 ? "sama" : d > 0 ? "naik " + d : "turun " + -d} dibanding 8 minggu lalu). Target ${t[0]}–${t[1]}: ${v >= t[0] && v <= t[1] ? "sudah di dalam target." : v < t[0] ? "masih di bawah, perpendek langkah sedikit." : "di atas target, tidak masalah selama nyaman."}`)}`; };
+      cards.push(`<h4>${ssTerm("cad")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 74">${SS.map(([a, s], i) => row(a, s, 22 + i * 28)).join("")}${[165, 170, 175, 180].map(q => `<text x="${X(q)}" y="72" text-anchor="middle">${q}</text>`).join("")}</svg>`); } }
+  $("ss-trends").innerHTML = cards.map((c, i) => `<div class="ss-tc" style="--i:${i}">${c}</div>`).join("");
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold: .2});
+  document.querySelectorAll(".ss-tc").forEach(c => REDUCED ? c.classList.add("in") : io.observe(c));
+}
+function renderSesi() { SSOPEN = null; ssFeed(); ssArah(); }
+
+// ---------------- tabs: header stays; compact header slides in once the big one has scrolled away
+let TAB = "ring"; try { TAB = localStorage.getItem("pacelab-tab") === "sesi" ? "sesi" : "ring"; } catch (e) {}
+function tabInd() { const t = $("tabs"), sel = t.querySelector(`[data-t="${TAB}"]`), ul = t.querySelector(".st-ul"); if (!sel.offsetWidth) return;
+  ul.style.width = sel.offsetWidth + "px"; ul.style.transform = `translateX(${sel.offsetLeft}px)`; }
+function tabSel() { document.querySelectorAll("#tabs [data-t], #st-mtabs [data-t]").forEach(b => b.setAttribute("aria-selected", b.dataset.t === TAB)); tabInd(); }
+function goTab(t, jump) { if (t === TAB) return; const from = $("p-" + TAB), to = $("p-" + t); TAB = t; tabSel();
+  try { localStorage.setItem("pacelab-tab", t); } catch (e) {}
+  const show = () => { from.classList.add("st-hide"); from.classList.remove("st-out"); to.classList.remove("st-hide"); to.classList.add("st-in0");
+    if (t === "sesi") renderSesi(); requestAnimationFrame(() => requestAnimationFrame(() => to.classList.remove("st-in0")));
+    if (jump) scrollTo({top: $("tabs").getBoundingClientRect().top + scrollY - 70, behavior: REDUCED ? "auto" : "smooth"}); };
+  if (REDUCED) return show(); from.classList.add("st-out"); setTimeout(show, 250); }
+$("tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) goTab(b.dataset.t); });
+$("tabs").addEventListener("keydown", e => { if (e.key === "ArrowRight" || e.key === "ArrowLeft") { goTab(TAB === "ring" ? "sesi" : "ring"); $("tabs").querySelector(`[data-t="${TAB}"]`).focus(); } });
+$("st-mtabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) goTab(b.dataset.t, true); });
+function miniFill() { const S = D(DATA.ms1), R = D(DATA.race_date), p = Math.max(0, Math.min(1, (D(DATA.today) - S) / (R - S))) * 100;
+  $("st-cd").innerHTML = `${$("days").dataset.to || $("days").textContent}<small>hari · MS${DATA.ms_cur}${DATA.phase ? " " + DATA.phase : ""}</small>`;
+  $("st-barfill").style.width = p + "%"; document.querySelector(".st-dots").style.left = p + "%"; }
+new IntersectionObserver(es => es.forEach(e => $("st-mini").classList.toggle("on", !e.isIntersecting && e.boundingClientRect.top < 0)), {threshold: 0}).observe($("leg2"));
+addEventListener("resize", tabInd);
+
+function renderAll() { lpClose(); xdecClose(); renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); flyBuild(); if (TAB === "sesi") renderSesi(); }
 function filter(groupId, set, render, ids) {
   $(groupId).querySelectorAll("button").forEach(b => { if (!b.hasAttribute("aria-pressed")) b.setAttribute("aria-pressed", "false"); });
   $(groupId).onclick = e => { const b = e.target.closest("button"); if (!b || b.getAttribute("aria-pressed") === "true") return;
@@ -1394,7 +1821,9 @@ function filter(groupId, set, render, ids) {
     setTimeout(() => { render(); ids.forEach((i, n) => { $(i).classList.remove("fade"); replay($(i).closest(".card"), n * 70); }); }, 280); };
 }
 renderLegend();
+if (TAB === "sesi") { $("p-ring").classList.add("st-hide"); $("p-sesi").classList.remove("st-hide"); }
 renderAll();
+tabSel(); miniFill();
 observeAll();
 filter("f-wk", n => WK = n, weekly, ["ch-km", "ch-lr", "ch-dec", "ch-wt"]);
 filter("f-day", n => DAYN = n, daily, ["ch-sleep", "ch-hrv", "ch-bb", "strip"]);

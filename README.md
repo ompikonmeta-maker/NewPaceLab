@@ -40,8 +40,10 @@ tanda lomba, kedua pelari berdiri di tanggal hari ini). Di bawahnya **batang tar
 dan **kurung fase** bertanggal (km & long run per fase, titik progres fase berjalan). Arahkan kursor ke batang
 untuk ringkasan; klik batang untuk **jadwal harian** minggu itu (Senin–Minggu dari sheet Kalender, ✓ km aktual,
 catatan coaching; ←/→ pindah minggu, Esc tutup). Saat halaman di-scroll, kedua pelari lepas dari lintasan dan
-parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. Lalu **Ringkasan** head-to-head, **Latihan**,
-**Pemulihan**, **Progres terbaik**, **Badge**. Tombol di kanan atas menyalakan/mematikan tiap pelari.
+parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. Lalu dua tab: **Ringkasan** (head-to-head,
+**Latihan**, **Pemulihan**, **Progres terbaik**, **Badge**) dan **Sesi** (lihat di bawah). Saat header besar sudah
+ter-scroll, header ringkas melekat di atas (hitung mundur, progres, tab). Tab terakhir diingat browser.
+Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 | Bagian | Sumber |
 |---|---|
@@ -55,6 +57,40 @@ parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. 
 | 5K / 10K / Half | segmen tercepat di dalam lari mana pun (data per detik), hanya saat rekor membaik |
 | Full | estimasi per akhir bulan, di atas pita target B |
 | Badge | 21/25/30/35K, 100 km/bulan, streak 7 & 14 minggu ≥90% target km, PR 5K/10K selama program |
+
+### Tab Sesi
+
+- **Linimasa cermin**: Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per minggu program.
+  Minggu aktif terbuka, minggu lain tertutup (km dan sesi dijalani/terjadwal). Rencana yang belum dijalani = satu baris tipis.
+- **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);
+  per km (batang = kecepatan, pita = rentang pace rencana; garis HR / cadence / elevasi bisa dinyalakan/dimatikan,
+  ditumpuk di jalur luar); waktu di zona HR; kesimpulan + saran tiap pelari.
+- **Arah** (8 minggu terakhir vs sekarang; angka biru = Taofik, oranye = Reza; ▲▼ dijelaskan saat disentuh):
+  pace di zona 2, meter per detak, jarak per minggu, long run terjauh menuju 42K, decoupling, cadence vs target.
+- Rencana per hari dibaca dari teks sel Kalender Excel: `Total X km` (atau `X km` pertama), rentang pace `m:ss - m:ss/km`
+  ("3 km pertama" = rentang pembukaan), "Detak jantung lo - hi" atau "di bawah X", "Pemanasan X km", "Tempo X km".
+- Cadence dan elevasi per detik ikut diunduh. **Update berikutnya mengunduh ulang semua lari sekali** (lebih lama);
+  setelah itu kembali inkremental. Kalau cadence kosong pada data asli: `python pacelab.py inspect`.
+
+| Hitungan | Rumus | Dasar |
+|---|---|---|
+| Kepatuhan (cincin 0–100) | rata-rata dari: jarak ÷ rencana (maks 1), % km dengan pace di rentang rencana (±5 dtk), % km dengan HR di rentang rencana | [keputusan dashboard], disetujui omPik |
+| Pace di zona 2 | pace berbobot waktu dari km (≥ 0,5 km) yang HR rata-ratanya di zona 2 (`zones[0] ≤ HR < zones[1]`, `config.json`), dari lari easy, long, recovery | [keputusan dashboard] |
+| Meter per detak | (jarak ÷ waktu) ÷ (HR ÷ 60), rata-rata lari selain latihan keras per minggu | [keputusan dashboard] |
+| Per km | km dipotong per 1000 m dari data per detik; HR rata berbobot waktu; potongan terakhir < 300 m dibuang | [keputusan dashboard] |
+
+| Penilaian pelatih | Batas | Dasar |
+|---|---|---|
+| Jarak | ≥ 95% rencana | [keputusan dashboard] |
+| Long run: buka 3 km pelan | pace 3 km pertama tidak lebih cepat dari batas cepat rentang pembukaan − 10 dtk | dokumen (pembukaan); 10 dtk [keputusan dashboard] |
+| HR di rentang (easy, long, recovery) | ≥ 80% km | [keputusan dashboard] |
+| Long run: decoupling | < 8%; dinilai hanya ≥ 20 km dan bukan minggu lomba | dokumen §6 |
+| Long run: cadence bertahan | turun < 5 spm dari paruh 1 ke paruh 2 | dokumen |
+| Long run: di bawah 210 menit | ≤ 3 j 30 mnt | dokumen |
+| Tempo: pace di rentang | pace rata km tempo di rentang ± 5 dtk | dokumen (rentang di Excel); 5 dtk [keputusan dashboard] |
+| Tempo: HR tidak lewat batas | HR maks per km ≤ batas atas rencana | Excel |
+| Tempo: pemanasan | lebih lambat dari batas lambat tempo + 30 dtk | [keputusan dashboard] |
+| Pace santai | ≥ 70% km di rentang (± 5 dtk) | [keputusan dashboard] |
 
 ### Kesimpulan di tiap grafik
 
