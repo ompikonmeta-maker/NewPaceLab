@@ -3,7 +3,13 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0b. Tab "Sesi" — dipilih T3 + A, versi 6 menunggu "gas"
+## 0b. Tab "Sesi" — dipilih T3 + A, versi 7 menunggu "gas"
+
+Versi 7: garis HR / cadence / elevasi ditumpuk jadi satu di jalur luar (batang pace terpisah); angka kartu Arah
+opsi B (berwarna biru/oranye); setiap ▲▼ punya penjelasan bahasa sederhana saat disentuh; opsi grafik Long run
+(A menuju 42K · B batang per minggu · C garis per minggu) dan Cadence (A pita target · B garis + pita ·
+C jarum metronom) menunggu pilihan.
+
 
 Versi 6 (hanya yang dikomentari): nama hari lengkap; tooltip per km satu baris per pelari; garis HR / cadence /
 elevasi bisa ditumpuk langsung di atas batang pace (opsi baru) atau di jalur luar (v5); penanda pemilik angka di
