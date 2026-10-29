@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 12. Data ringkasan Garmin di detail sesi — mockup siap, menunggu pilihan
+## 12. Data ringkasan Garmin di detail sesi — dipilih C, menunggu "gas"
 
 Mockup: [`docs/mockup/data-garmin.html`](mockup/data-garmin.html). Field sudah tersimpan sejak sync FIT (runs.json "g"):
 waktu bergerak/total, HR maks, ambang laktat (Reza), cadence rata/maks, panjang langkah, kontak tanah / osilasi / rasio
