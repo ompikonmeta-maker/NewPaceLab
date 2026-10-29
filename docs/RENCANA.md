@@ -1,7 +1,30 @@
 # Rencana yang belum diputuskan
 
-Diperbarui 29 Okt 2026. Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
+Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
+
+## 0. Duel per sesi + Arah (versi lanjutan, 29 Okt) — menunggu pilihan
+
+Mockup: [`docs/mockup/duel-sesi.html`](mockup/duel-sesi.html). Data di mockup rekaan.
+Menggantikan rencana 1 di bawah (B dan C sudah tercakup).
+
+1. **Pita sesi** (monitoring + rekaman): dua jalur Taofik/Reza per hari. Bentuk = jenis sesi
+   (bulat santai, kapsul long run, belah ketupat keras, titik kecil pemulihan), ukuran = jarak,
+   cincin hijau/kuning = kepatuhan rencana, garis putus = sesi bolong, rencana ke depan abu-abu. 2 / 4 / 12 minggu.
+2. **Kartu duel** (klik satu hari): cincin kepatuhan + kondisi pagi (tidur, BB) tiap pelari; baris cermin jarak, pace,
+   HR, cadence, meter per detak, decoupling (titik = lebih baik); pace per km (dua grafik kecil satu skala, pita
+   rentang rencana); HR per km (satu grafik); waktu di zona Z1–Z5 (cermin); satu catatan + saran per pelari.
+3. **Arah** (tren 8 minggu, dua garis per kartu): pace di zona 2, jarak per minggu, long run, decoupling, cadence, tidur;
+   angka sekarang + perubahan (hijau membaik, merah memburuk).
+4. Istilah bergaris titik → tooltip bahasa sederhana + rumus (decoupling, meter per detak, pace di zona 2, cadence,
+   kepatuhan, zona).
+
+Perlu diputuskan:
+- Letak: "Sesi" setelah Ringkasan; "Arah" menggantikan bagian Latihan (supaya tidak dobel) atau ditambahkan?
+- Cadence: tambah ke sync (unduh ulang semua lari sekali)?
+- Rumus **kepatuhan rencana** belum ada di dokumen → [keputusan dashboard], perlu disetujui
+  (usulan: rata-rata jarak ÷ rencana, % waktu pace di rentang, % waktu HR di rentang).
+- Pace di zona 2 dan meter per detak: tampilkan keduanya atau satu saja?
 
 ## 1. Detail hasil lari per sesi — menunggu pilihan
 

@@ -1,0 +1,317 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: duel per sesi</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--serious:#b54a1f;--serious-bg:#fbe9e0;
+  --z1:#dcdcd6;--z2:#b4b3ab;--z3:#8a8981;--z4:#5c5b55;--z5:#2c2b28;--ease:cubic-bezier(.22,1,.36,1);--spring:cubic-bezier(.34,1.4,.64,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318;
+  --z1:#3a3a37;--z2:#5a5a55;--z3:#86857e;--z4:#b5b4ac;--z5:#e6e5df}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+main{max-width:1180px;margin:0 auto;padding:28px 20px 120px}
+.num{font-variant-numeric:tabular-nums}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none} .dot.t{background:var(--t)} .dot.r{background:var(--r)}
+.head{display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:6px 0 14px}
+.head h2{margin:0;font-size:26px;letter-spacing:-.02em} .head p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.seg{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:3px;gap:2px}
+.seg button{border:0;background:none;font:inherit;font-size:13.5px;font-weight:600;color:var(--text-2);padding:6px 12px;border-radius:9px;cursor:pointer;transition:background .2s,color .2s}
+.seg button[aria-pressed="true"]{background:var(--bg);color:var(--text)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:18px 20px}
+/* term with explanation */
+.term{border-bottom:1.5px dotted var(--muted);cursor:help}
+/* tooltip */
+.tip{position:fixed;z-index:50;pointer-events:none;max-width:290px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--text-2);
+  box-shadow:0 14px 40px rgba(0,0,0,.16);opacity:0;transform:translateY(4px) scale(.98);transition:opacity .15s,transform .25s var(--spring)}
+.tip.on{opacity:1;transform:none} .tip b{color:var(--text)} .tip .t1{display:block;font-weight:650;color:var(--text);font-size:13.5px;margin-bottom:2px}
+.tip .f{display:block;margin-top:6px;padding:6px 8px;border-radius:8px;background:var(--bg);font-variant-numeric:tabular-nums;color:var(--text)}
+.tip .r2{display:flex;justify-content:space-between;gap:14px} .tip .r2 span:first-child{color:var(--muted)}
+
+/* ===== 1. ribbon (monitoring + recording) ===== */
+.rib{position:relative;display:flex}
+.rib .names{flex:none;width:76px;position:relative} .rib .names div{position:absolute;left:0;display:flex;align-items:center;gap:7px;font-size:13px;font-weight:700;transform:translateY(-50%)}
+.rib .sc{flex:1;min-width:0;overflow-x:auto;scrollbar-width:none;padding:4px 0 2px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 24px)}
+.rib .sc::-webkit-scrollbar{display:none}
+.rib svg{display:block;overflow:visible}
+.rib .lane{fill:none;stroke:var(--grid);stroke-width:1.5;stroke-dasharray:2 5}
+.rib .wk{stroke:var(--line);stroke-width:1}
+.rib .dlab{font-size:11px;fill:var(--muted);text-anchor:middle}
+.rib .dlab.today{fill:var(--text);font-weight:700}
+.rib .col{fill:transparent;cursor:pointer;transition:fill .2s} .rib .col:hover{fill:color-mix(in srgb,var(--text) 5%,transparent)}
+.rib .col.sel{fill:color-mix(in srgb,var(--text) 8%,transparent)}
+.mk{cursor:pointer;transform-box:fill-box;transform-origin:center;transform:scale(0);animation:pop .55s var(--spring) forwards}
+.mk.plan{fill:none;stroke:var(--muted);stroke-width:1.4;stroke-dasharray:3 3;opacity:.7}
+.mk.miss{fill:none;stroke-width:1.6;stroke-dasharray:2 3}
+.ring{fill:none;stroke-width:2;transform-box:fill-box;transform-origin:center;transform:scale(0);animation:pop .55s var(--spring) forwards}
+@keyframes pop{to{transform:scale(1)}}
+.nowl{stroke:var(--text);stroke-width:1.5}
+.leg{display:flex;gap:16px;flex-wrap:wrap;align-items:center;font-size:12.5px;color:var(--muted);margin-top:10px}
+.leg svg{width:18px;height:14px;vertical-align:-2px;margin-right:4px}
+
+/* ===== 2. duel card for one day ===== */
+.duel{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s var(--ease);margin-top:12px}
+.duel.open{grid-template-rows:1fr} .duel > div{overflow:hidden}
+.dc{opacity:0;transform:translateY(10px);transition:opacity .35s .1s,transform .5s .1s var(--ease)} .duel.open .dc{opacity:1;transform:none}
+.dtop{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px}
+.who{display:flex;align-items:center;gap:12px} .who.r{justify-content:flex-end;text-align:right}
+.who b{font-size:18px} .who small{display:block;color:var(--muted);font-size:13px}
+.comp{width:54px;height:54px;flex:none} .comp .tr{stroke:var(--grid)} .comp .v{stroke-dasharray:0 200;transition:stroke-dasharray 1.1s var(--ease)}
+.comp text{font:700 13px "Segoe UI",system-ui;fill:var(--text)}
+.mid{text-align:center} .mid b{display:block;font-size:17px} .mid span{font-size:13px;color:var(--muted)}
+.plan{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:4px}
+.plan span{font-size:12px;border:1px solid var(--line);border-radius:999px;padding:1px 8px;color:var(--text-2)}
+.rows{margin-top:16px}
+.row{display:grid;grid-template-columns:minmax(0,1fr) 128px minmax(0,1fr);align-items:center;gap:12px;padding:8px 0;border-top:1px solid var(--line)}
+.row .c{text-align:center;font-size:13px;color:var(--muted)}
+.side{display:flex;align-items:center;gap:10px} .side.l{flex-direction:row-reverse}
+.side .v{font-size:19px;font-weight:650;min-width:72px} .side.l .v{text-align:right} .side .v small{font-size:12px;font-weight:400;color:var(--muted)}
+.bar{flex:1;height:4px;border-radius:2px;background:var(--grid);position:relative;overflow:hidden}
+.bar i{position:absolute;top:0;bottom:0;border-radius:4px;width:0;transition:width .9s var(--ease)} .side.l .bar i{right:0} .side.r .bar i{left:0}
+.win{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--text);opacity:0;transition:opacity .3s .6s} .duel.open .win.on{opacity:1}
+.sec{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px}
+.g2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:18px}
+.mini svg{display:block;width:100%;overflow:visible}
+.mini .band{opacity:.13} .mini .b{transform-box:fill-box;transform-origin:bottom;transform:scaleY(0)} .duel.open .mini .b{animation:grow .6s var(--ease) forwards}
+@keyframes grow{to{transform:scaleY(1)}}
+.mini .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:1200;stroke-dashoffset:1200} .duel.open .mini .ln{animation:draw 1.4s .2s var(--ease) forwards}
+@keyframes draw{to{stroke-dashoffset:0}}
+.mini text{font-size:10.5px;fill:var(--muted)} .mini .gl{stroke:var(--grid)}
+.mini .hit{fill:transparent}
+.zrow{display:grid;grid-template-columns:minmax(0,1fr) 40px minmax(0,1fr);align-items:center;gap:8px;margin:4px 0}
+.zbar{display:flex;height:18px;border-radius:6px;overflow:hidden;gap:2px} .zbar.l{flex-direction:row-reverse}
+.zbar span{width:0;transition:width 1s var(--ease);font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow:hidden} .zrow .c{text-align:center;font-size:11.5px;color:var(--muted);font-weight:700}
+.zkey{display:flex;gap:10px;justify-content:center;font-size:11.5px;color:var(--muted);margin-top:6px} .zkey i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:4px;vertical-align:-1px}
+.notes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px;margin-top:16px}
+.note{border-radius:14px;padding:10px 12px;background:var(--bg);font-size:13.5px;color:var(--text-2)} .note b{color:var(--text)}
+.note svg{width:14px;height:14px;vertical-align:-2px;margin-right:5px;color:var(--warn)}
+.empty{color:var(--muted);font-size:14px;padding:6px 0}
+
+/* ===== 3. trends ===== */
+.tgrid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.tc{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px 10px;opacity:0;transform:translateY(12px)}
+.tc.in{animation:rise .6s var(--ease) forwards;animation-delay:calc(var(--i) * 60ms)}
+@keyframes rise{to{opacity:1;transform:none}}
+.tc h4{margin:0;font-size:14.5px;display:flex;align-items:center;gap:6px}
+.tc .need{margin-left:auto;font-size:11px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:1px 8px}
+.dl{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0 2px}
+.dl div{display:flex;align-items:baseline;gap:6px;font-size:13px;color:var(--muted)} .dl div:last-child{justify-content:flex-end}
+.dl b{font-size:18px;color:var(--text);letter-spacing:-.01em}
+.dl .ar{font-size:12px;font-weight:700} .ar.up{color:var(--good)} .ar.dn{color:var(--serious)} .ar.eq{color:var(--muted)}
+.tc svg{display:block;width:100%;height:86px;overflow:visible}
+.tc .ln{fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:900;stroke-dashoffset:900}
+.tc.in .ln{animation:draw 1.5s .25s var(--ease) forwards}
+.tc .end{opacity:0} .tc.in .end{animation:fadein .3s 1.5s forwards} @keyframes fadein{to{opacity:1}}
+.tc .ref{stroke:var(--line);stroke-dasharray:3 4}
+.tc .xl{display:flex;justify-content:space-between;font-size:10.5px;color:var(--muted)}
+.cross{stroke:var(--muted);stroke-width:1;opacity:0} .tc:hover .cross{opacity:.6}
+.hdot{opacity:0} .tc:hover .hdot{opacity:1}
+@media (max-width:900px){.tgrid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:640px){main{padding:20px 16px 100px}.tgrid,.g2,.notes{grid-template-columns:minmax(0,1fr)}
+  .row{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.side .bar{display:none}.side .v{min-width:0;font-size:17px}
+  .dtop{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.dtop .mid{grid-column:1/-1;order:-1}.comp{width:46px;height:46px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}.mk,.ring{transform:none}.tc{opacity:1;transform:none}.tc .ln,.mini .ln{stroke-dashoffset:0}.mini .b{transform:none}.dc{opacity:1;transform:none}}
+</style></head><body>
+<main>
+<div class="head"><div><h2>Sesi</h2><p>Setiap lari, berdampingan. Klik satu hari untuk duel sesi.</p></div>
+  <div class="seg" id="span"><button data-n="14" aria-pressed="true">2 mgg</button><button data-n="28" aria-pressed="false">4 mgg</button><button data-n="84" aria-pressed="false">12 mgg</button></div></div>
+
+<section class="card">
+  <div class="rib" id="rib"></div>
+  <div class="leg" id="leg"></div>
+  <div class="duel" id="duel"><div><div class="dc" id="dc"></div></div></div>
+</section>
+
+<div class="head" style="margin-top:34px"><div><h2>Arah</h2><p>Perubahan 8 minggu terakhir. Garis kanan = sekarang.</p></div></div>
+<div class="tgrid" id="trends"></div>
+</main>
+<div class="tip" id="tip"></div>
+
+<script>
+const $ = id => document.getElementById(id);
+// ---------------------------------------------------------------- demo data (seeded, realistic shape)
+let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+const TODAY = new Date(2026, 9, 29);
+const DAY = 864e5, iso = d => d.toISOString().slice(0, 10);
+const HARI = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"], BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"];
+const P = {t: {name: "Taofik", easy: [520, 555], z: [133, 151, 162, 177], cad: 170, ef0: .76},
+           r: {name: "Reza", easy: [525, 560], z: [139, 153, 164, 174], cad: 174, ef0: .72}};
+// weekly pattern from the program: Tue hard, Thu easy, Sat long, Sun recovery
+const PLAN = {2: ["hard", "Tempo 3 km", 7], 4: ["easy", "Lari santai", 7], 6: ["long", "Long run", 20], 0: ["rec", "Pemulihan", 6]};
+const SESS = {t: {}, r: {}};
+for (let i = 120; i >= 0; i--) { const d = new Date(TODAY - i * DAY), wd = d.getDay(), pl = PLAN[wd]; if (!pl) continue;
+  const prog = (120 - i) / 120;
+  for (const c of ["t", "r"]) { if (i === 0) continue; if (rnd() < (c === "r" ? .1 : .06)) continue;  // missed sessions
+    const k = pl[0], planKm = k === "long" ? 14 + Math.round(prog * 7) : pl[2];
+    const km = +(planKm * (k === "long" && rnd() < .2 ? .85 : .97 + rnd() * .08)).toFixed(1);
+    const ef = P[c].ef0 * (1 + prog * .06) * (.98 + rnd() * .04);       // metres per heartbeat (easy), improving
+    const hr = k === "hard" ? (c === "t" ? 166 : 162) : k === "rec" ? (c === "t" ? 128 : 134) : (c === "t" ? 143 : 147) + (k === "long" ? 3 : 0);
+    const paceS = k === "hard" ? (c === "t" ? 372 : 438) - prog * 8 : 60000 / (ef * hr);  // s/km
+    const n = Math.max(1, Math.round(km)), sp = [], hrs = [], cad = [];
+    for (let j = 0; j < n; j++) { const f = j / n; sp.push(paceS * (k === "long" ? (j < 3 ? 1.06 : 1 + f * .03) : 1) + (rnd() - .5) * 10);
+      hrs.push(Math.round(hr - 4 + f * (k === "long" ? (c === "t" ? 9 : 13) : 5) + (rnd() - .5) * 3)); cad.push(Math.round(P[c].cad + (k === "hard" ? 6 : 0) - f * (k === "long" ? (c === "t" ? 3 : 6) : 1) + (rnd() - .5) * 2)); }
+    const dec = k === "long" ? (c === "t" ? 3.2 : 6.4) + (rnd() - .5) * 2 - prog * 1.5 : null;
+    SESS[c][iso(d)] = {k, title: pl[1], planKm, km, sec: sp.reduce((s, x) => s + x, 0) * km / n, sp, hrs, cad, dec,
+      hr: Math.round(hrs.reduce((s, x) => s + x, 0) / n), ef, wake: {sl: 5.6 + rnd() * 1.8, bb: 40 + Math.round(rnd() * 45)}};
+  } }
+const PLANFOR = d => PLAN[new Date(d).getDay()];
+// ---------------------------------------------------------------- helpers
+const pace = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+const hm = s => `${Math.floor(s / 3600)}:${String(Math.round(s % 3600 / 60)).padStart(2, "0")}`;
+const tgl = d => { const x = new Date(d); return `${HARI[x.getDay()]} ${x.getDate()} ${BLN[x.getMonth()]}`; };
+const tip = $("tip"); let tipOn = null;
+function showTip(html, x, y) { tip.innerHTML = html; tip.classList.add("on"); const w = tip.offsetWidth, h = tip.offsetHeight;
+  let L = x + 14, T = y + 14; if (L + w > innerWidth - 8) L = x - w - 14; if (T + h > innerHeight - 8) T = y - h - 14; tip.style.left = Math.max(8, L) + "px"; tip.style.top = Math.max(8, T) + "px"; }
+const hideTip = () => tip.classList.remove("on");
+// plain-language glossary (with formula where there is one)
+const GL = {
+  dec: ["Decoupling", "Seberapa boros detak jantung di paruh kedua lari dibanding paruh pertama, pada kecepatan yang sama. Kecil = daya tahan kuat.",
+        "(meter per detak paruh 1 − paruh 2) ÷ paruh 1 × 100%<br>tanpa 3 km pertama · target &lt; 8%"],
+  ef: ["Meter per detak", "Jarak yang ditempuh setiap satu detak jantung saat lari santai. Naik = jantung makin hemat = makin bugar.",
+       "kecepatan (meter per menit) ÷ detak jantung rata-rata"],
+  pz2: ["Pace di zona 2", "Pace lari santai saat detak jantung di zona 2. Makin cepat di detak yang sama = kebugaran naik.",
+        "rata-rata pace pada detik-detik dengan HR di zona 2"],
+  cad: ["Cadence", "Jumlah langkah per menit. Sedikit lebih tinggi = beban lutut lebih ringan.", "target Taofik 168–172, Reza 172–176 · peringatan bila paruh 2 turun ≥ 5"],
+  comp: ["Kepatuhan rencana", "Seberapa dekat sesi dengan jadwal Excel: jarak, pace, dan detak jantung.", "rata-rata 3 nilai: jarak ÷ rencana, % waktu pace di rentang, % waktu HR di rentang"],
+  zone: ["Zona detak jantung", "Pembagian detak jantung jadi 5 tingkat usaha. Z2 = santai, masih bisa ngobrol. Z4 = keras.", "batas per pelari dari dokumen §2"],
+  acwr: ["Rasio beban", "Volume minggu ini dibanding rata-rata 4 minggu sebelumnya. Di atas 1,3 = naik terlalu cepat.", "km minggu ini ÷ rata-rata km 4 minggu sebelumnya"]};
+const term = (k, txt) => `<span class="term" data-g="${k}">${txt || GL[k][0]}</span>`;
+document.addEventListener("pointermove", e => { const g = e.target.closest("[data-g]"), h = e.target.closest("[data-h]");
+  if (g) { const G = GL[g.dataset.g]; showTip(`<span class="t1">${G[0]}</span>${G[1]}${G[2] ? `<span class="f">${G[2]}</span>` : ""}`, e.clientX, e.clientY); return; }
+  if (h) { showTip(h.dataset.h, e.clientX, e.clientY); return; } hideTip(); });
+
+// ---------------------------------------------------------------- 1. ribbon
+const KIND = {easy: "Lari santai", long: "Long run", hard: "Latihan keras", rec: "Pemulihan"};
+function shape(k, cx, cy, s, cls, style) {   // shape = kind of session, size = distance
+  if (k === "long") return `<rect class="${cls}" ${style} x="${cx - s * 1.5}" y="${cy - s * .75}" width="${s * 3}" height="${s * 1.5}" rx="${s * .75}"/>`;
+  if (k === "hard") { const q = s * 1.15; return `<path class="${cls}" ${style} stroke-linejoin="round" d="M${cx} ${cy - q}L${cx + q} ${cy}L${cx} ${cy + q}L${cx - q} ${cy}Z"/>`; }
+  return `<circle class="${cls}" ${style} cx="${cx}" cy="${cy}" r="${k === "rec" ? s * .75 : s}"/>`; }
+let SPAN = 14, SEL = null;
+function compl(s, c) { const okKm = Math.min(1, s.km / s.planKm), pr = s.k === "hard" ? .8 : .7 + rnd() * .3, hr = s.k === "hard" ? .85 : .75 + (c === "t" ? .2 : .1);
+  return Math.round((okKm + pr + hr) / 3 * 100); }
+const COMP = {}; for (const c of ["t", "r"]) for (const d in SESS[c]) COMP[c + d] = compl(SESS[c][d], c);
+function ribbon() {
+  const cw = SPAN > 28 ? 16 : SPAN > 14 ? 30 : 58, G0 = 24, W = (SPAN + 3) * cw + G0 + 10, H = 150, Y = {t: 44, r: 104};
+  let g = `<line class="lane" x1="0" x2="${W}" y1="${Y.t}" y2="${Y.t}"/><line class="lane" x1="0" x2="${W}" y1="${Y.r}" y2="${Y.r}"/>`;
+  for (let i = SPAN - 1; i >= -3; i--) { const d = new Date(TODAY - i * DAY), x = (SPAN - i) * cw + G0, D = iso(d), wd = d.getDay();
+    g += `<rect class="col${SEL === D ? " sel" : ""}" data-d="${D}" x="${x - cw / 2}" y="10" width="${cw}" height="${H - 18}" rx="10"/>`;
+    if (wd === 1) g += `<line class="wk" x1="${x - cw / 2}" x2="${x - cw / 2}" y1="16" y2="${H - 16}"/>`;
+    if (cw >= 30 || wd === 1) g += `<text class="dlab${i === 0 ? " today" : ""}" x="${x}" y="${H - 2}">${cw >= 58 ? HARI[wd] + " " + d.getDate() : d.getDate()}</text>`;
+    for (const c of ["t", "r"]) { const s = SESS[c][D], pl = PLANFOR(D), y = Y[c];
+      const dl = Math.round((SPAN - i) / (SPAN + 3) * 600);
+      if (s) { const cap = s.k === "long" ? cw * .3 : cw * .4, sz = Math.min(cap, Math.max(3, Math.sqrt(s.km) * (cw >= 58 ? 3.6 : cw >= 30 ? 2.6 : 1.7))), cp = COMP[c + D];
+        if (cw >= 30) g += shape(s.k, x, y, sz + 4, "ring", `style="stroke:${cp >= 85 ? "var(--good)" : "var(--warn)"};animation-delay:${dl + 120}ms"`);
+        g += shape(s.k, x, y, sz, "mk", `fill="var(--${c})" data-c="${c}" data-d="${D}" style="animation-delay:${dl}ms"`); }
+      else if (pl && i > 0) g += shape(pl[0], x, y, cw >= 58 ? 7 : 4, "mk miss", `stroke="var(--${c})" data-c="${c}" data-d="${D}" data-miss="1" style="animation-delay:${dl}ms"`);
+      else if (pl && i <= 0) g += shape(pl[0], x, y, cw >= 58 ? 7 : 4, "mk plan", `data-d="${D}" data-plan="1" style="animation-delay:${dl}ms"`); }
+    if (i === 0) g += `<line class="nowl" x1="${x}" x2="${x}" y1="18" y2="${H - 18}" opacity=".25"/>`; }
+  $("rib").innerHTML = `<div class="names" style="height:${H}px"><div style="top:${Y.t + 4}px"><i class="dot t"></i>Taofik</div><div style="top:${Y.r + 4}px"><i class="dot r"></i>Reza</div></div>
+    <div class="sc"><svg width="${W}" height="${H}" aria-label="Pita sesi dua pelari">${g}</svg></div>`;
+  $("rib").querySelector(".sc").scrollLeft = 1e5;
+  $("leg").innerHTML = [["easy", "santai"], ["long", "long run"], ["hard", "keras"], ["rec", "pemulihan"]].map(([k, t]) => `<span><svg viewBox="-9 -7 18 14">${shape(k, 0, 0, 5, "", 'fill="var(--muted)" style="transform:none"')}</svg>${t}</span>`).join("")
+    + `<span><svg viewBox="-9 -7 18 14"><circle cx="0" cy="0" r="5" fill="none" stroke="var(--muted)" stroke-dasharray="2 2"/></svg>bolong</span>`
+    + `<span><svg viewBox="-9 -7 18 14"><circle cx="0" cy="0" r="5.5" fill="none" stroke="var(--good)" stroke-width="2"/></svg>sesuai rencana</span><span style="margin-left:auto">ukuran = jarak</span>`;
+}
+$("rib").addEventListener("pointermove", e => { const m = e.target.closest(".mk"); if (!m) return;
+  const D = m.dataset.d; if (m.dataset.plan) { const p = PLANFOR(D); return showTip(`<span class="t1">${tgl(D)} · rencana</span>${p[1]}`, e.clientX, e.clientY); }
+  const c = m.dataset.c, s = SESS[c][D], p = PLANFOR(D);
+  if (m.dataset.miss) return showTip(`<span class="t1"><i class="dot ${c}"></i> ${P[c].name} · ${tgl(D)}</span>Tidak ada lari. Rencana: ${p[1]}`, e.clientX, e.clientY);
+  showTip(`<span class="t1"><i class="dot ${c}"></i> ${P[c].name} · ${tgl(D)}</span><span class="r2"><span>${KIND[s.k]}</span><b class="num">${s.km} km</b></span><span class="r2"><span>pace</span><b class="num">${pace(s.sec / s.km)}/km</b></span><span class="r2"><span>HR</span><b class="num">${s.hr}</b></span><span class="r2"><span>sesuai rencana</span><b class="num">${COMP[c + D]}%</b></span>`, e.clientX, e.clientY); });
+$("rib").addEventListener("click", e => { const col = e.target.closest("[data-d]"); if (!col) return; openDay(col.dataset.d); });
+$("span").onclick = e => { const b = e.target.closest("button"); if (!b) return; $("span").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); SPAN = +b.dataset.n; ribbon(); };
+
+// ---------------------------------------------------------------- 2. duel card
+const IC = {good: '<svg viewBox="0 0 24 24" width="14" height="14"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg>'};
+const BULB = '<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+function zones(s, c) { const z = [0, 0, 0, 0, 0], b = P[c].z; s.hrs.forEach(h => z[b.filter(x => h >= x).length]++); return z.map(v => v / s.hrs.length); }
+function openDay(D) {
+  SEL = D; ribbon(); const T = SESS.t[D], R = SESS.r[D], p = PLANFOR(D);
+  if (!T && !R) { $("dc").innerHTML = `<div class="empty">${tgl(D)} · ${p ? "rencana: " + p[1] + " · belum ada lari" : "hari tanpa lari di jadwal"}</div>`; $("duel").classList.add("open"); return; }
+  const ring = (c, s) => { if (!s) return `<svg class="comp" viewBox="0 0 54 54"><circle class="tr" cx="27" cy="27" r="22" fill="none" stroke-width="6"/><text x="27" y="31" text-anchor="middle">–</text></svg>`;
+    const v = COMP[c + D], C = 2 * Math.PI * 22; return `<svg class="comp" viewBox="0 0 54 54" data-g="comp"><circle class="tr" cx="27" cy="27" r="22" fill="none" stroke-width="6"/>
+      <circle class="v" data-to="${(v / 100 * C).toFixed(1)} ${C.toFixed(1)}" cx="27" cy="27" r="22" fill="none" stroke="var(--${c})" stroke-width="6" stroke-linecap="round" transform="rotate(-90 27 27)"/><text x="27" y="31" text-anchor="middle">${v}</text></svg>`; };
+  const lamp = s => s ? `${s.wake.sl.toFixed(1).replace(".", ",")} j tidur · BB ${s.wake.bb}` : "tidak lari";
+  // metric rows: [label, value fn, display fn, better = lower?]
+  const M = [["Jarak", s => s.km, v => `${v}<small> km</small>`, false],
+    ["Pace", s => s.sec / s.km, v => `${pace(v)}<small>/km</small>`, true],
+    ["HR rata", s => s.hr, v => `${v}`, null],
+    [term("cad"), s => Math.round(s.cad.reduce((a, b) => a + b, 0) / s.cad.length), v => `${v}<small> spm</small>`, false],
+    [term("ef"), s => s.ef * 1, v => v.toFixed(2), false]];
+  if ((T && T.dec != null) || (R && R.dec != null)) M.push([term("dec"), s => s.dec, v => v == null ? "–" : `${v.toFixed(1)}<small>%</small>`, true]);
+  const rows = M.map(([lab, f, fmt, low], i) => { const a = T ? f(T) : null, b = R ? f(R) : null, mx = Math.max(a || 0, b || 0) || 1;
+    const wa = a == null ? 0 : low === true ? Math.min(a, b ?? a) / a : a / mx, wb = b == null ? 0 : low === true ? Math.min(a ?? b, b) / b : b / mx;
+    const best = a == null || b == null || low === null || a === b ? null : (low ? (a < b ? "t" : "r") : (a > b ? "t" : "r"));
+    return `<div class="row num"><div class="side l"><span class="v">${a == null ? "–" : fmt(a)}</span><span class="bar"><i style="background:var(--t)" data-w="${wa * 100}"></i></span><span class="win${best === "t" ? " on" : ""}"></span></div>
+      <div class="c">${lab}</div><div class="side r"><span class="win${best === "r" ? " on" : ""}"></span><span class="bar"><i style="background:var(--r)" data-w="${wb * 100}"></i></span><span class="v">${b == null ? "–" : fmt(b)}</span></div></div>`; }).join("");
+  // splits: pace per km (bars, taller = faster) as small multiples on one shared scale; HR per km as one chart
+  const all = [T, R].filter(Boolean), pmin = Math.min(...all.flatMap(s => s.sp)) - 15, pmax = Math.max(...all.flatMap(s => s.sp)) + 15;
+  const CW = $("dc").clientWidth || 1000, small = CW < 600;
+  const paceChart = (c, s) => { if (!s) return `<div class="empty">–</div>`; const W = small ? CW : (CW - 18) / 2, H = 92, n = s.sp.length, bw = W / Math.max(n, 8);
+    const y = v => 6 + (H - 22) * ((v - pmin) / (pmax - pmin)), band = p && p[0] !== "hard" ? P[c].easy : null;
+    return `<svg viewBox="0 0 ${W} ${H}">${band ? `<rect class="band" x="0" width="${W}" y="${y(band[0])}" height="${y(band[1]) - y(band[0])}" fill="var(--${c})"/>` : ""}
+      ${s.sp.map((v, j) => `<rect class="b" style="animation-delay:${j * 30}ms" x="${j * bw + 1.5}" y="${y(v)}" width="${bw - 3}" height="${H - 16 - y(v)}" rx="3" fill="var(--${c})" opacity=".85"/>
+        <rect class="hit" x="${j * bw}" y="0" width="${bw}" height="${H}" data-h="<span class='t1'>${P[c].name} · km ${j + 1}</span><span class='r2'><span>pace</span><b>${pace(v)}/km</b></span><span class='r2'><span>HR</span><b>${s.hrs[j]}</b></span><span class='r2'><span>cadence</span><b>${s.cad[j]}</b></span>"/>`).join("")}
+      <text x="0" y="${H - 2}">km 1</text><text x="${Math.min(n, Math.max(n, 8)) * bw - 2}" y="${H - 2}" text-anchor="end">${n}</text></svg>`; };
+  const hrChart = () => { const W = CW, H = small ? 130 : 110, n = Math.max(...all.map(s => s.hrs.length)), lo = Math.min(...all.flatMap(s => s.hrs)) - 4, hi = Math.max(...all.flatMap(s => s.hrs)) + 4;
+    const x = j => 30 + j * (W - 40) / Math.max(1, n - 1), y = v => 6 + (H - 24) * (1 - (v - lo) / (hi - lo));
+    let g = [lo + 4, Math.round((lo + hi) / 2), hi - 4].map(v => `<line class="gl" x1="30" x2="${W}" y1="${y(v)}" y2="${y(v)}"/><text x="24" y="${y(v) + 3}" text-anchor="end">${Math.round(v)}</text>`).join("");
+    for (const [c, s] of [["t", T], ["r", R]]) if (s) g += `<path class="ln" stroke="var(--${c})" d="${s.hrs.map((v, j) => `${j ? "L" : "M"}${x(j).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}"/>`;
+    for (let j = 0; j < n; j++) g += `<rect class="hit" x="${x(j) - (W - 40) / n / 2}" y="0" width="${(W - 40) / n}" height="${H}" data-h="<span class='t1'>km ${j + 1} · detak jantung</span>${[["t", T], ["r", R]].filter(q => q[1] && q[1].hrs[j] != null).map(([c, s]) => `<span class='r2'><span><i class='dot ${c}'></i> ${P[c].name}</span><b>${s.hrs[j]}</b></span>`).join("")}"/>`;
+    return `<svg viewBox="0 0 ${W} ${H}">${g}<text x="30" y="${H - 2}">km 1</text><text x="${W}" y="${H - 2}" text-anchor="end">${n}</text></svg>`; };
+  const ZC = ["var(--z1)", "var(--z2)", "var(--z3)", "var(--z4)", "var(--z5)"];
+  const zt = T ? zones(T, "t") : null, zr = R ? zones(R, "r") : null;
+  const zbar = (z, side) => `<div class="zbar ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-h="<span class='t1'>Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .14 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`;
+  const note = (c, s) => { if (!s) return `<div class="note"><b>${P[c].name}</b> tidak lari. Libur ≤ 7 hari: ulangi minggu sebelumnya.</div>`;
+    const first = s.sp.slice(0, 3).reduce((a, b) => a + b, 0) / 3, fast = s.k === "long" && first < P[c].easy[0] + 20;
+    const cd = s.cad.length > 4 && (s.cad.slice(0, s.cad.length / 2 | 0).reduce((a, b) => a + b, 0) / (s.cad.length / 2 | 0)) - (s.cad.slice(s.cad.length / 2 | 0).reduce((a, b) => a + b, 0) / (s.cad.length - (s.cad.length / 2 | 0))) >= 5;
+    return `<div class="note"><b>${P[c].name}:</b> ${fast ? `${BULB}3 km pertama terlalu cepat (${pace(first)}/km). Buka di pace recovery.` : cd ? `${BULB}Cadence turun ≥ 5 di paruh kedua: tanda mulai capek.` : `${IC.good} Sesuai rencana. Tidak ada catatan.`}</div>`; };
+  $("dc").innerHTML = `<div class="dtop"><div class="who">${ring("t", T)}<div><b>Taofik</b><small>${lamp(T)}</small></div></div>
+      <div class="mid"><b>${tgl(D)}</b><span>${p ? p[1] : "di luar jadwal"}</span>${p ? `<div class="plan">${p[0] === "long" ? "<span>3 km pertama pace recovery</span>" : ""}<span>HR zona 2</span></div>` : ""}</div>
+      <div class="who r"><div><b>Reza</b><small>${lamp(R)}</small></div>${ring("r", R)}</div></div>
+    <div class="rows">${rows}</div>
+    <div class="sec">Pace per km <span style="font-weight:400;text-transform:none;letter-spacing:0">· batang tinggi = lebih cepat · pita = rentang rencana</span></div>
+    <div class="g2 mini">${paceChart("t", T)}${paceChart("r", R)}</div>
+    <div class="sec">Detak jantung per km</div><div class="mini">${hrChart()}</div>
+    <div class="sec">${term("zone", "Waktu di zona")}</div>
+    <div class="zrow"><div>${zbar(zt, "l")}</div><div class="c">Z1–5</div><div>${zbar(zr, "r")}</div></div>
+    <div class="zkey">${ZC.map((z, i) => `<span><i style="background:${z}"></i>Z${i + 1}</span>`).join("")}</div>
+    <div class="notes">${note("t", T)}${note("r", R)}</div>`;
+  const duel = $("duel"); duel.classList.remove("open");
+  requestAnimationFrame(() => requestAnimationFrame(() => { duel.classList.add("open");
+    setTimeout(() => { duel.querySelectorAll("[data-w]").forEach(i => i.style.width = i.dataset.w + "%"); duel.querySelectorAll(".comp .v").forEach(v => v.style.strokeDasharray = v.dataset.to); }, 150); }));
+}
+
+// ---------------------------------------------------------------- 3. trends (small multiples, both runners on one axis each)
+function weekly(c, f) { const out = []; for (let w = 7; w >= 0; w--) { const vals = Object.entries(SESS[c]).filter(([d]) => { const k = (TODAY - new Date(d)) / DAY; return k > w * 7 && k <= (w + 1) * 7; }).map(([, s]) => s);
+  out.push(f(vals)); } return out; }
+const avg = a => a.length ? a.reduce((s, x) => s + x, 0) / a.length : null;
+const TR = [
+  ["pz2", "Pace di zona 2", vs => avg(vs.filter(s => s.k === "easy" || s.k === "long").map(s => s.sec / s.km)), v => pace(v), true, "dtk/km", d => Math.abs(Math.round(d))],
+  ["dist", "Jarak per minggu", vs => vs.reduce((s, x) => s + x.km, 0), v => Math.round(v), false, "km", d => Math.abs(Math.round(d))],
+  ["lr", "Long run", vs => Math.max(0, ...vs.filter(s => s.k === "long").map(s => s.km)) || null, v => v.toFixed(0), false, "km", d => Math.abs(d).toFixed(0)],
+  ["dec", "Decoupling", vs => avg(vs.filter(s => s.dec != null).map(s => s.dec)), v => v.toFixed(1) + "%", true, "poin", d => Math.abs(d).toFixed(1)],
+  ["cad", "Cadence", vs => avg(vs.map(s => avg(s.cad))), v => Math.round(v), false, "spm", d => Math.abs(Math.round(d)), true],
+  ["hrv", "Tidur", vs => avg(vs.map(s => s.wake.sl)), v => v.toFixed(1).replace(".", ",") + " j", false, "j", d => Math.abs(d).toFixed(1).replace(".", ",")]];
+function trends() {
+  $("trends").innerHTML = TR.map(([k, name, f, fmt, low, unit, dfmt, need], i) => {
+    const S = {t: weekly("t", f), r: weekly("r", f)}, vals = [...S.t, ...S.r].filter(v => v != null), lo = Math.min(...vals), hi = Math.max(...vals), pad = (hi - lo) * .15 || 1;
+    const W = 320, H = 86, x = j => 4 + j * (W - 12) / 7, y = v => 8 + (H - 16) * (low ? (v - lo + pad) / (hi - lo + 2 * pad) : 1 - (v - lo + pad) / (hi - lo + 2 * pad));
+    const path = a => { let m = "M"; return a.map((v, j) => { if (v == null) return ""; const o = `${m}${x(j).toFixed(1)} ${y(v).toFixed(1)}`; m = "L"; return o; }).join(" "); };
+    const delta = c => { const a = S[c].filter(v => v != null); if (a.length < 2) return ""; const d = a[a.length - 1] - a[0], good = low ? d < 0 : d > 0, eq = !parseFloat(String(dfmt(d)).replace(",", "."));
+      const txt = k === "pz2" ? `${dfmt(d)} dtk ${d < 0 ? "lebih cepat" : "lebih lambat"}` : `${d > 0 ? "▲" : "▼"} ${dfmt(d)} ${unit}`;
+      return `<span class="ar ${eq ? "eq" : good ? "up" : "dn"}" data-h="${eq ? "Tidak berubah" : good ? "Membaik" : "Memburuk"} dibanding 8 minggu lalu">${eq ? "=" : txt}</span>`; };
+    const last = c => { const a = S[c].filter(v => v != null); return a.length ? fmt(a[a.length - 1]) : "–"; };
+    const ttl = GL[k] ? term(k, name) : name;
+    const hits = S.t.map((_, j) => `<rect x="${x(j) - (W - 12) / 14}" y="0" width="${(W - 12) / 7}" height="${H}" fill="transparent" data-h="<span class='t1'>${j === 7 ? "minggu ini" : (7 - j) + " minggu lalu"}</span>${["t", "r"].map(c => `<span class='r2'><span><i class='dot ${c}'></i> ${P[c].name}</span><b>${S[c][j] == null ? "–" : fmt(S[c][j])}</b></span>`).join("")}"/>`).join("");
+    return `<div class="tc" style="--i:${i}"><h4>${ttl}${need ? '<span class="need">butuh data cadence</span>' : ""}</h4>
+      <div class="dl num"><div><i class="dot t"></i><b>${last("t")}</b>${delta("t")}</div><div>${delta("r")}<b>${last("r")}</b><i class="dot r"></i></div></div>
+      <svg viewBox="0 0 ${W} ${H}" preserveAspectRatio="none"><path class="ln" stroke="var(--t)" d="${path(S.t)}"/><path class="ln" stroke="var(--r)" d="${path(S.r)}"/>
+        ${["t", "r"].map(c => { const a = S[c], j = a.length - 1; return a[j] == null ? "" : `<circle class="end" cx="${x(j)}" cy="${y(a[j])}" r="4" fill="var(--${c})" stroke="var(--surface)" stroke-width="2"/>`; }).join("")}${hits}</svg>
+      <div class="xl"><span>8 mgg lalu</span><span>sekarang</span></div></div>`; }).join("");
+  const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold: .2});
+  document.querySelectorAll(".tc").forEach(c => io.observe(c));
+}
+ribbon(); trends();
+const last = Object.keys(SESS.t).filter(d => SESS.r[d] && SESS.t[d].k === "long").sort().pop(); setTimeout(() => openDay(last), 500);
+</script>
+</body></html>
