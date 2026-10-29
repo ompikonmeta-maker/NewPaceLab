@@ -19,16 +19,25 @@ lap 9–11 auto-lap 1 km, lap 12 sisa 14 m (akhir sesi). Jadi lap asli tersedia 
 cek apakah key pribadi boleh mengunduh FIT (`/download-service/files/activity/<id>`); kalau tidak, FIT diekspor
 manual ke folder lokal dan dibaca dashboard.
 
-## 10. Lari tanpa data per detik — perlu dicek
+## 9c. Hasil `inspect` 29 Okt — FIT boleh diunduh
 
-`check` 29 Okt: Taofik 71/90 lari punya data per detik, Reza 65/89. 19 + 24 lari tanpa data per detik tidak punya
-per km, segmen 5K/10K, decoupling. Penyebab belum diketahui (lari manual, treadmill tanpa GPS, atau detail kosong
-saat sync pertama dan tidak diminta ulang). Usul: `check` menampilkan daftar lari tanpa data per detik (tanggal, km, tipe).
+- File FIT lari terakhir BOLEH diunduh dengan key pribadi: Taofik 12 lap / 3976 record, Reza 6 lap / 4190 record.
+- Data per detik tidak dipadatkan: baris diterima = metricsCount (3976 / 4190); measurementCount = jumlah jenis metrik (25 / 16).
+- Daftar aktivitas juga memberi lapCount, maxHR, averageRunningCadenceInStepsPerMinute, elevationGain, training effect;
+  ringkasan aktivitas memberi splitSummaries (ringkasan per jenis split).
+- Rencana: sync mengunduh FIT tiap lari sekali, menyimpan lap; tampilan lap jadi utama, per km cadangan (mockup dulu).
 
-omPik: 27 Okt di Garmin 12 lap, dashboard 9 batang. Dashboard tidak memakai lap Garmin: batang = potongan tiap 1000 m dari
-data per detik (`metrics.per_km`), sisa < 300 m dibuang (9,1 km → 9 batang). Lap Garmin mengikuti setelan jam (auto-lap,
-tombol lap, langkah workout pemanasan/tempo/pendinginan). Opsi: A tetap per km; B tambah tampilan "lap" bila Personal API
-memberi data lap (perlu dicek dulu: `inspect` diperluas untuk endpoint split/lap aktivitas, hanya nama field).
+## 10. Lari tanpa data per detik — penyebab ditemukan
+
+`check` 29 Okt: semua lari tanpa data per detik bertanggal 5 Apr – 28 Jun (Taofik 19, Reza 24); semua sesudah itu lengkap.
+Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama (±28 Okt − 120 hari = 30 Jun).
+Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
+FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
+
+## 11. Lap asli di detail sesi — mockup siap, menunggu pilihan
+
+Mockup: [`docs/mockup/lap-sesi.html`](mockup/lap-sesi.html). Tombol Lap jam | Per km. L1 sumbu jarak (blok setinggi jarak
+lap, kedua pelari sejajar per km) · L2 satu baris per lap · L3 tabel cermin. Penilaian pelatih memakai lap bila ada.
 
 ## 8. Kartu Progres terbaik bisa dibuka — **sudah dibuat** (E2, grafik setinggi jendela, titik lebih kecil)
 
