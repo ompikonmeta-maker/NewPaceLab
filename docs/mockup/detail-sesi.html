@@ -1,0 +1,161 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: detail sesi lari</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--serious:#b54a1f;--serious-bg:#fbe9e0;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif}
+main{max-width:1100px;margin:0 auto;padding:24px 16px 80px}
+h2{font-size:13px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin:34px 0 6px}
+.note{font-size:13px;color:var(--muted);margin:4px 0 12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block;flex:none} .dot.t{background:var(--t)} .dot.r{background:var(--r)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:12.5px;font-weight:600;padding:2px 9px 2px 6px;border-radius:999px;white-space:nowrap}
+.chip svg{width:15px;height:15px} .chip.good{color:var(--good);background:var(--good-bg)} .chip.warn{color:var(--warn);background:var(--warn-bg)} .chip.serious{color:var(--serious);background:var(--serious-bg)}
+.num{font-variant-numeric:tabular-nums}
+/* C: entry from the weekly schedule */
+.day{display:grid;grid-template-columns:52px 36px 1fr auto;gap:12px;align-items:start;padding:10px 12px;border-radius:14px;border:1px solid var(--line);max-width:640px;background:var(--surface)}
+.dn{font-size:12px;color:var(--muted);line-height:1.2} .dn b{display:block;font-size:18px;color:var(--text)}
+.ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:var(--text);color:var(--surface)} .ico svg{width:19px;height:19px}
+.ttl{font-weight:650} .chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:5px} .chips span{font-size:12px;border-radius:999px;padding:1px 8px;background:var(--bg);border:1px solid var(--line);color:var(--text-2)}
+.act{border:1px solid var(--good);color:var(--good);background:var(--good-bg);font:inherit;font-size:13px;font-weight:650;border-radius:999px;padding:3px 10px;cursor:pointer;display:inline-flex;gap:6px;align-items:center;transition:transform .2s cubic-bezier(.34,1.5,.64,1),box-shadow .2s}
+.act:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,.1)} .act svg{width:14px;height:14px}
+.pulse{animation:pl 1.6s ease-in-out infinite} @keyframes pl{50%{box-shadow:0 0 0 6px color-mix(in srgb,var(--good) 18%,transparent)}}
+/* B: session window */
+.win{height:640px;display:flex;flex-direction:column;overflow:hidden;background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 80px rgba(0,0,0,.18);max-width:720px}
+.wh{flex:none;padding:16px 20px 12px;border-bottom:1px solid var(--line)}
+.wh .top{display:flex;align-items:center;gap:10px} .wh h3{margin:0;font-size:20px;flex:1}
+.ib{width:36px;height:36px;border-radius:12px;border:1px solid var(--line);background:var(--surface);display:grid;place-items:center;color:var(--text-2)}
+.meta{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:13px} .meta span{border-radius:999px;padding:2px 10px;background:var(--bg);color:var(--text-2)} .meta .dark{background:var(--text);color:var(--surface);font-weight:600}
+.wb{flex:1;min-height:0;overflow:auto;padding:16px 20px 20px;scrollbar-width:thin}
+.kpi{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+.kpi div{background:var(--bg);border-radius:14px;padding:10px 12px} .kpi small{display:block;font-size:12px;color:var(--muted)} .kpi b{font-size:21px;letter-spacing:-.01em} .kpi i{font-style:normal;font-size:12.5px;color:var(--muted)}
+.sec{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:18px 0 8px}
+.vs{width:100%;border-collapse:collapse;font-size:13.5px}
+.vs th{font-size:12px;color:var(--muted);font-weight:600;text-align:left;padding:0 8px 6px 0}
+.vs td{padding:7px 8px 7px 0;border-top:1px solid var(--line);vertical-align:top;color:var(--text)} .vs td:first-child{color:var(--text-2)}
+.vs .sa{display:block;font-size:12.5px;color:var(--text-2);margin-top:3px} .vs .sa svg{width:13px;height:13px;vertical-align:-2px;margin-right:4px;color:var(--warn)}
+.chart svg{width:100%;height:190px;display:block;overflow:visible}
+.chart .bar{fill:color-mix(in srgb,var(--r) 30%,var(--surface));transform-origin:bottom;transform-box:fill-box;transform:scaleY(0);animation:up .6s var(--ease) forwards}
+.chart .band{fill:color-mix(in srgb,var(--good) 12%,transparent)}
+.chart .hr{fill:none;stroke:#d64545;stroke-width:2.2;stroke-dasharray:900;stroke-dashoffset:900;animation:draw 1.4s .3s var(--ease) forwards}
+.chart text{font-size:10.5px;fill:var(--muted)} @keyframes up{to{transform:scaleY(1)}} @keyframes draw{to{stroke-dashoffset:0}}
+.leg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--text-2);margin-top:4px} .leg i{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+.zones{display:flex;height:22px;border-radius:8px;overflow:hidden}
+.zones span{display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;width:0;transition:width 1s var(--ease)}
+.zl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:6px;margin-top:8px;font-size:12px;color:var(--text-2)} .zl b{display:block;font-size:13.5px;color:var(--text)}
+.chk{display:grid;gap:6px}
+.chk div{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:start;padding:8px 10px;border-radius:12px;font-size:13.5px}
+.chk .ok{background:var(--bg)} .chk .w{background:var(--warn-bg)} .chk svg{width:17px;height:17px;margin-top:1px} .chk .ok svg{color:var(--good)} .chk .w svg{color:var(--warn)}
+.chk small{display:block;color:var(--muted);font-size:12px}
+.dec{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:var(--bg);font-size:13.5px}
+.lnk{margin-left:auto;font-size:12.5px;font-weight:650;color:var(--t)}
+/* A: list */
+.list{width:100%;border-collapse:collapse;font-size:13.5px} .list th{font-size:12px;color:var(--muted);font-weight:600;text-align:right;padding:0 0 8px 10px;white-space:nowrap}
+.list th:first-child,.list th:nth-child(2){text-align:left;padding-left:0} .list td{padding:9px 0 9px 10px;border-top:1px solid var(--line);text-align:right;white-space:nowrap}
+.list td:first-child,.list td:nth-child(2){text-align:left;padding-left:0} .list tr.go{cursor:pointer} .list tr.go:hover td{background:var(--bg)}
+.seg{display:inline-flex;background:var(--grid);border-radius:10px;padding:3px;gap:2px;margin-bottom:10px} .seg button{border:0;background:none;font:inherit;font-size:13px;font-weight:600;color:var(--text-2);padding:5px 12px;border-radius:8px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.lwrap{overflow-x:auto}
+/* D: extra data */
+.grid2{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.ghost{position:relative} .ghost::after{content:"butuh sync baru";position:absolute;top:12px;right:14px;font-size:11px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:999px;padding:1px 8px}
+@media (max-width:640px){.kpi{grid-template-columns:repeat(2,minmax(0,1fr))}.zl{grid-template-columns:repeat(3,minmax(0,1fr))}.grid2{grid-template-columns:minmax(0,1fr)}.day{grid-template-columns:44px 32px 1fr}.day .st{grid-column:3}.list .hm{display:none}}
+</style></head><body>
+<main>
+<p class="note">Data contoh: lari demo Reza Sab 3 Okt (20.9 km) dibandingkan jadwal Excel Reza minggu itu. Angka dihitung dari data per detik demo.</p>
+
+<h2>C · Pintu masuk dari jendela jadwal</h2>
+<div class="day"><div class="dn">Sab<b>3</b></div><div class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 21V4h11l-2 4 2 4H5"/></svg></div>
+  <div><div class="ttl">Long run 20 km ▾</div><div class="chips"><span>± 3 jam 2 menit</span><span>8:45–9:20/km</span><span>HR 139–152</span></div></div>
+  <div class="st"><button class="act pulse">✓ 20.9 km <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M9 6l6 6-6 6"/></svg></button></div></div>
+<p class="note">Km aktual di tiap hari menjadi tombol. Klik → jendela detail sesi (B) membuka di atas jadwal, tombol ← kembali ke minggu itu.</p>
+
+<h2>B · Jendela detail sesi</h2>
+<div class="win">
+  <div class="wh"><div class="top"><button class="ib">←</button><h3>Sab 3 Okt · 05:47</h3><button class="ib">✕</button></div>
+    <div class="meta"><span class="dark"><i class="dot r"></i> Reza</span><span class="dark">Long run</span><span>Base · MS15</span></div></div>
+  <div class="wb">
+    <div class="kpi num"><div><small>Jarak</small><b>20.9</b> <i>km</i></div><div><small>Waktu</small><b>2:59</b> <i>j:m</i></div><div><small>Pace rata</small><b>8:34</b> <i>/km</i></div><div><small>HR rata</small><b>150</b> <i>bpm</i></div></div>
+
+    <div class="sec">Dibanding rencana Excel</div>
+    <table class="vs num"><tr><th>Bagian</th><th>Rencana</th><th>Aktual</th><th></th></tr>
+      <tr><td>Jarak</td><td>20 km</td><td>20.9 km</td><td id="s1"></td></tr>
+      <tr><td>3 km pertama</td><td>9:20–9:50/km</td><td>8:35/km<span class="sa" id="sa1"></span></td><td id="s2"></td></tr>
+      <tr><td>Sisanya · pace</td><td>8:45–9:20/km</td><td>8:34/km</td><td id="s3"></td></tr>
+      <tr><td>Sisanya · HR</td><td>139–152</td><td>rata 150 · 88% waktu di dalam</td><td id="s4"></td></tr>
+      <tr><td>Durasi</td><td>± 3:02, berhenti di 3:30</td><td>2:59</td><td id="s5"></td></tr></table>
+
+    <div class="sec">Pace &amp; HR per km</div>
+    <div class="chart" id="chart"></div>
+    <div class="leg"><span><i style="background:color-mix(in srgb,var(--r) 30%,var(--surface))"></i>pace per km</span><span><i style="background:#d64545"></i>HR rata per km</span><span><i style="background:color-mix(in srgb,var(--good) 25%,transparent)"></i>rentang HR rencana</span></div>
+
+    <div class="sec">Waktu di zona HR (dokumen §2)</div>
+    <div class="zones" id="zones"></div><div class="zl num" id="zl"></div>
+
+    <div class="sec">Cek keamanan (dokumen §4)</div>
+    <div class="chk" id="chk"></div>
+
+    <div class="sec">Decoupling</div>
+    <div class="dec"><span class="chip good" id="dc"></span><span>tanpa 3 km pertama <b>2.1%</b> · data penuh 2.4%</span><span class="lnk">lihat hitungan →</span></div>
+  </div>
+</div>
+
+<h2>A · Daftar sesi (opsional)</h2>
+<section class="card">
+  <div class="seg"><button aria-pressed="true">4 mgg</button><button aria-pressed="false">12 mgg</button><button aria-pressed="false">Semua</button></div>
+  <div class="lwrap"><table class="list num" id="list"></table></div>
+  <p class="note">Klik baris → jendela detail sesi yang sama (B).</p>
+</section>
+
+<h2>D · Data tambahan (opsional, butuh sync baru)</h2>
+<div class="grid2">
+  <section class="card ghost"><b>Cadence per km</b><p class="note">Target Reza 172–176. Peringatan bila paruh 2 turun ≥ 5 dibanding paruh 1 (dokumen §6).</p><div class="chart" id="cad"></div></section>
+  <section class="card ghost"><b>Elevasi</b><p class="note">Konteks tanjakan: decoupling dan pace bisa naik karena rute, bukan karena capek.</p><div class="chart" id="ele"></div></section>
+</div>
+<p class="note">Cadence dan elevasi belum ikut ditarik dari Garmin. Sync perlu ditambah dua kolom itu dan semua lari diunduh ulang sekali.</p>
+</main>
+<script>
+const $ = id => document.getElementById(id);
+const IC = {good: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  warn: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16.8" r="1.4" fill="currentColor"/></svg>'};
+const BULB = '<svg viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>';
+const ch = (l, t) => `<span class="chip ${l}">${IC[l]}${t}</span>`;
+$("s1").innerHTML = ch("good", "Selesai"); $("s2").innerHTML = ch("warn", "Terlalu cepat"); $("s3").innerHTML = ch("warn", "Lebih cepat"); $("s4").innerHTML = ch("good", "Sesuai"); $("s5").innerHTML = ch("good", "Aman");
+$("sa1").innerHTML = BULB + "Pembukaan harus pace recovery. HR mengalahkan pace.";
+$("dc").innerHTML = IC.good + "Bagus";
+// per-km splits from the demo stream: [km, seconds, avg HR]
+const S = [[1,515,146],[1,515,147],[1,515,147],[1,515,147],[1.01,515,147],[1.01,515,148],[1,510,148],[1.01,515,148],[1.01,515,149],[1,510,149],[1,515,150],[1,515,150],[1.01,515,150],[1,510,151],[1.01,515,151],[1.01,515,151],[1,510,152],[1,515,152],[1,515,152],[1.01,515,153],[.92,475,153]];
+(function chart() { const W = 660, H = 190, L = 34, R = 34, T = 10, B = 24, n = S.length, bw = (W - L - R) / n;
+  const pace = S.map(s => s[1] / s[0]), pmin = 480, pmax = 600, hmin = 130, hmax = 165;
+  const py = p => T + (H - T - B) * (1 - (pmax - p) / (pmax - pmin)), hy = h => T + (H - T - B) * (1 - (h - hmin) / (hmax - hmin));
+  let g = `<rect class="band" x="${L}" y="${hy(152)}" width="${W - L - R}" height="${hy(139) - hy(152)}"/>`;
+  g += pace.map((p, i) => `<rect class="bar" style="animation-delay:${i * 25}ms" x="${L + i * bw + 2}" y="${py(p)}" width="${bw - 4}" height="${H - B - py(p)}" rx="3"/>`).join("");
+  g += `<path class="hr" d="${S.map((s, i) => `${i ? "L" : "M"}${(L + i * bw + bw / 2).toFixed(1)} ${hy(s[2]).toFixed(1)}`).join(" ")}"/>`;
+  g += [8.5 * 60, 9 * 60, 9.5 * 60].map(p => `<text x="${L - 4}" y="${py(p) + 3}" text-anchor="end">${Math.floor(p / 60)}:${String(p % 60).padStart(2, "0")}</text>`).join("");
+  g += [140, 150, 160].map(h => `<text x="${W - R + 4}" y="${hy(h) + 3}" fill="#d64545">${h}</text>`).join("");
+  g += [1, 5, 10, 15, 20].map(k => `<text x="${L + (k - .5) * bw}" y="${H - 6}" text-anchor="middle">${k}</text>`).join("");
+  $("chart").innerHTML = `<svg viewBox="0 0 ${W} ${H}" aria-label="Pace dan HR per km">${g}</svg>`; })();
+const Z = [["Z1", "< 139", 0, "#9aa6b2"], ["Z2", "139–152", 9415, "#3aa357"], ["Z3", "153–163", 1340, "#e9b949"], ["Z4", "164–173", 0, "#e98a5c"], ["Z5", "≥ 174", 0, "#c22f2f"]], tot = Z.reduce((s, z) => s + z[2], 0);
+const mm = s => `${Math.floor(s / 3600)}:${String(Math.round(s % 3600 / 60)).padStart(2, "0")}`;
+$("zones").innerHTML = Z.map(z => `<span style="background:${z[3]}" data-w="${z[2] / tot * 100}">${z[2] / tot > .08 ? z[0] + " " + Math.round(z[2] / tot * 100) + "%" : ""}</span>`).join("");
+$("zl").innerHTML = Z.map(z => `<div><b>${z[0]} · ${mm(z[2])}</b>${z[1]} bpm</div>`).join("");
+requestAnimationFrame(() => requestAnimationFrame(() => document.querySelectorAll("#zones span").forEach(s => s.style.width = s.dataset.w + "%")));
+$("chk").innerHTML = [["w", "Aturan 110%", "Lari terpanjang 30 hari: 18.9 km → batas 20.8 km", "20.9 km · lewat 0.1 km"],
+  ["ok", "Batas 210 menit", "Berhenti di 3:30, berapa pun km-nya", "2:59"],
+  ["ok", "Jeda latihan keras", "Latihan keras paling cepat 48 jam setelah long run", "berikutnya Sel 6 Okt"]]
+  .map(([c, a, b, v]) => `<div class="${c}">${c === "ok" ? IC.good : IC.warn}<span>${a}<small>${b}</small></span><b class="num">${v}</b></div>`).join("");
+const RUNS = [["Sel 27 Okt", "Lari santai", 8.13, 4140, 147], ["Min 25 Okt", "Pemulihan", 3.66, 1775, 147], ["Sab 24 Okt", "Long run", 17.33, 8760, 154], ["Kam 22 Okt", "Lari santai", 7.27, 3560, 147], ["Sel 20 Okt", "Tempo", 6.51, 3295, 147], ["Min 18 Okt", "Pemulihan", 3.0, 1495, 147], ["Sab 17 Okt", "Lari", 9.96, 5080, 147]];
+const pc = (km, s) => { const p = s / km; return `${Math.floor(p / 60)}:${String(Math.round(p % 60)).padStart(2, "0")}`; };
+$("list").innerHTML = `<tr><th>Tanggal</th><th>Sesi</th><th>Jarak</th><th class="hm">Waktu</th><th>Pace</th><th>HR</th></tr>` +
+  RUNS.map(r => `<tr class="go"><td><i class="dot r"></i> ${r[0]}</td><td>${r[1]}</td><td>${r[2].toFixed(1)} km</td><td class="hm">${mm(r[3])}</td><td>${pc(r[2], r[3])}</td><td>${r[4]}</td></tr>`).join("");
+// D (illustration only)
+function mini(id, ys, lo, hi, col, band) { const W = 460, H = 120, n = ys.length, x = i => 10 + i * (W - 20) / (n - 1), y = v => 8 + (H - 26) * (1 - (v - lo) / (hi - lo));
+  $(id).innerHTML = `<svg viewBox="0 0 ${W} ${H}">${band ? `<rect class="band" x="10" y="${y(band[1])}" width="${W - 20}" height="${y(band[0]) - y(band[1])}"/>` : ""}<path class="hr" style="stroke:${col}" d="${ys.map((v, i) => `${i ? "L" : "M"}${x(i).toFixed(1)} ${y(v).toFixed(1)}`).join(" ")}"/></svg>`; }
+mini("cad", [175, 175, 174, 174, 175, 174, 173, 174, 173, 172, 172, 171, 171, 170, 170, 169, 169, 168, 168, 167, 167], 160, 180, "var(--r)", [172, 176]);
+mini("ele", [12, 14, 18, 25, 22, 16, 12, 10, 14, 30, 42, 38, 25, 18, 14, 12, 11, 15, 20, 16, 12], 0, 50, "var(--muted)");
+</script>
+</body></html>
