@@ -15,9 +15,9 @@ Lewat PowerShell:
 ```
 python pacelab.py            # tarik data Garmin kedua atlet, lalu buat dist/dashboard.html
 python pacelab.py build      # buat ulang dashboard dari data yang sudah ada
-python pacelab.py check      # cek field Garmin yang terbaca (hanya jumlah & nama field)
+python pacelab.py check      # cek field Garmin yang terbaca (hanya jumlah & nama field) + daftar lari tanpa data per detik
 python pacelab.py demo       # dashboard dari data rekaan, tanpa key/internet
-python pacelab.py inspect    # struktur respons Garmin (nama field & tipe, tanpa nilai), termasuk data lap lari terakhir
+python pacelab.py inspect    # struktur respons Garmin (nama field & tipe, tanpa nilai); untuk lari terakhir: kepadatan data per detik, boleh/tidaknya unduh file FIT (jumlah lap)
 ```
 
 Opsi: `--who TAOFIK|REZA|ALL`, `--since 2026-03-23`.
@@ -145,6 +145,7 @@ pacelab/garmin.py     client Personal API (token 24 jam, retry, key tidak pernah
 pacelab/sync.py       sync inkremental → data/<ATLET>/
 pacelab/program.py    pembaca Excel program (xlsx.py: pembaca .xlsx tanpa library)
 pacelab/metrics.py    semua perhitungan
+pacelab/fit.py        pembaca file FIT Garmin (lap, sesi, jumlah record) tanpa library
 pacelab/build.py      data → dist/dashboard.html (web/template.html)
 tools/mock_garmin.py  server Garmin tiruan untuk tes & demo
 tests/                python -m unittest discover -s tests

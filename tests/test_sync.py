@@ -105,10 +105,26 @@ class SyncTest(unittest.TestCase):
         with contextlib.redirect_stdout(buf):
             cli.cmd_inspect(cfg, [a for a in cfg["athletes"] if a["id"] == "REZA"], base=self.base)
         out = buf.getvalue()
-        for n in ("lari: details", "lari: splits", "lari: typedsplits", "lari: split_summaries"):
+        for n in ("lari: daftar aktivitas", "lari: data per detik", "lari: file FIT: 404", "lari: ringkasan",
+                  "lari: splits", "lari: typedsplits", "lari: split_summaries"):
             self.assertIn(n, out)
-        self.assertIn("metricDescriptors", out)
         self.assertNotIn("demo-reza", out)
+
+    def test_check_lists_runs_without_per_second_data(self):
+        from pacelab.check import report
+        d = self.tmp / "chk"
+        (d / "streams").mkdir(parents=True, exist_ok=True)
+        (d / "runs.json").write_text(json.dumps([{"id": 1, "date": "2026-10-01", "km": 5.0, "type": "running"},
+                                                 {"id": 2, "date": "2026-10-02", "km": 6.2, "type": "treadmill_running"}]))
+        (d / "wellness.json").write_text("{}")
+        (d / "streams" / "1.json").write_text(json.dumps({"t": [0], "d": [0], "keys": []}))
+        (d / "state.json").write_text(json.dumps({"no_stream": [2]}))
+        out = report(d, "X")
+        self.assertIn("tanpa data per detik (1)", out)
+        self.assertIn("2026-10-02", out)
+        self.assertIn("treadmill_running", out)
+        self.assertIn("Garmin: tidak ada detail", out)
+        self.assertNotIn("2026-10-01   ", out)
 
 
 class SchemaTest(unittest.TestCase):

@@ -103,8 +103,11 @@ def cmd_inspect(cfg, athletes, base=BASE):
         run_calls = []
         if last and last[0].get("activityId"):
             rid = last[0]["activityId"]
-            run_calls = [("lari: details", S.ACT_DETAILS % rid, {"maxChartSize": 5, "maxPolylineSize": 0})] + \
-                [("lari: " + n, p % rid, None) for n, p in S.LAP_PATHS]
+            print("  lari: daftar aktivitas (field lari terakhir):")
+            for p_, t in S.key_tree(last[0]):
+                print("    %s  (%s)" % (p_, t))
+            inspect_run(c, rid)
+            run_calls = [("lari: ringkasan", S.ACT_SUMMARY % rid, None)] + [("lari: " + n, p % rid, None) for n, p in S.LAP_PATHS]
         for name, path, params in calls + run_calls:
             try:
                 resp = c.get(path, params)
@@ -117,6 +120,34 @@ def cmd_inspect(cfg, athletes, base=BASE):
             print("  %s:" % name)
             for p, t in S.key_tree(resp):
                 print("    %s  (%s)" % (p, t))
+
+
+def inspect_run(c, rid):
+    """Counts and status only: how dense the per-second data is, and whether the original FIT may be downloaded."""
+    from pacelab import fit, sync as S
+    try:
+        det = c.get(S.ACT_DETAILS % rid, {"maxChartSize": 100000, "maxPolylineSize": 0})
+    except (ApiError, AuthError) as e:
+        det = None
+        print("  lari: details gagal (%s)" % e)
+    if isinstance(det, dict):
+        rows = len(det.get("activityDetailMetrics") or [])
+        print("  lari: data per detik: %d baris diterima, measurementCount %s, metricsCount %s, totalMetricsCount %s, %d metrik"
+              % (rows, det.get("measurementCount"), det.get("metricsCount"), det.get("totalMetricsCount"), len(det.get("metricDescriptors") or [])))
+    try:
+        blob = c.get(S.FIT_DOWNLOAD % rid, raw=True)
+    except (ApiError, AuthError) as e:
+        print("  lari: file FIT gagal (%s)" % e)
+        return
+    if blob is None:
+        print("  lari: file FIT: 404 (tidak dibuka untuk key pribadi)")
+        return
+    kind = "zip" if blob[:2] == b"PK" else "FIT" if blob[8:12] == b".FIT" else "lain (%r)" % blob[:12]
+    try:
+        r = fit.read(blob)
+        print("  lari: file FIT: BOLEH, %d byte (%s), %d lap, %d record per detik" % (len(blob), kind, len(r["laps"]), r["records"]))
+    except (ValueError, KeyError, IndexError) as e:
+        print("  lari: file FIT: dijawab %d byte (%s) tapi tidak terbaca: %s" % (len(blob), kind, e))
 
 
 def cmd_build(cfg, athletes, today=None, out=None):

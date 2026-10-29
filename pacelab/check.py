@@ -23,6 +23,17 @@ def report(folder, name):
     lines.append("  lari          : %d (tipe: %s)" % (len(runs), ", ".join(types)))
     lines.append("  stream        : %d/%d lari, %d dengan HR" % (len(streams), len(runs), with_hr))
     lines.append("  stream keys   : %s" % (", ".join(sorted(keys)) or "-"))
+    have = {p.stem for p in streams}
+    try:
+        no = set(json.loads((folder / "state.json").read_text()).get("no_stream") or [])
+    except (OSError, ValueError):
+        no = set()
+    miss = [r for r in runs if str(r.get("id")) not in have]
+    if miss:
+        lines.append("  tanpa data per detik (%d):" % len(miss))
+        for r in sorted(miss, key=lambda r: r.get("date") or ""):
+            lines.append("    %s  %6.2f km  %-16s %s" % (r.get("date"), r.get("km") or 0, r.get("type") or "?",
+                                                        "Garmin: tidak ada detail" if r.get("id") in no else "belum diminta"))
     lines.append("  wellness hari : %d (%s .. %s)" % (len(well), min(well, default="-"), max(well, default="-")))
     last30 = sorted(well)[-30:]
     lines.append("    %-12s %9s %14s" % ("", "semua", "30 hr terakhir"))
