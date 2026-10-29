@@ -74,7 +74,7 @@ def cmd_check(cfg, athletes):
         print(report(Path(cfg["data_dir"]) / a["id"], a["name"]))
 
 
-def cmd_inspect(cfg, athletes):
+def cmd_inspect(cfg, athletes, base=BASE):
     from pacelab import sync as S
     end = dt.date.today()
     a, b = (end - dt.timedelta(days=2)).isoformat(), end.isoformat()
@@ -86,9 +86,20 @@ def cmd_inspect(cfg, athletes):
         if not key:
             print("[x] %s: key tidak ada" % at["name"])
             continue
-        c = Client(at["id"], key, cache_dir=str(Path(cfg["data_dir"]).parent / ".token_cache"))
+        c = Client(at["id"], key, base=base, cache_dir=str(Path(cfg["data_dir"]).parent / ".token_cache"))
         print("== %s (%s .. %s)" % (at["name"], a, b))
-        for name, path, params in calls:
+        # the latest run: is lap data open to personal keys? (field names only)
+        try:
+            last = c.get(S.ACT_LIST, {"start": 0, "limit": 1, "activityType": "running"}) or []
+        except (ApiError, AuthError) as e:
+            last = []
+            print("  activities: %s" % e)
+        run_calls = []
+        if last and last[0].get("activityId"):
+            rid = last[0]["activityId"]
+            run_calls = [("lari: details", S.ACT_DETAILS % rid, {"maxChartSize": 5, "maxPolylineSize": 0})] + \
+                [("lari: " + n, p % rid, None) for n, p in S.LAP_PATHS]
+        for name, path, params in calls + run_calls:
             try:
                 resp = c.get(path, params)
             except (ApiError, AuthError) as e:

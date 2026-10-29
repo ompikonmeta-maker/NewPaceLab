@@ -3,7 +3,7 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 9. Per km vs lap Garmin — menunggu pilihan
+## 9. Per km vs lap Garmin — dipilih: lap utama, per km cadangan; menunggu hasil `inspect` dari omPik
 
 omPik: 27 Okt di Garmin 12 lap, dashboard 9 batang. Dashboard tidak memakai lap Garmin: batang = potongan tiap 1000 m dari
 data per detik (`metrics.per_km`), sisa < 300 m dibuang (9,1 km → 9 batang). Lap Garmin mengikuti setelan jam (auto-lap,

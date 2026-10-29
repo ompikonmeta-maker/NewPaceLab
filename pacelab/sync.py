@@ -17,6 +17,9 @@ from .garmin import ApiError
 
 ACT_LIST = "/activitylist-service/activities/search/activities"
 ACT_DETAILS = "/activity-service/activity/%s/details"
+# where Garmin Connect keeps the laps of an activity; whether personal keys may read them is checked by `inspect`
+LAP_PATHS = [("splits", "/activity-service/activity/%s/splits"), ("typedsplits", "/activity-service/activity/%s/typedsplits"),
+             ("split_summaries", "/activity-service/activity/%s/split_summaries")]
 SLEEP = "/sleep-service/sleep/dailySleepSummariesByDate"
 HRV = "/hrv-service/hrv/daily/%s/%s"
 BB = "/wellness-service/wellness/bodyBattery/reports/daily"

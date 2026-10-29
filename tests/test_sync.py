@@ -91,6 +91,26 @@ class SyncTest(unittest.TestCase):
         self.assertTrue((self.tmp / "data" / "REZA" / "runs.json").is_file())
 
 
+    def test_inspect_reports_lap_endpoints_without_values(self):
+        import importlib.util
+        spec = importlib.util.spec_from_file_location("cli", ROOT / "pacelab.py")
+        cli = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(cli)
+        cfg = cli.load_config(ROOT / "config.json")
+        keys = self.tmp / "keys_i"
+        keys.mkdir(exist_ok=True)
+        (keys / "REZA.key").write_text("demo-reza", encoding="utf-8")
+        cfg.update(keys_dir=str(keys), data_dir=str(self.tmp / "data_i"))
+        buf = io.StringIO()
+        with contextlib.redirect_stdout(buf):
+            cli.cmd_inspect(cfg, [a for a in cfg["athletes"] if a["id"] == "REZA"], base=self.base)
+        out = buf.getvalue()
+        for n in ("lari: details", "lari: splits", "lari: typedsplits", "lari: split_summaries"):
+            self.assertIn(n, out)
+        self.assertIn("metricDescriptors", out)
+        self.assertNotIn("demo-reza", out)
+
+
 class SchemaTest(unittest.TestCase):
     def test_old_schema_rereads_wellness_once(self):
         srv = make_server(today=TODAY)

@@ -17,7 +17,7 @@ python pacelab.py            # tarik data Garmin kedua atlet, lalu buat dist/das
 python pacelab.py build      # buat ulang dashboard dari data yang sudah ada
 python pacelab.py check      # cek field Garmin yang terbaca (hanya jumlah & nama field)
 python pacelab.py demo       # dashboard dari data rekaan, tanpa key/internet
-python pacelab.py inspect    # struktur respons Garmin (nama field & tipe, tanpa nilai)
+python pacelab.py inspect    # struktur respons Garmin (nama field & tipe, tanpa nilai), termasuk data lap lari terakhir
 ```
 
 Opsi: `--who TAOFIK|REZA|ALL`, `--since 2026-03-23`.
