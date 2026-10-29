@@ -20,8 +20,12 @@ Setiap rencana punya mockup dulu (lihat CLAUDE.md).
    (`renderPB`, data `pb` di `metrics`). Rekor 5K Reza terakhir membaik akhir Juli, 10K pertengahan Juli; sesudahnya
    belum ada segmen yang lebih cepat, jadi garis berhenti. Garis Taofik sampai Oktober karena ia memecahkan rekor
    di Oktober. Bukan data hilang (perlu dipastikan di data asli: lari Reza Agustus–Oktober ada di Latihan).
-   Usulan: garis diteruskan datar sampai hari ini (rekor masih berlaku) dengan ujung titik kosong, dan tooltip
-   "rekor sejak <tanggal>".
+   ~~Usulan: garis diteruskan datar sampai hari ini.~~ **omPik memilih:** tampilkan semua data — segmen 5K tercepat
+   dari setiap lari (bukan hanya saat rekor membaik) — lalu highlight titik yang tercepat. Sama untuk 10K, Half, dst.
+   Perlu: build mengirim usaha terbaik per lari per jarak (sekarang hanya deret rekor).
+4. **Bayangan abu-abu saat hari diklik** (kartu sesi yang dibuka, mis. Reza Kamis 29 Okt) dihilangkan. Asalnya dari
+   fokus F3: `.ss-box.fx2 .ss-fr.on .ss-sc{box-shadow:0 12px 32px …}`, ditambah warna gradasi kartu yang ikut terlihat
+   seperti bayangan di sisi luar.
 
 ## 0c. Penilaian pelatih v2 + ikon transparan — **sudah dibuat** (29 Okt)
 
