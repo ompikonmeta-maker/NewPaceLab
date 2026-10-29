@@ -3,6 +3,12 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
+## Daftar perbaikan — dicatat, belum dikerjakan (omPik: jangan langsung mockup)
+
+1. **Penanda minggu aktif di batang target km mingguan** (kotak panjang di sekeliling batang minggu ini, di bawah
+   lintasan) terlalu tegas. Buat lebih tenang. Sekarang: `.wkcol.now{outline:1.5px solid var(--text)}` di
+   `pacelab/web/template.html`.
+
 ## 0c. Penilaian pelatih v2 + ikon transparan — **sudah dibuat** (29 Okt)
 
 Mockup: [`docs/mockup/penilaian-pelatih-v2.html`](mockup/penilaian-pelatih-v2.html).
