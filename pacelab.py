@@ -89,11 +89,17 @@ def cmd_inspect(cfg, athletes, base=BASE):
         c = Client(at["id"], key, base=base, cache_dir=str(Path(cfg["data_dir"]).parent / ".token_cache"))
         print("== %s (%s .. %s)" % (at["name"], a, b))
         # the latest run: is lap data open to personal keys? (field names only)
+        # same query as the sync (the list may answer nothing without a date range); always say what happened
         try:
-            last = c.get(S.ACT_LIST, {"start": 0, "limit": 1, "activityType": "running"}) or []
+            last = c.get(S.ACT_LIST, {"start": 0, "limit": 1, "startDate": (end - dt.timedelta(days=30)).isoformat(),
+                                      "endDate": b, "activityType": "running"})
         except (ApiError, AuthError) as e:
             last = []
-            print("  activities: %s" % e)
+            print("  lari: daftar aktivitas gagal (%s)" % e)
+        if last is None:
+            print("  lari: daftar aktivitas 404")
+        elif not last:
+            print("  lari: tidak ada lari dalam 30 hari terakhir")
         run_calls = []
         if last and last[0].get("activityId"):
             rid = last[0]["activityId"]
