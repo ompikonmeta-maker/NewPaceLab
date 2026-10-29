@@ -12,11 +12,12 @@ decoupling tidak ada); pace santai tidak dinilai, hanya km lebih cepat dari bata
 ±5 dtk, km 1 tempo tidak dihitung untuk HR; pemanasan ≥ batas cepat pace santai dan HR ≤ batas atas Z2. Semua angka
 dari profil pelari di `config.json`. Dicatat di README sebagai [keputusan omPik]. Ikon pelari memudar saat menutupi data.
 
-## 0d. Linimasa 8 minggu + fokus + lompatan pelari — menunggu pilihan
+## 0d. Linimasa 8 minggu + fokus + gradasi + lompatan pelari — menunggu pilihan gradasi
 
 Mockup: [`docs/mockup/linimasa-fokus.html`](mockup/linimasa-fokus.html). Kotak setinggi 8 minggu dengan scrollbar
-yang hilang sendiri; buka satu minggu = yang lain tertutup. Fokus: F1 buram · F2 pudar abu-abu · F3 sorotan.
-Lompatan pelari: J1 ikuti scroll diperhalus · J2 lompat otomatis (pegas) · J3 lompat melengkung + mendarat.
+yang hilang sendiri; buka satu minggu = yang lain tertutup. Fokus dipilih: F2 + F3 (pudar abu-abu + mengecil,
+yang aktif terangkat dengan bayangan). Lompatan dipilih: J3 + pegas. Gradasi: G1 cermin (pekat = dekat target km) ·
+G2 batang progres + garis target · G3 garis tengah + bingkai (hiasan) · G4 kartu sesi (pekat = kepatuhan); boleh gabung.
 
 ## 0b. Tab "Sesi" — T3 + A versi 7, Long run A + Cadence A — **sudah dibuat** (29 Okt)
 
