@@ -6,8 +6,11 @@ Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 ## Daftar perbaikan — dicatat, belum dikerjakan (omPik: jangan langsung mockup)
 
 1. **Penanda minggu aktif di batang target km mingguan** (kotak panjang di sekeliling batang minggu ini, di bawah
-   lintasan) terlalu tegas. Buat lebih tenang. Sekarang: `.wkcol.now{outline:1.5px solid var(--text)}` di
-   `pacelab/web/template.html`.
+   lintasan) terlalu tegas. Buat lebih tenang, atau beri beberapa opsi garis yang lebih tenang. Sekarang:
+   `.wkcol.now{outline:1.5px solid var(--text)}` di `pacelab/web/template.html`.
+2. **Kartu Progres terbaik (5K / 10K / Half / Full) banyak ruang kosong.** Tinggi satu baris kartu ikut kartu Full
+   (status target, + panas, saran), jadi 5K/10K punya celah besar antara angka dan grafik; kartu Half yang belum ada
+   datanya tetap setinggi kartu lain dan hanya berisi "belum ada".
 
 ## 0c. Penilaian pelatih v2 + ikon transparan — **sudah dibuat** (29 Okt)
 
