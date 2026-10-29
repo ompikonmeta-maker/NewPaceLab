@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 13. Validasi kartu Arah (pace zona 2, meter per detak) — menunggu pilihan
+## 13. Validasi kartu Arah (pace zona 2, meter per detak) — dipilih V1 + V2; mockup [`docs/mockup/rincian-arah.html`](mockup/rincian-arah.html), menunggu "gas"
 
 omPik ragu dengan hasil hitungan. Usulan: V1 jendela "rincian hitungan" di tiap kartu (daftar sesi / km yang dipakai per
 minggu + angka + rumus, seperti ⓘ decoupling) supaya bisa dicocokkan dengan Garmin Connect; V2 pace zona 2 memakai lap

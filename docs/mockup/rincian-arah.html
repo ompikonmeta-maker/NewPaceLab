@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: rincian hitungan Arah</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--good:#0f8a0f;--serious:#b54a1f;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f;--serious:#f0956d}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} p.sub{color:var(--muted);margin:0 0 16px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.cards{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.tc{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px;text-align:center}
+.tc h4{margin:0 0 6px;font-size:15px}
+.tc .mx{display:flex;justify-content:center;gap:18px} .tc .nv{font-size:21px;font-weight:700} .tc .nv small{font-size:12px;font-weight:500;opacity:.7}
+.tc .t{color:var(--t)} .tc .r{color:var(--r)}
+.info{position:absolute;right:12px;top:12px;width:28px;height:28px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text-2);cursor:pointer;font:600 13px Georgia,serif}
+.info:hover{border-color:var(--text)}
+.src{display:inline-block;font-size:10.5px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-top:6px}
+/* window */
+.ov{position:fixed;inset:0;z-index:50;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,6,18,0);transition:background .35s}
+.ov.open{background:rgba(8,6,18,.42)}
+.win{width:min(760px,100%);height:min(720px,calc(100vh - 40px));display:flex;flex-direction:column;background:var(--surface);border-radius:20px;box-shadow:0 30px 80px rgba(0,0,0,.25);opacity:0;transform:scale(.96) translateY(10px);transition:opacity .35s,transform .4s cubic-bezier(.34,1.2,.64,1)}
+.ov.open .win{opacity:1;transform:none}
+.wh{display:flex;align-items:center;gap:10px;padding:16px 20px 10px} .wh h3{margin:0;font-size:18px}
+.x{margin-left:auto;width:34px;height:34px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:19px}
+.tabs{display:inline-flex;background:var(--bg);border-radius:10px;padding:3px} .tabs button{border:0;background:none;font:inherit;font-size:13px;padding:3px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
+.tabs button[aria-pressed=true]{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.body{flex:1;overflow:auto;padding:4px 20px 20px;scrollbar-width:thin}
+.form{background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--text-2);margin-bottom:10px}
+.form code{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px;color:var(--text)}
+.wk{border-top:1px solid var(--line)} .wk>button{width:100%;display:flex;align-items:center;gap:10px;border:0;background:none;font:inherit;color:inherit;padding:10px 2px;cursor:pointer;text-align:left}
+.wk>button b{font-size:14px} .wk>button .d{color:var(--muted);font-size:12.5px} .wk>button .res{margin-left:auto;font-weight:700;font-size:15px}
+.wk>button .tag{font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;background:var(--bg);color:var(--muted)}
+.wk.key>button .tag{background:color-mix(in srgb,var(--t) 14%,transparent);color:var(--t)}
+.wk .in{display:none;padding:0 2px 12px} .wk.open .in{display:block}
+table{width:100%;border-collapse:collapse;font-size:12.5px} th{color:var(--muted);font-weight:600;text-align:right;padding:4px 6px;border-bottom:1px solid var(--line)} td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--grid)}
+th:first-child,td:first-child,th:nth-child(2),td:nth-child(2){text-align:left}
+tr.out td{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)} tr.out td.why{text-decoration:none;font-style:italic}
+tr.sum td{border-bottom:0;font-weight:700;color:var(--text)} tr.sum td+td{text-align:right}
+.chip{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:6px;background:var(--bg);color:var(--muted)} .chip.lap{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.diff{margin-top:12px;background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13.5px}
+.how{font-size:12.5px;color:var(--muted);margin-top:10px}
+@media (max-width:640px){.cards{grid-template-columns:1fr}.hide-m{display:none}}
+</style></head><body><div class="wrap">
+<h1>Mockup: rincian hitungan kartu Arah (V1) + pace zona 2 dari lap jam (V2)</h1>
+<p class="sub">Data rekaan. Klik ⓘ di kartu. Semua angka di rincian bisa dicocokkan dengan Garmin Connect: ringkasan lari (jarak, waktu, HR rata-rata) dan tab Lap.</p>
+<div class="cards">
+  <div class="tc"><button class="info" data-k="pz2" aria-label="Rincian hitungan pace di zona 2">i</button><h4>Pace di zona 2</h4><div class="mx num"><span class="nv t">9:28<small>/km</small></span><span class="nv r">9:14<small>/km</small></span></div><span class="src">dari lap jam</span></div>
+  <div class="tc"><button class="info" data-k="ef" aria-label="Rincian hitungan meter per detak">i</button><h4>Meter per detak</h4><div class="mx num"><span class="nv t">0.84<small> m</small></span><span class="nv r">0.78<small> m</small></span></div><span class="src">dari ringkasan Garmin</span></div>
+</div>
+</div>
+<div class="ov" id="ov"><div class="win" role="dialog" aria-modal="true" aria-labelledby="wt">
+  <div class="wh"><h3 id="wt"></h3><div class="tabs" id="who"><button data-c="t" aria-pressed="true">Taofik</button><button data-c="r" aria-pressed="false">Reza</button></div><button class="x" id="x" aria-label="Tutup">×</button></div>
+  <div class="body" id="body"></div></div></div>
+<script>
+const $ = id => document.getElementById(id);
+const P = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`, T = s => `${Math.floor(s / 3600) ? Math.floor(s / 3600) + ":" : ""}${String(Math.floor(s % 3600 / 60)).padStart(Math.floor(s / 3600) ? 2 : 1, "0")}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+const Z2 = {t: [133, 150], r: [139, 152]};
+// rekaan: weeks newest first; each session: date, kind, km, sec, hr, laps [km, sec, hr]
+function mk(c, seed) { const W = [];
+  for (let w = 0; w < 8; w++) { const S = [], base = c === "t" ? 548 + w * 5 : 545 + w * 3;
+    [["Sel", "tempo", 7], ["Kam", "santai", 6], ["Sab", "long run", 14 + (w % 3)], ["Min", "pemulihan", 5]].forEach(([d, k, km], i) => {
+      const laps = []; let sec = 0, hrs = 0; for (let j = 0; j < Math.floor(km); j++) { const p = k === "tempo" && j >= 2 && j < 5 ? base * .7 : base + ((j * 7 + seed + w) % 9) * 6 - 20, h = k === "tempo" && j >= 2 && j < 5 ? 165 : 136 + ((j * 5 + seed + i) % 17) + (k === "long run" && j > 10 ? 6 : 0);
+        laps.push([1, p, h]); sec += p; hrs += h * p; }
+      if (km % 1) laps.push([km % 1, (km % 1) * base, 140]);
+      const day = new Date(2026, 9, 26 - w * 7 + [1, 3, 5, 6][i]);
+      S.push({date: `${d} ${day.getDate()} ${["Agu", "Sep", "Okt", "Nov"][day.getMonth() - 7]}`, kind: k, km, sec: Math.round(sec), hr: Math.round(hrs / sec), laps, src: w === 7 && i === 3 ? "km" : "lap"}); });
+    W.push({label: w === 0 ? "minggu ini" : `${w} mgg lalu`, S}); } return W; }
+const DATA = {t: mk("t", 3), r: mk("r", 7)};
+let K = "pz2", C = "t";
+function pz2Week(c, wk) { let tt = 0, kk = 0; const rows = [];
+  wk.S.forEach(s => { if (s.kind === "tempo") { rows.push(`<tr class="out"><td>${s.date}</td><td>${s.kind}</td><td colspan="4"></td><td class="why">latihan keras tidak dihitung</td></tr>`); return; }
+    s.laps.forEach((l, i) => { const inZ = l[2] >= Z2[c][0] && l[2] < Z2[c][1], ok = l[0] >= .5 && inZ;
+      if (ok) { tt += l[1]; kk += l[0]; }
+      rows.push(`<tr class="${ok ? "" : "out"}"><td>${i ? "" : s.date}</td><td>${i ? "" : s.kind} <span class="chip ${s.src === "lap" ? "lap" : ""}">${s.src === "lap" ? "lap " + (i + 1) : "km " + (i + 1)}</span></td><td>${l[0].toFixed(2)}</td><td>${T(l[1])}</td><td>${P(l[1] / l[0])}</td><td>${l[2]}</td><td class="why">${ok ? "" : l[0] < .5 ? "< 0,5 km" : "HR di luar zona 2"}</td></tr>`); }); });
+  return {res: kk ? tt / kk : null, html: `<table class="num"><thead><tr><th>Tanggal</th><th>Sesi · potongan</th><th>km</th><th>waktu</th><th>pace</th><th>HR</th><th class="hide-m"></th></tr></thead><tbody>${rows.join("")}
+    <tr class="sum"><td colspan="2">Jumlah yang dipakai</td><td>${kk.toFixed(2)}</td><td>${T(tt)}</td><td>${kk ? P(tt / kk) : "–"}</td><td></td><td class="hide-m"></td></tr></tbody></table>`}; }
+function efWeek(c, wk) { const rows = [], v = [];
+  wk.S.forEach(s => { if (s.kind === "tempo") { rows.push(`<tr class="out"><td>${s.date}</td><td>${s.kind}</td><td colspan="4"></td><td class="why">latihan keras tidak dihitung</td></tr>`); return; }
+    const mpm = s.km * 1000 / (s.sec / 60), e = mpm / s.hr; v.push(e);
+    rows.push(`<tr><td>${s.date}</td><td>${s.kind}</td><td>${(s.km * 1000).toLocaleString("id-ID")}</td><td>${T(s.sec)}</td><td>${mpm.toFixed(1)}</td><td>${s.hr}</td><td><b>${e.toFixed(3)}</b></td></tr>`); });
+  const res = v.reduce((q, x) => q + x, 0) / v.length;
+  return {res, html: `<table class="num"><thead><tr><th>Tanggal</th><th>Sesi</th><th>jarak m</th><th>waktu</th><th>m/menit</th><th>HR rata</th><th>m/detak</th></tr></thead><tbody>${rows.join("")}
+    <tr class="sum"><td colspan="6">Rata-rata ${v.length} sesi</td><td>${res.toFixed(2)}</td></tr></tbody></table>`}; }
+function render() { const W = DATA[C], f = K === "pz2" ? pz2Week : efWeek, R = W.map(w => f(C, w)), fmt = v => v == null ? "–" : K === "pz2" ? P(v) + "/km" : v.toFixed(2) + " m";
+  const iNow = R.findIndex(r => r.res != null), iOld = R.length - 1 - [...R].reverse().findIndex(r => r.res != null);
+  $("wt").textContent = K === "pz2" ? "Pace di zona 2 · rincian" : "Meter per detak · rincian";
+  const form = K === "pz2" ? `<b>Rumus:</b> dari lari santai, long run dan pemulihan, ambil <b>lap jam</b> (≥ 0,5 km) yang HR rata-ratanya di zona 2 (${Z2[C][0]}–${Z2[C][1] - 1} bpm), lalu <code>total waktu ÷ total km</code>. Tanpa file FIT: potongan per km dari data per detik (ditandai “km”).<br><b>Cocokkan di Garmin Connect:</b> buka lari → tab <i>Lap</i> → baris yang sama.`
+    : `<b>Rumus per sesi:</b> <code>(jarak m ÷ waktu menit) ÷ HR rata-rata</code>, ketiganya dari ringkasan Garmin. Per minggu: rata-rata sesi, tanpa tempo/interval.<br><b>Cocokkan di Garmin Connect:</b> buka lari → <i>Jarak</i>, <i>Waktu</i>, <i>Detak jantung rata-rata</i>.`;
+  $("body").innerHTML = `<div class="form">${form}</div>` + W.map((w, i) => `<div class="wk ${i === iNow || i === iOld ? "key open" : ""}"><button aria-expanded="${i === iNow || i === iOld}"><b>${w.label}</b><span class="d">${w.S[0].date} – ${w.S[3].date}</span>${i === iNow ? '<span class="tag">sekarang</span>' : i === iOld ? '<span class="tag">8 mgg lalu</span>' : ""}<span class="res num">${fmt(R[i].res)}</span></button><div class="in">${R[i].html}</div></div>`).join("")
+    + `<div class="diff num"><b>Perubahan:</b> ${fmt(R[iNow].res)} − ${fmt(R[iOld].res)} = <b>${K === "pz2" ? Math.round(R[iOld].res - R[iNow].res) + " dtk/km " + (R[iNow].res < R[iOld].res ? "lebih cepat" : "lebih lambat") : (R[iNow].res - R[iOld].res).toFixed(2) + " m"}</b></div>
+    <p class="how">Coret = tidak dipakai, dengan alasannya. Angka besar di kartu = minggu “sekarang”; panah = selisih dengan minggu “8 mgg lalu”.</p>`;
+  $("body").querySelectorAll(".wk>button").forEach(b => b.onclick = () => { const w = b.parentElement, o = !w.classList.contains("open"); w.classList.toggle("open", o); b.setAttribute("aria-expanded", o); }); }
+document.querySelectorAll(".info").forEach(b => b.onclick = () => { K = b.dataset.k; render(); $("ov").style.display = "flex"; requestAnimationFrame(() => requestAnimationFrame(() => $("ov").classList.add("open"))); });
+const close = () => { $("ov").classList.remove("open"); setTimeout(() => $("ov").style.display = "none", 380); };
+$("x").onclick = close; $("ov").onclick = e => { if (e.target === $("ov")) close(); }; addEventListener("keydown", e => e.key === "Escape" && close());
+$("who").onclick = e => { const b = e.target.closest("[data-c]"); if (!b) return; C = b.dataset.c; $("who").querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", x === b)); render(); };
+</script>
+</body></html>
