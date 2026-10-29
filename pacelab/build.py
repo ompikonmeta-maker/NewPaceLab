@@ -89,14 +89,22 @@ def athlete_data(a, data_dir, today):
         "last_done_ms": last_done["ms"] if last_done else None,
         "sync": _read(folder / "state.json", {}).get("last_sync"),
         "run_days": _run_days(in_program),
-        "sessions": [_session(r, streams.get(r["id"])) for r in in_program],
+        "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None)) for r in in_program],
     }
 
 
-def _session(r, stream):
-    """One run for the Sesi tab: totals, per-km splits and (for runs of 10 km or more) decoupling."""
+LAP_TRIG = {"distance": "a", "manual": "m", "session_end": "e", "time": "t", "position": "p"}
+
+
+def _session(r, stream, laps=None):
+    """One run for the Sesi tab: totals, the watch's laps (from its FIT file), per-km splits and (for runs of
+    10 km or more) decoupling. "g" holds the run summary exactly as Garmin reports it."""
     s = {"id": r["id"], "date": r["date"], "time": (r.get("start") or "")[11:16], "km": round(r["km"], 2),
-         "sec": round(r["sec"]), "hr": r.get("avg_hr"), "splits": [], "dec": None, "dec_full": None}
+         "sec": round(r["sec"]), "hr": r.get("avg_hr"), "splits": [], "dec": None, "dec_full": None,
+         "g": r.get("g") or {}, "name": r.get("name"),
+         # [km, seconds (timer), mean HR, mean cadence, trigger a=auto-lap distance m=manual e=end t=time p=position w=other]
+         "laps": [[l["km"], l["sec"], l.get("hr"), l.get("cad"), LAP_TRIG.get(l.get("trigger"), "w")]
+                  for l in (laps or {}).get("laps", []) if l.get("km") is not None and l.get("sec")]}
     if stream:
         s["splits"] = m.per_km(stream)
         if r["km"] >= m.LONG_RUN_MIN_KM:

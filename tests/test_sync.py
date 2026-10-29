@@ -53,6 +53,26 @@ class SyncTest(unittest.TestCase):
         self.assertEqual(r2["new_runs"], 0)
         self.assertLess(r2["requests"], 15)
 
+    def test_fit_gives_laps_and_fills_old_runs(self):
+        out = self.tmp / "REZA"
+        Syncer(self.client(), out, log=lambda *a: None).run(TODAY - dt.timedelta(days=150), TODAY)
+        runs = json.loads((out / "runs.json").read_text())
+        old = [r for r in runs if r["date"] < (TODAY - dt.timedelta(days=120)).isoformat()]
+        self.assertTrue(old)
+        for r in runs:   # every run has laps from its FIT file and per-second data (old ones only from the FIT)
+            self.assertTrue((out / "laps" / ("%s.json" % r["id"])).is_file())
+            self.assertTrue((out / "streams" / ("%s.json" % r["id"])).is_file())
+        s = json.loads((out / "streams" / ("%s.json" % old[0]["id"])).read_text())
+        self.assertEqual(s["keys"], ["fit"])
+        self.assertAlmostEqual(s["d"][-1] / 1000, old[0]["km"], delta=.05)
+        lp = json.loads((out / "laps" / ("%s.json" % runs[-1]["id"])).read_text())["laps"]
+        self.assertAlmostEqual(sum(l["km"] for l in lp), runs[-1]["km"], delta=.05)
+        self.assertEqual(lp[-1]["trigger"], "session_end")
+        self.assertIn("hr_max", runs[-1]["g"])
+        self.assertIn("te_aer", runs[-1]["g"])
+        tempo = [r for r in runs if r["g"].get("te_label") == "TEMPO"]
+        self.assertIn("manual", [l["trigger"] for l in json.loads((out / "laps" / ("%s.json" % tempo[-1]["id"])).read_text())["laps"]])
+
     def test_old_streams_downloaded_once_more_for_cadence(self):
         out = self.tmp / "REZA"
         Syncer(self.client(), out, log=lambda *a: None).run(dt.date(2026, 10, 1), TODAY)
@@ -105,7 +125,7 @@ class SyncTest(unittest.TestCase):
         with contextlib.redirect_stdout(buf):
             cli.cmd_inspect(cfg, [a for a in cfg["athletes"] if a["id"] == "REZA"], base=self.base)
         out = buf.getvalue()
-        for n in ("lari: daftar aktivitas", "lari: data per detik", "lari: file FIT: 404", "lari: ringkasan",
+        for n in ("lari: daftar aktivitas", "lari: data per detik", "lari: file FIT: BOLEH", "lari: ringkasan",
                   "lari: splits", "lari: typedsplits", "lari: split_summaries"):
             self.assertIn(n, out)
         self.assertNotIn("demo-reza", out)

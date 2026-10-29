@@ -6,8 +6,8 @@ probe report; run `python pacelab.py check` on real data to confirm them.
 
 Usage: python tools/mock_garmin.py [port]   (keys: demo-taofik, demo-reza)
 """
-import math
 import datetime as dt
+import math
 import json
 import random
 import re
@@ -16,11 +16,14 @@ import threading
 import urllib.parse
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
+import fitgen
+
 PROFILES = {
     "demo-taofik": {"seed": 7, "easy": 470, "hr": 142, "fit_gain": .12, "rhr": 52, "hrv": 52, "sleep": 6.6, "bb": 72, "kg": 68.0},
     "demo-reza": {"seed": 11, "easy": 545, "hr": 146, "fit_gain": .10, "rhr": 61, "hrv": 36, "sleep": 5.8, "bb": 50, "kg": 81.5},
 }
 START = dt.date(2026, 3, 23)
+DETAILS_DAYS = 120   # like Garmin: per-second details only for recent runs; the FIT file always
 MS1 = dt.date(2026, 6, 22)
 
 
@@ -65,7 +68,7 @@ class Athlete:
         p = PROFILES[key]
         self.p, self.today = p, today
         rnd = random.Random(p["seed"])
-        self.runs, self.streams, self.well = [], {}, {}
+        self.runs, self.streams, self.well, self.fits = [], {}, {}, {}
         day, aid = START, p["seed"] * 10 ** 8
         while day <= today:
             ms = (day - MS1).days // 7 + 1
@@ -79,35 +82,52 @@ class Athlete:
                 if day == dt.date(2026, 10, 11):  # 5K race
                     dist, pace = 5.02, p["easy"] * fitness * .74
                 aid += 1
-                self._add_run(aid, day, dist, pace, rnd, race=day == dt.date(2026, 10, 11))
+                self._add_run(aid, day, dist, pace, rnd, race=day == dt.date(2026, 10, 11),
+                              tempo=day.weekday() == 1 and dist >= 6)
             self._add_day(day, rnd, prog)
             day += dt.timedelta(days=1)
 
-    def _add_run(self, aid, day, km, pace, rnd, race=False):
+    def _add_run(self, aid, day, km, pace, rnd, race=False, tempo=False):
         step, t, d, hr, rows = 5, 0.0, 0.0, [], []
         total = km * 1000
         drift = rnd.uniform(.04, .14) if km >= 10 else .02
         while d < total:
             frac = d / total
-            v = 1000 / (pace * (1 + rnd.uniform(-.03, .03)))
-            h = self.p["hr"] * (1.12 if race else 1) * (1 + drift * frac) + rnd.uniform(-2, 2)
+            hard = tempo and 2500 <= d < 5500           # a tempo block after warm-up and strides
+            v = 1000 / (pace * (.8 if hard else 1) * (1 + rnd.uniform(-.03, .03)))
+            h = self.p["hr"] * (1.12 if race or hard else 1) * (1 + drift * frac) + rnd.uniform(-2, 2)
             cad = (172 if self.p["hr"] > 145 else 168) + rnd.uniform(-2, 2) - (5 * frac if km >= 15 else 1 * frac)
             ele = 15 + 8 * math.sin(d / 1700.0) + 4 * math.sin(d / 430.0)
             rows.append([t, round(d, 1), round(h), round(v, 3), round(cad), round(ele, 1)])
             t += step
             d = min(total, d + v * step)
         rows.append([t, round(total, 1)] + rows[-1][2:])
+        start = dt.datetime.combine(day, dt.time(5, rnd.randint(30, 59)))
+        self.fits[aid] = ([(r[0], r[1], r[2], r[4], r[5]) for r in rows], int(start.replace(tzinfo=dt.timezone.utc).timestamp()) - 7 * 3600,
+                          (2160, 2320, 2480) if tempo else ())
+        old = day < self.today - dt.timedelta(days=DETAILS_DAYS)
         self.streams[aid] = {
-            "activityId": aid, "measurementCount": len(rows), "metricsCount": 6,
+            "activityId": aid, "measurementCount": 6, "metricsCount": 0 if old else len(rows),
             "metricDescriptors": [{"metricsIndex": 0, "key": "sumDuration"}, {"metricsIndex": 1, "key": "sumDistance"},
                                   {"metricsIndex": 2, "key": "directHeartRate"}, {"metricsIndex": 3, "key": "directSpeed"},
                                   {"metricsIndex": 4, "key": "directDoubleCadence"}, {"metricsIndex": 5, "key": "directElevation"}],
-            "activityDetailMetrics": [{"metrics": r} for r in rows]}
+            "activityDetailMetrics": [] if old else [{"metrics": r} for r in rows]}
         self.runs.append({
             "activityId": aid, "activityName": "Lari" if not race else "Race 5K",
             "activityType": {"typeKey": "running"},
-            "startTimeLocal": "%s 05:%02d:00" % (day.isoformat(), rnd.randint(30, 59)),
-            "distance": round(total, 1), "duration": round(t, 1), "averageHR": round(sum(r[2] for r in rows) / len(rows))})
+            "startTimeLocal": start.strftime("%Y-%m-%d %H:%M:%S"),
+            "distance": round(total, 1), "duration": round(t, 1), "averageHR": round(sum(r[2] for r in rows) / len(rows)),
+            "movingDuration": round(t - 4, 1), "elapsedDuration": round(t + 30, 1), "maxHR": max(r[2] for r in rows),
+            "averageRunningCadenceInStepsPerMinute": round(sum(r[4] for r in rows) / len(rows), 1),
+            "maxRunningCadenceInStepsPerMinute": max(r[4] for r in rows), "averageSpeed": round(total / t, 3),
+            "elevationGain": round(sum(max(0, b[5] - a[5]) for a, b in zip(rows, rows[1:])), 1),
+            "elevationLoss": round(sum(max(0, a[5] - b[5]) for a, b in zip(rows, rows[1:])), 1),
+            "avgStrideLength": round(total / t / (sum(r[4] for r in rows) / len(rows) / 60) * 100, 1),
+            "aerobicTrainingEffect": round(min(5, 1.6 + km / 8 + (1 if tempo or race else 0)), 1),
+            "anaerobicTrainingEffect": round(1.4 if tempo or race else .3, 1),
+            "trainingEffectLabel": "TEMPO" if tempo else "VO2MAX" if race else "AEROBIC_BASE",
+            "activityTrainingLoad": round(km * 9 * (1.4 if tempo or race else 1), 1), "calories": round(km * 68),
+            "lapCount": int(total // 1000) + 1 + (3 if tempo else 0), "minTemperature": 26.0, "maxTemperature": 31.0})
 
     def _add_day(self, day, rnd, prog):
         p = self.p
@@ -131,6 +151,10 @@ class Athlete:
             rs = sorted(rs, key=lambda r: r["startTimeLocal"], reverse=True)
             s, n = int(q.get("start", 0)), int(q.get("limit", 20))
             return rs[s:s + n]
+        m = re.match(r"/download-service/files/activity/(\d+)$", path)
+        if m and int(m.group(1)) in self.fits:
+            rows, start, manual = self.fits[int(m.group(1))]
+            return RawBody(fitgen.zipped(fitgen.write_fit(rows, start, manual=manual), "%s_ACTIVITY.fit" % m.group(1)))
         m = re.match(r"/activity-service/activity/(\d+)/details$", path)
         if m:
             return self.streams.get(int(m.group(1)))
@@ -155,6 +179,10 @@ class Athlete:
             return {"dailyWeightSummaries": [{"summaryDate": k, "latestWeight": {"weight": v["kg"] * 1000}}
                                              for k, v in self.days(m.group(1), m.group(2)) if v["kg"]]}
         return None
+
+
+class RawBody(bytes):
+    """A binary answer (the FIT zip), sent as is."""
 
 
 def make_server(port=0, today=None):
@@ -193,6 +221,12 @@ def make_server(port=0, today=None):
             u = urllib.parse.urlparse(self.path)
             q = {k: v[0] for k, v in urllib.parse.parse_qs(u.query).items()}
             resp = ath.respond(u.path, q)
+            if isinstance(resp, RawBody):
+                self.send_response(200)
+                self.send_header("Content-Type", "application/x-zip-compressed")
+                self.send_header("Content-Length", str(len(resp)))
+                self.end_headers()
+                return self.wfile.write(resp)
             self._send(200 if resp is not None else 404, resp)
 
     srv = ThreadingHTTPServer(("127.0.0.1", port), H)

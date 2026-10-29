@@ -43,6 +43,21 @@ class FitTest(unittest.TestCase):
             z.writestr("123_ACTIVITY.fit", build_fit(self.LAPS))
         self.assertEqual(len(fit.read(buf.getvalue())["laps"]), 4)
 
+    def test_stream_from_records_uses_timer_time(self):
+        import sys
+        from pathlib import Path
+        sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "tools"))
+        import fitgen
+        rows = [(i * 5.0, i * 5 * 3.0, 150, 170, 20.0) for i in range(500)]          # 3 m/s, 2495 s, 7.5 km
+        r = fit.read(fitgen.zipped(fitgen.write_fit(rows, 1790000000, manual=(2100, 2250))))
+        s = r["stream"]
+        self.assertEqual(len(s["t"]), 500)
+        self.assertEqual(s["t"][-1], 2495)
+        self.assertEqual(s["cad"][0], 170)
+        self.assertEqual(s["el"][0], 20.0)
+        self.assertEqual([l["trigger"] for l in r["laps"]][:4], ["distance", "distance", "manual", "manual"])
+        self.assertAlmostEqual(sum(l["km"] for l in r["laps"]), 7.485, delta=.01)
+
     def test_not_fit(self):
         with self.assertRaises(ValueError):
             fit.read(b'{"error":"NOT_FOUND"}')

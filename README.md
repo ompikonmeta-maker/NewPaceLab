@@ -73,6 +73,9 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   pace di zona 2, meter per detak, jarak per minggu, long run terjauh menuju 42K, decoupling, cadence vs target.
 - Rencana per hari dibaca dari teks sel Kalender Excel: `Total X km` (atau `X km` pertama), rentang pace `m:ss - m:ss/km`
   ("3 km pertama" = rentang pembukaan), "Detak jantung lo - hi" atau "di bawah X", "Pemanasan X km", "Tempo X km".
+- Sync juga mengunduh **file FIT asli dari jam** untuk setiap lari (sekali): lap persis seperti di jam, dan data per
+  detik untuk lari yang detail Garmin-nya kosong (Garmin hanya memberi detail ±120 hari terakhir). Ringkasan Garmin per
+  lari (HR maks, cadence, elevasi, training effect, beban, power, suhu, langkah, jumlah lap) disimpan apa adanya.
 - Cadence dan elevasi per detik ikut diunduh. **Update berikutnya mengunduh ulang semua lari sekali** (lebih lama);
   setelah itu kembali inkremental. Kalau cadence kosong pada data asli: `python pacelab.py inspect`.
 
@@ -145,7 +148,8 @@ pacelab/garmin.py     client Personal API (token 24 jam, retry, key tidak pernah
 pacelab/sync.py       sync inkremental → data/<ATLET>/
 pacelab/program.py    pembaca Excel program (xlsx.py: pembaca .xlsx tanpa library)
 pacelab/metrics.py    semua perhitungan
-pacelab/fit.py        pembaca file FIT Garmin (lap, sesi, jumlah record) tanpa library
+pacelab/fit.py        pembaca file FIT Garmin (lap, sesi, data per detik) tanpa library
+tools/fitgen.py       penulis file FIT kecil untuk server tiruan dan tes
 pacelab/build.py      data → dist/dashboard.html (web/template.html)
 tools/mock_garmin.py  server Garmin tiruan untuk tes & demo
 tests/                python -m unittest discover -s tests

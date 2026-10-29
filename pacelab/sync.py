@@ -1,7 +1,8 @@
 """Incremental download of one athlete's runs and wellness into data/<ID>/.
 
   runs.json        normalized run summaries
-  streams/<id>.json   {"t","d","hr","cad","el","v"} per run (from activity details)
+  streams/<id>.json   {"t","d","hr","cad","el","v"} per run (from activity details, else from the FIT file)
+  laps/<id>.json      {"laps": [...], "session": {...}} as recorded on the watch (from the FIT file)
   wellness.json    {"YYYY-MM-DD": {"sleep_s","sleep_score","hrv","hrv_status","bb","rhr","weight"}}
   state.json       what is already downloaded
 
@@ -11,8 +12,11 @@ Field names are read defensively; `pacelab.py check` reports what was found.
 import datetime as dt
 import json
 import re
+import struct
+import zipfile
 from pathlib import Path
 
+from . import fit
 from .garmin import ApiError
 
 ACT_LIST = "/activitylist-service/activities/search/activities"
@@ -32,7 +36,8 @@ WEIGHT = "/weight-service/weight/range/%s/%s"
 CHUNK = {"sleep": 28, "hrv": 180, "bb": 28, "daily": 28, "weight": 180}
 REFETCH_DAYS = 3  # late-arriving sleep/HRV for the last nights
 SCHEMA = 3  # bump when wellness parsing changes: the full history is re-read once
-STREAM_V = 2  # bump when per-second parsing changes: every stream is downloaded once more (2: cadence, elevation)
+STREAM_V = 2
+FIT_V = 1         # bump to download every run's FIT file once more  # bump when per-second parsing changes: every stream is downloaded once more (2: cadence, elevation)
 RHR_KEY = re.compile(r"resting_?heart_?rate(_?value)?$|^rhr$", re.I)
 DATE_KEY = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -125,6 +130,19 @@ def key_tree(obj, prefix="", depth=0, out=None):
 
 # ------------------------------------------------------------------ normalize
 
+# activity-list field -> short key in runs.json "g" (all optional; units as Garmin sends them)
+GARMIN_FIELDS = [
+    ("moving_s", "movingDuration"), ("elapsed_s", "elapsedDuration"), ("hr_max", "maxHR"),
+    ("cad", "averageRunningCadenceInStepsPerMinute"), ("cad_max", "maxRunningCadenceInStepsPerMinute"),
+    ("speed", "averageSpeed"), ("speed_max", "maxSpeed"), ("gain_m", "elevationGain"), ("loss_m", "elevationLoss"),
+    ("stride_cm", "avgStrideLength"), ("gct_ms", "avgGroundContactTime"), ("vo_cm", "avgVerticalOscillation"),
+    ("vr_pct", "avgVerticalRatio"), ("power", "avgPower"), ("power_max", "maxPower"), ("power_norm", "normPower"),
+    ("te_aer", "aerobicTrainingEffect"), ("te_ana", "anaerobicTrainingEffect"), ("te_label", "trainingEffectLabel"),
+    ("load", "activityTrainingLoad"), ("lt_bpm", "lactateThresholdBpm"), ("kcal", "calories"), ("steps", "steps"),
+    ("temp_min", "minTemperature"), ("temp_max", "maxTemperature"), ("laps", "lapCount"), ("pr", "isPR"),
+    ("water_ml", "waterEstimated")]
+
+
 def norm_run(a):
     dist = pick(a, "distance") or 0
     return {
@@ -136,6 +154,8 @@ def norm_run(a):
         "km": round(dist / 1000.0, 3),
         "sec": round(pick(a, "duration", "movingDuration", "elapsedDuration") or 0, 1),
         "avg_hr": pick(a, "averageHR"),
+        # everything else Garmin already summarises for the run, kept as Garmin reports it
+        "g": {k: v for k, v in ((k, a.get(f)) for k, f in GARMIN_FIELDS) if v is not None},
     }
 
 
@@ -239,6 +259,9 @@ class Syncer:
         self.unavailable = []
         self.no_stream = set(self.state.get("no_stream", []))
         self.refetch = self.state.get("stream_v", 1) < STREAM_V  # older streams lack cadence/elevation
+        self.no_fit = set(self.state.get("no_fit", []))
+        if self.state.get("fit_v", 0) < FIT_V:
+            self.no_fit = set()
 
     def run(self, since, until):
         new_runs = self.sync_runs(since, until)
@@ -268,11 +291,14 @@ class Syncer:
                     new += 1
                     if new % 25 == 0:
                         self.log("    %d lari diunduh..." % new)
+                if not (self.dir / "laps" / ("%s.json" % r["id"])).is_file() and r["id"] not in self.no_fit:
+                    self._fit(r)
                 self.runs[r["id"]] = r
             _write(self.dir / "runs.json", sorted(self.runs.values(), key=lambda x: x["start"] or x["date"]))
             if len(items) < page:
                 self.refetch = False
                 self.state["stream_v"] = STREAM_V
+                self.state["fit_v"] = FIT_V
                 return new
             start += page
 
@@ -285,6 +311,29 @@ class Syncer:
             self.no_stream.add(r["id"])  # asked once; not retried on later syncs
             self.state["no_stream"] = sorted(self.no_stream)
             self.log("    ! %s %.1f km: data per detik tidak tersedia" % (r["date"], r["km"]))
+
+    def _fit(self, r):
+        """The watch's own file: laps as recorded, and the per-second data when the details answer was empty
+        (Garmin's details stop for runs older than ~120 days; the FIT file does not)."""
+        try:
+            blob = self.c.get(FIT_DOWNLOAD % r["id"], raw=True)
+        except ApiError:
+            return                      # a passing failure: asked again on the next sync
+        try:
+            got = fit.read(blob) if blob else None
+        except (ValueError, KeyError, IndexError, struct.error, zipfile.BadZipFile):
+            got = None
+        if not got:
+            self.no_fit.add(r["id"])
+            self.state["no_fit"] = sorted(self.no_fit)
+            return
+        _write(self.dir / "laps" / ("%s.json" % r["id"]), {"laps": got["laps"], "session": got["session"]})
+        sp = self.dir / "streams" / ("%s.json" % r["id"])
+        if got["stream"] and not sp.is_file():
+            _write(sp, dict(got["stream"], v=STREAM_V, keys=["fit"]))
+            self.no_stream.discard(r["id"])
+            self.state["no_stream"] = sorted(self.no_stream)
+            self.log("    + %s %.1f km: data per detik dari file FIT" % (r["date"], r["km"]))
 
     # -------------------------------------------------------------- wellness
     def sync_wellness(self, since, until):

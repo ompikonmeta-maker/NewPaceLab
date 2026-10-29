@@ -132,8 +132,8 @@ def inspect_run(c, rid):
         print("  lari: details gagal (%s)" % e)
     if isinstance(det, dict):
         rows = len(det.get("activityDetailMetrics") or [])
-        print("  lari: data per detik: %d baris diterima, measurementCount %s, metricsCount %s, totalMetricsCount %s, %d metrik"
-              % (rows, det.get("measurementCount"), det.get("metricsCount"), det.get("totalMetricsCount"), len(det.get("metricDescriptors") or [])))
+        print("  lari: data per detik: %d baris diterima dari %s baris (metricsCount), %d jenis metrik"
+              % (rows, det.get("metricsCount"), len(det.get("metricDescriptors") or [])))
     try:
         blob = c.get(S.FIT_DOWNLOAD % rid, raw=True)
     except (ApiError, AuthError) as e:
