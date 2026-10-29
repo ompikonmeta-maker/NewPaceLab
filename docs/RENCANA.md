@@ -11,6 +11,14 @@ tempo / pendinginan, per km di dalamnya); B2 lap ditebak dari perubahan kecepata
 di `python pacelab.py check` (baris "stream keys") — bila ada indeks lap, lap asli bisa dibangun ulang.
 Hasil `check` (29 Okt): tidak ada metrik lap. Saran: B1 utama, per km cadangan — menunggu pilihan omPik.
 
+## 9b. Contoh file FIT dari omPik (27 Okt, Taofik) — lap lengkap ada di FIT
+
+Dibaca dengan pembaca FIT Python standar (uji coba di scratchpad): 12 lap, 3976 record per detik, sesi 8,49 km.
+Lap 1–2 auto-lap 1 km (8:42, 8:40), lap 3–5 lap manual ±160 m, lap 6–8 tempo 1 km (6:11, 5:54, 5:50),
+lap 9–11 auto-lap 1 km, lap 12 sisa 14 m (akhir sesi). Jadi lap asli tersedia di FIT. Langkah berikut:
+cek apakah key pribadi boleh mengunduh FIT (`/download-service/files/activity/<id>`); kalau tidak, FIT diekspor
+manual ke folder lokal dan dibaca dashboard.
+
 ## 10. Lari tanpa data per detik — perlu dicek
 
 `check` 29 Okt: Taofik 71/90 lari punya data per detik, Reza 65/89. 19 + 24 lari tanpa data per detik tidak punya
