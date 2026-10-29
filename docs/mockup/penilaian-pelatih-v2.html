@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: penilaian pelatih v2</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:40px 0 4px} p.sub{color:var(--muted);margin:0 0 16px;font-size:13.5px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:18px 20px;margin-bottom:14px}
+.num{font-variant-numeric:tabular-nums}
+.t{color:var(--t)} .r{color:var(--r)}
+/* runner demo */
+.demo{position:relative;height:340px;overflow:auto;border-radius:16px;border:1px solid var(--line);background:var(--bg);scrollbar-width:none}
+.demo::-webkit-scrollbar{display:none}
+.demo .in{padding:20px 90px 260px}
+.demo .blk{height:64px;border-radius:14px;background:var(--surface);border:1px solid var(--line);margin:0 -70px 18px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;color:var(--text-2);font-size:13.5px}
+.demo .gap{height:90px;display:grid;place-items:center;color:var(--muted);font-size:12px}
+.fr{position:sticky;float:left;top:140px;margin-left:-82px;width:56px;text-align:center;transition:opacity .25s var(--ease);pointer-events:none;height:0;overflow:visible}
+.fr.R{float:right;margin-left:0;margin-right:-82px}
+.fr svg{width:40px;height:32px} .fr b{display:block;font-size:12px}
+.fr.dim{opacity:.18}
+/* checks */
+.sess{display:grid;grid-template-columns:1fr 170px 1fr;gap:4px 14px;align-items:center}
+.sess .hd{grid-column:1/-1;text-align:center;margin-bottom:6px} .sess .hd b{font-size:15px} .sess .hd span{display:block;color:var(--muted);font-size:12.5px}
+.row{display:contents} .row[hidden]{display:none} .row>div{padding:7px 0;border-top:1px solid var(--line)}
+.L{display:flex;justify-content:flex-end;align-items:center;gap:8px;text-align:right} .R{display:flex;align-items:center;gap:8px}
+.C{text-align:center;color:var(--muted);font-size:12.5px;line-height:1.3}
+.val{color:var(--text-2);font-size:13.5px} .val small{display:block;color:var(--muted);font-size:11.5px}
+.ic{width:18px;height:18px;flex:none} .ok{color:var(--good)} .wn{color:var(--warn)} .na{color:var(--muted)}
+.new{display:inline-block;font-size:10.5px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:6px;padding:0 5px;margin-left:4px;vertical-align:1px}
+.kms{display:flex;gap:3px;flex-wrap:wrap} .L .kms{justify-content:flex-end}
+.km{font-size:11px;border-radius:5px;padding:1px 5px;background:var(--bg);border:1px solid var(--line);color:var(--text-2)}
+.km.f{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:700}
+.km.x{opacity:.45;text-decoration:line-through}
+.pills{display:flex;gap:6px;justify-content:center;margin:10px 0 2px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:4px 12px;font:inherit;font-size:12.5px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.verd{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.verd div{background:var(--bg);border-radius:12px;padding:10px 12px;font-size:13px;color:var(--text-2)} .verd div:first-child{text-align:right}
+table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:7px 8px;border-top:1px solid var(--line);vertical-align:top} th{color:var(--muted);font-weight:600}
+code,pre{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px} pre{background:var(--bg);border-radius:12px;padding:12px;overflow:auto;margin:0}
+.q{border-left:3px solid var(--text);padding:4px 0 4px 14px;margin:12px 0}
+.q b{display:block} .q span{color:var(--text-2);font-size:13.5px}
+@media (max-width:640px){.sess{grid-template-columns:1fr 92px 1fr;gap:4px 8px}.val{font-size:12.5px}.verd{grid-template-columns:1fr}.verd div:first-child{text-align:left}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body><div class="wrap">
+
+<h1>Mockup: penilaian pelatih v2 + ikon pelari transparan</h1>
+<p class="sub">Data rekaan, dibentuk dari contoh nyata di pesan omPik (long run Reza 25 Okt, tempo Taofik 27 Okt). Belum diterapkan ke dashboard.</p>
+
+<h2>1. Ikon pelari transparan saat menutupi data</h2>
+<p class="sub">Scroll kotak di bawah. Ikon tetap di tempat parkirnya; begitu ada kartu/angka di belakangnya, ikon memudar (18%). Di ruang kosong kembali penuh.</p>
+<div class="demo" id="demo"><div class="in">
+  <div class="fr" id="fT"><svg viewBox="0 0 20 16"><path fill="var(--t)" d="M11 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM8 5l3 .5 2 3 3 .5-.3 1.4-3.6-.6-1-1.4-1 3 2.4 2-.8 3.6-1.5-.3.6-2.7-2.6-1.8L7 15H5.3l2.2-6.2L6.4 9 5 11 3.8 10.2 5.7 7z"/></svg><b class="t">Taofik</b></div>
+  <div class="fr R" id="fR"><svg viewBox="0 0 20 16"><path fill="var(--r)" d="M11 1.5a1.5 1.5 0 1 1 0 3 1.5 1.5 0 0 1 0-3zM8 5l3 .5 2 3 3 .5-.3 1.4-3.6-.6-1-1.4-1 3 2.4 2-.8 3.6-1.5-.3.6-2.7-2.6-1.8L7 15H5.3l2.2-6.2L6.4 9 5 11 3.8 10.2 5.7 7z"/></svg><b class="r">Reza</b></div>
+  <div class="gap">ruang kosong</div>
+  <div class="blk"><span>9.1 km · 6:50/km</span><span>7.9 km · 8:11/km</span></div>
+  <div class="blk"><span>143 bpm</span><span>147 bpm</span></div>
+  <div class="gap">ruang kosong</div>
+  <div class="blk"><span>Pemanasan 2 km ✓</span><span>✓ Pemanasan 2 km</span></div>
+  <div class="gap">ruang kosong</div>
+  <div class="blk"><span>Z2 100%</span><span>Z2 100%</span></div>
+</div></div>
+
+<h2>2. Penilaian pelatih per jenis sesi</h2>
+<p class="sub">Label <span class="new">baru</span> = aturan yang berubah. Kotak kecil = km per km; kuning = km yang ditandai, coret = tidak dihitung.</p>
+
+<!-- long run -->
+<div class="card">
+  <div class="sess">
+    <div class="hd"><b>Sabtu 25 Okt · Long run 20 km</b><span>HR 139–152 · easy 8:45–9:20 (Reza) · 8:40–9:15 (Taofik) · suhu 31–34°C</span></div>
+    <div class="row"><div class="L"><span class="val num">20.1 / 20 km<small>101%</small></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Jarak 95–110% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">20.0 / 20 km<small>100%</small></span></div></div>
+    <div class="row"><div class="L"><span class="val num">9:31/km</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Buka 3 km pelan</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">9:44/km</span></div></div>
+    <div class="row" id="lrA"><div class="L"><span class="val num">95% km<small>1 km di atas 152</small></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">HR tidak lewat batas<br>≥ 75% km <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">75% km<small>km 16–20 di atas 152</small></span></div></div>
+    <div class="row" id="lrB" hidden><div class="L"><span class="val num">km 13 lewat<small>bukan di 25% akhir</small></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">HR lewat batas hanya di 25% akhir, decoupling &lt; 8% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">km 16–20 · dec 5,0%<small>boleh: drift karena panas</small></span></div></div>
+    <div class="row"><div class="L"><span class="val num">9:24/km</span><svg class="ic na"><use href="#na"/></svg></div><div class="C">Pace rata <span class="new">tidak dinilai</span></div><div class="R"><svg class="ic na"><use href="#na"/></svg><span class="val num">9:37/km<small>dulu: gagal (70% di rentang)</small></span></div></div>
+    <div class="row"><div class="L"><span class="val num">6,2%</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Decoupling &lt; 8%</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">5,0%</span></div></div>
+    <div class="row"><div class="L"><span class="val num">−2 spm</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Cadence bertahan</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">−3 spm</span></div></div>
+    <div class="row"><div class="L"><span class="val num">3:11:20</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Di bawah 210 mnt</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">3:12:40</span></div></div>
+  </div>
+  <div class="pills" role="group" aria-label="Aturan HR long run"><button class="pill" aria-pressed="true" data-o="A">Opsi A: ≥ 75% km</button><button class="pill" aria-pressed="false" data-o="B">Opsi B: lewat hanya di 25% akhir + dec &lt; 8%</button></div>
+</div>
+
+<!-- tempo -->
+<div class="card">
+  <div class="sess">
+    <div class="hd"><b>Selasa 27 Okt · Tempo 3 km</b><span>Pemanasan 2 km · tempo Taofik 6:00–6:10 · Reza 7:10–7:20 (HR jadi patokan)</span></div>
+    <div class="row"><div class="L"><span class="val num">9.1 / 8 km<small>114%</small></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">Jarak 95–110% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">7.9 / 8 km<small>99%</small></span></div></div>
+    <div class="row"><div class="L"><span class="kms"><span class="km f">5:54</span><span class="km f">5:51</span><span class="km">6:04</span></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">Pace tempo per km ±5 dtk <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="kms"><span class="km">7:18</span><span class="km">7:14</span><span class="km">7:12</span></span></div></div>
+    <div class="row"><div class="L"><span class="val num">2 km sedikit terlalu cepat<small>batas cepat 5:55</small></span></div><div class="C"></div><div class="R"><span class="val num">semua di rentang<small>7:05–7:25</small></span></div></div>
+    <div class="row"><div class="L"><span class="kms"><span class="km x">152</span><span class="km">160</span><span class="km">161</span></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">HR tempo ≤ batas<br>km 1 tempo tidak dihitung <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="kms"><span class="km x">150</span><span class="km">158</span><span class="km">161</span></span></div></div>
+    <div class="row"><div class="L"><span class="val num">8:52/km · 138 bpm</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Pemanasan ≥ 8:40 / 8:45<br>dan HR ≤ batas Z2 <span class="new">baru</span></div><div class="R"><svg class="ic wn"><use href="#wn"/></svg><span class="val num">8:31/km · 149 bpm<small>lebih cepat dari 8:45</small></span></div></div>
+  </div>
+  <div class="verd"><div><b class="t">Taofik:</b> 2 km tempo sedikit terlalu cepat, jarak 114%. 💡 Km pertama tempo di pace paling lambat dari rentang.</div><div><b class="r">Reza:</b> pemanasan terlalu cepat. 💡 Pemanasan benar-benar santai sebelum tempo.</div></div>
+</div>
+
+<!-- easy -->
+<div class="card">
+  <div class="sess">
+    <div class="hd"><b>Minggu 26 Okt · Easy 8 km</b><span>HR 133–151 (Taofik) · 139–153 (Reza)</span></div>
+    <div class="row"><div class="L"><span class="val num">10.0 / 8 km<small>125% · lebih dari 110%</small></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">Jarak 95–110% <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">8.2 / 8 km<small>103%</small></span></div></div>
+    <div class="row"><div class="L"><span class="val num">0 km di atas 151</span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">HR: hanya km di ATAS batas atas yang dihitung (≤ 20%) <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">1 km di atas 153<small>12% · Z1 boleh</small></span></div></div>
+    <div class="row"><div class="L"><span class="kms"><span class="km f">8:31</span><span class="km">8:58</span><span class="km">9:20</span><span class="km">9:41</span><span class="km">…</span></span><svg class="ic wn"><use href="#wn"/></svg></div><div class="C">Km lebih cepat dari batas cepat <span class="new">baru</span><br>lebih lambat tidak apa-apa</div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="kms"><span class="km">9:02</span><span class="km">9:30</span><span class="km">9:55</span><span class="km">…</span></span></div></div>
+  </div>
+  <div class="verd"><div><b class="t">Taofik:</b> 10 km dari rencana 8 km (125%). 💡 Aturan 110%: tambahan jarak masuk ke long run berikutnya, bukan hari santai.</div><div><b class="r">Reza:</b> sesi bersih, semua sesuai rencana.</div></div>
+</div>
+
+<!-- gate cut -->
+<div class="card">
+  <div class="sess">
+    <div class="hd"><b>Sabtu 18 Okt · Long run 20 km</b><span>Gerbang pagi Reza: tidur 5,7 j → long run dipotong 20% (dokumen §7)</span></div>
+    <div class="row"><div class="L"><span class="val num">20.3 / 20 km<small>102%</small></span><svg class="ic ok"><use href="#ok"/></svg></div><div class="C">Jarak 95–110%<br>target ikut potongan gerbang <span class="new">baru</span></div><div class="R"><svg class="ic ok"><use href="#ok"/></svg><span class="val num">16.1 / 16 km<small>dipotong 20% · patuh</small></span></div></div>
+  </div>
+</div>
+
+<h2>3. Angka diambil dari profil pelari, bukan dari kode</h2>
+<p class="sub">Zona, rentang pace dan target per pelari di <code>config.json</code>; batas penilaian di satu blok <code>coach</code> (bisa ditimpa per pelari). Rentang dari sel Excel hari itu tetap dipakai lebih dulu; profil jadi cadangan.</p>
+<div class="card"><pre>"coach": {"km": [0.95, 1.10], "hr_over_max": 0.20, "lr_hr_in": 0.75, "tol_s": 5,
+          "open_tol_s": 10, "cad_drop": 5, "lr_max_min": 210, "dec_max": 8},
+"athletes": [
+ {"id": "TAOFIK", "zones": [133,151,162,177], "cadence": [168,172], "weight_floor": 65,
+  "pace": {"rec": ["9:15","9:45"], "easy": ["8:40","9:15"], "mp": ["7:15","7:30"],
+           "tempo": ["6:00","6:10"], "interval": ["6:00","6:15"]}},
+ {"id": "REZA",   "zones": [139,153,164,174], "cadence": [172,176], "weight_floor": 73,
+  "pace": {"rec": ["9:20","9:50"], "easy": ["8:45","9:20"], "mp": ["7:45","7:45"],
+           "tempo": ["7:10","7:20"], "interval": ["6:20","6:30"], "hr_leads": true}}]</pre></div>
+
+<h2>4. Yang perlu omPik putuskan</h2>
+<div class="q"><b>Q1 · HR long run</b><span>A: lulus kalau ≥ 75% km di rentang. B: HR boleh lewat batas hanya di 25% bagian akhir, asalkan decoupling &lt; 8% (lihat tombol di kartu long run).</span></div>
+<div class="q"><b>Q2 · Potongan yang disengaja</b><span>Gerbang tidur −20% / −40% bisa dihitung otomatis dari data tidur dan Body Battery pagi itu. "Aturan betis" belum ada di <code>RUMUS-BATAS-SUMBER.md</code> dan tidak ada datanya di Garmin. Bagaimana dashboard tahu? (mis. tulis "betis" di judul aktivitas Garmin, atau abaikan dulu)</span></div>
+
+<svg width="0" height="0" style="position:absolute"><defs>
+<symbol id="ok" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M6.2 10.3l2.6 2.5 5-5.2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+<symbol id="wn" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M10 5.6v5.6" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/><circle cx="10" cy="14.2" r="1.1" fill="currentColor"/></symbol>
+<symbol id="na" viewBox="0 0 20 20"><circle cx="10" cy="10" r="8.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-dasharray="2 2.4"/><path d="M6.5 10h7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></symbol>
+</defs></svg>
+<script>
+// runner fades while a card sits behind it
+const demo = document.getElementById("demo");
+function dim() { ["fT", "fR"].forEach(id => { const f = document.getElementById(id), r = f.querySelector("svg").getBoundingClientRect();
+  f.style.visibility = "hidden"; const under = document.elementFromPoint(r.left + r.width / 2, r.top + r.height / 2); f.style.visibility = "";
+  f.classList.toggle("dim", !!(under && under.closest(".blk"))); }); }
+demo.addEventListener("scroll", dim, {passive: true}); dim();
+// long run HR option
+document.querySelector(".pills").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return;
+  document.querySelectorAll(".pills .pill").forEach(p => p.setAttribute("aria-pressed", p === b));
+  document.getElementById("lrA").hidden = b.dataset.o !== "A"; document.getElementById("lrB").hidden = b.dataset.o !== "B"; });
+</script>
+</div></body></html>
