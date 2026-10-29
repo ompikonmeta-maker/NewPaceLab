@@ -375,6 +375,27 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .pbx-top li{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;padding:4px 6px;border-radius:8px;font-size:12.5px} .pbx-top li:hover,.pbx-top li.on{background:var(--bg)} .pbx-top li .n{color:var(--muted)} .pbx-top li b{font-variant-numeric:tabular-nums}
 .pbx .est{color:var(--warn);font-weight:700}
 @media (max-width:760px){.pbx{padding:10px}.pbx-win{height:calc(100vh - 20px);padding:14px 14px 16px}.pbx-bd{display:block;overflow:auto}.pbx-l{display:block}.pbx-r{margin-top:16px}.pbx-ch{height:min(52vh,340px)}.pbx-lg{margin-top:8px}.pbx-r{overflow:visible}.pbx-nav button{padding:4px 7px}}
+/* Arah: "rincian hitungan" window */
+.ss-tc{position:relative} .ss-ix{position:absolute;right:10px;top:10px;width:26px;height:26px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--text-2);cursor:pointer;font:600 12.5px Georgia,serif;transition:border-color .2s,transform .3s cubic-bezier(.34,1.4,.64,1)}
+.ss-ix:hover,.ss-ix:focus-visible{border-color:var(--text);transform:scale(1.08)}
+.ssx{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,6,18,0);transition:background .4s,backdrop-filter .4s}
+.ssx.open{background:rgba(8,6,18,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.ssx-win{position:relative;width:min(780px,100%);height:min(740px,calc(100vh - 40px));display:flex;flex-direction:column;background:var(--surface);border-radius:20px;padding:16px 20px 0;box-shadow:0 30px 80px rgba(0,0,0,.25);opacity:0;transform:scale(.96) translateY(10px);transition:opacity .4s cubic-bezier(.4,0,.2,1),transform .4s cubic-bezier(.34,1.2,.64,1)}
+.ssx.open .ssx-win{opacity:1;transform:none} .ssx-win .pbx-hd{flex-wrap:wrap}
+.ssx-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;scrollbar-width:none;margin-top:10px;padding-bottom:18px} .ssx-body::-webkit-scrollbar{display:none}
+.ssx-form{background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13px;color:var(--text-2);margin-bottom:8px} .ssx-form code{font-family:Consolas,"Cascadia Mono",monospace;font-size:12.5px;color:var(--text)}
+.ssx-wk{border-top:1px solid var(--line)} .ssx-wk>button{width:100%;display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:0;background:none;font:inherit;color:inherit;padding:10px 2px;cursor:pointer;text-align:left}
+.ssx-wk>button b{font-size:14px} .ssx-wk>button .d{color:var(--muted);font-size:12.5px} .ssx-wk>button .res{margin-left:auto;font-weight:700;font-size:15px}
+.ssx-wk>button .tag{font-size:11px;font-weight:700;border-radius:6px;padding:0 6px;background:color-mix(in srgb,var(--t) 14%,transparent);color:var(--t)}
+.ssx-wk .in{display:none;padding:0 2px 12px;overflow-x:auto} .ssx-wk.open .in{display:block}
+.ssx table{width:100%;border-collapse:collapse;font-size:12.5px} .ssx th{color:var(--muted);font-weight:600;text-align:right;padding:4px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+.ssx td{text-align:right;padding:4px 6px;border-bottom:1px solid var(--grid);white-space:nowrap} .ssx th:nth-child(-n+2),.ssx td:nth-child(-n+2){text-align:left}
+.ssx td:nth-child(2){white-space:normal}
+.ssx tr.out td{color:var(--muted);text-decoration:line-through;text-decoration-color:color-mix(in srgb,var(--muted) 60%,transparent)} .ssx tr.out td.why{text-decoration:none;font-style:italic}
+.ssx td.why{color:var(--muted);font-style:italic} .ssx tr.sum td{border-bottom:0;font-weight:700;color:var(--text)} .ssx tr.sum td+td{text-align:right}
+.ssx .chip{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:6px;background:var(--bg);color:var(--muted);font-weight:600} .ssx .chip.lap{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.ssx-diff{margin-top:12px;background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13.5px} .ssx-how{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+@media (max-width:640px){.ssx{padding:10px}.ssx-win{height:calc(100vh - 20px);padding:14px 14px 0}.ssx table{font-size:11.5px}.ssx th,.ssx td{padding:3px 4px}.ssx td:nth-child(2){white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}.ssx-wk>button .d{display:none}}
 .pb-chips{display:flex;flex-wrap:wrap;gap:8px} .pb-cw{display:inline-flex;align-items:center;gap:6px;cursor:help}
 .pb-empty{height:100%;min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
 .pb-empty svg{width:100%;height:110px;opacity:.22} .pb-empty p{margin:0;text-align:center;font-size:13px;color:var(--muted)} .pb-empty p b{display:block;color:var(--text);font-size:14px}
@@ -744,6 +765,9 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
   <div class="xb" id="xdec-b"><div id="xdec-in"></div></div>
   <div class="sbar" id="xdec-sbar" aria-hidden="true"></div>
 </div>
+<div class="ssx" id="ssx" aria-hidden="true"><div class="ssx-win" role="dialog" aria-modal="true" aria-labelledby="ssx-h">
+  <div class="pbx-hd"><h3 id="ssx-h"></h3><span class="ss-vw" id="ssx-who" role="group" aria-label="Pelari"></span><button class="pbx-x" data-close aria-label="Tutup">×</button></div>
+  <div class="ssx-body" id="ssx-body"><div></div></div><div class="sbar" id="ssx-sbar" aria-hidden="true"></div></div></div>
 <div class="pbx" id="pbx" aria-hidden="true"><div class="pbx-win" id="pbx-win" role="dialog" aria-modal="true" aria-labelledby="pbx-h"></div></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
   <div class="panel">
@@ -1591,7 +1615,7 @@ function bounce(scroller, content, bar) {
   const lim = () => Math.min(140, (page ? innerHeight : scroller.clientHeight) * .18);
   const atEnd = dir => { const st = page ? scrollY : scroller.scrollTop, h = page ? innerHeight : scroller.clientHeight, sh = page ? document.documentElement.scrollHeight : scroller.scrollHeight;
     return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
-  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin,.ss-box,.pbx")));
+  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin,.ss-box,.pbx,.ssx")));
   const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
     content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
     if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
@@ -2037,12 +2061,58 @@ function ssPark() { const top = $("ss-box").getBoundingClientRect().top - $("st-
 $("ss-box").addEventListener("wheel", ssPark, {passive: true}); $("ss-box").addEventListener("touchstart", ssPark, {passive: true});
 function ssEdges() { const b = $("ss-box"); b.classList.toggle("ft", b.scrollTop > 2); b.classList.toggle("fb", b.scrollTop + b.clientHeight < b.scrollHeight - 2); }
 const ssBox = ownScroll($("ss-box"), $("ss-sbar"), document.querySelector(".ss-boxw"));
+const ssxS = ownScroll($("ssx-body"), $("ssx-sbar"), document.querySelector(".ssx-win"));
 $("ss-box").addEventListener("scroll", ssEdges, {passive: true});
 addEventListener("resize", () => TAB === "sesi" && ssBoxSize());
 let pbT = 0; addEventListener("resize", () => { clearTimeout(pbT); pbT = setTimeout(() => TAB === "ring" && pbFit(), 150); });
+document.addEventListener("click", e => { const ix = e.target.closest(".ss-ix"); if (ix) { e.stopPropagation(); return ssxOpen(ix.dataset.x); }
+  if (!SSX) return; if (e.target === $("ssx") || e.target.closest("#ssx [data-close]")) return ssxClose();
+  const who = e.target.closest("#ssx-who [data-c]"); if (who) { SSX.c = who.dataset.c; return ssxRender(); }
+  const wk = e.target.closest(".ssx-wk > button"); if (wk) { const w = wk.parentElement, o = !w.classList.contains("open"); w.classList.toggle("open", o); wk.setAttribute("aria-expanded", o); requestAnimationFrame(() => ssxS.size()); } });
+addEventListener("keydown", e => { if (SSX && e.key === "Escape") ssxClose(); });
 $("p-sesi").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest(".ss-fr:not(.plan)") && !e.target.closest(".ss-det")) { e.preventDefault(); e.target.closest(".ss-fr").click(); } });
 
 // ---------------- Arah: 8 weeks, one picture per question, numbers in the runner's colour, every arrow explained
+// zone-2 pace reads the watch's laps when the FIT file is there (as in Garmin Connect's Laps tab), else our per-km cuts
+const ssPieces = x => x.laps && x.laps.length ? x.laps : x.splits;
+const SSIX = k => `<button class="ss-ix" data-x="${k}" aria-label="Rincian hitungan" aria-haspopup="dialog">i</button>`;
+const HARI3 = ["Min", "Sen", "Sel", "Rab", "Kam", "Jum", "Sab"];
+// ---------------- "rincian hitungan": every session and lap behind an Arah card, to check against Garmin Connect
+let SSX = null;   // {k, c}
+function ssxWeeks(a) { const out = []; for (let w = 0; w < 8; w++) { const hi = addDays(DATA.today, -7 * w), lo = addDays(hi, -7);
+  out.push({w, lo, hi, S: (a.sessions || []).filter(x => x.date > lo && x.date <= hi).sort((p, q) => p.date < q.date ? -1 : 1)}); } return out; }
+function ssxWeek(a, k, W) { const rows = [], kind = x => (parsePlan(planCell(a, x.date)) || {k: "easy"}), day = x => `${HARI3[D(x.date).getDay()]} ${tgl(x.date)}`;
+  const out = (x, why) => `<tr class="out"><td>${day(x)}</td><td>${esc(kind(x).title || "di luar jadwal")}</td><td colspan="4"></td><td class="why">${why}</td></tr>`;
+  if (k === "pz2") { let tt = 0, kk = 0;
+    W.S.forEach(x => { const pl = kind(x); if (!["easy", "long", "rec"].includes(pl.k)) return rows.push(out(x, "latihan keras tidak dihitung"));
+      const lap = x.laps && x.laps.length;
+      ssPieces(x).forEach((p, i) => { const inZ = p[2] && a.zones && zoneOf(a, p[2]) === 1, ok = inZ && p[0] >= .5; if (ok) { tt += p[1]; kk += p[0]; }
+        rows.push(`<tr class="${ok ? "" : "out"}"><td>${i ? "" : day(x)}</td><td>${i ? "" : esc(pl.title || "di luar jadwal") + " "}<span class="chip ${lap ? "lap" : ""}">${lap ? "lap" : "km"} ${i + 1}</span></td><td>${p[0].toFixed(2)}</td><td>${hms(p[1])}</td><td>${paceS(p[1] / p[0])}</td><td>${p[2] ?? "–"}</td>
+          <td class="why">${ok ? "" : p[0] < .5 ? "&lt; 0,5 km" : !p[2] ? "tanpa HR" : "HR di luar zona 2"}</td></tr>`); }); });
+    return {res: kk ? tt / kk : null, html: rows.length ? `<table class="num"><thead><tr><th>Tanggal</th><th>Sesi · potongan</th><th>km</th><th>waktu</th><th>pace</th><th>HR</th><th></th></tr></thead><tbody>${rows.join("")}
+      <tr class="sum"><td colspan="2">Jumlah yang dipakai</td><td>${kk.toFixed(2)}</td><td>${hms(tt)}</td><td>${kk ? paceS(tt / kk) : "–"}</td><td></td><td></td></tr></tbody></table>` : `<p class="muted">Tidak ada lari minggu ini.</p>`}; }
+  const v = [];
+  W.S.forEach(x => { const pl = kind(x); if (pl.k === "hard") return rows.push(out(x, "latihan keras tidak dihitung")); if (!x.hr) return rows.push(out(x, "tanpa HR"));
+    const mpm = x.km * 1000 / (x.sec / 60), e = mpm / x.hr; v.push(e);
+    rows.push(`<tr><td>${day(x)}</td><td>${esc(pl.title || "di luar jadwal")}</td><td>${Math.round(x.km * 1000).toLocaleString("id-ID")}</td><td>${hms(x.sec)}</td><td>${mpm.toFixed(1)}</td><td>${x.hr}</td><td><b>${e.toFixed(3)}</b></td></tr>`); });
+  const res = v.length ? mean(v) : null;
+  return {res, html: rows.length ? `<table class="num"><thead><tr><th>Tanggal</th><th>Sesi</th><th>jarak m</th><th>waktu</th><th>m/menit</th><th>HR rata</th><th>m/detak</th></tr></thead><tbody>${rows.join("")}
+    <tr class="sum"><td colspan="6">Rata-rata ${v.length} sesi</td><td>${res == null ? "–" : res.toFixed(2)}</td></tr></tbody></table>` : `<p class="muted">Tidak ada lari minggu ini.</p>`}; }
+function ssxRender() { const {k, c} = SSX, a = A.find(x => x.c === c), Wk = ssxWeeks(a), R = Wk.map(W => ssxWeek(a, k, W));
+  const fmt = v => v == null ? "–" : k === "pz2" ? paceS(v) + "/km" : v.toFixed(2) + " m";
+  const iNow = R.findIndex(r => r.res != null), iOld = R.length - 1 - [...R].reverse().findIndex(r => r.res != null), z = a.zones || [];
+  $("ssx-h").textContent = (k === "pz2" ? "Pace di zona 2" : "Meter per detak") + " · rincian";
+  $("ssx-who").innerHTML = V().map(x => `<button data-c="${x.c}" aria-pressed="${x.c === c}">${x.name}</button>`).join("");
+  const form = k === "pz2" ? `<b>Rumus:</b> dari lari santai, long run dan pemulihan (jenis sesi dari Excel), ambil <b>lap jam</b> (≥ 0,5 km) yang HR rata-ratanya di zona 2 (${z[0]}–${z[1] - 1} bpm, <code>config.json</code>), lalu <code>total waktu ÷ total km</code>. Lari tanpa file FIT: potongan per km dari data per detik (ditandai “km”).<br><b>Cocokkan di Garmin Connect:</b> buka lari → tab <i>Lap</i> → baris yang sama.`
+    : `<b>Rumus per sesi:</b> <code>(jarak m ÷ waktu menit) ÷ HR rata-rata</code>, ketiganya dari ringkasan Garmin. Per minggu: rata-rata sesi, tanpa tempo/interval.<br><b>Cocokkan di Garmin Connect:</b> buka lari → <i>Jarak</i>, <i>Waktu</i>, <i>Detak jantung rata-rata</i>.`;
+  const diff = iNow < 0 ? "" : k === "pz2" ? (() => { const d = Math.round(R[iNow].res - R[iOld].res); return `${fmt(R[iNow].res)} − ${fmt(R[iOld].res)} = <b>${Math.abs(d)} dtk/km ${d < 0 ? "lebih cepat" : d > 0 ? "lebih lambat" : "sama"}</b>`; })()
+    : `${fmt(R[iNow].res)} − ${fmt(R[iOld].res)} = <b>${(R[iNow].res - R[iOld].res).toFixed(2)} m</b>`;
+  $("ssx-body").firstElementChild.innerHTML = `<div class="ssx-form">${form}</div>` + Wk.map((W, i) => `<div class="ssx-wk ${i === iNow || i === iOld ? "key open" : ""}"><button aria-expanded="${i === iNow || i === iOld}"><b>${i ? i + " mgg lalu" : "7 hari terakhir"}</b><span class="d">${tgl(addDays(W.lo, 1))} – ${tgl(W.hi)}</span>${i === iNow ? '<span class="tag">sekarang</span>' : i === iOld ? '<span class="tag">8 mgg lalu</span>' : ""}<span class="res num">${fmt(R[i].res)}</span></button><div class="in">${R[i].html}</div></div>`).join("")
+    + (diff ? `<div class="ssx-diff num"><b>Perubahan:</b> ${diff}</div>` : "") + `<p class="ssx-how">Coret = tidak dipakai, dengan alasannya. Angka besar di kartu = minggu “sekarang”; panah = selisih dengan minggu “8 mgg lalu” (minggu tertua yang punya data dari 8 minggu terakhir).</p>`;
+  $("ssx-body").scrollTop = 0; requestAnimationFrame(() => ssxS.size()); }
+function ssxOpen(k) { SSX = {k, c: (V()[0] || A[0]).c}; ssxRender(); const ov = $("ssx"); ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false");
+  requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); ov.querySelector(".pbx-x").focus(); ssxS.size(); })); }
+function ssxClose() { if (!SSX) return; SSX = null; const ov = $("ssx"); ov.classList.remove("open"); setTimeout(() => { ov.style.display = "none"; ov.setAttribute("aria-hidden", "true"); }, 400); }
 function ssArah() { const vis = V(), W = 300, end = DATA.today;
   const wk = (a, f) => { const o = []; for (let w = 7; w >= 0; w--) { const hi = addDays(end, -7 * w), lo = addDays(hi, -7); o.push(f((a.sessions || []).filter(x => x.date > lo && x.date <= hi))); } return o; };
   const first = a => a.find(v => v != null), last = a => [...a].reverse().find(v => v != null);
@@ -2053,7 +2123,7 @@ function ssArah() { const vis = V(), W = 300, end = DATA.today;
   const series = f => vis.map(a => [a, wk(a, f)]), ok = S => S.some(([, s]) => s.some(v => v != null));
   const cards = [];
   // 1. pace in zone 2: a track, ghost = 8 weeks ago, dot travels to now (right = faster)
-  { const f = a => xs => { const sp = xs.filter(x => ["easy", "long", "rec"].includes(kindOf(a, x))).flatMap(x => x.splits).filter(p => p[2] && a.zones && zoneOf(a, p[2]) === 1 && p[0] >= .5);
+  { const f = a => xs => { const sp = xs.filter(x => ["easy", "long", "rec"].includes(kindOf(a, x))).flatMap(ssPieces).filter(p => p[2] && a.zones && zoneOf(a, p[2]) === 1 && p[0] >= .5);
       return sp.length ? sp.reduce((q, p) => q + p[1], 0) / sp.reduce((q, p) => q + p[0], 0) : null; };
     const SS = vis.map(a => [a, wk(a, f(a))]);
     if (ok(SS)) { const v = SS.flatMap(([, s]) => s).filter(x => x != null), slow = Math.max(...v) + 10, fast = Math.min(...v) - 10, X = q => 14 + (slow - q) / (slow - fast || 1) * (W - 28);
@@ -2065,7 +2135,7 @@ function ssArah() { const vis = V(), W = 300, end = DATA.today;
         return `<span class="nv">${paceS(last(s))}<small>/km</small></span>${dl(d, d < 0, `${d < 0 ? "▲" : "▼"} ${n} dtk/km`, d < 0
           ? `${a.name} lari santai ${n} detik per km lebih cepat dibanding 8 minggu lalu, dengan detak jantung yang sama (zona 2). Artinya makin bugar.`
           : `${a.name} lari santai ${n} detik per km lebih lambat dibanding 8 minggu lalu pada detak jantung yang sama. Bisa karena capek, panas, atau kurang tidur.`)}`; };
-      cards.push(`<h4>${ssTerm("pz2")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 70">${SS.map(([a, s], i) => lane(a, s, 18 + i * 28)).join("")}<text x="14" y="68">lebih lambat</text><text x="${W - 14}" y="68" text-anchor="end">lebih cepat →</text></svg>`); } }
+      cards.push(`<h4>${ssTerm("pz2")}${SSIX("pz2")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 70">${SS.map(([a, s], i) => lane(a, s, 18 + i * 28)).join("")}<text x="14" y="68">lebih lambat</text><text x="${W - 14}" y="68" text-anchor="end">lebih cepat →</text></svg>`); } }
   // 2. metres per heartbeat: then → now
   { const SS = vis.map(a => [a, wk(a, xs => mean(xs.filter(x => kindOf(a, x) !== "hard").map(ssEf)))]);
     if (ok(SS)) { const v = SS.flatMap(([, s]) => s).filter(x => x != null), lo = Math.min(...v) - .01, hi = Math.max(...v) + .01, Y = q => 8 + (1 - (q - lo) / (hi - lo)) * 54;
@@ -2074,7 +2144,7 @@ function ssArah() { const vis = V(), W = 300, end = DATA.today;
       const side = a => { const s = SS.find(q => q[0] === a)[1]; if (last(s) == null) return `<span class="nv">–</span>`; const d = last(s) - first(s), cm = Math.round(Math.abs(d) * 100);
         return `<span class="nv">${last(s).toFixed(2)}<small> m</small></span>${dl(cm, d > 0, `${d > 0 ? "▲" : "▼"} ${Math.abs(d).toFixed(2)} m`,
           `Setiap satu detak jantung, ${a.name} sekarang menempuh ${cm} cm ${d > 0 ? "lebih jauh" : "lebih pendek"} dibanding 8 minggu lalu. ${d > 0 ? "Jantung makin hemat." : "Jantung bekerja lebih keras untuk jarak yang sama."}`)}`; };
-      cards.push(`<h4>${ssTerm("ef")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 86">${SS.map(([a, s]) => sl(a, s)).join("")}<text x="60" y="84" text-anchor="middle">8 mgg lalu</text><text x="${W - 60}" y="84" text-anchor="middle">sekarang</text></svg>`); } }
+      cards.push(`<h4>${ssTerm("ef")}${SSIX("ef")}</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 86">${SS.map(([a, s]) => sl(a, s)).join("")}<text x="60" y="84" text-anchor="middle">8 mgg lalu</text><text x="${W - 60}" y="84" text-anchor="middle">sekarang</text></svg>`); } }
   // 3. km per week: mirrored skyline (Taofik up, Reza down)
   { const SS = vis.map(a => [a, wk(a, xs => xs.reduce((q, x) => q + x.km, 0))]), mx = Math.max(1, ...SS.flatMap(([, s]) => s)), bw = (W - 20) / 8;
     const bars = (a, s, up) => s.map((v, j) => { const h = v / mx * 30; return `<rect class="ss-sky" style="animation-delay:${j * 50}ms;transform-origin:${up ? "bottom" : "top"}" x="${10 + j * bw + 3}" y="${up ? 36 - h : 38}" width="${bw - 6}" height="${Math.max(h, .5)}" rx="3" fill="var(--${a.c})" opacity="${j === 7 ? 1 : .55}"

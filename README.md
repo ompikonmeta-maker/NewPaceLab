@@ -76,6 +76,8 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   osilasi & rasio vertikal, power, elevasi, suhu, kalori, langkah, perkiraan keringat, jumlah lap. Yang tidak dikirim
   jam salah satu pelari ditulis "–".
   Penilaian tempo dan pemanasan memakai lap bila ada (lap yang tengahnya di rentang rencana ± 300 m) [keputusan dashboard].
+- **Rincian hitungan** (tombol ⓘ di kartu Pace di zona 2 dan Meter per detak): tiap minggu, setiap sesi dan lap yang
+  dipakai atau dicoret (dengan alasannya), jumlahnya, hasilnya, dan rumusnya, untuk dicocokkan dengan Garmin Connect.
 - **Arah** (8 minggu terakhir vs sekarang; angka biru = Taofik, oranye = Reza; ▲▼ dijelaskan saat disentuh):
   pace di zona 2, meter per detak, jarak per minggu, long run terjauh menuju 42K, decoupling, cadence vs target.
 - Rencana per hari dibaca dari teks sel Kalender Excel: `Total X km` (atau `X km` pertama), rentang pace `m:ss - m:ss/km`
@@ -88,7 +90,7 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 | Hitungan | Rumus | Dasar |
 |---|---|---|
-| Pace di zona 2 | pace berbobot waktu dari km (≥ 0,5 km) yang HR rata-ratanya di zona 2 (`zones[0] ≤ HR < zones[1]`, `config.json`), dari lari easy, long, recovery | [keputusan dashboard] |
+| Pace di zona 2 | pace berbobot waktu (total waktu ÷ total km) dari **lap jam** (file FIT, ≥ 0,5 km) yang HR rata-ratanya di zona 2 (`zones[0] ≤ HR < zones[1]`, `config.json`), dari lari santai, long run, pemulihan; lari tanpa file FIT: potongan per km dari data per detik | [keputusan dashboard]; lap jam: keputusan omPik |
 | Meter per detak | (jarak ÷ waktu) ÷ (HR ÷ 60), rata-rata lari selain latihan keras per minggu | [keputusan dashboard] |
 | Cadence (sesi, kartu Arah) | cadence rata-rata dari Garmin per lari (`averageRunningCadenceInStepsPerMinute`), apa adanya; per minggu = rata-rata sesi. Hanya bila Garmin tidak mengirimnya: dari data per detik | keputusan omPik |
 | Per km | km dipotong per 1000 m dari data per detik; HR rata berbobot waktu; potongan terakhir < 300 m dibuang | [keputusan dashboard] |
