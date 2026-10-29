@@ -71,6 +71,8 @@ def athlete_data(a, data_dir, today):
         "weeks": weeks,
         "est": {"sec": est_now, "from": est_src, "series": est_series},
         "pb": {k: v for k, v in pb.items()},
+        # every run's fastest segment per distance (date, seconds): all points on the best-progress charts
+        "eff": {k: [[d, sec] for d, sec, _ in rows] for k, rows in eff.items()},
         "days": [{
             "date": day.isoformat(),
             "sleep_h": round(well.get(day.isoformat(), {}).get("sleep_s", 0) / 3600, 2) or None,
@@ -172,7 +174,7 @@ def _slim(x, color):
         "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "zones": x.get("zones"), "cadence": x.get("cadence"), "pace": x.get("pace"), "coach": x.get("coach"), "sleep_min": prog["sleep"].get("min"),
         "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
-        "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],
+        "est": x["est"], "pb": x["pb"], "eff": x["eff"], "days": x["days"], "today": x["today"],
         "badges": x["badges"], "week_stats": x["week_stats"], "sync": x["sync"],
         # full program for the track and the weekly schedule overlay
         "plan": [{k: w.get(k) for k in ("ms", "start", "phase", "km", "lr", "down", "event", "notes", "days")}

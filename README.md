@@ -55,14 +55,14 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
 | Latihan (filter 4 / 12 minggu / semua) | km, long run, decoupling, berat vs target per minggu yang sudah selesai; sumbu = tanggal awal minggu |
 | Pemulihan (filter 7 / 14 / 30 / 60 hari) | lampu harian, tidur, HRV, Body Battery |
-| 5K / 10K / Half | segmen tercepat di dalam lari mana pun (data per detik), hanya saat rekor membaik |
-| Full | estimasi per akhir bulan, di atas pita target B |
+| 5K / 10K / Half | segmen tercepat di dalam setiap lari (data per detik): satu titik per lari, garis tipis bertangga = rekor berjalan sampai hari ini, titik bercincin = tercepat. Belum ada data: grafik bayangan + tanggal tes berikutnya |
+| Full | estimasi per akhir bulan, di atas pita target B; status target per pelari sebagai chip (batas, + panas, saran saat disentuh). Keempat kartu sama tinggi, grafik mengisi sisa ruang |
 | Badge | 21/25/30/35K, 100 km/bulan, streak 7 & 14 minggu ≥90% target km, PR 5K/10K selama program |
 
 ### Tab Sesi
 
 - **Linimasa cermin**: Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per minggu program,
-  dalam kotak setinggi 8 minggu (scroll di dalamnya; di HP maksimal 78% layar). Minggu aktif terbuka; membuka satu minggu
+  dalam kotak setinggi 10 minggu (scroll di dalamnya; di HP maksimal 78% layar). Minggu aktif terbuka; membuka satu minggu
   menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
   luar: makin pekat = makin patuh rencana. Rencana yang belum dijalani = satu baris tipis.
 - **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);

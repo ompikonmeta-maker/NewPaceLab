@@ -3,7 +3,7 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## Daftar perbaikan 1–5 — mockup siap, menunggu pilihan
+## Daftar perbaikan 1–5 — **sudah dibuat** (29 Okt): M4, A+B+C, 3a, tanpa bayangan, 10 minggu
 
 1. **Penanda minggu aktif di batang target km mingguan** (kotak panjang di sekeliling batang minggu ini, di bawah
    lintasan) terlalu tegas. Buat lebih tenang, atau beri beberapa opsi garis yang lebih tenang. Sekarang:

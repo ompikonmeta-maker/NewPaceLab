@@ -52,6 +52,9 @@ class BuildTest(unittest.TestCase):
         self.assertEqual(len(a["badges"]), 9)
         self.assertIn(a["today"]["light"]["level"], ("hijau", "kuning", "oranye", "merah"))
         self.assertTrue(a["pb"]["5K"])
+        # every effort ships, not only the record staircase; the fastest effort is the last record
+        self.assertGreaterEqual(len(a["eff"]["5K"]), len(a["pb"]["5K"]))
+        self.assertEqual(min(sec for _, sec in a["eff"]["5K"]), a["pb"]["5K"][-1]["sec"])
         self.assertIsNotNone(d["score"])
         s = max(a["sessions"], key=lambda x: x["km"])
         self.assertEqual(len(s["splits"]), int(s["km"]) + (s["km"] % 1 >= .3))

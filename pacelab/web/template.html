@@ -110,10 +110,11 @@ body.ready .wkcol i{animation:up .7s var(--ease) forwards}
 @keyframes up{to{transform:none}}
 .wkcol .t{background:var(--t)}.wkcol .r{background:var(--r)}
 .wkcol.future i{opacity:.28}.wkcol.down i{filter:grayscale(.6)}
-.wkcol.now{outline:1.5px solid var(--text);outline-offset:1px}
+.wkcol.now{background:linear-gradient(transparent,color-mix(in srgb,var(--text) 8%,transparent))}
+.wkcol.now::after{content:"";position:absolute;bottom:-4px;left:2px;right:2px;height:2px;border-radius:1px;background:var(--text);opacity:.45}
 .wkcol .race{position:absolute;top:-2px;left:50%;width:7px;height:7px;margin-left:-3.5px;border-radius:50%;background:var(--text);box-shadow:0 0 0 2px var(--bg)}
 .wkcol .ghost{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--line)}
-.prog .nowline{position:absolute;top:0;height:52px;width:2px;background:var(--text);margin-left:-1px;pointer-events:none}
+.prog .nowline{display:none}  /* the active week is marked by its soft column (M4) */
 .brk{display:flex;margin-top:6px}
 .bk{position:relative;padding-top:14px;text-align:center;font-size:12.5px;color:var(--muted);white-space:nowrap;overflow:hidden;border-radius:8px;transition:background .2s;cursor:default}
 .bk:hover{background:color-mix(in srgb,var(--text) 4%,transparent)}
@@ -349,6 +350,9 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .tip .v{margin-left:auto;padding-left:16px;font-weight:600}
 .tip .d{color:var(--muted);font-size:12px;margin:0 0 4px 18px}
 .pb{display:flex;gap:6px 16px;font-size:15px;margin:10px 0 4px;flex-wrap:wrap}
+.pb-chips{display:flex;flex-wrap:wrap;gap:8px} .pb-cw{display:inline-flex;align-items:center;gap:6px;cursor:help}
+.pb-empty{height:100%;min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
+.pb-empty svg{width:100%;height:110px;opacity:.22} .pb-empty p{margin:0;text-align:center;font-size:13px;color:var(--muted)} .pb-empty p b{display:block;color:var(--text);font-size:14px}
 .pb span{white-space:nowrap}
 .kpi,.vitals div{min-width:0;overflow-wrap:anywhere}
 .pb b{font-size:20px;font-weight:650}
@@ -437,7 +441,6 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-box.fx .ss-wg:not(.open),.ss-box.fx2 .ss-wg.open .ss-fr:not(.on){opacity:.35;filter:grayscale(1);transform:scale(.97)}
 .ss-box.fx .ss-wg:not(.open):hover,.ss-box.fx2 .ss-wg.open .ss-fr:not(.on):hover{opacity:1;filter:none;transform:none}
 .ss-box.fx .ss-wg.open .ss-wgh .wm{border-color:var(--text);box-shadow:0 12px 32px rgba(0,0,0,.12)}
-.ss-box.fx2 .ss-fr.on .ss-sc{box-shadow:0 12px 32px rgba(0,0,0,.12)}
 .ss-feed{position:relative}
 .ss-feed::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--grid)}
 .ss-wg{position:relative;margin-bottom:6px}
@@ -975,27 +978,36 @@ function draw(id, {x, series, h = 220, ymin, ymax, invert = false, refs = [], ba
     segs(se).forEach(g => {
       const d = g.length === 1 ? "" : smooth(g);
       if (se.target) { if (d) s += `<path class="ar" d="${d}" fill="none" stroke="var(--${c})" stroke-width="1.6" stroke-dasharray="5 5" stroke-opacity=".6"/>`; return; }
+      // all efforts: small faded dots; the fastest gets a ring and its value
+      if (se.scatter) { const b = g.reduce((m, q) => (invert ? q[1] < m[1] : q[1] > m[1]) ? q : m), bv = se.v.reduce((m, p) => p[1] != null && (m == null || (invert ? p[1] < m : p[1] > m)) ? p[1] : m, null);
+        g.forEach((q, i) => { if (q !== b) s += `<circle class="pt" style="transition-delay:${500 + i*25}ms" cx="${q[0]}" cy="${q[1]}" r="2.8" fill="var(--${c})" opacity=".45"/>`; });
+        const rt = b[0] > W - P.r - 70;
+        s += `<circle class="pt end" style="transition-delay:1100ms" cx="${b[0]}" cy="${b[1]}" r="6.5" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.5"/><circle class="pt end" style="transition-delay:1100ms" cx="${b[0]}" cy="${b[1]}" r="2.6" fill="var(--${c})"/>
+          <text class="pt end" style="transition-delay:1150ms" x="${b[0] + (rt ? -10 : 10)}" y="${b[1] - 9}" text-anchor="${rt ? "end" : "start"}" font-size="12" font-weight="700" fill="var(--${c})">${fmtV(bv)}</text>`; return; }
+      // running best as a thin staircase
+      if (se.step) { const d2 = g.map((q, i) => i ? `H${q[0].toFixed(1)}V${q[1].toFixed(1)}` : `M${q[0].toFixed(1)},${q[1].toFixed(1)}`).join("");
+        s += `<path class="ar" d="${d2}" fill="none" stroke="var(--${c})" stroke-width="1.6" stroke-opacity=".5" stroke-linejoin="round"/>`; return; }
       if (d && se.area !== false) s += `<path class="area" style="transition-delay:${300 + j*120}ms" d="${d}L${g[g.length-1][0]},${ys(invert ? hi : lo)}L${g[0][0]},${ys(invert ? hi : lo)}Z" fill="url(#g${uid}${c})"/>`;
       if (d) s += `<path class="${se.dash ? "ar" : "ln"}" ${se.dash ? 'stroke-dasharray="6 5"' : 'pathLength="1"'} d="${d}" fill="none" stroke="var(--${c})" stroke-width="2.5" stroke-linecap="round" style="transition-delay:${j*140}ms"/>`;
       if (se.dots || g.length === 1) g.forEach((q, i) => s += `<circle class="pt" style="transition-delay:${700 + i*45}ms" cx="${q[0]}" cy="${q[1]}" r="4" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.2"/>`);
     });
-    if (!se.target) { const gs = segs(se), last = gs.length ? gs[gs.length-1] : null, L = last && last[last.length-1];
+    if (!se.target && !se.scatter && !se.step) { const gs = segs(se), last = gs.length ? gs[gs.length-1] : null, L = last && last[last.length-1];
       if (L) s += `<circle class="pt end" style="transition-delay:${1100 + j*140}ms" cx="${L[0]}" cy="${L[1]}" r="5" fill="var(--${c})" stroke="var(--surface)" stroke-width="2"/>`; }
   });
   s += `<line class="xh" x1="0" x2="0" y1="${P.t}" y2="${H-P.b}" stroke="var(--muted)" stroke-dasharray="3 3" opacity="0"/>`;
-  series.filter(se => !se.target).forEach(se => s += `<circle class="hd" data-c="${se.c}" r="6" fill="var(--${se.c})" stroke="var(--surface)" stroke-width="2.5" opacity="0"/>`);
+  series.filter(se => !se.target && !se.step).forEach(se => s += `<circle class="hd" data-c="${se.c}" r="6" fill="var(--${se.c})" stroke="var(--surface)" stroke-width="2.5" opacity="0"/>`);
   s += `<rect x="${P.l}" y="0" width="${W-P.l-P.r}" height="${H}" fill="transparent"/></svg><div class="tip" aria-hidden="true"></div>`;
   el.innerHTML = s;
 
   // hover + keyboard: crosshair, dots, tooltip beside/above/below the active points
   const svg = el.querySelector("svg"), tip = el.querySelector(".tip"), xh = svg.querySelector(".xh");
-  const keys = xnum ? [...new Set(series.filter(s => !s.target).flatMap(s => s.v.filter(p => p[1] != null).map(p => p[0])))].sort((a, b) => a - b) : x.map((_, i) => i);
+  const keys = xnum ? [...new Set(series.filter(s => !s.target && !s.step).flatMap(s => s.v.filter(p => p[1] != null).map(p => p[0])))].sort((a, b) => a - b) : x.map((_, i) => i);
   let cur = keys.length - 1;
   const show = k => {
     const cx = xs(k);
     xh.style.transform = `translateX(${cx}px)`; xh.setAttribute("opacity", ".7");
     let html = `<b>${xnum ? tgl(new Date(k).toISOString().slice(0, 10)) : (xlab ? xlab(x[k], true) : x[k])}</b>`;
-    series.filter(se => !se.target).forEach(se => {
+    series.filter(se => !se.target && !se.step).forEach(se => {
       const p = xnum ? se.v.find(q => q[0] === k) : se.v[k], v = p == null ? null : val(p);
       const dot = svg.querySelector(`.hd[data-c="${se.c}"]`);
       if (v != null) { dot.style.transform = `translate(${cx}px,${ys(v)}px)`; dot.dataset.v = v; dot.setAttribute("opacity", "1"); } else dot.setAttribute("opacity", "0");
@@ -1119,19 +1131,38 @@ function daily() {
 function renderPB() {
   ["5K", "10K", "Half"].forEach(k => {
     $("pb-" + k).innerHTML = V().map(a => { const p = a.pb[k] || []; return `<span><i class="dot ${a.c}"></i> <b>${num(p.length ? p[p.length-1].sec : null, "hms")}</b></span>`; }).join("");
-    $("in-" + k).innerHTML = V().map(a => { const p = a.pb[k] || []; if (p.length < 2) return line(a, `<span class="muted">${p.length ? "baru 1 catatan" : "belum ada"}</span>`);
-      const gain = p[0].sec - p[p.length-1].sec; return line(a, `<span><b>−${hms(gain)}</b> sejak ${tgl(p[0].date)}</span>`); }).join("");
-    chart("ch-" + k, {xnum: true, invert: true, time: true, h: 180, fmtY: hms, fmtV: hms, label: `Rekor ${k} dari waktu ke waktu`,
-      series: V().map(a => ({c: a.c, dots: true, area: false, v: (a.pb[k] || []).map(p => [D(p.date).getTime(), p.sec])}))});
+    const n = a => (a.eff && a.eff[k] || []).length;
+    $("in-" + k).innerHTML = V().map(a => { const p = a.pb[k] || []; if (p.length < 2) return line(a, `<span class="muted">${p.length ? `baru 1 catatan · ${n(a)} lari` : "belum ada"}</span>`);
+      const gain = p[0].sec - p[p.length-1].sec; return line(a, `<span><b>−${hms(gain)}</b> sejak ${tgl(p[0].date)} · ${n(a)} lari</span>`); }).join("");
+    // every run's fastest segment as a dot, the running best as a thin staircase up to today, the fastest ringed
+    const has = V().some(a => n(a)), now = D(DATA.today).getTime();
+    if (!has) return pbEmpty(k);
+    chart("ch-" + k, {xnum: true, invert: true, time: true, h: 180, fmtY: hms, fmtV: hms, label: `Semua usaha ${k} dari waktu ke waktu; titik bercincin = tercepat`,
+      detail: (a, x, v) => { const b = Math.min(...(a.eff[k] || []).map(p => p[1])); return v === b ? "tercepat" : ""; },
+      series: V().flatMap(a => { const E = (a.eff && a.eff[k] || []).map(p => [D(p[0]).getTime(), p[1]]); if (!E.length) return [];
+        let best = Infinity; const st = []; E.forEach(p => { if (p[1] < best) { best = p[1]; st.push([p[0], best]); } }); st.push([now, best]);
+        return [{c: a.c, v: st, step: true, area: false}, {c: a.c, v: E, scatter: true, area: false}]; })});
   });
   $("pb-Full").innerHTML = V().map(a => `<span><i class="dot ${a.c}"></i> <b>${num(a.est.sec, "hm")}</b></span>`).join("");
-  $("in-Full").innerHTML = V().map(a => { const s = estStatus(a), T = a.targets || {};
-    return line(a, `${chip(s[0], s[1])}<span>${a.est.sec ? `+ panas <b>${hm(a.est.sec * HEAT)}</b> · ` : ""}<span class="muted">${["A", "B", "C"].filter(k => T[k] && T[k].hi).map(k => `${k} ≤ ${hm(T[k].hi)}`).join(" · ")}</span></span>${tip("est", s[0])}`); }).join("");
+  // compact: one chip per runner; limits, heat correction and advice live in the chip's tooltip
+  const sh = a => { const s = estStatus(a), T = a.targets || {}, adv = TIPS.est && TIPS.est[s[0]];
+    return esc(`<span class='t1'>${a.name} · ${s[1]}</span>${a.est.sec ? `+ panas 5%: <b>${hm(a.est.sec * HEAT)}</b><br>` : ""}${["A", "B", "C"].filter(k => T[k] && T[k].hi).map(k => `${k} ≤ ${hm(T[k].hi)}`).join(" · ")}${adv ? `<br>Saran: ${adv}` : ""}`).replace(/"/g, "&quot;"); };
+  $("in-Full").innerHTML = `<div class="pb-chips">${V().map(a => `<span class="pb-cw" data-sh="${sh(a)}"><i class="dot ${a.c}" aria-hidden="true"></i>${chip(estStatus(a)[0], estStatus(a)[1].replace("Masuk ", "").replace(/^t/, "T"))}</span>`).join("")}</div>
+    <div class="muted" style="font-size:13px">+ panas ${V().map(a => a.est.sec ? hm(a.est.sec * HEAT) : "–").join(" / ")} · sentuh status untuk batas dan saran</div>`;
   chart("ch-Full", {xnum: true, invert: true, time: true, h: 180, fmtY: hm, fmtV: hm, label: "Estimasi waktu maraton per akhir bulan dibanding target",
     detail: (a, k) => { const p = a.est.series.find(q => D(q.date).getTime() === k); return p ? `dari usaha ${p.from}` : ""; },
     bands: V().filter(a => a.target && a.target.hi).map(a => ({c: a.c, y: [a.target.lo || a.target.hi - 600, a.target.hi]})),
     series: V().map(a => ({c: a.c, dots: true, dash: true, area: false, v: a.est.series.map(p => [D(p.date).getTime(), p.sec])}))});
+  requestAnimationFrame(pbFit);
 }
+// no effort yet (e.g. Half): a faint placeholder chart and when the next test is
+function pbEmpty(k) { delete CHARTS["ch-" + k]; const ev = (DATA.all_events || []).find(e => e.date >= DATA.today && new RegExp(k === "Half" ? "half" : k, "i").test(e.event));
+  const km = {"5K": "5", "10K": "10", Half: "21,1"}[k], d = ev ? Math.round((D(ev.date) - D(DATA.today)) / 864e5) : null;
+  $("ch-" + k).innerHTML = `<div class="pb-empty"><svg viewBox="0 0 200 90" preserveAspectRatio="none" aria-hidden="true"><path d="M4 70 L50 66 L92 66 L130 40 L196 36" fill="none" stroke="var(--t)" stroke-width="2"/><path d="M4 50 L60 50 L110 46 L160 30 L196 30" fill="none" stroke="var(--r)" stroke-width="2"/></svg>
+    <p>${ev ? `<b>${esc(calm(ev.event))} · ${tgl(ev.date)}</b>${d} hari lagi · ` : ""}titik pertama muncul setelah lari ≥ ${km} km</p></div>`; }
+// the four cards share one height (the tallest, usually Full); the other charts take the room that is left
+function pbFit() { ["5K", "10K", "Half"].forEach(k => { const el = $("ch-" + k), o = CHARTS["ch-" + k]; if (!o) return;
+  el.innerHTML = ""; el.style.flex = "1 1 auto"; const h = Math.max(180, Math.floor(el.clientHeight)); o.h = h; draw("ch-" + k, o); }); }
 
 // ---------------------------------------------------------------- badges
 function renderBadges() {
@@ -1793,13 +1824,14 @@ $("p-sesi").addEventListener("click", e => {
 function ssCloseDay() { if (SSOPEN) SSOPEN.classList.remove("open"); SSOPEN = null; $("ss-feed").querySelectorAll(".ss-fr.on").forEach(x => x.classList.remove("on")); }
 function ssFocus() { const b = $("ss-box"); b.classList.toggle("fx", !!$("ss-feed").querySelector(".ss-wg.open")); b.classList.toggle("fx2", !!SSOPEN); }
 function ssBoxTo(el, delay) { setTimeout(() => { const b = $("ss-box"); b.scrollTo({top: b.scrollTop + el.getBoundingClientRect().top - b.getBoundingClientRect().top - 4, behavior: REDUCED ? "auto" : "smooth"}); }, delay); }
-// box height = 8 closed weeks (capped at 78% of the screen on phones); fades at the edges show there is more
+// box height = 10 closed weeks (capped at 78% of the screen on phones); fades at the edges show there is more
 function ssBoxSize() { const b = $("ss-box"), hs = [...b.querySelectorAll(".ss-wgh")]; if (!hs.length) return;
-  const h = hs[0].offsetHeight + 6; b.style.height = hs.length > 8 ? Math.min(h * 8 + 4, innerHeight * .78) + "px" : ""; ssEdges(); ssBox.size(); }
+  const h = hs[0].offsetHeight + 6; b.style.height = hs.length > 10 ? (innerWidth < 640 ? Math.min(h * 10 + 4, innerHeight * .78) : h * 10 + 4) + "px" : ""; ssEdges(); ssBox.size(); }
 function ssEdges() { const b = $("ss-box"); b.classList.toggle("ft", b.scrollTop > 2); b.classList.toggle("fb", b.scrollTop + b.clientHeight < b.scrollHeight - 2); }
 const ssBox = ownScroll($("ss-box"), $("ss-sbar"), document.querySelector(".ss-boxw"));
 $("ss-box").addEventListener("scroll", ssEdges, {passive: true});
 addEventListener("resize", () => TAB === "sesi" && ssBoxSize());
+let pbT = 0; addEventListener("resize", () => { clearTimeout(pbT); pbT = setTimeout(() => TAB === "ring" && pbFit(), 150); });
 $("p-sesi").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest(".ss-fr:not(.plan)") && !e.target.closest(".ss-det")) { e.preventDefault(); e.target.closest(".ss-fr").click(); } });
 
 // ---------------- Arah: 8 weeks, one picture per question, numbers in the runner's colour, every arrow explained
@@ -1888,7 +1920,7 @@ function tabSel() { document.querySelectorAll("#tabs [data-t], #st-mtabs [data-t
 function goTab(t, jump) { if (t === TAB) return; const from = $("p-" + TAB), to = $("p-" + t); TAB = t; tabSel();
   try { localStorage.setItem("pacelab-tab", t); } catch (e) {}
   const show = () => { from.classList.add("st-hide"); from.classList.remove("st-out"); to.classList.remove("st-hide"); to.classList.add("st-in0");
-    if (t === "sesi") renderSesi(); requestAnimationFrame(() => requestAnimationFrame(() => to.classList.remove("st-in0")));
+    if (t === "sesi") renderSesi(); else pbFit(); requestAnimationFrame(() => requestAnimationFrame(() => to.classList.remove("st-in0")));
     if (jump) scrollTo({top: $("tabs").getBoundingClientRect().top + scrollY - 70, behavior: REDUCED ? "auto" : "smooth"}); };
   if (REDUCED) return show(); from.classList.add("st-out"); setTimeout(show, 250); }
 $("tabs").addEventListener("click", e => { const b = e.target.closest("[data-t]"); if (b) goTab(b.dataset.t); });
