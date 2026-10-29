@@ -1,7 +1,7 @@
 """Incremental download of one athlete's runs and wellness into data/<ID>/.
 
   runs.json        normalized run summaries
-  streams/<id>.json   {"t","d","hr"} per run (from activity details)
+  streams/<id>.json   {"t","d","hr","cad","el","v"} per run (from activity details)
   wellness.json    {"YYYY-MM-DD": {"sleep_s","sleep_score","hrv","hrv_status","bb","rhr","weight"}}
   state.json       what is already downloaded
 
@@ -27,6 +27,7 @@ WEIGHT = "/weight-service/weight/range/%s/%s"
 CHUNK = {"sleep": 28, "hrv": 180, "bb": 28, "daily": 28, "weight": 180}
 REFETCH_DAYS = 3  # late-arriving sleep/HRV for the last nights
 SCHEMA = 3  # bump when wellness parsing changes: the full history is re-read once
+STREAM_V = 2  # bump when per-second parsing changes: every stream is downloaded once more (2: cadence, elevation)
 RHR_KEY = re.compile(r"resting_?heart_?rate(_?value)?$|^rhr$", re.I)
 DATE_KEY = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -145,7 +146,10 @@ def norm_stream(details):
         return None
     ts_ms = ti == idx.get("directTimestamp") and "sumDuration" not in idx and "sumElapsedDuration" not in idx
     hi = idx.get("directHeartRate")
-    t, d, hr = [], [], []
+    ci = next((idx[k] for k in ("directDoubleCadence", "directRunCadence") if k in idx), None)
+    ei = next((idx[k] for k in ("directElevation", "directCorrectedElevation") if k in idx), None)
+    t, d, hr, cad, el = [], [], [], [], []
+    val = lambda r, i: r[i] if i is not None and i < len(r) else None
     t0 = None
     for r in rows:
         tv, dv = r[ti], r[idx["sumDistance"]]
@@ -160,7 +164,17 @@ def norm_stream(details):
         d.append(round(dv, 1))
         hv = r[hi] if hi is not None and hi < len(r) else None
         hr.append(round(hv) if hv else None)
-    return {"t": t, "d": d, "hr": hr, "keys": sorted(k for k in idx if k)} if len(t) > 1 else None
+        cv, ev = val(r, ci), val(r, ei)
+        cad.append(round(cv) if cv else None)
+        el.append(round(ev, 1) if ev is not None else None)
+    if len(t) < 2:
+        return None
+    # some watches report steps per minute of one leg (~85): double it to steps per minute
+    cs = sorted(c for c in cad if c)
+    if cs and cs[len(cs) // 2] < 120:
+        cad = [c * 2 if c else None for c in cad]
+    return {"t": t, "d": d, "hr": hr, "cad": cad if cs else None, "el": el if any(e is not None for e in el) else None,
+            "v": STREAM_V, "keys": sorted(k for k in idx if k)}
 
 
 def norm_sleep(item):
@@ -219,6 +233,7 @@ class Syncer:
         self.well = _read(self.dir / "wellness.json", {})
         self.unavailable = []
         self.no_stream = set(self.state.get("no_stream", []))
+        self.refetch = self.state.get("stream_v", 1) < STREAM_V  # older streams lack cadence/elevation
 
     def run(self, since, until):
         new_runs = self.sync_runs(since, until)
@@ -242,7 +257,8 @@ class Syncer:
                 if r["id"] is None or not r["date"]:
                     continue
                 has_stream = (self.dir / "streams" / ("%s.json" % r["id"])).is_file()
-                if r["id"] not in self.runs or not (has_stream or r["id"] in self.no_stream):
+                stale = self.refetch and has_stream
+                if r["id"] not in self.runs or stale or not (has_stream or r["id"] in self.no_stream):
                     self._stream(r)
                     new += 1
                     if new % 25 == 0:
@@ -250,6 +266,8 @@ class Syncer:
                 self.runs[r["id"]] = r
             _write(self.dir / "runs.json", sorted(self.runs.values(), key=lambda x: x["start"] or x["date"]))
             if len(items) < page:
+                self.refetch = False
+                self.state["stream_v"] = STREAM_V
                 return new
             start += page
 

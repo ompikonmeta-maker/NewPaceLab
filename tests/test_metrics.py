@@ -46,6 +46,20 @@ class StreamTest(unittest.TestCase):
         e1, e2 = v1 / h1, v2 / h2  # the working shown in the dashboard gives the same result
         self.assertAlmostEqual((e1 - e2) / e1 * 100, r["pct"], delta=0.06)
 
+    def test_per_km(self):
+        s = stream(540, 5.5, hr=lambda t: 140 if t < 1350 else 150)
+        s["cad"] = [170] * len(s["t"])
+        s["el"] = list(range(len(s["t"])))
+        k = m.per_km(s)
+        self.assertEqual(len(k), 6)  # 5 full km + the last 500 m
+        self.assertAlmostEqual(k[0][0], 1.0, delta=.01)
+        self.assertAlmostEqual(k[0][1], 540, delta=6)
+        self.assertEqual(k[0][2], 140)
+        self.assertEqual(k[4][2], 150)
+        self.assertEqual(k[0][3], 170)
+        self.assertAlmostEqual(k[-1][0], .5, delta=.01)
+        self.assertEqual(m.per_km(stream(540, 1.2))[-1][0], 1.0)  # 200 m tail dropped
+
     def test_decoupling_filters_records(self):
         s = stream(540, 15, hr=lambda t: 70 if t < 1000 else 150)  # HR <= 80 is dropped
         self.assertAlmostEqual(m.decoupling(s), 0.0, delta=0.2)

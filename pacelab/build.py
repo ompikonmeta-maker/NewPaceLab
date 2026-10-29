@@ -64,7 +64,7 @@ def athlete_data(a, data_dir, today):
     last_done = done[-1] if done else None
     return {
         "id": a["id"], "name": a["name"],
-        "program": prog, "weight_floor": a.get("weight_floor"),
+        "program": prog, "weight_floor": a.get("weight_floor"), "zones": a.get("zones"), "cadence": a.get("cadence"),
         "has_data": bool(runs or well),
         "longest": max([r["km"] for r in in_program] or [0]),
         "weeks": weeks,
@@ -86,7 +86,21 @@ def athlete_data(a, data_dir, today):
         "last_done_ms": last_done["ms"] if last_done else None,
         "sync": _read(folder / "state.json", {}).get("last_sync"),
         "run_days": _run_days(in_program),
+        "sessions": [_session(r, streams.get(r["id"])) for r in in_program],
     }
+
+
+def _session(r, stream):
+    """One run for the Sesi tab: totals, per-km splits and (for runs of 10 km or more) decoupling."""
+    s = {"id": r["id"], "date": r["date"], "time": (r.get("start") or "")[11:16], "km": round(r["km"], 2),
+         "sec": round(r["sec"]), "hr": r.get("avg_hr"), "splits": [], "dec": None, "dec_full": None}
+    if stream:
+        s["splits"] = m.per_km(stream)
+        if r["km"] >= m.LONG_RUN_MIN_KM:
+            dd = m.decoupling_detail(stream)
+            if dd:
+                s["dec"], s["dec_full"] = dd["pct"], dd["full"]
+    return s
 
 
 def _run_days(runs):
@@ -144,7 +158,7 @@ def _slim(x, color):
     return {
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
-        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "sleep_min": prog["sleep"].get("min"),
+        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "zones": x.get("zones"), "cadence": x.get("cadence"), "sleep_min": prog["sleep"].get("min"),
         "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],
@@ -152,5 +166,5 @@ def _slim(x, color):
         # full program for the track and the weekly schedule overlay
         "plan": [{k: w.get(k) for k in ("ms", "start", "phase", "km", "lr", "down", "event", "notes", "days")}
                  for w in prog["weeks"]],
-        "run_days": x["run_days"],
+        "run_days": x["run_days"], "sessions": x["sessions"],
     }

@@ -6,6 +6,7 @@ probe report; run `python pacelab.py check` on real data to confirm them.
 
 Usage: python tools/mock_garmin.py [port]   (keys: demo-taofik, demo-reza)
 """
+import math
 import datetime as dt
 import json
 import random
@@ -90,14 +91,17 @@ class Athlete:
             frac = d / total
             v = 1000 / (pace * (1 + rnd.uniform(-.03, .03)))
             h = self.p["hr"] * (1.12 if race else 1) * (1 + drift * frac) + rnd.uniform(-2, 2)
-            rows.append([t, round(d, 1), round(h), round(v, 3)])
+            cad = (172 if self.p["hr"] > 145 else 168) + rnd.uniform(-2, 2) - (5 * frac if km >= 15 else 1 * frac)
+            ele = 15 + 8 * math.sin(d / 1700.0) + 4 * math.sin(d / 430.0)
+            rows.append([t, round(d, 1), round(h), round(v, 3), round(cad), round(ele, 1)])
             t += step
             d = min(total, d + v * step)
-        rows.append([t, round(total, 1), rows[-1][2], rows[-1][3]])
+        rows.append([t, round(total, 1)] + rows[-1][2:])
         self.streams[aid] = {
-            "activityId": aid, "measurementCount": len(rows), "metricsCount": 4,
+            "activityId": aid, "measurementCount": len(rows), "metricsCount": 6,
             "metricDescriptors": [{"metricsIndex": 0, "key": "sumDuration"}, {"metricsIndex": 1, "key": "sumDistance"},
-                                  {"metricsIndex": 2, "key": "directHeartRate"}, {"metricsIndex": 3, "key": "directSpeed"}],
+                                  {"metricsIndex": 2, "key": "directHeartRate"}, {"metricsIndex": 3, "key": "directSpeed"},
+                                  {"metricsIndex": 4, "key": "directDoubleCadence"}, {"metricsIndex": 5, "key": "directElevation"}],
             "activityDetailMetrics": [{"metrics": r} for r in rows]}
         self.runs.append({
             "activityId": aid, "activityName": "Lari" if not race else "Race 5K",

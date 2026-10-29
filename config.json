@@ -1,7 +1,9 @@
 {
   "athletes": [
-    {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx", "weight_floor": 65},
-    {"id": "REZA", "name": "Reza", "program": "programs/Program_Marathon_PRAMANA.xlsx", "weight_floor": 73}
+    {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx", "weight_floor": 65,
+     "zones": [133, 151, 162, 177], "cadence": [168, 172]},
+    {"id": "REZA", "name": "Reza", "program": "programs/Program_Marathon_PRAMANA.xlsx", "weight_floor": 73,
+     "zones": [139, 153, 164, 174], "cadence": [172, 176]}
   ],
   "since": "2026-03-23",
   "data_dir": "data",

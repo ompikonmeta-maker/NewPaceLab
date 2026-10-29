@@ -53,6 +53,11 @@ class BuildTest(unittest.TestCase):
         self.assertIn(a["today"]["light"]["level"], ("hijau", "kuning", "oranye", "merah"))
         self.assertTrue(a["pb"]["5K"])
         self.assertIsNotNone(d["score"])
+        s = max(a["sessions"], key=lambda x: x["km"])
+        self.assertEqual(len(s["splits"]), int(s["km"]) + (s["km"] % 1 >= .3))
+        self.assertIsNotNone(s["dec"])
+        km, sec, hr, cad, el = s["splits"][0]
+        self.assertTrue(km and sec and hr and cad and el is not None)
 
     def test_build_without_data(self):
         cfg = {"data_dir": str(self.tmp / "kosong")}

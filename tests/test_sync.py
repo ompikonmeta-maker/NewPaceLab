@@ -46,9 +46,23 @@ class SyncTest(unittest.TestCase):
         day = well["2026-10-20"]
         for k in ("sleep_s", "hrv", "hrv_status", "bb", "rhr"):
             self.assertIn(k, day)
+        s = json.loads(next((out / "streams").glob("*.json")).read_text())
+        self.assertTrue(s["cad"] and 150 < sorted(c for c in s["cad"] if c)[len(s["cad"]) // 2] < 190)
+        self.assertTrue(s["el"])
         r2 = Syncer(self.client(), out, log=lambda *a: None).run(dt.date(2026, 9, 1), TODAY)
         self.assertEqual(r2["new_runs"], 0)
         self.assertLess(r2["requests"], 15)
+
+    def test_old_streams_downloaded_once_more_for_cadence(self):
+        out = self.tmp / "REZA"
+        Syncer(self.client(), out, log=lambda *a: None).run(dt.date(2026, 10, 1), TODAY)
+        st = json.loads((out / "state.json").read_text())
+        st["stream_v"] = 1  # as written by the previous version
+        (out / "state.json").write_text(json.dumps(st))
+        n = len(list((out / "streams").glob("*.json")))
+        r = Syncer(self.client(), out, log=lambda *a: None).run(dt.date(2026, 10, 1), TODAY)
+        self.assertEqual(r["new_runs"], n)
+        self.assertEqual(Syncer(self.client(), out, log=lambda *a: None).run(dt.date(2026, 10, 1), TODAY)["new_runs"], 0)
 
     def test_bad_key_message_has_no_key(self):
         secret = "SANGAT-RAHASIA-123"
@@ -122,6 +136,15 @@ class NormalizeTest(unittest.TestCase):
         self.assertEqual(s["t"], [0, 5, 10])
         self.assertEqual(s["d"], [0, 15, 31])
         self.assertEqual(s["hr"], [120, 125, None])
+        self.assertIsNone(s["cad"])
+
+    def test_stream_cadence_one_leg_is_doubled(self):
+        det = {"metricDescriptors": [{"metricsIndex": 0, "key": "sumDuration"}, {"metricsIndex": 1, "key": "sumDistance"},
+                                     {"metricsIndex": 2, "key": "directRunCadence"}, {"metricsIndex": 3, "key": "directElevation"}],
+               "activityDetailMetrics": [{"metrics": [0, 0, 84, 10.0]}, {"metrics": [5, 15, 86, 10.5]}, {"metrics": [10, 31, 85, 11.2]}]}
+        s = norm_stream(det)
+        self.assertEqual(s["cad"], [168, 172, 170])
+        self.assertEqual(s["el"], [10.0, 10.5, 11.2])
 
     def test_rhr_shapes(self):
         self.assertEqual(rhr_by_date({"data": [{"calendarDate": "2026-10-26", "restingHeartRate": 52}]}),
