@@ -3,7 +3,22 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0. Duel per sesi + Arah (versi lanjutan, 29 Okt) — menunggu pilihan
+## 0a. Tab "Sesi" (versi 3, 29 Okt malam) — menunggu pilihan
+
+Mockup: [`docs/mockup/tab-sesi.html`](mockup/tab-sesi.html) (pilih opsi di bilah atas). Data rekaan.
+Sudah diputuskan: cadence ditambah ke sync; rumus kepatuhan disetujui; pace di zona 2 dan meter per detak dua-duanya tampil.
+
+- **Tab** (header hitung mundur + lintasan tetap terlihat): T1 judul besar + garis geser · T2 tombol pil berikon ·
+  T3 header ringkas melekat di atas saat di-scroll (hitung mundur, garis progres, tab).
+- **Isi Sesi**: A Linimasa cermin (Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per MS) ·
+  B Pita + duel · C Rapor pelatih (nilai mingguan A–D dari 4 pilar: konsistensi, intensitas, daya tahan, pemulihan).
+- **Detail duel (sama di semua opsi), semuanya cermin**: angka di dekat sumbu, batang tumbuh keluar; penilaian
+  pelatih per jenis sesi (✓ / !); grafik per km kupu-kupu (batang kecepatan + pita rentang rencana, garis HR di jalur
+  luar); waktu di zona cermin; satu catatan + saran per pelari.
+- **Arah**: angka Taofik rata kanan, Reza rata kiri, dua garis.
+- Rumus nilai A–D (opsi C) belum ada di dokumen → [keputusan dashboard], perlu disetujui bila C dipilih.
+
+## 0. Duel per sesi + Arah (versi lanjutan, 29 Okt) — digantikan 0a
 
 Mockup: [`docs/mockup/duel-sesi.html`](mockup/duel-sesi.html). Data di mockup rekaan.
 Menggantikan rencana 1 di bawah (B dan C sudah tercakup).
