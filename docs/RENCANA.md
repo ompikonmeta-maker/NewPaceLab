@@ -3,7 +3,12 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 9. Per km vs lap Garmin — dipilih: lap utama, per km cadangan; menunggu hasil `inspect` dari omPik
+## 9. Per km vs lap Garmin — lap Garmin tidak tersedia; menunggu pilihan pengganti
+
+Hasil `inspect` (29 Okt, kedua pelari): splits / typedsplits / split_summaries = 404 untuk key pribadi; details hanya berisi
+metricDescriptors (data per detik), tanpa daftar lap. Pengganti yang mungkin: B1 segmen dari rencana Excel (pemanasan /
+tempo / pendinginan, per km di dalamnya); B2 lap ditebak dari perubahan kecepatan di data per detik; cek dulu nama metrik
+di `python pacelab.py check` (baris "stream keys") — bila ada indeks lap, lap asli bisa dibangun ulang.
 
 omPik: 27 Okt di Garmin 12 lap, dashboard 9 batang. Dashboard tidak memakai lap Garmin: batang = potongan tiap 1000 m dari
 data per detik (`metrics.per_km`), sisa < 300 m dibuang (9,1 km → 9 batang). Lap Garmin mengikuti setelan jam (auto-lap,
