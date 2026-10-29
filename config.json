@@ -1,9 +1,14 @@
 {
+  "coach": {"km": [0.95, 1.10], "hr_over_max": 0.20, "lr_hr_in": 0.75, "lr_tail": 0.25, "dec_max": 8,
+            "tol_s": 5, "open_tol_s": 10, "cad_drop": 5, "lr_max_min": 210},
   "athletes": [
     {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx", "weight_floor": 65,
-     "zones": [133, 151, 162, 177], "cadence": [168, 172]},
+     "zones": [133, 151, 162, 177], "cadence": [168, 172],
+     "pace": {"rec": ["9:15", "9:45"], "easy": ["8:40", "9:15"], "mp": ["7:15", "7:30"], "tempo": ["6:00", "6:10"], "interval": ["6:00", "6:15"]}},
     {"id": "REZA", "name": "Reza", "program": "programs/Program_Marathon_PRAMANA.xlsx", "weight_floor": 73,
-     "zones": [139, 153, 164, 174], "cadence": [172, 176]}
+     "zones": [139, 153, 164, 174], "cadence": [172, 176],
+     "pace": {"rec": ["9:20", "9:50"], "easy": ["8:45", "9:20"], "mp": ["7:45", "7:45"], "tempo": ["7:10", "7:20"], "interval": ["6:20", "6:30"],
+              "hr_leads": true}}
   ],
   "since": "2026-03-23",
   "data_dir": "data",

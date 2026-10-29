@@ -425,7 +425,19 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-tip.wide{max-width:none} .ss-tip .kmt{display:grid;grid-template-columns:repeat(5,max-content);column-gap:14px;row-gap:3px;white-space:nowrap;font-variant-numeric:tabular-nums;align-items:baseline}
 .ss-tip .kmt .kn{display:flex;align-items:center;gap:6px;color:var(--muted)} .ss-tip .kmt b{text-align:right} .ss-tip .kmt small{font-weight:400;color:var(--muted)} .ss-tip .dot{width:8px;height:8px}
 .ss-term{border-bottom:1.5px dotted var(--muted);cursor:help}
-/* feed: weeks, days on a centre spine */
+/* feed: weeks, days on a centre spine; a box 8 weeks tall with its own fading scrollbar */
+.ss-boxw{position:relative}
+.ss-box{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;padding:2px 6px}
+.ss-box::-webkit-scrollbar{display:none}
+.ss-box.ft{-webkit-mask-image:linear-gradient(transparent,#000 28px);mask-image:linear-gradient(transparent,#000 28px)}
+.ss-box.fb{-webkit-mask-image:linear-gradient(#000 calc(100% - 28px),transparent);mask-image:linear-gradient(#000 calc(100% - 28px),transparent)}
+.ss-box.ft.fb{-webkit-mask-image:linear-gradient(transparent,#000 28px,#000 calc(100% - 28px),transparent);mask-image:linear-gradient(transparent,#000 28px,#000 calc(100% - 28px),transparent)}
+/* focus: what is not expanded turns grey, fades and shrinks a little; the expanded part lifts */
+.ss-wg,.ss-fr{transition:opacity .4s var(--ease),filter .4s var(--ease),transform .4s var(--ease)}
+.ss-box.fx .ss-wg:not(.open),.ss-box.fx2 .ss-wg.open .ss-fr:not(.on){opacity:.35;filter:grayscale(1);transform:scale(.97)}
+.ss-box.fx .ss-wg:not(.open):hover,.ss-box.fx2 .ss-wg.open .ss-fr:not(.on):hover{opacity:1;filter:none;transform:none}
+.ss-box.fx .ss-wg.open .ss-wgh .wm{border-color:var(--text);box-shadow:0 12px 32px rgba(0,0,0,.12)}
+.ss-box.fx2 .ss-fr.on .ss-sc{box-shadow:0 12px 32px rgba(0,0,0,.12)}
 .ss-feed{position:relative}
 .ss-feed::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--grid)}
 .ss-wg{position:relative;margin-bottom:6px}
@@ -443,7 +455,10 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-sc{display:flex;align-items:center;gap:12px;border:1px solid var(--line);background:var(--surface);border-radius:16px;padding:10px 14px;transition:box-shadow .3s;opacity:0;transform:translateY(8px)}
 .ss-wg.open .ss-sc{animation:ssrise .5s var(--ease) forwards;animation-delay:calc(var(--i) * 40ms)} @keyframes ssrise{to{opacity:1;transform:none}}
 .ss-fr:hover .ss-sc{box-shadow:0 8px 24px rgba(0,0,0,.07)}
-.ss-sc.L{flex-direction:row-reverse;text-align:right} .ss-sc .km{font-size:20px;font-weight:700;letter-spacing:-.01em} .ss-sc .km small{font-size:12px;font-weight:400;color:var(--muted)}
+.ss-sc.L{flex-direction:row-reverse;text-align:right}
+/* card colour fades from the outer edge; stronger = closer to plan (compliance) */
+.ss-sc.L:not(.ghost){border-color:transparent;background:linear-gradient(90deg,color-mix(in srgb,var(--t) calc(var(--cp,0) * 30%),var(--surface)),var(--surface) 75%)}
+.ss-sc.R:not(.ghost){border-color:transparent;background:linear-gradient(270deg,color-mix(in srgb,var(--r) calc(var(--cp,0) * 30%),var(--surface)),var(--surface) 75%)} .ss-sc .km{font-size:20px;font-weight:700;letter-spacing:-.01em} .ss-sc .km small{font-size:12px;font-weight:400;color:var(--muted)}
 .ss-sc .meta{font-size:12.5px;color:var(--muted);line-height:1.35} .ss-sc .sp2{flex:1}
 .ss-sc.ghost{border-style:dashed;background:transparent;color:var(--muted);font-size:13px;justify-content:center}
 .ss-sc.none{visibility:hidden}
@@ -471,7 +486,8 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-sec{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--muted);margin:22px 0 8px;text-align:center} .ss-sec .s2{font-weight:400;text-transform:none;letter-spacing:0}
 .ss-mir{display:grid;grid-template-columns:minmax(0,1fr) 116px minmax(0,1fr);align-items:center;column-gap:10px} .ss-mir > .c{text-align:center;font-size:12.5px;color:var(--muted)}
 .ss-ck .crow{padding:6px 0;border-top:1px solid var(--line)} .ss-ck .L,.ss-ck .R{display:flex;align-items:center;gap:8px;font-size:13.5px} .ss-ck .L{justify-content:flex-end;text-align:right}
-.ss-ck .val{color:var(--text-2);font-variant-numeric:tabular-nums} .ss-ck svg{width:18px;height:18px;flex:none} .ss-ok{color:var(--good)} .ss-wn{color:var(--warn)} .ss-na{color:var(--muted)}
+.ss-ck .val{color:var(--text-2);font-variant-numeric:tabular-nums} .ss-ck .val small{display:block;color:var(--muted);font-size:11.5px;line-height:1.3}
+.ss-kms{display:inline-flex;gap:3px;flex-wrap:wrap} .ss-ck .L .ss-kms{justify-content:flex-end} .ss-kms .km{font-size:11px;border-radius:5px;padding:0 5px;background:var(--bg);border:1px solid var(--line)} .ss-kms .km.f{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:700} .ss-kms .km.x{opacity:.45;text-decoration:line-through} .ss-ck svg{width:18px;height:18px;flex:none} .ss-ok{color:var(--good)} .ss-wn{color:var(--warn)} .ss-na{color:var(--muted)}
 .ss-lt{display:flex;justify-content:center;gap:6px;margin:-2px 0 10px;flex-wrap:wrap}
 .ss-lt button{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 12px 3px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .25s}
 .ss-lt button::before{content:"";width:16px;height:0;border-top:2px solid currentColor;opacity:.45;transition:opacity .25s} .ss-lt button[data-lane="cad"]::before{border-top-style:dashed} .ss-lt button[data-lane="el"]::before{border-top-style:dotted;border-top-width:3px}
@@ -562,6 +578,7 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .fr .gnd{position:absolute;left:24%;right:6%;bottom:-3px;height:2px;background:repeating-linear-gradient(90deg,currentColor 0 7px,transparent 7px 14px);opacity:0;animation:ground .4s linear infinite;transition:opacity .3s}
 .fr .nm{position:absolute;left:50%;top:100%;margin-top:6px;transform:translateX(-50%) translateY(-4px);font-size:13px;font-weight:700;white-space:nowrap;opacity:0;transition:opacity .25s,transform .35s var(--ease)}
 .fr.docked .nm{opacity:1;transform:translateX(-50%)} .fr.docked .gnd{opacity:.5}
+.fr{transition:opacity .3s var(--ease)} .fr.dim{opacity:.18}
 .leg span{display:inline-flex;align-items:center;gap:6px}
 .leg i{width:12px;height:12px;border-radius:3px;display:inline-block}
 
@@ -668,8 +685,8 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="grid"><section class="card c12"><div class="badges" id="badges"></div></section></div>
 </div>
 <div class="st-pane st-hide" id="p-sesi">
-  <div class="ss-h"><div><h3>Linimasa sesi</h3><p>Taofik di kiri, Reza di kanan. Klik minggu untuk buka/tutup, klik hari untuk melihat duel sesi.</p></div></div>
-  <div class="ss-feed" id="ss-feed"></div>
+  <div class="ss-h"><div><h3>Linimasa sesi</h3><p>Taofik di kiri, Reza di kanan. Klik minggu untuk membuka (yang lain tertutup), klik hari untuk melihat duel sesi.</p></div></div>
+  <div class="ss-boxw"><div class="ss-box" id="ss-box"><div class="ss-feed" id="ss-feed"></div></div><div class="sbar" id="ss-sbar" aria-hidden="true"></div></div>
   <div class="ss-h" style="margin-top:36px"><div><h3>Arah</h3><p>Dibanding 8 minggu lalu. <b class="ss-up">▲▼ hijau</b> = membaik, <b class="ss-dn">▲▼ merah</b> = memburuk. Sentuh angka perubahan untuk penjelasannya.</p></div></div>
   <div class="ss-tg" id="ss-trends"></div>
 </div>
@@ -1371,30 +1388,49 @@ addEventListener("keydown", e => { if (e.key === "Escape" && lpFor) lpClose(); }
 // ---------------------------------------------------------------- runners leave the track on scroll and park at the edges
 const fly = {};
 function flyBuild() {
-  Object.values(fly).forEach(f => f.el.remove()); for (const k in fly) delete fly[k];
+  Object.values(fly).forEach(f => { cancelAnimationFrame(f.anim); f.el.remove(); }); for (const k in fly) delete fly[k];
   V().forEach(a => { const el = document.createElement("div"); el.className = "fr " + a.c; el.setAttribute("aria-hidden", "true");
     el.innerHTML = `<svg viewBox="-8 0 32 24"><g class="wind"><line x1="3" y1="8" x2="-3" y2="8"/><line x1="2" y1="12.5" x2="-5" y2="12.5"/><line x1="3" y1="17" x2="-2" y2="17"/></g><g class="rn">${RUN}</g></svg><span class="gnd"></span><span class="nm">${a.name}</span>`;
     document.body.appendChild(el); fly[a.c] = {el, off: null}; });
   flyPlace();
 }
 const easeIO = t => t < .5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
+// J3: once the track has scrolled away the runners jump on their own (fixed time, not tied to scroll speed):
+// crouch, an arc over the top, a short squash on landing. Scrolling back jumps them home the same way.
+const FLY_MS = 700;
+function flyGeo(c, f) { const pair = document.querySelector(".tl .pair"), svg = pair && pair.querySelector("svg"); if (!svg) return null;
+  const k = svg.getBoundingClientRect().width / 52, W = document.documentElement.clientWidth, small = W < 640, sc = small ? .8 : 1, el = f.el, s = el.firstChild;
+  s.setAttribute("width", 32 * k); s.setAttribute("height", 24 * k);
+  if (!f.off) { el.style.transform = "none"; const a = el.getBoundingClientRect(), b = el.querySelector(".rn").getBoundingClientRect(); f.off = [b.left - a.left, b.top - a.top]; }
+  const home = svg.querySelector(`.rn.${c}`).getBoundingClientRect(), w = 32 * k * sc, pad = small ? 14 : 26;
+  return {svg, pr: pair.getBoundingClientRect(), home: [home.left - f.off[0], home.top - f.off[1], 1], park: [c === "r" ? W - pad - w : pad, innerHeight / 2 - 12 * k * sc, sc]}; }
+function flyPut(f, x, y, z, sx, sy) { f.el.style.transformOrigin = "0 0"; f.el.style.transform = `translate(${x}px,${y}px) scale(${z})`; f.pos = [x, y, z];
+  const s = f.el.firstChild; s.style.transformOrigin = "50% 100%"; s.style.transform = sx === 1 && sy === 1 ? "" : `scale(${sx},${sy})`; }
+// fade a parked runner while data sits behind it (pointer-events:none lets the hit test see through it)
+function flyCovers(f) { const r = f.el.querySelector(".rn").getBoundingClientRect(); if (!r.width) return false;
+  for (const [px, py] of [[.5, .5], [.5, .15], [.5, .85]]) { let n = document.elementFromPoint(r.left + r.width * px, r.top + r.height * py);
+    for (let d = 0; n && n !== document.body && d < 6; n = n.parentElement, d++) { const cs = getComputedStyle(n);
+      if (n.matches(".wrap,.st-pane,.ss-box,.ss-feed,.ss-boxw,.ss-wg,.ss-wgb,.ss-fr")) continue;
+      if (n.closest("svg") || cs.backgroundImage !== "none" || !/rgba\(0, 0, 0, 0\)|transparent/.test(cs.backgroundColor) || [...n.childNodes].some(c => c.nodeType === 3 && c.textContent.trim())) return true; } }
+  return false; }
 function flyPlace() {
-  const pair = document.querySelector(".tl .pair"), svg = pair && pair.querySelector("svg"); if (!svg) return;
-  const pr = pair.getBoundingClientRect(), k = svg.getBoundingClientRect().width / 52, W = document.documentElement.clientWidth, H = innerHeight;
-  const raw = Math.min(1, Math.max(0, (64 - pr.top) / 170)), t = easeIO(raw), small = W < 640, sc = small ? .8 : 1;
-  svg.style.visibility = raw > 0 ? "hidden" : "";
-  for (const c in fly) { const f = fly[c], el = f.el, s = el.firstChild;
-    s.setAttribute("width", 32 * k); s.setAttribute("height", 24 * k);
-    el.classList.toggle("on", raw > 0); el.classList.toggle("docked", raw > .85);
-    if (!raw) continue;
-    if (!f.off) { el.style.transform = "none"; const a = el.getBoundingClientRect(), b = el.querySelector(".rn").getBoundingClientRect(); f.off = [b.left - a.left, b.top - a.top, b.width, b.height]; }
-    const home = svg.querySelector(`.rn.${c}`).getBoundingClientRect();
-    const hx = home.left - f.off[0], hy = home.top - f.off[1], w = 32 * k * sc, pad = small ? 14 : 26;
-    const ex = c === "r" ? W - pad - w : pad, ey = H / 2 - 12 * k * sc;
-    const x = hx + (ex - hx) * t, y = hy + (ey - hy) * t - Math.sin(Math.PI * t) * 28, z = 1 + (sc - 1) * t;
-    el.style.transform = `translate(${x}px,${y}px) scale(${z})`; el.style.transformOrigin = "0 0";
-  }
-}
+  for (const c in fly) { const f = fly[c], g = flyGeo(c, f); if (!g) return;
+    const away = g.pr.top < 56;  // track slid under the compact header
+    if (f.away !== away && f.away !== undefined && !REDUCED) { f.away = away; flyJump(c, f); }
+    f.away = away;
+    if (f.anim) continue;
+    f.el.classList.toggle("on", away); f.el.classList.toggle("docked", away);
+    g.svg.style.visibility = Object.values(fly).some(q => q.away || q.anim) ? "hidden" : "";
+    if (away) { flyPut(f, ...g.park, 1, 1); f.el.classList.toggle("dim", flyCovers(f)); } else f.el.classList.remove("dim"); } }
+function flyJump(c, f) { const t0 = performance.now(), from = (f.pos || flyGeo(c, f)[f.away ? "home" : "park"]).slice(), out = f.away;
+  cancelAnimationFrame(f.anim); f.el.classList.add("on"); f.el.classList.remove("docked", "dim"); flyGeo(c, f).svg.style.visibility = "hidden";
+  const step = now => { const g = flyGeo(c, f); if (!g) return; const k = Math.min(1, (now - t0) / FLY_MS), e = easeIO(k), to = out ? g.park : g.home;
+    const cx = (from[0] + to[0]) / 2, cy = Math.max(24, Math.min(from[1], to[1]) - 70);   // control point above both ends (kept on screen): an arc over the top
+    const x = (1 - e) ** 2 * from[0] + 2 * (1 - e) * e * cx + e * e * to[0], y = (1 - e) ** 2 * from[1] + 2 * (1 - e) * e * cy + e * e * to[1];
+    let sx = 1, sy = 1; if (k < .15) { sy = 1 - k * 1.2; sx = 1 + k * .8; } else if (k > .86) { const q = Math.sin((k - .86) / .14 * Math.PI) * .14; sy = 1 - q; sx = 1 + q; }
+    flyPut(f, x, y, from[2] + (to[2] - from[2]) * e, sx, sy);
+    if (k < 1) f.anim = requestAnimationFrame(step); else { f.anim = 0; flyPlace(); } };
+  f.anim = requestAnimationFrame(step); }
 let flyQ = 0;
 addEventListener("scroll", () => flyQ || (flyQ = requestAnimationFrame(() => { flyQ = 0; flyPlace(); })), {passive: true});
 addEventListener("resize", () => { for (const c in fly) fly[c].off = null; flyPlace(); });
@@ -1405,7 +1441,7 @@ function bounce(scroller, content, bar) {
   const lim = () => Math.min(140, (page ? innerHeight : scroller.clientHeight) * .18);
   const atEnd = dir => { const st = page ? scrollY : scroller.scrollTop, h = page ? innerHeight : scroller.clientHeight, sh = page ? document.documentElement.scrollHeight : scroller.scrollHeight;
     return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
-  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin")));
+  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin,.ss-box")));
   const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
     content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
     if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
@@ -1545,7 +1581,7 @@ function parsePlan(cell, ev) { if (!cell) return null;
   const h = txt.match(/detak jantung\s*(di bawah\s*)?(\d+)\s*(?:[-–]\s*(\d+))?/i);
   const warm = txt.match(/pemanasan[^\d\n]*(\d+(?:[.,]\d+)?)\s*km/i), tk = t.match(/(?:tempo|interval)[^\d]*(\d+(?:[.,]\d+)?)\s*km/i);
   return {k: ev ? "race" : k, title: calm(t), km: tot ? num(tot[1]) : first ? num(first[1]) : null, open, main,
-    hr: h ? (h[1] ? [0, +h[2]] : [+h[2], +(h[3] || h[2])]) : null, warm: warm ? num(warm[1]) : 0, tempo: tk ? num(tk[1]) : null}; }
+    hr: h ? (h[1] ? [0, +h[2]] : [+h[2], +(h[3] || h[2])]) : null, warm: warm ? num(warm[1]) : 0, tempo: tk ? num(tk[1]) : null, iv: /interval/i.test(t)}; }
 const RUNK = k => k && !["rest", "str"].includes(k);
 const zoneOf = (a, h) => (a.zones || []).filter(b => h >= b).length;      // 0..4 = Z1..Z5
 const spPace = sp => sp[1] / sp[0];
@@ -1557,38 +1593,76 @@ function segOf(x, pl) { const sp = x.splits; if (!pl) return sp;
   if (pl.k === "hard" && pl.tempo) return sp.slice(Math.round(pl.warm || 0), Math.round((pl.warm || 0) + pl.tempo));
   if (pl.k === "long" && pl.open) return sp.slice(3); return sp; }
 const inRng = (v, r, tol) => r && v != null && v >= r[0] - tol && v <= r[1] + tol;
-function ssComp(a, x, pl) { if (!x || !pl) return null; const parts = [], seg = segOf(x, pl).filter(p => p[0] >= .5);
-  if (pl.km) parts.push(Math.min(1, x.km / pl.km));
-  if (pl.main && seg.length) parts.push(seg.filter(p => inRng(spPace(p), pl.main, 5)).length / seg.length);
-  const hs = seg.filter(p => p[2]); if (pl.hr && hs.length) parts.push(hs.filter(p => p[2] >= pl.hr[0] && p[2] <= pl.hr[1]).length / hs.length);
+// Coach checks. Every number comes from the athlete profile in config.json ("coach", "pace", "zones");
+// the plan cell of that day wins over the profile. Rules: README "Penilaian pelatih" [keputusan omPik].
+const PK = {easy: "easy", long: "easy", rec: "rec"};
+function planFill(a, pl) { if (!pl || !["easy", "long", "rec", "hard"].includes(pl.k)) return pl; const P = a.pace || {}, z = a.zones || [], q = Object.assign({}, pl);
+  if (!q.main) q.main = pl.k === "hard" ? P[pl.iv ? "interval" : "tempo"] || null : P[PK[pl.k]] || null;
+  if (!q.hr && z.length > 1) q.hr = pl.k === "rec" ? [0, z[0]] : pl.k === "hard" ? null : [z[0], z[1]];
+  return q; }
+// morning gate (dokumen §7, same table as the Saturday rule): planned long run cut by sleep / Body Battery
+function gateOf(a, s, pl) { const w = wellOf(a, s); if (!pl || pl.k !== "long" || !w || !w.sleep_h || w.bb == null) return null;
+  const low = ["LOW", "POOR"].includes(w.hrv_status);
+  if (w.sleep_h < 5 && w.bb < 30 && low) return {km: 8, t: "diganti easy 8 km"};
+  if (w.sleep_h < 5 && w.bb < 40) return {f: .6, t: "dipotong 40%"};
+  if (w.sleep_h >= 6 && w.bb >= 50) return null;
+  return {f: .8, t: "dipotong 20%"}; }
+const kmPace = L => L.length ? L.reduce((q, p) => q + p[1], 0) / L.reduce((q, p) => q + p[0], 0) : null;
+const kmc = (L, bad) => `<span class="ss-kms">${L.map((v, i) => `<span class="km${bad(i) === 1 ? " f" : bad(i) === 2 ? " x" : ""}">${v}</span>`).join("")}</span>`;
+// distance window: plan × [lo, hi]; a morning-gate cut lowers the floor and still counts as done to plan
+function kmWin(a, x, pl, s) { const C = a.coach || {}, g = gateOf(a, s, pl); if (!pl || !pl.km || !C.km) return null;
+  const lo = g ? (g.km || pl.km * g.f) * C.km[0] : pl.km * C.km[0], hi = pl.km * C.km[1];
+  return {lo, hi, g, ok: x.km >= lo && x.km <= hi, pct: x.km / pl.km}; }
+// long run HR, option B: over the top only in the last part and decoupling under the limit; fallback A without decoupling
+function lrHr(a, x, pl) { const C = a.coach || {}, hs = x.splits.filter(p => p[2] && p[0] >= .5), top = pl.hr && pl.hr[1]; if (!top || !hs.length) return null;
+  const over = x.splits.map((p, i) => p[2] > top && p[0] >= .5 ? i : -1).filter(i => i >= 0), n = x.splits.length;
+  if (!over.length) return {ok: true, v: `tidak ada km di atas ${top}`};
+  const rng = over.length > 1 ? `km ${over[0] + 1}–${over[over.length - 1] + 1}` : `km ${over[0] + 1}`;
+  if (x.dec != null && C.lr_tail != null && C.dec_max != null) { const tail = over.every(i => i >= Math.floor(n * (1 - C.lr_tail)));
+    return {ok: tail && x.dec < C.dec_max, v: `${rng} di atas ${top}<small>${!tail ? `bukan di ${Math.round(C.lr_tail * 100)}% akhir` : `decoupling ${f1(x.dec).replace(".", ",")}%${x.dec < C.dec_max ? " · boleh" : ""}`}</small>`}; }
+  if (C.lr_hr_in == null) return null; const inn = 1 - over.length / hs.length;
+  return {ok: inn >= C.lr_hr_in, v: `${Math.round(inn * 100)}% km tidak lewat ${top}<small>${rng} lewat · cadangan (decoupling tidak ada)</small>`}; }
+function ssComp(a, x, pl0, s) { const pl = planFill(a, pl0); if (!x || !pl) return null; const C = a.coach || {}, parts = [], tol = C.tol_s || 0;
+  const kw = kmWin(a, x, pl, s || x.date); if (kw) parts.push(kw.ok ? 1 : x.km < kw.lo ? x.km / kw.lo : kw.hi / x.km);
+  const seg = segOf(x, pl).filter(p => p[0] >= .5);
+  if (pl.main && seg.length && !pl.iv) parts.push(seg.filter(p => pl.k === "hard" ? inRng(spPace(p), pl.main, tol) : spPace(p) >= pl.main[0]).length / seg.length);
+  const hs = (pl.k === "hard" ? seg.slice(1) : x.splits.filter(p => p[0] >= .5)).filter(p => p[2]);
+  if (pl.hr && hs.length) parts.push(hs.filter(p => p[2] <= pl.hr[1]).length / hs.length);
   return parts.length ? Math.round(mean(parts) * 100) : null; }
-// what a coach looks at, per kind of session  [label, ok|wn|na, value]   (thresholds: [keputusan dashboard] in README)
-function ssChecks(a, x, pl, wkEvent) { if (!x) return null; const k = pl ? pl.k : "easy", seg = segOf(x, pl), hs = seg.filter(p => p[2]);
-  const hrIn = pl && pl.hr && hs.length ? hs.filter(p => p[2] >= pl.hr[0] && p[2] <= pl.hr[1]).length / hs.length : null, out = [];
-  if (pl && pl.km) out.push(["Jarak", x.km >= pl.km * .95 ? "ok" : "wn", `${f1(x.km)} / ${pl.km} km`]);
+// what a coach looks at, per kind of session  [label, ok|wn|na, value]
+function ssChecks(a, x, pl0, wkEvent, s) { if (!x) return null; const pl = planFill(a, pl0), k = pl ? pl.k : "easy", C = a.coach || {}, P = a.pace || {}, out = [], tol = C.tol_s || 0;
+  const kw = pl && kmWin(a, x, pl, s || x.date);
+  if (kw) out.push(["Jarak", kw.ok ? "ok" : "wn", `${f1(x.km)} / ${pl.km} km<small>${Math.round(kw.pct * 100)}%${kw.g ? ` · ${kw.g.t} (${f1(kw.g.km || pl.km * kw.g.f)} km)${kw.ok ? " · patuh" : ""}` : x.km > kw.hi ? ` · lebih dari ${Math.round(C.km[1] * 100)}%` : ""}</small>`]);
+  const easyLike = k === "easy" || k === "rec" || k === "long";
+  if (k === "long" && pl.open && C.open_tol_s != null) { const op = kmPace(x.splits.slice(0, 3)); out.push(["Buka 3 km pelan", op >= pl.open[0] - C.open_tol_s ? "ok" : "wn", `${paceS(op)}/km`]); }
+  if (easyLike && pl) {
+    if (k === "long") { const h = lrHr(a, x, pl); if (h) out.push(["HR tidak lewat batas", h.ok ? "ok" : "wn", h.v]); }
+    else if (pl.hr && C.hr_over_max != null) { const hs = x.splits.filter(p => p[2] && p[0] >= .5), ov = hs.filter(p => p[2] > pl.hr[1]).length;
+      if (hs.length) out.push(["HR tidak lewat batas", ov / hs.length <= C.hr_over_max ? "ok" : "wn", `${ov} km di atas ${pl.hr[1]}<small>${Math.round(ov / hs.length * 100)}% · di bawah rentang tetap aman</small>`]); }
+    if (pl.main) { const sp = (k === "long" && pl.open ? x.splits.slice(3) : x.splits).filter(p => p[0] >= .5), fast = sp.filter(p => spPace(p) < pl.main[0]).length;
+      out.push(["Km lebih cepat dari rentang", fast ? "wn" : "ok", `${fast ? fast + " km" : "tidak ada"}<small>batas cepat ${paceS(pl.main[0])} · lebih lambat tidak apa-apa</small>`]); } }
   if (k === "long") {
-    if (pl.open) { const o = x.splits.slice(0, 3), op = o.reduce((q, p) => q + p[1], 0) / o.reduce((q, p) => q + p[0], 0); out.push(["Buka 3 km pelan", op >= pl.open[0] - 10 ? "ok" : "wn", `${paceS(op)}/km`]); }
-    if (hrIn != null) out.push(["HR di rentang", hrIn >= .8 ? "ok" : "wn", `${Math.round(hrIn * 100)}% km`]);
-    if (x.dec != null) out.push([ssTerm("dec"), x.km < 20 || wkEvent ? "na" : x.dec < 8 ? "ok" : "wn", `${f1(x.dec)}%${x.km < 20 || wkEvent ? " · tidak dinilai" : ""}`]);
-    const c = x.splits.map(p => p[3]).filter(Boolean); if (c.length >= 6) { const h = c.length >> 1, dr = mean(c.slice(0, h)) - mean(c.slice(h)); out.push(["Cadence bertahan", dr < 5 ? "ok" : "wn", `${dr >= 0 ? "−" : "+"}${Math.abs(Math.round(dr))} spm`]); }
-    out.push(["Di bawah 210 mnt", x.sec <= 210 * 60 ? "ok" : "wn", hms(x.sec)]); }
-  else if (k === "hard") {
-    if (pl.main && seg.length) { const tp = seg.reduce((q, p) => q + p[1], 0) / seg.reduce((q, p) => q + p[0], 0); out.push(["Pace tempo di rentang", inRng(tp, pl.main, 5) ? "ok" : "wn", `${paceS(tp)}/km`]); }
-    if (pl.hr && hs.length) { const mx = Math.max(...hs.map(p => p[2])); out.push([`HR tidak lewat ${pl.hr[1]}`, mx <= pl.hr[1] ? "ok" : "wn", `maks ${mx} bpm`]); }
-    if (pl.warm) { const w = x.splits.slice(0, Math.round(pl.warm)), wp = w.length ? w.reduce((q, p) => q + p[1], 0) / w.reduce((q, p) => q + p[0], 0) : null;
-      out.push([`Pemanasan ${pl.warm} km`, wp && pl.main && wp > pl.main[1] + 30 ? "ok" : "wn", wp ? `${paceS(wp)}/km` : "–"]); } }
-  else if (k === "rec") { if (hrIn != null) out.push([`HR di bawah ${pl.hr[1]}`, hrIn >= .8 ? "ok" : "wn", `${Math.round(hrIn * 100)}% km`]); }
-  else if (k !== "race") { if (hrIn != null) out.push(["HR di rentang", hrIn >= .8 ? "ok" : "wn", `${Math.round(hrIn * 100)}% km`]);
-    if (pl && pl.main && seg.length) { const v = seg.filter(p => inRng(spPace(p), pl.main, 5)).length / seg.length; out.push(["Pace santai", v >= .7 ? "ok" : "wn", `${paceS(x.sec / x.km)}/km`]); } }
+    if (x.dec != null && C.dec_max != null) out.push([ssTerm("dec"), x.km < 20 || wkEvent ? "na" : x.dec < C.dec_max ? "ok" : "wn", `${f1(x.dec)}%${x.km < 20 || wkEvent ? " · tidak dinilai" : ""}`]);
+    const c = x.splits.map(p => p[3]).filter(Boolean); if (c.length >= 6 && C.cad_drop != null) { const h = c.length >> 1, dr = mean(c.slice(0, h)) - mean(c.slice(h)); out.push(["Cadence bertahan", dr < C.cad_drop ? "ok" : "wn", `${dr >= 0 ? "−" : "+"}${Math.abs(Math.round(dr))} spm`]); }
+    if (C.lr_max_min) out.push([`Di bawah ${C.lr_max_min} mnt`, x.sec <= C.lr_max_min * 60 ? "ok" : "wn", hms(x.sec)]); }
+  else if (k === "hard") { const seg = segOf(x, pl).filter(p => p[0] >= .5), hs = seg.slice(1).filter(p => p[2]);
+    const hrOk = pl.hr && hs.length ? Math.max(...hs.map(p => p[2])) <= pl.hr[1] : null;
+    if (pl.iv) out.push(["Pace interval", "na", "tidak dinilai<small>data per km tidak memisahkan repetisi</small>"]);
+    else if (pl.main && seg.length) { const v = seg.map(spPace), fast = v.filter(q => q < pl.main[0] - tol).length, slow = v.filter(q => q > pl.main[1] + tol).length, lead = P.hr_leads && hrOk;
+      out.push(["Pace tempo per km", fast + slow === 0 ? "ok" : lead ? "na" : "wn", `${kmc(v.map(paceS), i => v[i] < pl.main[0] - tol || v[i] > pl.main[1] + tol ? 1 : 0)}<small>${fast ? fast + " km sedikit terlalu cepat" : ""}${fast && slow ? " · " : ""}${slow ? slow + " km terlalu lambat" : ""}${!fast && !slow ? "semua di rentang" : ""} · ${paceS(pl.main[0] - tol)}–${paceS(pl.main[1] + tol)}${lead && fast + slow ? " · HR jadi patokan" : ""}</small>`]); }
+    if (hrOk != null) out.push(["HR tempo tidak lewat batas", hrOk ? "ok" : "wn", `${kmc(seg.map(p => p[2] || "–"), i => i === 0 ? 2 : seg[i][2] > pl.hr[1] ? 1 : 0)}<small>maks ${pl.hr[1]} · km 1 tempo tidak dihitung</small>`]);
+    if (pl.warm && P.easy && (a.zones || []).length > 1) { const w = x.splits.slice(0, Math.round(pl.warm)), wp = kmPace(w), wh = mean(w.map(p => p[2]).filter(Boolean)), z2 = a.zones[1];
+      out.push(["Pemanasan santai", wp && wp >= P.easy[0] && (wh == null || wh <= z2) ? "ok" : "wn", wp ? `${paceS(wp)}/km · ${wh ? Math.round(wh) + " bpm" : "–"}<small>≥ ${paceS(P.easy[0])} dan HR ≤ ${z2}</small>` : "–"]); } }
   return out; }
-const SSTIP = {"Jarak": "Jangan dikejar sekaligus minggu ini.", "Buka 3 km pelan": "3 km pertama di pace recovery, pindah ke easy di km 4–6.",
-  "HR di rentang": "Perlambat sampai detak jantung kembali di rentang. HR mengalahkan pace.", "Decoupling": "Buka pelan, minum sesuai tes keringat.",
-  "Cadence bertahan": "Jaga langkah pendek dan cepat di paruh kedua.", "Di bawah 210 mnt": "Berhenti di 3 jam 30 menit, berapa pun km-nya.",
-  "Pace tempo di rentang": "Km pertama tempo di pace paling lambat dari rentang.", "Pace santai": "Lari santai benar-benar santai; HR mengalahkan pace."};
-function ssVerdict(a, x, pl) { if (!x) return `<b>${a.name}</b> tidak lari. Libur ≤ 7 hari: ulangi minggu sebelumnya.`;
-  const bad = (ssChecks(a, x, pl) || []).filter(c => c[1] === "wn").map(c => c[0].replace(/<[^>]+>/g, ""));
+const SSTIP = {"Jarak": "Ikuti km rencana; lebih dari 110% tidak dikejar di hari lain, kurang tidak dikejar sekaligus.", "Buka 3 km pelan": "3 km pertama di pace recovery, pindah ke easy di km 4–6.",
+  "HR tidak lewat batas": "Perlambat sampai detak jantung kembali di bawah batas atas. HR mengalahkan pace.", "Decoupling": "Buka pelan, minum sesuai tes keringat.",
+  "Cadence bertahan": "Jaga langkah pendek dan cepat di paruh kedua.", "Km lebih cepat dari rentang": "Lari santai benar-benar santai; lebih lambat tidak apa-apa.",
+  "Pace tempo per km": "Km pertama tempo di pace paling lambat dari rentang.", "HR tempo tidak lewat batas": "Turunkan pace tempo sedikit.",
+  "Pemanasan santai": "Pemanasan benar-benar santai sebelum tempo."};
+function ssVerdict(a, x, pl, s) { if (!x) return `<b>${a.name}</b> tidak lari. Libur ≤ 7 hari: ulangi minggu sebelumnya.`;
+  const bad = (ssChecks(a, x, pl, false, s) || []).filter(c => c[1] === "wn").map(c => c[0].replace(/<[^>]+>/g, ""));
   if (!bad.length) return `<b>${a.name}:</b> sesi bersih, semua sesuai rencana.`;
-  const k = bad[0].startsWith("HR tidak lewat") ? "Turunkan pace tempo sedikit." : bad[0].startsWith("HR di bawah") ? "Lebih pelan lagi; tujuannya memulihkan." : bad[0].startsWith("Pemanasan") ? "Pemanasan benar-benar santai sebelum tempo." : SSTIP[bad[0]] || "";
+  const k = bad[0].startsWith("Di bawah") ? `Berhenti di ${hms((a.coach || {}).lr_max_min * 60)}, berapa pun km-nya.` : SSTIP[bad[0]] || "";
   return `<b>${a.name}:</b> ${bad.join(", ").toLowerCase()} perlu perhatian.${BULB}${k}`; }
 function ssRing(c, v, sz) { const C = 2 * Math.PI * 20; return `<svg class="ss-ringc" width="${sz || 50}" height="${sz || 50}" viewBox="0 0 50 50" data-g="comp"><circle class="tr" cx="25" cy="25" r="20" fill="none" stroke-width="6"/>
   ${v == null ? "" : `<circle class="v" data-to="${(v / 100 * C).toFixed(1)} ${C.toFixed(1)}" cx="25" cy="25" r="20" fill="none" stroke="var(--${c})" stroke-width="6" stroke-linecap="round" transform="rotate(-90 25 25)"/>`}
@@ -1641,7 +1715,7 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const rows = `<div class="ss-vt num">${M.map(([lab, f, fmt, dir]) => { const a = T ? f(T) : null, b = R ? f(R) : null; if (a == null && b == null) return "";
     const mx = Math.max(a || 0, b || 0) || 1, w = v => v == null ? 0 : dir < 0 ? Math.min(a ?? v, b ?? v) / v : v / mx;
     return `<span class="bb L"><i style="background:var(--t)" data-w="${w(a) * 100}"></i></span><span class="v L">${a == null ? "–" : fmt(a)}</span><span class="c">${lab}</span><span class="v R">${b == null ? "–" : fmt(b)}</span><span class="bb R"><i style="background:var(--r)" data-w="${w(b) * 100}"></i></span>`; }).join("")}</div>`;
-  const ct = ssChecks(ta, T, PT, ev), cr = ssChecks(ra, R, PR, ev), base = (ct && ct.length >= (cr || []).length ? ct : cr) || [];
+  const ct = ssChecks(ta, T, PT, ev, s), cr = ssChecks(ra, R, PR, ev, s), base = (ct && ct.length >= (cr || []).length ? ct : cr) || [];
   const CK = {ok: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     wn: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.4" fill="currentColor"/></svg>',
     na: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>'};
@@ -1653,9 +1727,9 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const zs = (a, x) => { const z = [0, 0, 0, 0, 0]; let t = 0; x.splits.forEach(p => { if (p[2] && a.zones) { z[zoneOf(a, p[2])] += p[1]; t += p[1]; } }); return t ? z.map(v => v / t) : null; };
   const zbar = (a, x, side) => { const z = x && zs(a, x); return `<div class="ss-zb ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-sh="<span class='t1'>${a.name} · Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .15 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`; };
   const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null));
-  return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small></div>` : ""}</div>
+  return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small></div>` : ""}</div>
       <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span></div>
-      <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR)) : ""}</div></div>
+      <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
     <div class="ss-sec">Per km <span class="s2">· batang = kecepatan, lebih panjang lebih cepat · pita = rentang pace rencana</span></div>
@@ -1663,7 +1737,7 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
     <div class="ss-bfw" data-d="${s}"></div>
     <div class="ss-sec">${ssTerm("zone", "Waktu di zona")}</div>
     <div class="ss-mir"><div>${zbar(ta, T, "L")}</div><div class="c">Z1–5</div><div>${zbar(ra, R, "R")}</div></div>
-    <div class="ss-verdict">${vis.includes("t") ? `<div class="ss-vd L">${ssVerdict(ta, T, PT)}</div>` : "<div></div>"}${vis.includes("r") ? `<div class="ss-vd">${ssVerdict(ra, R, PR)}</div>` : ""}</div></div>`; }
+    <div class="ss-verdict">${vis.includes("t") ? `<div class="ss-vd L">${ssVerdict(ta, T, PT, s)}</div>` : "<div></div>"}${vis.includes("r") ? `<div class="ss-vd">${ssVerdict(ra, R, PR, s)}</div>` : ""}</div></div>`; }
 
 // ---------------- feed: program weeks (newest first), the active week open
 function ssFeed() { const vis = V().map(a => a.c), today = DATA.today, ta = A.find(x => x.c === "t"), ra = A.find(x => x.c === "r");
@@ -1678,7 +1752,8 @@ function ssFeed() { const vis = V().map(a => a.c), today = DATA.today, ta = A.fi
   const card = (a, x, pl, side, d) => { if (!vis.includes(a.c)) return `<div class="ss-sc none"></div>`;
     if (!x && d.s >= DATA.today) return `<div class="ss-pln ${side}">${pl && pl.km ? pl.km + " km" : ""}</div>`;
     if (!x) return `<div class="ss-sc ghost" style="--i:${i}">tidak lari</div>`;
-    return `<div class="ss-sc ${side}" style="--i:${i}">${ssRing(a.c, ssComp(a, x, pl), 40)}<div class="sp2"><div class="km num">${f1(x.km)}<small> km</small></div>
+    const cp = ssComp(a, x, pl);
+    return `<div class="ss-sc ${side}" style="--i:${i};--cp:${(cp || 0) / 100}">${ssRing(a.c, cp, 40)}<div class="sp2"><div class="km num">${f1(x.km)}<small> km</small></div>
       <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? ` · dec ${f1(x.dec)}%` : ""}</div></div></div>`; };
   const sum = (a, W) => { if (!vis.includes(a.c)) return ""; const pl = W.days.filter(d => d.s < DATA.today && RUNK(((a.c === "t" ? d.pT : d.pR) || {}).k));
     const done = pl.filter(d => a.c === "t" ? d.xT : d.xR), km = W.days.reduce((q, d) => q + ((a.c === "t" ? d.xT : d.xR) || {km: 0}).km, 0);
@@ -1701,16 +1776,30 @@ $("p-sesi").addEventListener("click", e => {
   if (lane) { SSLON[lane.dataset.lane] = !SSLON[lane.dataset.lane]; lane.setAttribute("aria-pressed", SSLON[lane.dataset.lane]);
     const w = lane.closest(".ss-dd").querySelector(".ss-bfw"); w.innerHTML = ssBf(w.dataset.d, w); w.querySelectorAll(".b").forEach(r => { r.style.animation = "none"; r.style.transform = "none"; }); return; }
   const wh = e.target.closest(".ss-wgh");
-  if (wh) { const g = wh.parentElement, o = !g.classList.contains("open"); g.classList.toggle("open", o); wh.setAttribute("aria-expanded", o); return; }
+  if (wh) { const g = wh.parentElement, o = !g.classList.contains("open"), had = [...$("ss-feed").querySelectorAll(".ss-wg.open")].some(x => x !== g);
+    $("ss-feed").querySelectorAll(".ss-wg.open").forEach(x => { x.classList.remove("open"); x.querySelector(".ss-wgh").setAttribute("aria-expanded", false); });
+    ssCloseDay(); if (o) { g.classList.add("open"); wh.setAttribute("aria-expanded", true); ssBoxTo(g, had ? 520 : 60); }
+    ssFocus(); return; }
   const fr = e.target.closest(".ss-fr"); if (!fr || fr.classList.contains("plan") || e.target.closest(".ss-det")) return;
   const host = fr.querySelector(".ss-det"), s = fr.dataset.d, was = SSOPEN && SSOPEN !== host && SSOPEN.classList.contains("open");
-  if (SSOPEN && SSOPEN !== host) SSOPEN.classList.remove("open");
-  if (SSOPEN === host && host.classList.contains("open")) { host.classList.remove("open"); SSOPEN = null; return; }
-  host.firstElementChild.innerHTML = ssDetail(s); SSOPEN = host;
+  if (SSOPEN === host && host.classList.contains("open")) { ssCloseDay(); ssFocus(); return; }
+  ssCloseDay(); host.firstElementChild.innerHTML = ssDetail(s); SSOPEN = host; fr.classList.add("on"); ssFocus();
   const w = host.querySelector(".ss-bfw"); w.innerHTML = ssBf(s, host.firstElementChild); ssAnimate(host);
-  // move the day to the top of the screen, under the compact header (after a closing day above has settled)
-  setTimeout(() => scrollTo({top: fr.getBoundingClientRect().top + scrollY - ($("st-mini").offsetHeight + 10), behavior: REDUCED ? "auto" : "smooth"}), was ? 580 : 80);
+  // box under the compact header, the day at the top of the box (after a closing day above has settled)
+  const box = $("ss-box"), top = box.getBoundingClientRect().top + scrollY - ($("st-mini").offsetHeight + 10);
+  if (Math.abs(scrollY - top) > 40) scrollTo({top, behavior: REDUCED ? "auto" : "smooth"});
+  ssBoxTo(fr, was ? 580 : 80);
 });
+function ssCloseDay() { if (SSOPEN) SSOPEN.classList.remove("open"); SSOPEN = null; $("ss-feed").querySelectorAll(".ss-fr.on").forEach(x => x.classList.remove("on")); }
+function ssFocus() { const b = $("ss-box"); b.classList.toggle("fx", !!$("ss-feed").querySelector(".ss-wg.open")); b.classList.toggle("fx2", !!SSOPEN); }
+function ssBoxTo(el, delay) { setTimeout(() => { const b = $("ss-box"); b.scrollTo({top: b.scrollTop + el.getBoundingClientRect().top - b.getBoundingClientRect().top - 4, behavior: REDUCED ? "auto" : "smooth"}); }, delay); }
+// box height = 8 closed weeks (capped at 78% of the screen on phones); fades at the edges show there is more
+function ssBoxSize() { const b = $("ss-box"), hs = [...b.querySelectorAll(".ss-wgh")]; if (!hs.length) return;
+  const h = hs[0].offsetHeight + 6; b.style.height = hs.length > 8 ? Math.min(h * 8 + 4, innerHeight * .78) + "px" : ""; ssEdges(); ssBox.size(); }
+function ssEdges() { const b = $("ss-box"); b.classList.toggle("ft", b.scrollTop > 2); b.classList.toggle("fb", b.scrollTop + b.clientHeight < b.scrollHeight - 2); }
+const ssBox = ownScroll($("ss-box"), $("ss-sbar"), document.querySelector(".ss-boxw"));
+$("ss-box").addEventListener("scroll", ssEdges, {passive: true});
+addEventListener("resize", () => TAB === "sesi" && ssBoxSize());
 $("p-sesi").addEventListener("keydown", e => { if ((e.key === "Enter" || e.key === " ") && e.target.closest(".ss-fr:not(.plan)") && !e.target.closest(".ss-det")) { e.preventDefault(); e.target.closest(".ss-fr").click(); } });
 
 // ---------------- Arah: 8 weeks, one picture per question, numbers in the runner's colour, every arrow explained
@@ -1789,7 +1878,7 @@ function ssArah() { const vis = V(), W = 300, end = DATA.today;
   const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), {threshold: .2});
   document.querySelectorAll(".ss-tc").forEach(c => REDUCED ? c.classList.add("in") : io.observe(c));
 }
-function renderSesi() { SSOPEN = null; ssFeed(); ssArah(); }
+function renderSesi() { SSOPEN = null; ssFeed(); ssArah(); ssBoxSize(); ssFocus(); $("ss-box").scrollTop = 0; }
 
 // ---------------- tabs: header stays; compact header slides in once the big one has scrolled away
 let TAB = "ring"; try { TAB = localStorage.getItem("pacelab-tab") === "sesi" ? "sesi" : "ring"; } catch (e) {}

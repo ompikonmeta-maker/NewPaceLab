@@ -65,6 +65,7 @@ def athlete_data(a, data_dir, today):
     return {
         "id": a["id"], "name": a["name"],
         "program": prog, "weight_floor": a.get("weight_floor"), "zones": a.get("zones"), "cadence": a.get("cadence"),
+        "pace": _pace(a.get("pace")), "coach": a.get("coach") or None,
         "has_data": bool(runs or well),
         "longest": max([r["km"] for r in in_program] or [0]),
         "weeks": weeks,
@@ -111,7 +112,17 @@ def _run_days(runs):
     return out
 
 
+def _pace(p):
+    """Profile pace ranges "m:ss" -> seconds per km; other keys (flags) pass through."""
+    if not p:
+        return None
+    sec = lambda v: int(v.split(":")[0]) * 60 + int(v.split(":")[1])
+    return {k: [sec(x) for x in v] if isinstance(v, list) else v for k, v in p.items()}
+
+
 def build(cfg, athletes, today, out_path):
+    # coach thresholds: config "coach", overridable per athlete
+    athletes = [dict(a, coach={**cfg.get("coach", {}), **a.get("coach", {})}) for a in athletes]
     data = [athlete_data(a, cfg["data_dir"], today) for a in athletes]
     p0 = data[0]["program"]
     ms_cur = m.ms_of(today.isoformat(), p0["ms1"])
@@ -158,7 +169,7 @@ def _slim(x, color):
     return {
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
-        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "zones": x.get("zones"), "cadence": x.get("cadence"), "sleep_min": prog["sleep"].get("min"),
+        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "zones": x.get("zones"), "cadence": x.get("cadence"), "pace": x.get("pace"), "coach": x.get("coach"), "sleep_min": prog["sleep"].get("min"),
         "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "days": x["days"], "today": x["today"],

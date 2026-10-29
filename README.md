@@ -39,8 +39,9 @@ Urutan dari atas: hitung mundur dan **lintasan program** (22 Jun → hari marato
 tanda lomba, kedua pelari berdiri di tanggal hari ini). Di bawahnya **batang target km mingguan** kedua pelari
 dan **kurung fase** bertanggal (km & long run per fase, titik progres fase berjalan). Arahkan kursor ke batang
 untuk ringkasan; klik batang untuk **jadwal harian** minggu itu (Senin–Minggu dari sheet Kalender, ✓ km aktual,
-catatan coaching; ←/→ pindah minggu, Esc tutup). Saat halaman di-scroll, kedua pelari lepas dari lintasan dan
-parkir di tepi kiri (Taofik) dan kanan (Reza); scroll ke atas mengembalikannya. Lalu dua tab: **Ringkasan** (head-to-head,
+catatan coaching; ←/→ pindah minggu, Esc tutup). Saat lintasan ter-scroll ke atas, kedua pelari melompat melengkung
+ke tepi kiri (Taofik) dan kanan (Reza) lalu parkir; scroll ke atas membuat mereka lompat pulang. Saat ada data di belakangnya,
+ikon pelari memudar. Lalu dua tab: **Ringkasan** (head-to-head,
 **Latihan**, **Pemulihan**, **Progres terbaik**, **Badge**) dan **Sesi** (lihat di bawah). Saat header besar sudah
 ter-scroll, header ringkas melekat di atas (hitung mundur, progres, tab). Tab terakhir diingat browser.
 Tombol di kanan atas menyalakan/mematikan tiap pelari.
@@ -60,8 +61,10 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 ### Tab Sesi
 
-- **Linimasa cermin**: Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per minggu program.
-  Minggu aktif terbuka, minggu lain tertutup (km dan sesi dijalani/terjadwal). Rencana yang belum dijalani = satu baris tipis.
+- **Linimasa cermin**: Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per minggu program,
+  dalam kotak setinggi 8 minggu (scroll di dalamnya; di HP maksimal 78% layar). Minggu aktif terbuka; membuka satu minggu
+  menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
+  luar: makin pekat = makin patuh rencana. Rencana yang belum dijalani = satu baris tipis.
 - **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);
   per km (batang = kecepatan, pita = rentang pace rencana; garis HR / cadence / elevasi bisa dinyalakan/dimatikan,
   ditumpuk di jalur luar); waktu di zona HR; kesimpulan + saran tiap pelari.
@@ -74,23 +77,29 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 | Hitungan | Rumus | Dasar |
 |---|---|---|
-| Kepatuhan (cincin 0–100) | rata-rata dari: jarak ÷ rencana (maks 1), % km dengan pace di rentang rencana (±5 dtk), % km dengan HR di rentang rencana | [keputusan dashboard], disetujui omPik |
 | Pace di zona 2 | pace berbobot waktu dari km (≥ 0,5 km) yang HR rata-ratanya di zona 2 (`zones[0] ≤ HR < zones[1]`, `config.json`), dari lari easy, long, recovery | [keputusan dashboard] |
 | Meter per detak | (jarak ÷ waktu) ÷ (HR ÷ 60), rata-rata lari selain latihan keras per minggu | [keputusan dashboard] |
 | Per km | km dipotong per 1000 m dari data per detik; HR rata berbobot waktu; potongan terakhir < 300 m dibuang | [keputusan dashboard] |
 
-| Penilaian pelatih | Batas | Dasar |
+Semua angka penilaian diambil dari **profil pelari di `config.json`**, bukan dari kode: blok `coach` (berlaku untuk semua,
+bisa ditimpa per pelari dengan `"coach"` di data pelari), `zones`, dan `pace` (rentang dari dokumen §3). Rentang pace/HR dari
+sel Excel hari itu dipakai lebih dulu; profil jadi cadangan.
+
+| Penilaian pelatih | Aturan (kunci `config.json`) | Dasar |
 |---|---|---|
-| Jarak | ≥ 95% rencana | [keputusan dashboard] |
-| Long run: buka 3 km pelan | pace 3 km pertama tidak lebih cepat dari batas cepat rentang pembukaan − 10 dtk | dokumen (pembukaan); 10 dtk [keputusan dashboard] |
-| HR di rentang (easy, long, recovery) | ≥ 80% km | [keputusan dashboard] |
+| Jarak | 95–110% rencana (`coach.km`). Long run yang dipotong gerbang pagi (−20% / −40% / ganti easy 8 km, dokumen §7) dihitung patuh | [keputusan omPik]; aturan betis diabaikan |
+| HR lari santai / pemulihan | hanya km di **atas** batas atas yang dihitung, maksimal 20% km (`coach.hr_over_max`); di bawah rentang aman | [keputusan omPik] |
+| HR long run | boleh lewat batas atas hanya di 25% bagian akhir (`coach.lr_tail`) dan decoupling < 8% (`coach.dec_max`). Kalau decoupling tidak ada: ≥ 75% km tidak lewat batas (`coach.lr_hr_in`) | [keputusan omPik] |
+| Pace lari santai / long run | tidak dinilai; km yang lebih cepat dari batas cepat ditandai, lebih lambat tidak apa-apa | [keputusan omPik], dokumen §3 "HR mengalahkan pace" |
+| Long run: buka 3 km pelan | pace 3 km pertama tidak lebih cepat dari batas cepat pembukaan − 10 dtk (`coach.open_tol_s`) | dokumen §6; 10 dtk [keputusan dashboard] |
 | Long run: decoupling | < 8%; dinilai hanya ≥ 20 km dan bukan minggu lomba | dokumen §6 |
-| Long run: cadence bertahan | turun < 5 spm dari paruh 1 ke paruh 2 | dokumen |
-| Long run: di bawah 210 menit | ≤ 3 j 30 mnt | dokumen |
-| Tempo: pace di rentang | pace rata km tempo di rentang ± 5 dtk | dokumen (rentang di Excel); 5 dtk [keputusan dashboard] |
-| Tempo: HR tidak lewat batas | HR maks per km ≤ batas atas rencana | Excel |
-| Tempo: pemanasan | lebih lambat dari batas lambat tempo + 30 dtk | [keputusan dashboard] |
-| Pace santai | ≥ 70% km di rentang (± 5 dtk) | [keputusan dashboard] |
+| Long run: cadence bertahan | turun < 5 spm dari paruh 1 ke paruh 2 (`coach.cad_drop`) | dokumen §6 |
+| Long run: durasi | ≤ 210 menit (`coach.lr_max_min`) | dokumen §4 |
+| Tempo: pace per km | tiap km tempo di rentang ± 5 dtk (`coach.tol_s`); "sedikit terlalu cepat" / "terlalu lambat". Reza: HR jadi patokan (`pace.hr_leads`), pace tidak dinilai kalau HR aman | [keputusan omPik], dokumen §3 |
+| Tempo: HR | HR per km ≤ batas atas; km pertama tempo tidak dihitung | [keputusan omPik] |
+| Interval: pace | tidak dinilai: data per km tidak memisahkan repetisi | [keputusan dashboard] |
+| Pemanasan | pace ≥ batas cepat pace santai (`pace.easy`) dan HR rata ≤ batas atas Z2 (`zones[1]`) | [keputusan omPik] |
+| Kepatuhan (cincin, warna kartu) | rata-rata: skor jarak (1 di dalam jendela), % km pace sesuai aturan di atas, % km HR tidak lewat batas atas | rumus disetujui omPik, disesuaikan aturan di atas |
 
 ### Kesimpulan di tiap grafik
 

@@ -3,7 +3,7 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0c. Penilaian pelatih v2 + ikon transparan — menunggu "gas"
+## 0c. Penilaian pelatih v2 + ikon transparan — **sudah dibuat** (29 Okt)
 
 Mockup: [`docs/mockup/penilaian-pelatih-v2.html`](mockup/penilaian-pelatih-v2.html).
 Diputuskan 29 Okt: jarak 95–110% (potongan gerbang tidur dihitung patuh, aturan betis diabaikan); HR hanya dinilai
@@ -12,7 +12,7 @@ decoupling tidak ada); pace santai tidak dinilai, hanya km lebih cepat dari bata
 ±5 dtk, km 1 tempo tidak dihitung untuk HR; pemanasan ≥ batas cepat pace santai dan HR ≤ batas atas Z2. Semua angka
 dari profil pelari di `config.json`. Dicatat di README sebagai [keputusan omPik]. Ikon pelari memudar saat menutupi data.
 
-## 0d. Linimasa 8 minggu + fokus + gradasi + lompatan pelari — menunggu pilihan gradasi
+## 0d. Linimasa 8 minggu + fokus + gradasi + lompatan pelari — **sudah dibuat** (29 Okt): F2+F3, G4, J3 tanpa pegas
 
 Mockup: [`docs/mockup/linimasa-fokus.html`](mockup/linimasa-fokus.html). Kotak setinggi 8 minggu dengan scrollbar
 yang hilang sendiri; buka satu minggu = yang lain tertutup. Fokus dipilih: F2 + F3 (pudar abu-abu + mengecil,

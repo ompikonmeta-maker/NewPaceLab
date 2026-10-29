@@ -59,6 +59,16 @@ class BuildTest(unittest.TestCase):
         km, sec, hr, cad, el = s["splits"][0]
         self.assertTrue(km and sec and hr and cad and el is not None)
 
+    def test_profile_pace_and_coach_thresholds(self):
+        cfg = {"data_dir": str(self.tmp / "data"), "coach": {"km": [0.95, 1.10], "tol_s": 5}}
+        ath = [dict(self.athletes[0], pace={"easy": ["8:40", "9:15"], "hr_leads": True}, coach={"tol_s": 3}), self.athletes[1]]
+        d = payload(build(cfg, ath, TODAY, self.tmp / "out2.html").read_text(encoding="utf-8"))
+        a, b = d["athletes"]
+        self.assertEqual(a["pace"], {"easy": [520, 555], "hr_leads": True})
+        self.assertEqual(a["coach"], {"km": [0.95, 1.10], "tol_s": 3})   # athlete overrides the shared block
+        self.assertEqual(b["coach"], {"km": [0.95, 1.10], "tol_s": 5})
+        self.assertIsNone(b["pace"])
+
     def test_build_without_data(self):
         cfg = {"data_dir": str(self.tmp / "kosong")}
         d = payload(build(cfg, self.athletes, TODAY, self.tmp / "empty.html").read_text(encoding="utf-8"))
