@@ -63,8 +63,8 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 
 - **Linimasa cermin**: Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per minggu program,
   dalam kotak setinggi 10 minggu: minggu yang terbuka penuh + 9 minggu tertutup (satu baris tipis), tidak lebih tinggi dari
-  sisa layar di bawah header ringkas. Begitu kotak dipakai (klik / scroll), halaman bergeser sampai kotak pas di bawah header
-  ringkas. Minggu aktif terbuka; membuka satu minggu menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
+  sisa layar di bawah header ringkas. Begitu kotak dipakai (klik / scroll), halaman bergeser sampai judul "Linimasa sesi" pas di
+  bawah header ringkas, dengan kotak tepat di bawahnya. Minggu aktif terbuka; membuka satu minggu menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
   luar: makin pekat = makin patuh rencana. Rencana yang belum dijalani = satu baris tipis.
 - **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);
   **Lap jam** (utama, dari file FIT): tiap lap jadi blok setinggi jaraknya dan selebar kecepatannya, kedua pelari sejajar

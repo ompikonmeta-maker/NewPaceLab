@@ -747,7 +747,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="grid"><section class="card c12"><div class="badges" id="badges"></div></section></div>
 </div>
 <div class="st-pane st-hide" id="p-sesi">
-  <div class="ss-h"><div><h3>Linimasa sesi</h3><p>Taofik di kiri, Reza di kanan. Klik minggu untuk membuka (yang lain tertutup), klik hari untuk melihat duel sesi.</p></div></div>
+  <div class="ss-h" id="ss-head"><div><h3>Linimasa sesi</h3><p>Taofik di kiri, Reza di kanan. Klik minggu untuk membuka (yang lain tertutup), klik hari untuk melihat duel sesi.</p></div></div>
   <div class="ss-boxw"><div class="ss-box" id="ss-box"><div class="ss-feed" id="ss-feed"></div></div><div class="sbar" id="ss-sbar" aria-hidden="true"></div></div>
   <div class="ss-h" style="margin-top:36px"><div><h3>Arah</h3><p>Dibanding 8 minggu lalu. <b class="ss-up">▲▼ hijau</b> = membaik, <b class="ss-dn">▲▼ merah</b> = memburuk. Sentuh angka perubahan untuk penjelasannya.</p></div></div>
   <div class="ss-tg" id="ss-trends"></div>
@@ -2053,10 +2053,12 @@ function ssBoxTo(el, delay) { setTimeout(() => { const b = $("ss-box"); b.scroll
 function ssBoxSize() { const b = $("ss-box"), hs = [...b.querySelectorAll(".ss-wgh")]; if (!hs.length) return;
   const closed = b.querySelector(".ss-wg:not(.open) .ss-wgh") || hs[0], row = closed.offsetHeight + 6, op = b.querySelector(".ss-wg.open");
   const ten = (op ? op.querySelector(".ss-wgh").offsetHeight + 6 + op.querySelector(".ss-wgb > div").scrollHeight + row * 9 : row * 10) + 4;
-  const room = innerHeight - $("st-mini").offsetHeight - 24;
+  const room = innerHeight - $("st-mini").offsetHeight - ssHeadH() - 24;   // the heading above stays on screen too
   b.style.height = hs.length > 10 || ten > room ? Math.min(ten, room) + "px" : ""; ssEdges(); ssBox.size(); }
 // using the box (wheel, touch, a click) parks it right under the compact header, so page and box never scroll at once
-function ssPark() { const top = $("ss-box").getBoundingClientRect().top - $("st-mini").offsetHeight - 10; if (Math.abs(top) < 8) return;
+// height of the "Linimasa sesi" heading block above the box (heading top to box top)
+const ssHeadH = () => $("ss-box").getBoundingClientRect().top - $("ss-head").getBoundingClientRect().top;
+function ssPark() { const top = $("ss-head").getBoundingClientRect().top - $("st-mini").offsetHeight - 10; if (Math.abs(top) < 8) return;
   scrollTo({top: scrollY + top, behavior: REDUCED ? "auto" : "smooth"}); }
 $("ss-box").addEventListener("wheel", ssPark, {passive: true}); $("ss-box").addEventListener("touchstart", ssPark, {passive: true});
 function ssEdges() { const b = $("ss-box"); b.classList.toggle("ft", b.scrollTop > 2); b.classList.toggle("fb", b.scrollTop + b.clientHeight < b.scrollHeight - 2); }
