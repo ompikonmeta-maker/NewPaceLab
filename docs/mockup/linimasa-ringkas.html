@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: linimasa ringkas</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:70px 20px 60vh}
+h1{font-size:22px;margin:0 0 4px} h3{margin:0;font-size:18px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+/* compact header (always on in this mockup) */
+.mini{position:fixed;top:0;left:0;right:0;height:52px;z-index:10;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line);display:flex;align-items:center;gap:16px;padding:0 max(20px,calc(50% - 570px))}
+.mini b{font-size:20px} .mini small{color:var(--muted);font-size:12.5px} .mini .bar{flex:1;max-width:360px;height:6px;border-radius:3px;background:var(--grid)} .mini .bar i{display:block;height:100%;width:37%;border-radius:3px;background:linear-gradient(90deg,var(--t),var(--r))}
+.filler{height:420px;border-radius:18px;border:1px dashed var(--line);display:grid;place-items:center;color:var(--muted);margin-bottom:28px}
+.info{display:flex;gap:10px;flex-wrap:wrap;margin:0 0 10px;font-size:12.5px;color:var(--muted)} .info b{color:var(--text)}
+/* the box */
+.boxw{position:relative}
+.box{position:relative;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:none;padding:2px 6px;transition:height .35s var(--ease)}
+.box::-webkit-scrollbar{display:none}
+.box.ft{-webkit-mask-image:linear-gradient(transparent,#000 24px);mask-image:linear-gradient(transparent,#000 24px)}
+.box.fb{-webkit-mask-image:linear-gradient(#000 calc(100% - 24px),transparent);mask-image:linear-gradient(#000 calc(100% - 24px),transparent)}
+.box.ft.fb{-webkit-mask-image:linear-gradient(transparent,#000 24px,#000 calc(100% - 24px),transparent);mask-image:linear-gradient(transparent,#000 24px,#000 calc(100% - 24px),transparent)}
+.feed{position:relative} .feed::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--grid)}
+.wk{position:relative;transition:opacity .4s var(--ease),filter .4s var(--ease),transform .4s var(--ease)}
+.box.fx .wk:not(.open){opacity:.35;filter:grayscale(1);transform:scale(.97)} .box.fx .wk:not(.open):hover{opacity:1;filter:none;transform:none}
+/* closed week: one slim line (about 46px) */
+.wh{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:14px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:5px 0;height:46px}
+.wh .s{display:flex;align-items:baseline;gap:8px;font-size:12.5px;color:var(--muted)} .wh .s.L{justify-content:flex-end} .wh .s b{font-size:15px;color:var(--text)}
+.wh .m{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 14px;white-space:nowrap;font-size:13px}
+.wh .m b{font-size:13px} .wh .m span{color:var(--muted);font-size:12px} .wh .m svg{color:var(--muted);transition:transform .35s var(--ease)}
+.wk.open .wh{height:auto;padding:8px 0} .wk.open .wh .m{border-color:var(--text);box-shadow:0 10px 26px rgba(0,0,0,.1)} .wk.open .wh .m svg{transform:rotate(180deg)}
+.wb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .45s var(--ease)} .wb>div{overflow:hidden} .wk.open .wb{grid-template-rows:1fr}
+.day{display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);gap:14px;align-items:center;padding:6px 0}
+.sc{display:flex;align-items:center;gap:12px;border-radius:16px;padding:10px 14px}
+.sc.L{flex-direction:row-reverse;text-align:right;background:linear-gradient(90deg,color-mix(in srgb,var(--t) calc(var(--cp) * 30%),var(--surface)),var(--surface) 75%)}
+.sc.R{background:linear-gradient(270deg,color-mix(in srgb,var(--r) calc(var(--cp) * 30%),var(--surface)),var(--surface) 75%)}
+.sc .km{font-size:19px;font-weight:700} .sc .km small{font-size:12px;font-weight:400;color:var(--muted)} .sc .meta{font-size:12.5px;color:var(--muted)} .sc .sp{flex:1}
+.mid{text-align:center;position:relative;z-index:1} .mid b{display:block;font-size:13px} .mid span{font-size:11.5px;color:var(--muted)}
+.ring{width:38px;height:38px;flex:none}
+.sbar{position:absolute;right:2px;width:5px;border-radius:3px;background:color-mix(in srgb,var(--text) 30%,transparent);opacity:0;transition:opacity .4s}
+.sbar.on{opacity:1}
+.flash{position:fixed;left:50%;top:60px;transform:translateX(-50%);background:var(--text);color:var(--surface);font-size:12.5px;border-radius:999px;padding:4px 12px;opacity:0;transition:opacity .3s;pointer-events:none;z-index:11}
+.flash.on{opacity:.85}
+@media (max-width:640px){.wh{gap:8px}.wh .s span{display:none}.wh .m span{display:none}.day{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.sc .meta{display:none}.ring{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style></head><body>
+<div class="mini"><b class="num">227</b><small>hari · MS19 Support</small><div class="bar"><i></i></div></div>
+<div class="flash" id="flash">kotak dipaskan di bawah header</div>
+<div class="wrap">
+<h1>Mockup: linimasa ringkas (ide 1 + 2 + 3)</h1>
+<p class="sub">Data rekaan. Ubah tinggi jendela browser untuk melihat ide 2. Klik atau scroll di dalam kotak untuk ide 3.</p>
+<div class="filler">(bagian atas halaman: lintasan, batang mingguan, tab)</div>
+<h3>Linimasa sesi</h3>
+<p class="sub">1 · Minggu tertutup = satu baris tipis (km · MS + tanggal · km). 2 · Tinggi kotak = 10 minggu, atau sisa layar di bawah header kalau layarnya pendek. 3 · Begitu kotak dipakai, halaman bergeser sampai kotak pas di bawah header.</p>
+<div class="info" id="info"></div>
+<div class="boxw"><div class="box" id="box"><div class="feed" id="feed"></div></div><div class="sbar" id="sbar"></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id), REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const BLN = ["Jan","Feb","Mar","Apr","Mei","Jun","Jul","Agu","Sep","Okt","Nov","Des"], HARI = ["Selasa", "Kamis", "Sabtu", "Minggu"], ms1 = new Date(2026, 5, 22), tg = d => `${d.getDate()} ${BLN[d.getMonth()]}`;
+const ring = (c, v) => `<svg class="ring" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="var(--grid)" stroke-width="6"/><circle cx="25" cy="25" r="20" fill="none" stroke="var(--${c})" stroke-width="6" stroke-dasharray="${v * 1.257} 200" transform="rotate(-90 25 25)" stroke-linecap="round"/><text x="25" y="29.5" text-anchor="middle" style="font:700 12.5px sans-serif;fill:var(--text)">${v}</text></svg>`;
+let h = "";
+for (let ms = 19; ms >= 1; ms--) { const a = new Date(ms1); a.setDate(a.getDate() + (ms - 1) * 7); const b = new Date(a); b.setDate(b.getDate() + 6);
+  const ph = ms > 16 ? "Support" : ms > 8 ? "Base" : "Awal", kt = 20 + (ms * 7) % 19, kr = 19 + (ms * 5) % 21;
+  let days = ""; [1, 3, 5, 6].forEach((o, i) => { const d = new Date(a); d.setDate(d.getDate() + o); const ct = [.9, .5, 1, .7][(ms + i) % 4], cr = [.6, 1, .8, .4][(ms + i) % 4];
+    days += `<div class="day"><div class="sc L" style="--cp:${ct}">${ring("t", Math.round(ct * 100))}<div class="sp"><div class="km num">${(5 + (ms + i) % 4 * 2.3).toFixed(1)}<small> km</small></div><div class="meta num">7:${10 + i * 7}/km · 143 bpm</div></div></div>
+      <div class="mid"><b>${HARI[i]} ${tg(d)}</b><span>${["Lari santai", "Tempo", "Long run", "Pemulihan"][i]}</span></div>
+      <div class="sc R" style="--cp:${cr}">${ring("r", Math.round(cr * 100))}<div class="sp"><div class="km num">${(5 + (ms + i + 1) % 4 * 2.1).toFixed(1)}<small> km</small></div><div class="meta num">8:${10 + i * 6}/km · 147 bpm</div></div></div></div>`; });
+  h += `<section class="wk${ms === 19 ? " open" : ""}"><button class="wh" aria-expanded="${ms === 19}"><span class="s L num"><b>${kt} km</b><span>4/4 sesi</span></span>
+    <span class="m"><b>MS${ms}${ms === 19 ? " · minggu ini" : " · " + ph}</b><span>${tg(a)} – ${tg(b)}</span><svg width="12" height="12" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg></span>
+    <span class="s num"><span>4/4 sesi</span><b>${kr} km</b></span></button><div class="wb"><div>${days}</div></div></section>`; }
+$("feed").innerHTML = h;
+const box = $("box"), MINI = 52;
+// 2 · height: 10 closed weeks, or what is left under the compact header on a short screen
+// the open week counts as one of the ten, at its full height
+function size() { const wh = box.querySelector(".wk:not(.open) .wh") || box.querySelector(".wh"), row = wh.offsetHeight, op = box.querySelector(".wk.open"),
+    ten = (op ? op.querySelector(".wh").offsetHeight + op.querySelector(".wb > div").scrollHeight + row * 9 : row * 10) + 4;
+  const room = innerHeight - MINI - 24, H = Math.min(ten, room); box.style.height = H + "px";
+  $("info").innerHTML = `<span>baris minggu <b>${row}px</b></span><span>10 minggu (1 terbuka + 9 tertutup) <b>${ten}px</b></span><span>sisa layar <b>${room}px</b></span><span>kotak <b>${H}px</b> ${H < ten ? "(ikut layar)" : "(10 minggu)"}</span>`; edges(); }
+function edges() { box.classList.toggle("ft", box.scrollTop > 2); box.classList.toggle("fb", box.scrollTop + box.clientHeight < box.scrollHeight - 2);
+  const sb = $("sbar"), r = box.clientHeight / box.scrollHeight; sb.style.height = Math.max(30, box.clientHeight * r) + "px"; sb.style.top = (box.scrollTop / (box.scrollHeight - box.clientHeight || 1)) * (box.clientHeight - parseFloat(sb.style.height)) + "px"; }
+// 3 · using the box parks it right under the compact header
+let parkT = 0;
+function park() { const top = box.getBoundingClientRect().top - MINI - 12; if (Math.abs(top) < 6) return;
+  scrollTo({top: scrollY + top, behavior: REDUCED ? "auto" : "smooth"}); $("flash").classList.add("on"); clearTimeout(parkT); parkT = setTimeout(() => $("flash").classList.remove("on"), 900); }
+let hideT = 0;
+box.addEventListener("scroll", () => { edges(); $("sbar").classList.add("on"); clearTimeout(hideT); hideT = setTimeout(() => $("sbar").classList.remove("on"), 900); }, {passive: true});
+box.addEventListener("wheel", park, {passive: true}); box.addEventListener("touchstart", park, {passive: true});
+$("feed").addEventListener("click", e => { const wh = e.target.closest(".wh"); if (!wh) return; park();
+  const w = wh.parentElement, o = !w.classList.contains("open"), had = [...box.querySelectorAll(".wk.open")].some(x => x !== w);
+  box.querySelectorAll(".wk.open").forEach(x => { x.classList.remove("open"); x.querySelector(".wh").setAttribute("aria-expanded", false); });
+  if (o) { w.classList.add("open"); wh.setAttribute("aria-expanded", true); setTimeout(() => box.scrollTo({top: box.scrollTop + w.getBoundingClientRect().top - box.getBoundingClientRect().top - 4, behavior: REDUCED ? "auto" : "smooth"}), had ? 480 : 60); }
+  box.classList.toggle("fx", !!box.querySelector(".wk.open")); size(); setTimeout(edges, 500); });
+box.classList.add("fx"); addEventListener("resize", size); size();
+</script>
+</body></html>

@@ -3,6 +3,18 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
+## 6. Linimasa ringkas (ide 1 + 2 + 3) — mockup siap, menunggu "gas"
+
+Mockup: [`docs/mockup/linimasa-ringkas.html`](mockup/linimasa-ringkas.html). Minggu tertutup jadi satu baris tipis (±46 px);
+tinggi kotak = 10 minggu (1 terbuka + 9 tertutup) atau sisa layar di bawah header ringkas bila lebih kecil; begitu kotak
+dipakai (klik / scroll), halaman bergeser sampai kotak pas di bawah header ringkas.
+
+## 7. Lari 5K Reza 10 Okt tidak muncul — perlu cek data asli
+
+Kemungkinan (dari kode): (a) tipe aktivitas di Garmin bukan "running" (mis. treadmill/track/lainnya) sehingga tidak
+ikut filter `activityType=running`; (b) data per detik tidak tersedia (ditandai sekali, tidak diminta ulang);
+(c) jarak GPS < 5000 m, sehingga segmen 5K tidak bisa dihitung (butuh 5000 m penuh). Menunggu hasil cek omPik.
+
 ## Daftar perbaikan 1–5 — **sudah dibuat** (29 Okt): M4, A+B+C, 3a, tanpa bayangan, 10 minggu
 
 1. **Penanda minggu aktif di batang target km mingguan** (kotak panjang di sekeliling batang minggu ini, di bawah
