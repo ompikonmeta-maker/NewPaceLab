@@ -67,8 +67,11 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   ringkas. Minggu aktif terbuka; membuka satu minggu menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
   luar: makin pekat = makin patuh rencana. Rencana yang belum dijalani = satu baris tipis.
 - **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);
-  per km (batang = kecepatan, pita = rentang pace rencana; garis HR / cadence / elevasi bisa dinyalakan/dimatikan,
-  ditumpuk di jalur luar); waktu di zona HR; kesimpulan + saran tiap pelari.
+  **Lap jam** (utama, dari file FIT): tiap lap jadi blok setinggi jaraknya dan selebar kecepatannya, kedua pelari sejajar
+  per km; lap manual / sisa akhir lebih pudar; sentuh blok untuk pace, jarak, waktu, HR, cadence, asal lap.
+  **Per km** (cadangan, dari data per detik): batang = kecepatan. Pita = rentang pace rencana; garis HR / cadence / elevasi
+  bisa dinyalakan/dimatikan, ditumpuk di jalur luar. Waktu di zona HR; kesimpulan + saran tiap pelari.
+  Penilaian tempo dan pemanasan memakai lap bila ada (lap yang tengahnya di rentang rencana ± 300 m) [keputusan dashboard].
 - **Arah** (8 minggu terakhir vs sekarang; angka biru = Taofik, oranye = Reza; ▲▼ dijelaskan saat disentuh):
   pace di zona 2, meter per detak, jarak per minggu, long run terjauh menuju 42K, decoupling, cadence vs target.
 - Rencana per hari dibaca dari teks sel Kalender Excel: `Total X km` (atau `X km` pertama), rentang pace `m:ss - m:ss/km`

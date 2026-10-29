@@ -517,6 +517,9 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-ck .val{color:var(--text-2);font-variant-numeric:tabular-nums} .ss-ck .val small{display:block;color:var(--muted);font-size:11.5px;line-height:1.3}
 .ss-kms{display:inline-flex;gap:3px;flex-wrap:wrap} .ss-ck .L .ss-kms{justify-content:flex-end} .ss-kms .km{font-size:11px;border-radius:5px;padding:0 5px;background:var(--bg);border:1px solid var(--line)} .ss-kms .km.f{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:700} .ss-kms .km.x{opacity:.45;text-decoration:line-through} .ss-ck svg{width:18px;height:18px;flex:none} .ss-ok{color:var(--good)} .ss-wn{color:var(--warn)} .ss-na{color:var(--muted)}
 .ss-lt{display:flex;justify-content:center;gap:6px;margin:-2px 0 10px;flex-wrap:wrap}
+.ss-vw{display:inline-flex;background:var(--bg);border-radius:10px;padding:3px;vertical-align:middle;margin-right:6px}
+.ss-vw button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;letter-spacing:normal;text-transform:none;padding:3px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
+.ss-vw button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
 .ss-lt button{border:1px solid var(--line);background:var(--surface);color:var(--muted);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:3px 12px 3px 10px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .25s}
 .ss-lt button::before{content:"";width:16px;height:0;border-top:2px solid currentColor;opacity:.45;transition:opacity .25s} .ss-lt button[data-lane="cad"]::before{border-top-style:dashed} .ss-lt button[data-lane="el"]::before{border-top-style:dotted;border-top-width:3px}
 .ss-lt button[aria-pressed="true"]{color:var(--text);border-color:var(--text)} .ss-lt button[aria-pressed="true"]::before{opacity:1} .ss-lt button:disabled{opacity:.4;cursor:default}
@@ -1726,8 +1729,11 @@ function sessOf(a, s) { const xs = (a.sessions || []).filter(x => x.date === s);
 const ssCad = x => { const v = x.splits.filter(p => p[3]); return v.length ? v.reduce((q, p) => q + p[3] * p[1], 0) / v.reduce((q, p) => q + p[1], 0) : null; };
 const ssEf = x => x.hr ? (x.km * 1000 / (x.sec / 60)) / x.hr : null;
 // which km count for pace / HR checks: tempo block for hard days, after the 3 slow km on long runs, else all
+// the watch's laps whose middle falls inside [a, b] km (laps of at least 300 m); null when the run has no laps there
+function lapsIn(x, a, b) { if (!x.laps || !x.laps.length) return null; let at = 0;
+  const L = x.laps.filter(l => { const m = at + l[0] / 2; at += l[0]; return l[0] >= .3 && m >= a - .3 && m <= b + .3; }); return L.length ? L : null; }   // ±300 m: the watch never splits exactly at the plan
 function segOf(x, pl) { const sp = x.splits; if (!pl) return sp;
-  if (pl.k === "hard" && pl.tempo) return sp.slice(Math.round(pl.warm || 0), Math.round((pl.warm || 0) + pl.tempo));
+  if (pl.k === "hard" && pl.tempo) return lapsIn(x, pl.warm || 0, (pl.warm || 0) + pl.tempo) || sp.slice(Math.round(pl.warm || 0), Math.round((pl.warm || 0) + pl.tempo));
   if (pl.k === "long" && pl.open) return sp.slice(3); return sp; }
 const inRng = (v, r, tol) => r && v != null && v >= r[0] - tol && v <= r[1] + tol;
 // Coach checks. Every number comes from the athlete profile in config.json ("coach", "pace", "zones");
@@ -1785,16 +1791,16 @@ function ssChecks(a, x, pl0, wkEvent, s) { if (!x) return null; const pl = planF
   else if (k === "hard") { const seg = segOf(x, pl).filter(p => p[0] >= .5), hs = seg.slice(1).filter(p => p[2]);
     const hrOk = pl.hr && hs.length ? Math.max(...hs.map(p => p[2])) <= pl.hr[1] : null;
     if (pl.iv) out.push(["Pace interval", "na", "tidak dinilai<small>data per km tidak memisahkan repetisi</small>"]);
-    else if (pl.main && seg.length) { const v = seg.map(spPace), fast = v.filter(q => q < pl.main[0] - tol).length, slow = v.filter(q => q > pl.main[1] + tol).length, lead = P.hr_leads && hrOk;
-      out.push(["Pace tempo per km", fast + slow === 0 ? "ok" : lead ? "na" : "wn", `${kmc(v.map(paceS), i => v[i] < pl.main[0] - tol || v[i] > pl.main[1] + tol ? 1 : 0)}<small>${fast ? fast + " km sedikit terlalu cepat" : ""}${fast && slow ? " · " : ""}${slow ? slow + " km terlalu lambat" : ""}${!fast && !slow ? "semua di rentang" : ""} · ${paceS(pl.main[0] - tol)}–${paceS(pl.main[1] + tol)}${lead && fast + slow ? " · HR jadi patokan" : ""}</small>`]); }
-    if (hrOk != null) out.push(["HR tempo tidak lewat batas", hrOk ? "ok" : "wn", `${kmc(seg.map(p => p[2] || "–"), i => i === 0 ? 2 : seg[i][2] > pl.hr[1] ? 1 : 0)}<small>maks ${pl.hr[1]} · km 1 tempo tidak dihitung</small>`]);
-    if (pl.warm && P.easy && (a.zones || []).length > 1) { const w = x.splits.slice(0, Math.round(pl.warm)), wp = kmPace(w), wh = mean(w.map(p => p[2]).filter(Boolean)), z2 = a.zones[1];
+    else if (pl.main && seg.length) { const U = seg.some(p => typeof p[4] === "string") ? " lap" : " km", v = seg.map(spPace), fast = v.filter(q => q < pl.main[0] - tol).length, slow = v.filter(q => q > pl.main[1] + tol).length, lead = P.hr_leads && hrOk;
+      out.push(["Pace tempo", fast + slow === 0 ? "ok" : lead ? "na" : "wn", `${kmc(v.map(paceS), i => v[i] < pl.main[0] - tol || v[i] > pl.main[1] + tol ? 1 : 0)}<small>${fast ? fast + U + " sedikit terlalu cepat" : ""}${fast && slow ? " · " : ""}${slow ? slow + U + " terlalu lambat" : ""}${!fast && !slow ? "semua di rentang" : ""} · ${seg.some(p => typeof p[4] === "string") ? "per lap" : "per km"} ${paceS(pl.main[0] - tol)}–${paceS(pl.main[1] + tol)}${lead && fast + slow ? " · HR jadi patokan" : ""}</small>`]); }
+    if (hrOk != null) out.push(["HR tempo tidak lewat batas", hrOk ? "ok" : "wn", `${kmc(seg.map(p => p[2] || "–"), i => i === 0 ? 2 : seg[i][2] > pl.hr[1] ? 1 : 0)}<small>maks ${pl.hr[1]} · ${seg.some(p => typeof p[4] === "string") ? "lap" : "km"} 1 tempo tidak dihitung</small>`]);
+    if (pl.warm && P.easy && (a.zones || []).length > 1) { const w = lapsIn(x, 0, pl.warm) || x.splits.slice(0, Math.round(pl.warm)), wp = kmPace(w), wh = mean(w.map(p => p[2]).filter(Boolean)), z2 = a.zones[1];
       out.push(["Pemanasan santai", wp && wp >= P.easy[0] && (wh == null || wh <= z2) ? "ok" : "wn", wp ? `${paceS(wp)}/km · ${wh ? Math.round(wh) + " bpm" : "–"}<small>≥ ${paceS(P.easy[0])} dan HR ≤ ${z2}</small>` : "–"]); } }
   return out; }
 const SSTIP = {"Jarak": "Ikuti km rencana; lebih dari 110% tidak dikejar di hari lain, kurang tidak dikejar sekaligus.", "Buka 3 km pelan": "3 km pertama di pace recovery, pindah ke easy di km 4–6.",
   "HR tidak lewat batas": "Perlambat sampai detak jantung kembali di bawah batas atas. HR mengalahkan pace.", "Decoupling": "Buka pelan, minum sesuai tes keringat.",
   "Cadence bertahan": "Jaga langkah pendek dan cepat di paruh kedua.", "Km lebih cepat dari rentang": "Lari santai benar-benar santai; lebih lambat tidak apa-apa.",
-  "Pace tempo per km": "Km pertama tempo di pace paling lambat dari rentang.", "HR tempo tidak lewat batas": "Turunkan pace tempo sedikit.",
+  "Pace tempo": "Km pertama tempo di pace paling lambat dari rentang.", "HR tempo tidak lewat batas": "Turunkan pace tempo sedikit.",
   "Pemanasan santai": "Pemanasan benar-benar santai sebelum tempo."};
 function ssVerdict(a, x, pl, s) { if (!x) return `<b>${a.name}</b> tidak lari. Libur ≤ 7 hari: ulangi minggu sebelumnya.`;
   const bad = (ssChecks(a, x, pl, false, s) || []).filter(c => c[1] === "wn").map(c => c[0].replace(/<[^>]+>/g, ""));
@@ -1809,8 +1815,46 @@ const wellOf = (a, s) => (a.days || []).find(d => d.date === s);
 // ---------------- per-km butterfly: inner bars = speed (+ plan band); outer lane = HR / cadence / elevation stacked, told apart by line style
 const SSL = {hr: {n: "Detak jantung", u: "bpm", i: 2, da: "none", w: 2}, cad: {n: "Cadence", u: "spm", i: 3, da: "5 3", w: 1.8}, el: {n: "Elevasi", u: "m", i: 4, da: "1 3", w: 2}};
 const SSLON = {hr: true, cad: true, el: true};
+let SSV = "lap"; try { SSV = localStorage.getItem("pacelab-lap") === "km" ? "km" : "lap"; } catch (e) {}
+// L1: the watch's laps on a distance axis. Each lap is a block as tall as its distance and as wide as its speed,
+// so both runners line up kilometre by kilometre; a runner without a FIT file falls back to per-km blocks.
+function ssLap(s, host, T, R, ta, ra) {
+  const W = Math.max(300, host.clientWidth || 900), small = W < 600, mid = small ? 44 : 80, sw = (W - mid) / 2;
+  const blocks = x => x.laps && x.laps.length ? x.laps : x.splits.map(p => [p[0], p[1], p[2], p[3], "k"]);
+  const tot = Math.max(...[T, R].filter(Boolean).map(x => blocks(x).reduce((q, l) => q + l[0], 0)), .5);
+  const K = Math.max(18, Math.min(46, 620 / tot)), top = 26, H = top + tot * K + 8, Y = km => top + km * K;
+  const has = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), on = Object.keys(SSL).filter(k => SSLON[k] && has(k));
+  const laneW = on.length ? sw * .3 : 0, gap = 16, inner = sw - (on.length ? laneW + gap : 0) - 4;
+  const PL = {t: T && planFill(ta, parsePlan(planCell(ta, s))), r: R && planFill(ra, parsePlan(planCell(ra, s)))};
+  const all = [T, R].filter(Boolean).flatMap(x => blocks(x).filter(l => l[0] >= .1).map(l => l[1] / l[0])).concat(...Object.values(PL).map(q => q && q.main || []));
+  const slow = Math.max(...all) + 25, fast = Math.min(...all) - 10, len = v => Math.max(3, (slow - v) / (slow - fast) * inner);
+  const TR = {a: "auto-lap", m: "tombol lap", e: "akhir sesi", t: "lap waktu", p: "lap posisi", w: "lap", k: "per km"};
+  const every = K < 24 ? 2 : 1;
+  let g = "";
+  for (let k = 0; k <= Math.floor(tot); k += every) g += `<line x1="0" x2="${W}" y1="${Y(k)}" y2="${Y(k)}" stroke="var(--grid)"/><text x="${W / 2}" y="${Y(k) + 4}" text-anchor="middle">${k}${small ? "" : " km"}</text>`;
+  for (const [a, x, L] of [[ta, T, true], [ra, R, false]]) { if (!x) continue; const c = a.c, x0 = L ? sw - 8 : sw + mid + 8, dir = L ? -1 : 1;
+    const pl = PL[c], bnd = pl && pl.main;
+    if (bnd) { const bA = len(bnd[1]), bB = len(bnd[0]); g += `<rect x="${L ? x0 - bB : x0 + bA}" y="${top}" width="${Math.abs(bB - bA)}" height="${tot * K}" rx="4" fill="var(--${c})" opacity=".1"/>`; }
+    let at = 0; blocks(x).forEach((l, i) => { const w = len(l[1] / l[0]), y = Y(at), h = Math.max(2, l[0] * K - 2); at += l[0];
+      const dist = l[0] >= .995 ? f1(l[0]) + " km" : Math.round(l[0] * 1000) + " m", lap = l[4] === "k" ? "km " + (i + 1) : "lap " + (i + 1);
+      const sh = `<span class='t1'>${a.name} · ${lap}</span><span class='kmt' style='grid-template-columns:repeat(3,max-content)'><b>${paceS(l[1] / l[0])}<small>/km</small></b><b>${dist}</b><b>${hms(l[1])}</b><b>${l[2] ?? "–"}<small> bpm</small></b><b>${l[3] ?? "–"}<small> spm</small></b><span class='kn'>${TR[l[4]] || "lap"}</span></span>`;
+      g += `<rect class="b lp" style="transform-origin:${L ? "right" : "left"};animation-delay:${i * 30}ms" x="${L ? x0 - w : x0}" y="${y + 1}" width="${w}" height="${h}" rx="${Math.min(4, h / 2)}" fill="var(--${c})" opacity="${l[4] === "m" || l[4] === "e" || l[0] < .5 ? .55 : .92}" data-sh="${sh}"/>`;
+      if (h >= 15 && w > (small ? 40 : 66)) g += `<text x="${L ? x0 - w + 7 : x0 + w - 7}" y="${y + h / 2 + 4}" text-anchor="${L ? "start" : "end"}" style="fill:var(--surface);font-weight:600;pointer-events:none">${small ? "" : (l[4] === "k" ? "" : i + 1 + " · ")}${paceS(l[1] / l[0])}</text>`; });
+    // HR / cadence / elevation on the same distance axis, in the outer lane
+    const l0 = inner + 4 + gap, lx = d => x0 + dir * (l0 + d);
+    const rng = k => { const v = [T, R].filter(Boolean).flatMap(q => q.splits.map(p => p[SSL[k].i]).filter(z => z != null)); return [Math.min(...v) - 1, Math.max(...v) + 1]; };
+    let cum = 0; const mids = x.splits.map(p => { const m = cum + p[0] / 2; cum += p[0]; return m; });
+    if (on.length && laneW / on.length >= 44) { g += `<line x1="${lx(0)}" x2="${lx(laneW)}" y1="${top - 7}" y2="${top - 7}" stroke="var(--line)"/>`;
+      on.forEach((k, i) => { const cx = lx(laneW * (i + .5) / on.length); g += `<line x1="${cx - 14}" x2="${cx - 2}" y1="${top - 14}" y2="${top - 14}" stroke="${k === "el" ? "var(--muted)" : `var(--${c})`}" stroke-width="2" stroke-dasharray="${SSL[k].da === "none" ? "" : SSL[k].da}"/><text x="${cx + 1}" y="${top - 10}">${SSL[k].u}</text>`; }); }
+    on.forEach(k => { const [lo, hi] = rng(k), pts = x.splits.map((p, j) => [p[SSL[k].i], Y(mids[j])]).filter(q => q[0] != null), px = v => lx((v - lo) / (hi - lo || 1) * laneW), col = k === "el" ? "var(--muted)" : `var(--${c})`;
+      if (!pts.length) return; const d = pts.map(([v, y], i) => `${i ? "L" : "M"}${px(v).toFixed(1)} ${y.toFixed(1)}`).join(" ");
+      if (k === "el") g += `<path class="a" d="M${lx(0)} ${pts[0][1]} ${pts.map(([v, y]) => `L${px(v).toFixed(1)} ${y.toFixed(1)}`).join(" ")} L${lx(0)} ${pts[pts.length - 1][1]}Z"/>`;
+      g += `<path class="l" d="${d}" stroke="${col}" stroke-width="${SSL[k].w}" ${SSL[k].da === "none" ? "" : `stroke-dasharray="${SSL[k].da}"`} stroke-linecap="round"/>`;
+      if (k === "hr") pts.forEach(([v, y]) => g += `<circle cx="${px(v)}" cy="${y}" r="2.4" fill="var(--surface)" stroke="${col}" stroke-width="1.5"/>`); }); }
+  return `<svg class="ss-bfs" viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`; }
 function ssBf(s, host) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x => x.c === "r")], vis = V().map(a => a.c);
   const T = vis.includes("t") ? sessOf(ta, s) : null, R = vis.includes("r") ? sessOf(ra, s) : null;
+  if (SSV === "lap" && [T, R].some(x => x && x.laps && x.laps.length)) return ssLap(s, host, T, R, ta, ra);
   const W = Math.max(300, host.clientWidth || 900), small = W < 600, n = Math.max(T ? T.splits.length : 0, R ? R.splits.length : 0);
   if (!n) return `<p class="muted" style="text-align:center">Data per km belum ada untuk sesi ini.</p>`;
   const RH = 17, top = 26, H = top + n * RH + 6, mid = small ? 40 : 116, sw = (W - mid) / 2;
@@ -1863,13 +1907,15 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const ZC = ["var(--z1)", "var(--z2)", "var(--z3)", "var(--z4)", "var(--z5)"];
   const zs = (a, x) => { const z = [0, 0, 0, 0, 0]; let t = 0; x.splits.forEach(p => { if (p[2] && a.zones) { z[zoneOf(a, p[2])] += p[1]; t += p[1]; } }); return t ? z.map(v => v / t) : null; };
   const zbar = (a, x, side) => { const z = x && zs(a, x); return `<div class="ss-zb ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-sh="<span class='t1'>${a.name} · Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .15 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`; };
-  const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null));
+  const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), hasLap = [T, R].some(x => x && x.laps && x.laps.length);
   return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small></div>` : ""}</div>
       <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span></div>
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
-    <div class="ss-sec">Per km <span class="s2">· batang = kecepatan, lebih panjang lebih cepat · pita = rentang pace rencana</span></div>
+    ${hasLap ? `<div class="ss-sec"><span class="ss-vw" role="group" aria-label="Potongan"><button data-view="lap" aria-pressed="${SSV === "lap"}">Lap jam</button><button data-view="km" aria-pressed="${SSV === "km"}">Per km</button></span>
+      <span class="s2">${SSV === "lap" ? "blok = satu lap setinggi jaraknya, lebar = kecepatan" : "batang = kecepatan, lebih panjang lebih cepat"} · pita = rentang pace rencana</span></div>`
+      : `<div class="ss-sec">Per km <span class="s2">· batang = kecepatan, lebih panjang lebih cepat · pita = rentang pace rencana</span></div>`}
     <div class="ss-lt">${Object.keys(SSL).map(k => `<button data-lane="${k}" aria-pressed="${!!SSLON[k] && hasL(k)}" ${hasL(k) ? "" : "disabled title='belum ada data'"}>${SSL[k].n}</button>`).join("")}</div>
     <div class="ss-bfw" data-d="${s}"></div>
     <div class="ss-sec">${ssTerm("zone", "Waktu di zona")}</div>
@@ -1909,6 +1955,11 @@ let SSOPEN = null;
 function ssAnimate(host) { requestAnimationFrame(() => requestAnimationFrame(() => { host.classList.add("open");
   setTimeout(() => { host.querySelectorAll("[data-w]").forEach(i => i.style.width = i.dataset.w + "%"); host.querySelectorAll(".ss-ringc .v").forEach(v => v.style.strokeDasharray = v.dataset.to); }, 150); })); }
 $("p-sesi").addEventListener("click", e => {
+  const vw = e.target.closest(".ss-vw [data-view]");
+  if (vw) { SSV = vw.dataset.view; try { localStorage.setItem("pacelab-lap", SSV); } catch (er) {}
+    const dd = vw.closest(".ss-dd"); dd.querySelectorAll(".ss-vw button").forEach(b => b.setAttribute("aria-pressed", b.dataset.view === SSV));
+    dd.querySelector(".ss-vw + .s2").textContent = (SSV === "lap" ? "blok = satu lap setinggi jaraknya, lebar = kecepatan" : "batang = kecepatan, lebih panjang lebih cepat") + " · pita = rentang pace rencana";
+    const w = dd.querySelector(".ss-bfw"); w.innerHTML = ssBf(w.dataset.d, w); return; }
   const lane = e.target.closest(".ss-lt [data-lane]");
   if (lane) { SSLON[lane.dataset.lane] = !SSLON[lane.dataset.lane]; lane.setAttribute("aria-pressed", SSLON[lane.dataset.lane]);
     const w = lane.closest(".ss-dd").querySelector(".ss-bfw"); w.innerHTML = ssBf(w.dataset.d, w); w.querySelectorAll(".b").forEach(r => { r.style.animation = "none"; r.style.transform = "none"; }); return; }

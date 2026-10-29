@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 11. Lap asli di detail sesi — mockup siap, menunggu pilihan
+## 11. Lap asli di detail sesi — **sudah dibuat** (L1, Lap jam utama, Per km cadangan)
 
 Mockup: [`docs/mockup/lap-sesi.html`](mockup/lap-sesi.html). Tombol Lap jam | Per km. L1 sumbu jarak (blok setinggi jarak
 lap, kedua pelari sejajar per km) · L2 satu baris per lap · L3 tabel cermin. Penilaian pelatih memakai lap bila ada.
