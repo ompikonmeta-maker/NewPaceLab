@@ -127,7 +127,12 @@ class Athlete:
             "anaerobicTrainingEffect": round(1.4 if tempo or race else .3, 1),
             "trainingEffectLabel": "TEMPO" if tempo else "VO2MAX" if race else "AEROBIC_BASE",
             "activityTrainingLoad": round(km * 9 * (1.4 if tempo or race else 1), 1), "calories": round(km * 68),
-            "lapCount": int(total // 1000) + 1 + (3 if tempo else 0), "minTemperature": 26.0, "maxTemperature": 31.0})
+            "lapCount": int(total // 1000) + 1 + (3 if tempo else 0), "minTemperature": 26.0, "maxTemperature": 31.0,
+            "steps": round(t / 60 * 170)})
+        # like the real watches: only Taofik's reports running dynamics and power, only Reza's a lactate threshold
+        extra = {"avgPower": round(230 + 40 * (tempo or race)), "maxPower": 410, "normPower": 240, "avgGroundContactTime": 262.0,
+                 "avgVerticalOscillation": 8.9, "avgVerticalRatio": 9.3} if self.p["hr"] < 145 else {"lactateThresholdBpm": 166.0, "waterEstimated": round(km * 95)}
+        self.runs[-1].update(extra)
 
     def _add_day(self, day, rnd, prog):
         p = self.p

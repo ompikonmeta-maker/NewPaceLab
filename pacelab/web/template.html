@@ -517,6 +517,16 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-ck .val{color:var(--text-2);font-variant-numeric:tabular-nums} .ss-ck .val small{display:block;color:var(--muted);font-size:11.5px;line-height:1.3}
 .ss-kms{display:inline-flex;gap:3px;flex-wrap:wrap} .ss-ck .L .ss-kms{justify-content:flex-end} .ss-kms .km{font-size:11px;border-radius:5px;padding:0 5px;background:var(--bg);border:1px solid var(--line)} .ss-kms .km.f{background:var(--warn-bg);border-color:transparent;color:var(--warn);font-weight:700} .ss-kms .km.x{opacity:.45;text-decoration:line-through} .ss-ck svg{width:18px;height:18px;flex:none} .ss-ok{color:var(--good)} .ss-wn{color:var(--warn)} .ss-na{color:var(--muted)}
 .ss-lt{display:flex;justify-content:center;gap:6px;margin:-2px 0 10px;flex-wrap:wrap}
+.ss-sec .src{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.05em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.ss-tes{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.ss-te{display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:14px;padding:10px 14px} .ss-te.R{flex-direction:row-reverse;text-align:right}
+.ss-te .tx{flex:1;min-width:0;display:flex;flex-direction:column} .ss-te .tx b{font-size:15px} .ss-te .tx small{color:var(--muted);font-size:12px}
+.ss-te .ld{font-size:12.5px;color:var(--muted);margin-top:4px} .ss-te .ld b{color:var(--text);font-size:13px}
+.ss-te .lb{height:7px;border-radius:4px;background:var(--grid);overflow:hidden;margin-top:4px;display:flex} .ss-te.R .lb{justify-content:flex-end}
+.ss-te .lb i{display:block;height:100%;width:0;border-radius:4px;transition:width .9s var(--ease)}
+.ss-gg text{font:700 14px var(--font);fill:var(--text)} .ss-gg .v{stroke-dasharray:0 1;transition:stroke-dasharray 1s var(--ease)} .ss-det.open .ss-gg .v{stroke-dasharray:1 1}
+.ss-gt>span{height:34px} .ss-gt .gh{grid-column:1/-1;justify-content:center;height:26px;border-top:0;padding-top:10px;font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.ss-gt .v{font-size:15px} .ss-gt .na{color:var(--muted);font-weight:400}
 .ss-vw{display:inline-flex;background:var(--bg);border-radius:10px;padding:3px;vertical-align:middle;margin-right:6px}
 .ss-vw button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;letter-spacing:normal;text-transform:none;padding:3px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
 .ss-vw button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
@@ -551,7 +561,7 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-nd,.ss-gn{transform:translate(150px,66px) rotate(-180deg)} .ss-nd{transition:transform 1.3s cubic-bezier(.34,1.4,.64,1)} .ss-tc.in .ss-nd,.ss-tc.in .ss-gn{transform:translate(150px,66px) rotate(var(--deg))}
 @media (max-width:900px){.ss-tg{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.ss-tg,.ss-verdict{grid-template-columns:minmax(0,1fr)}.ss-vd.L{text-align:left}
-  .ss-fr{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.ss-wgh{gap:8px}.ss-wgh .wm>span,.ss-wgh .ws>span{display:none}.ss-sc{padding:8px 10px;gap:8px}.ss-sc .meta{display:none}.ss-sc .km{font-size:17px}.ss-sc .ss-ringc{display:none}
+  .ss-fr{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.ss-tes{grid-template-columns:1fr}.ss-te .ss-gg{width:60px;height:38px}.ss-wgh{gap:8px}.ss-wgh .wm>span,.ss-wgh .ws>span{display:none}.ss-sc{padding:8px 10px;gap:8px}.ss-sc .meta{display:none}.ss-sc .km{font-size:17px}.ss-sc .ss-ringc{display:none}
   .ss-wgh .wm{padding:4px 10px}
   .ss-vt{grid-template-columns:0 minmax(0,1fr) 84px minmax(0,1fr) 0;column-gap:6px}.ss-vt .bb{visibility:hidden;border:0!important}.ss-vt .v{font-size:16px}
   .ss-mir{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr)}.ss-dtop{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ss-dtop .mid{grid-column:1/-1;order:-1}}
@@ -1702,9 +1712,43 @@ const SSG = {
   ef: ["Meter per detak", "Jarak yang ditempuh setiap satu detak jantung. Naik = jantung makin hemat = makin bugar.", "kecepatan (meter/menit) ÷ detak jantung rata-rata"],
   pz2: ["Pace di zona 2", "Pace lari santai saat detak jantung di zona 2. Makin cepat di detak yang sama = makin bugar.", "rata-rata pace pada km dengan HR di zona 2 (lari santai dan long run)"],
   cad: ["Cadence", "Langkah per menit. Sedikit lebih tinggi = beban lutut lebih ringan.", "target Taofik 168–172, Reza 172–176 · waspada bila paruh 2 turun ≥ 5"],
-  comp: ["Kepatuhan rencana", "Seberapa dekat sesi dengan jadwal Excel.", "rata-rata dari: jarak ÷ rencana, % km pace di rentang, % km detak jantung di rentang"],
+  comp: ["Kepatuhan rencana", "Seberapa dekat sesi dengan jadwal Excel.", "rata-rata dari: skor jarak (95–110% rencana), % km/lap dengan pace sesuai aturan, % km dengan detak jantung tidak lewat batas atas"],
+  te: ["Efek latihan", "Penilaian jam Garmin: seberapa besar sesi ini melatih sistem aerobik (daya tahan) dan anaerobik (kecepatan, sprint). 0 = tidak ada efek, 5 = berlebihan.", "angka dari Garmin (Firstbeat), apa adanya"],
+  load: ["Beban latihan", "Angka Garmin untuk total beban sesi: lama × intensitas. Makin besar, makin butuh pemulihan.", "angka dari Garmin, apa adanya"],
+  gct: ["Kontak tanah", "Lama kaki menempel di tanah tiap langkah. Lebih singkat biasanya lebih efisien.", "dari jam / sensor, milidetik"],
+  vo: ["Osilasi vertikal", "Seberapa tinggi badan memantul naik-turun tiap langkah.", "dari jam / sensor, sentimeter"],
+  vr: ["Rasio vertikal", "Pantulan dibagi panjang langkah. Lebih kecil = lebih sedikit tenaga terbuang ke atas.", "osilasi vertikal ÷ panjang langkah × 100%"],
+  lt: ["Ambang laktat", "Detak jantung perkiraan Garmin saat tubuh mulai menumpuk asam laktat; di atasnya cepat lelah.", "angka dari Garmin, apa adanya"],
   zone: ["Zona detak jantung", "5 tingkat usaha. Z1–Z2 santai (masih bisa ngobrol), Z3 sedang, Z4 keras, Z5 maksimal.", "batas per pelari: docs/RUMUS-BATAS-SUMBER.md §2"]};
 const ssTerm = (k, t) => `<span class="ss-term" data-g="${k}">${t || SSG[k][0]}</span>`;
+// ---------------- the run summary as Garmin reports it (runs.json "g"): training effect first, then a mirrored table
+const TEL = {RECOVERY: "Pemulihan", AEROBIC_BASE: "Dasar aerobik", TEMPO: "Tempo", LACTATE_THRESHOLD: "Ambang laktat", VO2MAX: "VO2 maks",
+  ANAEROBIC_CAPACITY: "Kapasitas anaerobik", SPRINT: "Sprint", NO_BENEFIT: "Tanpa efek"};
+const GROWS = [   // [group, label (or glossary key), key, unit, format]
+  ["Waktu", "Waktu bergerak", "moving_s", "", hms], ["Waktu", "Waktu total", "elapsed_s", "", hms],
+  ["Jantung", "HR maks", "hr_max", "bpm"], ["Jantung", "lt", "lt_bpm", "bpm"],
+  ["Langkah", "Cadence rata", "cad", "spm", Math.round], ["Langkah", "Cadence maks", "cad_max", "spm", Math.round], ["Langkah", "Panjang langkah", "stride_cm", "cm", Math.round],
+  ["Langkah", "gct", "gct_ms", "ms", Math.round], ["Langkah", "vo", "vo_cm", "cm", f1], ["Langkah", "vr", "vr_pct", "%", f1],
+  ["Tenaga", "Power rata", "power", "W", Math.round], ["Tenaga", "Power maks", "power_max", "W", Math.round],
+  ["Medan & cuaca", "Elevasi naik", "gain_m", "m", Math.round], ["Medan & cuaca", "Elevasi turun", "loss_m", "m", Math.round], ["Medan & cuaca", "Suhu", "temp_max", "°C", (v, g) => g.temp_min != null ? `${Math.round(g.temp_min)}–${Math.round(v)}` : Math.round(v)],
+  ["Lain-lain", "Kalori", "kcal", "kkal", Math.round], ["Lain-lain", "Langkah", "steps", ""], ["Lain-lain", "Perkiraan keringat", "water_ml", "ml", Math.round], ["Lain-lain", "Jumlah lap", "laps", ""]];
+function ssGauge(v, c) { const k = Math.max(0, Math.min(5, v || 0)) / 5, a = Math.PI * (1 - k), x = 36 + 30 * Math.cos(a), y = 40 - 30 * Math.sin(a);
+  return `<svg class="ss-gg" width="72" height="46" viewBox="0 0 72 46" aria-hidden="true"><path d="M6 40 A30 30 0 0 1 66 40" fill="none" stroke="var(--grid)" stroke-width="7" stroke-linecap="round"/>
+    ${k ? `<path class="v" d="M6 40 A30 30 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="var(--${c})" stroke-width="7" stroke-linecap="round" pathLength="1"/>` : ""}<text x="36" y="40" text-anchor="middle">${v == null ? "–" : f1(v)}</text></svg>`; }
+function ssGarmin(T, R, ta, ra) { const vis = V().map(a => a.c), G = {t: T && vis.includes("t") ? T.g || {} : null, r: R && vis.includes("r") ? R.g || {} : null};
+  const any = k => ["t", "r"].some(c => G[c] && G[c][k] != null);
+  if (!["te_aer", ...GROWS.map(r => r[2])].some(any)) return "";
+  const maxLoad = Math.max(250, ...["t", "r"].map(c => G[c] && G[c].load || 0));
+  const te = c => { const g = G[c]; if (!g) return "<div></div>"; const a = c === "t" ? ta : ra;
+    return `<div class="ss-te ${c === "r" ? "R" : ""}">${c === "r" ? ssGauge(g.te_ana, c) + ssGauge(g.te_aer, c) : ssGauge(g.te_aer, c) + ssGauge(g.te_ana, c)}<div class="tx"><b>${g.te_label ? esc(TEL[g.te_label] || calm(g.te_label.replace(/_/g, " "))) : a.name}</b>
+      <small>aerobik · anaerobik (0–5)</small><span class="ld">${ssTerm("load")} <b class="num">${g.load != null ? Math.round(g.load) : "–"}</b></span><span class="lb"><i style="background:var(--${c})" data-w="${(g.load || 0) / maxLoad * 100}"></i></span></div></div>`; };
+  let grp = "", rows = "";
+  GROWS.filter(r => any(r[2])).forEach(r => { if (r[0] !== grp) { grp = r[0]; rows += `<span class="gh">${grp}</span>`; }
+    const v = c => G[c] && G[c][r[2]] != null ? G[c][r[2]] : null, a = v("t"), b = v("r"), mx = Math.max(+a || 0, +b || 0) || 1;
+    const show = c => { const x = v(c); return x == null ? '<span class="na">–</span>' : `${r[4] ? r[4](x, G[c]) : x}${r[3] ? `<small>${r[3]}</small>` : ""}`; };
+    rows += `<span class="bb L"><i style="background:var(--t)" data-w="${(+a || 0) / mx * 100}"></i></span><span class="v L">${G.t ? show("t") : ""}</span><span class="c">${SSG[r[1]] ? ssTerm(r[1]) : r[1]}</span><span class="v R">${G.r ? show("r") : ""}</span><span class="bb R"><i style="background:var(--r)" data-w="${(+b || 0) / mx * 100}"></i></span>`; });
+  return `${any("te_aer") ? `<div class="ss-sec">${ssTerm("te")} <span class="src">GARMIN</span></div><div class="ss-tes">${te("t")}${te("r")}</div>` : ""}
+    ${rows ? `<div class="ss-sec">Data Garmin <span class="src">GARMIN</span></div><div class="ss-vt ss-gt num">${rows}</div>` : ""}`; }
 document.addEventListener("pointermove", e => { if (!e.target.closest) return; const g = e.target.closest("[data-g]"), h = e.target.closest("[data-sh]");
   if (g) { const G = SSG[g.dataset.g]; return ssShow(`<span class="t1">${G[0]}</span>${G[1]}${G[2] ? `<span class="f">${G[2]}</span>` : ""}`, e.clientX, e.clientY); }
   if (h) return ssShow(h.dataset.sh, e.clientX, e.clientY); sstip.classList.remove("on"); });
@@ -1912,6 +1956,7 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
       <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span></div>
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
+    ${ssGarmin(T, R, ta, ra)}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
     ${hasLap ? `<div class="ss-sec"><span class="ss-vw" role="group" aria-label="Potongan"><button data-view="lap" aria-pressed="${SSV === "lap"}">Lap jam</button><button data-view="km" aria-pressed="${SSV === "km"}">Per km</button></span>
       <span class="s2">${SSV === "lap" ? "blok = satu lap setinggi jaraknya, lebar = kecepatan" : "batang = kecepatan, lebih panjang lebih cepat"} · pita = rentang pace rencana</span></div>`

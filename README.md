@@ -71,6 +71,10 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   per km; lap manual / sisa akhir lebih pudar; sentuh blok untuk pace, jarak, waktu, HR, cadence, asal lap.
   **Per km** (cadangan, dari data per detik): batang = kecepatan. Pita = rentang pace rencana; garis HR / cadence / elevasi
   bisa dinyalakan/dimatikan, ditumpuk di jalur luar. Waktu di zona HR; kesimpulan + saran tiap pelari.
+  **Efek latihan** dan **Data Garmin** (apa adanya, ditandai GARMIN): efek latihan aerobik / anaerobik (0–5) + label + beban
+  latihan, lalu tabel cermin: waktu bergerak / total, HR maks, ambang laktat, cadence, panjang langkah, kontak tanah,
+  osilasi & rasio vertikal, power, elevasi, suhu, kalori, langkah, perkiraan keringat, jumlah lap. Yang tidak dikirim
+  jam salah satu pelari ditulis "–".
   Penilaian tempo dan pemanasan memakai lap bila ada (lap yang tengahnya di rentang rencana ± 300 m) [keputusan dashboard].
 - **Arah** (8 minggu terakhir vs sekarang; angka biru = Taofik, oranye = Reza; ▲▼ dijelaskan saat disentuh):
   pace di zona 2, meter per detak, jarak per minggu, long run terjauh menuju 42K, decoupling, cadence vs target.
