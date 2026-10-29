@@ -3,7 +3,12 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0b. Tab "Sesi" — dipilih T3 + A, versi 5 menunggu "gas"
+## 0b. Tab "Sesi" — dipilih T3 + A, versi 6 menunggu "gas"
+
+Versi 6 (hanya yang dikomentari): nama hari lengkap; tooltip per km satu baris per pelari; garis HR / cadence /
+elevasi bisa ditumpuk langsung di atas batang pace (opsi baru) atau di jalur luar (v5); penanda pemilik angka di
+kartu Arah: A nama kecil, B angka berwarna, C pil berwarna, D label langsung di grafik — menunggu pilihan.
+
 
 Mockup: [`docs/mockup/tab-sesi-T3A.html`](mockup/tab-sesi-T3A.html). Data rekaan.
 
