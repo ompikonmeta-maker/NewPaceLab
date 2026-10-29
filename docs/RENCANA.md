@@ -34,6 +34,14 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 12. Data ringkasan Garmin di detail sesi — mockup siap, menunggu pilihan
+
+Mockup: [`docs/mockup/data-garmin.html`](mockup/data-garmin.html). Field sudah tersimpan sejak sync FIT (runs.json "g"):
+waktu bergerak/total, HR maks, ambang laktat (Reza), cadence rata/maks, panjang langkah, kontak tanah / osilasi / rasio
+vertikal / power (jam Taofik), training effect aerobik/anaerobik + label, beban latihan, elevasi, suhu, kalori, langkah,
+perkiraan keringat, jumlah lap. Opsi: A tabel cermin berkelompok · B kartu kecil per pelari · C efek latihan di depan + tabel.
+Belum dipakai juga: data harian (SpO2, napas, stres, langkah, menit intensitas, kebutuhan tidur) — rencana terpisah.
+
 ## 11. Lap asli di detail sesi — **sudah dibuat** (L1, Lap jam utama, Per km cadangan)
 
 Mockup: [`docs/mockup/lap-sesi.html`](mockup/lap-sesi.html). Tombol Lap jam | Per km. L1 sumbu jarak (blok setinggi jarak

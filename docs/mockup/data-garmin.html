@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: data Garmin di sesi</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--good:#0f8a0f;--warn:#9a6a00;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f;--warn:#f2c14e}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 4px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.note{font-size:13px;color:var(--text-2);margin:4px 0 14px;min-height:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.sec{text-align:center;font-size:12.5px;font-weight:700;color:var(--muted);letter-spacing:.05em;margin:4px 0 10px}
+.sec small{font-weight:400;letter-spacing:0}
+/* A: grouped mirrored table */
+.grp{margin-top:6px} .grp h5{margin:12px 0 2px;text-align:center;font-size:11.5px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
+.row{display:grid;grid-template-columns:minmax(0,1fr) max-content 150px max-content minmax(0,1fr);column-gap:12px;align-items:center;height:34px;border-top:1px solid var(--line)}
+.row .bb{position:relative;height:100%} .row .bb i{position:absolute;top:50%;height:5px;margin-top:-2.5px;border-radius:3px} .row .bb.L i{right:0;background:var(--t)} .row .bb.R i{left:0;background:var(--r)}
+.row .bb.L{border-right:1.5px dashed var(--line)} .row .bb.R{border-left:1.5px dashed var(--line)}
+.row .v{font-weight:650;font-size:15px;white-space:nowrap} .row .v small{font-weight:400;color:var(--muted);font-size:11.5px;margin-left:2px} .row .v.L{text-align:right}
+.row .c{text-align:center;font-size:12.5px;color:var(--muted)} .row .na{color:var(--muted);font-weight:400}
+/* B: chip grid per runner */
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.who{display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:8px} .who.R{justify-content:flex-end}
+.dt{display:inline-block;width:9px;height:9px;border-radius:50%}
+.chips{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px}
+.ch{background:var(--bg);border-radius:12px;padding:8px 10px} .ch .k{font-size:11.5px;color:var(--muted)} .ch .v{font-size:16px;font-weight:650} .ch .v small{font-size:11.5px;font-weight:400;color:var(--muted)}
+.ch.off{opacity:.45}
+/* C: training effect hero */
+.te{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:12px}
+.teb{background:var(--bg);border-radius:14px;padding:12px 14px;display:flex;gap:14px;align-items:center}
+.teb svg{flex:none} .teb .lab{font-weight:700} .teb .lab small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.load{height:8px;border-radius:4px;background:var(--grid);overflow:hidden;margin-top:6px} .load i{display:block;height:100%}
+.src{display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:0 5px;margin-left:6px;vertical-align:1px}
+@media (max-width:700px){.duo,.te{grid-template-columns:1fr}.row{grid-template-columns:minmax(0,1fr) max-content 92px max-content minmax(0,1fr);column-gap:6px}}
+</style></head><body><div class="wrap">
+<h1>Mockup: data ringkasan Garmin di detail sesi</h1>
+<p class="sub">Data rekaan, nama field asli dari hasil <code>inspect</code>. Semua angka ditampilkan apa adanya dari Garmin (tanda <span class="src">GARMIN</span>); yang tidak dikirim jam salah satu pelari ditulis “–” (contoh: power, ground contact hanya ada di jam Taofik; ambang laktat hanya di Reza).</p>
+<div class="pills" id="opt" role="group" aria-label="Opsi">
+  <button class="pill" aria-pressed="true" data-o="A">A Tabel cermin berkelompok</button>
+  <button class="pill" aria-pressed="false" data-o="B">B Kartu kecil per pelari</button>
+  <button class="pill" aria-pressed="false" data-o="C">C Training effect di depan + tabel</button>
+</div>
+<p class="note" id="note"></p>
+<div class="card" id="host"></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+// one session as Garmin sends it (rekaan)
+const G = {
+  t: {moving_s: 3940, elapsed_s: 4010, hr_max: 172, cad: 171, cad_max: 186, gain_m: 38, loss_m: 41, stride_cm: 95, gct_ms: 262, vo_cm: 8.9, vr_pct: 9.3,
+      power: 248, power_max: 402, te_aer: 3.6, te_ana: 1.9, te_label: "TEMPO", load: 142, kcal: 610, steps: 11240, temp_min: 27, temp_max: 31, laps: 12},
+  r: {moving_s: 3820, elapsed_s: 3870, hr_max: 168, cad: 174, cad_max: 182, gain_m: 22, loss_m: 25, stride_cm: 82, te_aer: 3.2, te_ana: 1.4, te_label: "TEMPO",
+      load: 118, kcal: 580, steps: 10990, temp_min: 28, temp_max: 32, laps: 6, lt_bpm: 166, water_ml: 820}};
+const hms = s => `${Math.floor(s / 3600)}:${String(Math.floor(s % 3600 / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
+const TE = {RECOVERY: "Pemulihan", AEROBIC_BASE: "Dasar aerobik", TEMPO: "Tempo", LACTATE_THRESHOLD: "Ambang laktat", VO2MAX: "VO2 maks", ANAEROBIC_CAPACITY: "Kapasitas anaerobik", SPRINT: "Sprint"};
+// [group, label, key, unit, fmt, higher = more bar]
+const ROWS = [
+  ["Waktu", "Waktu bergerak", "moving_s", "", hms], ["Waktu", "Waktu total", "elapsed_s", "", hms],
+  ["Jantung", "HR maks", "hr_max", "bpm"], ["Jantung", "Ambang laktat", "lt_bpm", "bpm"],
+  ["Langkah", "Cadence rata", "cad", "spm"], ["Langkah", "Cadence maks", "cad_max", "spm"], ["Langkah", "Panjang langkah", "stride_cm", "cm"],
+  ["Langkah", "Kontak tanah", "gct_ms", "ms"], ["Langkah", "Osilasi vertikal", "vo_cm", "cm"], ["Langkah", "Rasio vertikal", "vr_pct", "%"],
+  ["Tenaga", "Power rata", "power", "W"], ["Tenaga", "Power maks", "power_max", "W"],
+  ["Efek latihan", "Aerobik", "te_aer", "/ 5"], ["Efek latihan", "Anaerobik", "te_ana", "/ 5"], ["Efek latihan", "Beban latihan", "load", ""],
+  ["Medan & cuaca", "Elevasi naik", "gain_m", "m"], ["Medan & cuaca", "Elevasi turun", "loss_m", "m"], ["Medan & cuaca", "Suhu", "temp_max", "°C", (v, c) => `${G[c].temp_min}–${v}`],
+  ["Lain-lain", "Kalori", "kcal", "kkal"], ["Lain-lain", "Langkah", "steps", ""], ["Lain-lain", "Perkiraan keringat", "water_ml", "ml"], ["Lain-lain", "Jumlah lap", "laps", ""]];
+const val = (c, r) => { const v = G[c][r[2]]; return v == null ? null : r[4] ? r[4](v, c) : (typeof v === "number" ? v.toLocaleString("id-ID") : v); };
+function A(rows = ROWS) { let html = "", grp = "";
+  rows.forEach(r => { if (r[0] !== grp) { grp = r[0]; html += `<h5>${grp}</h5>`; }
+    const a = G.t[r[2]], b = G.r[r[2]], mx = Math.max(a || 0, b || 0) || 1, w = v => v == null ? 0 : v / mx * 100;
+    html += `<div class="row num"><span class="bb L"><i style="width:${w(a)}%"></i></span><span class="v L">${a == null ? '<span class="na">–</span>' : val("t", r) + (r[3] ? `<small>${r[3]}</small>` : "")}</span><span class="c">${r[1]}</span><span class="v">${b == null ? '<span class="na">–</span>' : val("r", r) + (r[3] ? `<small>${r[3]}</small>` : "")}</span><span class="bb R"><i style="width:${w(b)}%"></i></span></div>`; });
+  return `<div class="sec">DATA GARMIN <span class="src">GARMIN</span></div><div class="grp">${html}</div>`; }
+function B() { const one = c => `<div><div class="who ${c === "r" ? "R" : ""}"><span class="dt" style="background:var(--${c})"></span>${c === "t" ? "Taofik" : "Reza"}</div><div class="chips num">${ROWS.map(r => { const v = val(c, r);
+    return `<div class="ch ${v == null ? "off" : ""}"><div class="k">${r[1]}</div><div class="v">${v == null ? "–" : v}${v != null && r[3] ? `<small> ${r[3]}</small>` : ""}</div></div>`; }).join("")}</div></div>`;
+  return `<div class="sec">DATA GARMIN <span class="src">GARMIN</span></div><div class="duo">${one("t")}${one("r")}</div>`; }
+function gauge(v, c) { const a = Math.PI * (1 - v / 5), x = 36 + 30 * Math.cos(a), y = 40 - 30 * Math.sin(a);
+  return `<svg width="72" height="46" viewBox="0 0 72 46"><path d="M6 40 A30 30 0 0 1 66 40" fill="none" stroke="var(--grid)" stroke-width="7" stroke-linecap="round"/><path d="M6 40 A30 30 0 0 1 ${x.toFixed(1)} ${y.toFixed(1)}" fill="none" stroke="var(--${c})" stroke-width="7" stroke-linecap="round"/><text x="36" y="40" text-anchor="middle" style="font:700 14px sans-serif;fill:var(--text)">${v.toFixed(1)}</text></svg>`; }
+function C() { const box = c => { const g = G[c];
+    return `<div class="teb">${gauge(g.te_aer, c)}${gauge(g.te_ana, c)}<div><div class="lab">${TE[g.te_label] || g.te_label}<small>efek latihan aerobik · anaerobik (0–5)</small></div>
+      <div style="font-size:12.5px;color:var(--muted);margin-top:6px">beban latihan <b style="color:var(--text)">${g.load}</b></div><div class="load"><i style="width:${g.load / 2}%;background:var(--${c})"></i></div></div></div>`; };
+  return `<div class="sec">EFEK LATIHAN <span class="src">GARMIN</span></div><div class="te">${box("t")}${box("r")}</div>${A(ROWS.filter(r => r[0] !== "Efek latihan"))}`; }
+const NOTE = {A: "Lanjutan tabel angka yang sudah ada (Jarak, Pace, HR rata, Cadence, Meter per detak), dikelompokkan: Waktu · Jantung · Langkah · Tenaga · Efek latihan · Medan & cuaca · Lain-lain. Batang mulai dari garis putus-putus yang sama, tanpa penanda unggul.",
+  B: "Dua kolom kartu kecil, satu per pelari; yang tidak dikirim jam dibuat pudar. Ringkas, tapi tidak cermin baris per baris.",
+  C: "Efek latihan Garmin (aerobik/anaerobik 0–5 + label + beban) jadi sorotan di atas, sisanya tabel cermin seperti A. Paling cepat menjawab: sesi ini melatih apa?"};
+function render(o) { $("host").innerHTML = {A, B, C}[o](); $("note").textContent = NOTE[o]; }
+$("opt").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; $("opt").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); render(b.dataset.o); });
+render("A");
+</script>
+</body></html>
