@@ -1711,7 +1711,7 @@ const SSG = {
   dec: ["Decoupling", "Seberapa boros detak jantung di paruh kedua dibanding paruh pertama, pada kecepatan yang sama. Kecil = daya tahan kuat.", "(meter per detak paruh 1 − paruh 2) ÷ paruh 1 × 100%<br>tanpa 3 km pertama · target &lt; 8%"],
   ef: ["Meter per detak", "Jarak yang ditempuh setiap satu detak jantung. Naik = jantung makin hemat = makin bugar.", "kecepatan (meter/menit) ÷ detak jantung rata-rata"],
   pz2: ["Pace di zona 2", "Pace lari santai saat detak jantung di zona 2. Makin cepat di detak yang sama = makin bugar.", "rata-rata pace pada km dengan HR di zona 2 (lari santai dan long run)"],
-  cad: ["Cadence", "Langkah per menit. Sedikit lebih tinggi = beban lutut lebih ringan.", "target Taofik 168–172, Reza 172–176 · waspada bila paruh 2 turun ≥ 5"],
+  cad: ["Cadence", "Langkah per menit. Sedikit lebih tinggi = beban lutut lebih ringan.", "angka cadence rata-rata dari Garmin per lari · target Taofik 168–172, Reza 172–176 · waspada bila paruh 2 turun ≥ 5"],
   comp: ["Kepatuhan rencana", "Seberapa dekat sesi dengan jadwal Excel.", "rata-rata dari: skor jarak (95–110% rencana), % km/lap dengan pace sesuai aturan, % km dengan detak jantung tidak lewat batas atas"],
   te: ["Efek latihan", "Penilaian jam Garmin: seberapa besar sesi ini melatih sistem aerobik (daya tahan) dan anaerobik (kecepatan, sprint). 0 = tidak ada efek, 5 = berlebihan.", "angka dari Garmin (Firstbeat), apa adanya"],
   load: ["Beban latihan", "Angka Garmin untuk total beban sesi: lama × intensitas. Makin besar, makin butuh pemulihan.", "angka dari Garmin, apa adanya"],
@@ -1770,7 +1770,8 @@ const RUNK = k => k && !["rest", "str"].includes(k);
 const zoneOf = (a, h) => (a.zones || []).filter(b => h >= b).length;      // 0..4 = Z1..Z5
 const spPace = sp => sp[1] / sp[0];
 function sessOf(a, s) { const xs = (a.sessions || []).filter(x => x.date === s); return xs.length ? xs.reduce((p, q) => q.km > p.km ? q : p) : null; }
-const ssCad = x => { const v = x.splits.filter(p => p[3]); return v.length ? v.reduce((q, p) => q + p[3] * p[1], 0) / v.reduce((q, p) => q + p[1], 0) : null; };
+// cadence as Garmin reports it for the run (averageRunningCadenceInStepsPerMinute); per-second data only when Garmin sent none
+const ssCad = x => { if (x.g && x.g.cad != null) return x.g.cad; const v = x.splits.filter(p => p[3]); return v.length ? v.reduce((q, p) => q + p[3] * p[1], 0) / v.reduce((q, p) => q + p[1], 0) : null; };
 const ssEf = x => x.hr ? (x.km * 1000 / (x.sec / 60)) / x.hr : null;
 // which km count for pace / HR checks: tempo block for hard days, after the 3 slow km on long runs, else all
 // the watch's laps whose middle falls inside [a, b] km (laps of at least 300 m); null when the run has no laps there

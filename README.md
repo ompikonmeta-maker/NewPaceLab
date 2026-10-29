@@ -90,6 +90,7 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 |---|---|---|
 | Pace di zona 2 | pace berbobot waktu dari km (≥ 0,5 km) yang HR rata-ratanya di zona 2 (`zones[0] ≤ HR < zones[1]`, `config.json`), dari lari easy, long, recovery | [keputusan dashboard] |
 | Meter per detak | (jarak ÷ waktu) ÷ (HR ÷ 60), rata-rata lari selain latihan keras per minggu | [keputusan dashboard] |
+| Cadence (sesi, kartu Arah) | cadence rata-rata dari Garmin per lari (`averageRunningCadenceInStepsPerMinute`), apa adanya; per minggu = rata-rata sesi. Hanya bila Garmin tidak mengirimnya: dari data per detik | keputusan omPik |
 | Per km | km dipotong per 1000 m dari data per detik; HR rata berbobot waktu; potongan terakhir < 300 m dibuang | [keputusan dashboard] |
 
 Semua angka penilaian diambil dari **profil pelari di `config.json`**, bukan dari kode: blok `coach` (berlaku untuk semua,
