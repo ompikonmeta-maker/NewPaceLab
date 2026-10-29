@@ -20,7 +20,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PY_VERSION = "3.12.10"
 URL = "https://www.python.org/ftp/python/{v}/python-{v}-embed-{arch}.zip"
 APP = ["pacelab.py", "config.json", "README.md", "Update Dashboard.bat", "Demo Dashboard.bat",
-       "pacelab", "tools/mock_garmin.py"]
+       "pacelab", "tools/mock_garmin.py", "tools/fitgen.py"]
 
 README = """NewPaceLab portable - Windows {arch}
 
