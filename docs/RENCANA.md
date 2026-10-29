@@ -3,7 +3,21 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0a. Tab "Sesi" (versi 3, 29 Okt malam) — menunggu pilihan
+## 0b. Tab "Sesi" — dipilih T3 + A, versi 4 menunggu "gas"
+
+Mockup: [`docs/mockup/tab-sesi-T3A.html`](mockup/tab-sesi-T3A.html). Data rekaan.
+
+- T3: header besar tetap; saat di-scroll muncul header ringkas melekat (hitung mundur, progres, tab Ringkasan | Sesi).
+- A: linimasa cermin dikelompokkan per minggu program; minggu aktif terbuka, minggu lain tertutup (ringkasan km dan
+  sesi dijalani/terjadwal tiap pelari); klik minggu = buka/tutup.
+- Klik hari: detail duel terbuka dan baris tanggal otomatis bergeser ke atas layar (di bawah header ringkas).
+- Baris angka: kolom angka lebar tetap, semua batang mulai dari garis putus-putus yang sama; batang yang kalah pudar,
+  tooltip menjelaskan siapa unggul dan kenapa.
+- Per km: tombol Detak jantung / Cadence / Elevasi; yang aktif ditumpuk ke luar sebagai jalur terpisah
+  (di HP satu jalur sekaligus).
+- Data baru yang dibutuhkan dari Garmin: cadence dan elevasi per detik (sync diubah, semua lari diunduh ulang sekali).
+
+## 0a. Tab "Sesi" (versi 3, 29 Okt malam) — sudah dipilih T3 + A
 
 Mockup: [`docs/mockup/tab-sesi.html`](mockup/tab-sesi.html) (pilih opsi di bilah atas). Data rekaan.
 Sudah diputuskan: cadence ditambah ke sync; rumus kepatuhan disetujui; pace di zona 2 dan meter per detak dua-duanya tampil.
