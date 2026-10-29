@@ -11,6 +11,17 @@ Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 2. **Kartu Progres terbaik (5K / 10K / Half / Full) banyak ruang kosong.** Tinggi satu baris kartu ikut kartu Full
    (status target, + panas, saran), jadi 5K/10K punya celah besar antara angka dan grafik; kartu Half yang belum ada
    datanya tetap setinggi kartu lain dan hanya berisi "belum ada".
+   omPik: **tinggi semua kartu tetap sama.** Usulan solusi (mockup nanti):
+   - A. Grafik mengisi sisa tinggi kartu (kartu jadi kolom fleksibel), jadi celah di 5K/10K hilang dan grafik lebih tinggi.
+   - B. Isi kartu Full dipadatkan (status + panas + saran jadi satu baris chip, rincian di tooltip) supaya teks semua
+     kartu kira-kira sama tinggi; grafik tetap sejajar di bawah.
+   - C. Kartu kosong (Half belum ada data) diisi grafik bayangan + info kapan tes Half berikutnya, bukan ruang kosong.
+3. **Grafik Reza di 5K / 10K berhenti di Juli.** Sudah dicek: grafik hanya menggambar titik saat rekor membaik
+   (`renderPB`, data `pb` di `metrics`). Rekor 5K Reza terakhir membaik akhir Juli, 10K pertengahan Juli; sesudahnya
+   belum ada segmen yang lebih cepat, jadi garis berhenti. Garis Taofik sampai Oktober karena ia memecahkan rekor
+   di Oktober. Bukan data hilang (perlu dipastikan di data asli: lari Reza Agustus–Oktober ada di Latihan).
+   Usulan: garis diteruskan datar sampai hari ini (rekor masih berlaku) dengan ujung titik kosong, dan tooltip
+   "rekor sejak <tanggal>".
 
 ## 0c. Penilaian pelatih v2 + ikon transparan — **sudah dibuat** (29 Okt)
 
