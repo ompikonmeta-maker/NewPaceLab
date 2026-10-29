@@ -3,6 +3,13 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
+## 9. Per km vs lap Garmin — menunggu pilihan
+
+omPik: 27 Okt di Garmin 12 lap, dashboard 9 batang. Dashboard tidak memakai lap Garmin: batang = potongan tiap 1000 m dari
+data per detik (`metrics.per_km`), sisa < 300 m dibuang (9,1 km → 9 batang). Lap Garmin mengikuti setelan jam (auto-lap,
+tombol lap, langkah workout pemanasan/tempo/pendinginan). Opsi: A tetap per km; B tambah tampilan "lap" bila Personal API
+memberi data lap (perlu dicek dulu: `inspect` diperluas untuk endpoint split/lap aktivitas, hanya nama field).
+
 ## 8. Kartu Progres terbaik bisa dibuka — **sudah dibuat** (E2, grafik setinggi jendela, titik lebih kecil)
 
 Mockup: [`docs/mockup/progres-detail.html`](mockup/progres-detail.html). Isi detail sama untuk semua opsi: grafik besar
