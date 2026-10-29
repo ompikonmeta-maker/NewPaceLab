@@ -3,7 +3,7 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 0b. Tab "Sesi" — dipilih T3 + A, versi 4 menunggu "gas"
+## 0b. Tab "Sesi" — dipilih T3 + A, versi 5 menunggu "gas"
 
 Mockup: [`docs/mockup/tab-sesi-T3A.html`](mockup/tab-sesi-T3A.html). Data rekaan.
 
@@ -11,10 +11,15 @@ Mockup: [`docs/mockup/tab-sesi-T3A.html`](mockup/tab-sesi-T3A.html). Data rekaan
 - A: linimasa cermin dikelompokkan per minggu program; minggu aktif terbuka, minggu lain tertutup (ringkasan km dan
   sesi dijalani/terjadwal tiap pelari); klik minggu = buka/tutup.
 - Klik hari: detail duel terbuka dan baris tanggal otomatis bergeser ke atas layar (di bawah header ringkas).
-- Baris angka: kolom angka lebar tetap, semua batang mulai dari garis putus-putus yang sama; batang yang kalah pudar,
-  tooltip menjelaskan siapa unggul dan kenapa.
-- Per km: tombol Detak jantung / Cadence / Elevasi; yang aktif ditumpuk ke luar sebagai jalur terpisah
-  (di HP satu jalur sekaligus).
+- Baris angka: kolom angka menyesuaikan angka terlebar; semua batang mulai dari garis putus-putus yang sama;
+  tidak ada penanda unggul.
+- Per km: tombol Detak jantung / Cadence / Elevasi; yang aktif ditumpuk dalam satu jalur, dibedakan jenis garis
+  (HR garis penuh + titik, cadence putus-putus, elevasi titik-titik + area).
+- Rencana yang belum dijalani: satu baris tipis (km rencana di kiri/kanan, tanggal di tengah).
+- Satuan selalu ditulis (bpm, spm, m, j, %, /km, kg); "Body Battery" ditulis lengkap (skor 0–100, tanpa satuan).
+- Arah: pace zona 2 = lintasan (titik bergerak dari 8 minggu lalu ke sekarang); meter per detak = garis miring
+  dulu → sekarang; jarak per minggu = batang cermin atas/bawah; long run = tangga menuju 42K; decoupling = jarum
+  di busur zona dokumen (<5, 5–8, ≥8); cadence = jejak titik di pita target.
 - Data baru yang dibutuhkan dari Garmin: cadence dan elevasi per detik (sync diubah, semua lari diunduh ulang sekali).
 
 ## 0a. Tab "Sesi" (versi 3, 29 Okt malam) — sudah dipilih T3 + A
