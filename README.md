@@ -55,15 +55,16 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
 | Latihan (filter 4 / 12 minggu / semua) | km, long run, decoupling, berat vs target per minggu yang sudah selesai; sumbu = tanggal awal minggu |
 | Pemulihan (filter 7 / 14 / 30 / 60 hari) | lampu harian, tidur, HRV, Body Battery |
-| 5K / 10K / Half | segmen tercepat di dalam setiap lari (data per detik): satu titik per lari, garis tipis bertangga = rekor berjalan sampai hari ini, titik bercincin = tercepat. Belum ada data: grafik bayangan + tanggal tes berikutnya |
+| 5K / 10K / Half | segmen tercepat di dalam setiap lari (data per detik): satu titik per lari. Lari yang jarak GPS-nya sedikit kurang (≥ 98%, `config.json` `effort.min_frac`) dan lari terpanjang di hari tes Checkpoint (≥ 80%, `effort.test_min_frac`) ikut dihitung: waktunya disetarakan ke jarak penuh dengan pace rata-rata, ditandai ≈ [keputusan omPik; 80% keputusan dashboard]. Klik kartu = jendela detail (grafik besar, hover ke titik terdekat, 4 mgg / 12 mgg / semua, ringkasan per pelari, 5 tercepat, ←/→ pindah jarak); garis tipis bertangga = rekor berjalan sampai hari ini, titik bercincin = tercepat. Belum ada data: grafik bayangan + tanggal tes berikutnya |
 | Full | estimasi per akhir bulan, di atas pita target B; status target per pelari sebagai chip (batas, + panas, saran saat disentuh). Keempat kartu sama tinggi, grafik mengisi sisa ruang |
 | Badge | 21/25/30/35K, 100 km/bulan, streak 7 & 14 minggu ≥90% target km, PR 5K/10K selama program |
 
 ### Tab Sesi
 
 - **Linimasa cermin**: Taofik kiri, tanggal di tengah, Reza kanan; terbaru di atas; dikelompokkan per minggu program,
-  dalam kotak setinggi 10 minggu (scroll di dalamnya; di HP maksimal 78% layar). Minggu aktif terbuka; membuka satu minggu
-  menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
+  dalam kotak setinggi 10 minggu: minggu yang terbuka penuh + 9 minggu tertutup (satu baris tipis), tidak lebih tinggi dari
+  sisa layar di bawah header ringkas. Begitu kotak dipakai (klik / scroll), halaman bergeser sampai kotak pas di bawah header
+  ringkas. Minggu aktif terbuka; membuka satu minggu menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
   luar: makin pekat = makin patuh rencana. Rencana yang belum dijalani = satu baris tipis.
 - **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);
   per km (batang = kecepatan, pita = rentang pace rencana; garis HR / cadence / elevasi bisa dinyalakan/dimatikan,

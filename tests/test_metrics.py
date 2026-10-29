@@ -31,6 +31,22 @@ class StreamTest(unittest.TestCase):
              "hr": slow["hr"] + fast["hr"][1:]}
         self.assertAlmostEqual(m.best_effort(s, 5000), 1500, delta=2)
 
+    def test_short_gps_runs_count_as_estimated_efforts(self):
+        rule = {"min_frac": 0.98, "test_min_frac": 0.8}
+        runs = [{"id": 1, "date": "2026-10-10", "km": 4.718}, {"id": 2, "date": "2026-10-10", "km": 2.0},
+                {"id": 3, "date": "2026-10-11", "km": 4.996}, {"id": 4, "date": "2026-10-12", "km": 4.7},
+                {"id": 5, "date": "2026-10-13", "km": 5.024}]
+        streams = {r["id"]: stream(360, r["km"]) for r in runs}
+        eff = m.efforts(runs, streams, rule, m.test_days([{"date": "2026-10-10", "event": "Tes 5K"}]))["5K"]
+        got = {rid: (sec, est) for _, sec, rid, est in eff}
+        self.assertAlmostEqual(got[1][0], 1800, delta=6)   # test day, 4.7 km at 6:00/km -> 30:00 for 5 km
+        self.assertTrue(got[1][1])
+        self.assertNotIn(2, got)                           # only the longest run of a test day
+        self.assertTrue(got[3][1])                         # 4 m short: within 98%
+        self.assertNotIn(4, got)                           # 4.7 km on an ordinary day stays out
+        self.assertFalse(got[5][1])                        # a full 5 km is measured, not estimated
+        self.assertEqual(len(m.efforts(runs, streams)["5K"]), 1)   # without the rule: strict 5000 m
+
     def test_decoupling(self):
         flat = stream(540, 15, hr=145)
         self.assertAlmostEqual(m.decoupling(flat), 0.0, delta=0.2)

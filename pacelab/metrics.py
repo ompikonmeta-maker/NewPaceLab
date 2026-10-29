@@ -7,6 +7,7 @@ Inputs are the normalized records written by sync.py:
   wellness {"YYYY-MM-DD": {"sleep_s", "hrv", "hrv_status", "bb", "rhr", "weight"}}
 """
 import datetime as dt
+import re
 import statistics
 
 DIST = {"5K": 5000.0, "10K": 10000.0, "Half": 21097.5, "Full": 42195.0}
@@ -158,18 +159,45 @@ def streaks(weeks):
 
 # ---------------------------------------------------------------- best efforts
 
-def efforts(runs, streams):
-    """{dist: [(date, sec, run_id)]} best effort of every run, chronological."""
+def efforts(runs, streams, rule=None, tests=None):
+    """{dist: [(date, sec, run_id, estimated)]} best effort of every run, chronological.
+
+    A run a little short of the distance by GPS still counts when it covers at least
+    rule["min_frac"] of it; a test day from the program (tests = {dist: {dates}}) counts
+    its longest run when it covers rule["test_min_frac"]. Both are scaled to the full
+    distance at the run's average pace and flagged as estimated."""
+    rule, tests = rule or {}, tests or {}
     out = {k: [] for k in ("5K", "10K", "Half")}
+    longest = {}
+    for r in runs:
+        if streams.get(r["id"]) and r["km"] > longest.get(r["date"], (0, None))[0]:
+            longest[r["date"]] = (r["km"], r["id"])
     for r in sorted(runs, key=lambda r: r["date"]):
         s = streams.get(r["id"])
         if not s:
             continue
         for k in out:
-            v = best_effort(s, DIST[k])
+            v, est = best_effort(s, DIST[k]), False
+            if not v:
+                t, x = s.get("t") or [], s.get("d") or []
+                cover = x[-1] - x[0] if len(x) > 1 else 0
+                frac = cover / DIST[k]
+                near = rule.get("min_frac") and frac >= rule["min_frac"]
+                test = (r["date"] in tests.get(k, ()) and longest.get(r["date"], (0, None))[1] == r["id"]
+                        and rule.get("test_min_frac") and frac >= rule["test_min_frac"])
+                if (near or test) and cover > 0:
+                    v, est = (t[-1] - t[0]) * DIST[k] / cover, True
             if v:
-                out[k].append((r["date"], round(v), r["id"]))
+                out[k].append((r["date"], round(v), r["id"], est))
     return out
+
+
+TEST_RE = {"5K": r"(?<![0-9])5\s?k\b", "10K": r"(?<![0-9])10\s?k\b", "Half": r"half"}
+
+
+def test_days(events):
+    """Program test / race dates per distance, from the Checkpoint events."""
+    return {k: {e["date"] for e in events or [] if re.search(rx, e.get("event") or "", re.I)} for k, rx in TEST_RE.items()}
 
 
 def pb_progress(eff):
@@ -177,10 +205,10 @@ def pb_progress(eff):
     out = {}
     for k, rows in eff.items():
         best, pts = None, []
-        for date, sec, rid in rows:
+        for date, sec, rid, *est in rows:
             if best is None or sec < best:
                 best = sec
-                pts.append({"date": date, "sec": sec, "id": rid})
+                pts.append({"date": date, "sec": sec, "id": rid, "est": bool(est and est[0])})
         out[k] = pts
     return out
 
@@ -197,7 +225,7 @@ def marathon_estimate(eff, on_date):
     lo = on_date - dt.timedelta(days=EST_WINDOW_DAYS)
     best = (None, None)
     for k in ("Half", "10K", "5K"):
-        recent = [s for date, s, _ in eff.get(k, []) if lo <= d(date) <= on_date]
+        recent = [s for date, s, *_ in eff.get(k, []) if lo <= d(date) <= on_date]
         if recent:
             est = round(riegel(min(recent), DIST[k]))
             if best[0] is None or est < best[0]:
@@ -320,8 +348,8 @@ def badges(runs, weeks, eff, ms1):
 
     def pr_in_program(k):
         rows = eff.get(k, [])
-        before = [s for date, s, _ in rows if date < ms1]
-        during = [s for date, s, _ in rows if date >= ms1]
+        before = [s for date, s, *_ in rows if date < ms1]
+        during = [s for date, s, *_ in rows if date >= ms1]
         return bool(during) and (not before or min(during) < min(before))
 
     return [

@@ -47,7 +47,7 @@ def athlete_data(a, data_dir, today):
         w["kg"] = round(sum(kgs) / len(kgs), 2) if kgs else None
         w["kg_t"] = weight_t.get(w["ms"])
 
-    eff = m.efforts(runs, streams)
+    eff = m.efforts(runs, streams, a.get("effort"), m.test_days(prog["events"]))
     pb = m.pb_progress(eff)
     est_series = m.estimate_series(eff, m.d(prog["ms1"]), today)
     est_now, est_src = m.marathon_estimate(eff, today)
@@ -72,7 +72,7 @@ def athlete_data(a, data_dir, today):
         "est": {"sec": est_now, "from": est_src, "series": est_series},
         "pb": {k: v for k, v in pb.items()},
         # every run's fastest segment per distance (date, seconds): all points on the best-progress charts
-        "eff": {k: [[d, sec] for d, sec, _ in rows] for k, rows in eff.items()},
+        "eff": {k: [[d, sec, 1] if est else [d, sec] for d, sec, _, est in rows] for k, rows in eff.items()},
         "days": [{
             "date": day.isoformat(),
             "sleep_h": round(well.get(day.isoformat(), {}).get("sleep_s", 0) / 3600, 2) or None,
@@ -124,7 +124,7 @@ def _pace(p):
 
 def build(cfg, athletes, today, out_path):
     # coach thresholds: config "coach", overridable per athlete
-    athletes = [dict(a, coach={**cfg.get("coach", {}), **a.get("coach", {})}) for a in athletes]
+    athletes = [dict(a, coach={**cfg.get("coach", {}), **a.get("coach", {})}, effort=cfg.get("effort")) for a in athletes]
     data = [athlete_data(a, cfg["data_dir"], today) for a in athletes]
     p0 = data[0]["program"]
     ms_cur = m.ms_of(today.isoformat(), p0["ms1"])

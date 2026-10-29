@@ -1,6 +1,7 @@
 {
   "coach": {"km": [0.95, 1.10], "hr_over_max": 0.20, "lr_hr_in": 0.75, "lr_tail": 0.25, "dec_max": 8,
             "tol_s": 5, "open_tol_s": 10, "cad_drop": 5, "lr_max_min": 210},
+  "effort": {"min_frac": 0.98, "test_min_frac": 0.8},
   "athletes": [
     {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx", "weight_floor": 65,
      "zones": [133, 151, 162, 177], "cadence": [168, 172],

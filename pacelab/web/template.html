@@ -350,6 +350,31 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .tip .v{margin-left:auto;padding-left:16px;font-weight:600}
 .tip .d{color:var(--muted);font-size:12px;margin:0 0 4px 18px}
 .pb{display:flex;gap:6px 16px;font-size:15px;margin:10px 0 4px;flex-wrap:wrap}
+/* best-progress cards open a large window (E2): the card flies to the centre, the page dims */
+.pbc{cursor:pointer;position:relative} .pbc::after{content:"";position:absolute;right:18px;top:20px;width:16px;height:16px;opacity:0;transition:opacity .2s;
+  background:currentColor;-webkit-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M14 4h6v6M10 20H4v-6M20 4l-7 7M4 20l7-7' fill='none' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/contain no-repeat;color:var(--muted)}
+.pbc:hover::after,.pbc:focus-visible::after{opacity:1} .pbc:hover{border-color:color-mix(in srgb,var(--text) 22%,transparent)}
+.pbx{position:fixed;inset:0;z-index:80;display:none;align-items:center;justify-content:center;padding:24px;background:rgba(8,6,18,0);transition:background .4s,backdrop-filter .4s}
+.pbx.open{background:rgba(8,6,18,.42);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.pbx-win{width:min(1120px,100%);height:min(760px,calc(100vh - 48px));display:flex;flex-direction:column;background:var(--surface);border-radius:22px;padding:18px 24px 20px;box-shadow:0 30px 80px rgba(0,0,0,.25);transform-origin:0 0}
+.pbx-hd{display:flex;align-items:center;gap:12px;flex:none} .pbx-hd h3{margin:0;font-size:20px}
+.pbx-nav{display:flex;gap:2px} .pbx-nav button{border:0;background:none;color:var(--muted);font:inherit;font-size:13.5px;padding:4px 11px;border-radius:9px;cursor:pointer} .pbx-nav button[aria-current="true"]{background:var(--bg);color:var(--text);font-weight:600}
+.pbx-x{margin-left:auto;width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:20px;line-height:1}
+.pbx-x:hover{background:var(--bg)}
+.pbx-bd{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:22px;margin-top:10px}
+.pbx-l{display:flex;flex-direction:column;min-height:0} .pbx-per{display:flex;gap:4px;flex:none}
+.pbx-per button{border:1px solid var(--line);background:var(--surface);color:var(--text-2);font:inherit;font-size:12px;padding:2px 11px;border-radius:999px;cursor:pointer} .pbx-per button[aria-pressed="true"]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.pbx-ch{position:relative;flex:1;min-height:220px;margin-top:6px} .pbx-ch svg{position:absolute;inset:0;width:100%;height:100%} .pbx-ch text{font-size:11.5px;fill:var(--muted)}
+.pbx-tt{position:absolute;pointer-events:none;background:var(--surface);border:1px solid var(--line);box-shadow:0 10px 28px rgba(0,0,0,.12);border-radius:12px;padding:8px 12px;font-size:12.5px;white-space:nowrap;opacity:0;transform:translateY(4px);transition:opacity .15s,transform .15s;z-index:2}
+.pbx-tt.on{opacity:1;transform:none} .pbx-tt b{font-size:15px} .pbx-tt small{display:block;color:var(--muted)}
+.pbx-lg{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--muted);flex:none;margin-top:4px} .pbx-lg span{display:inline-flex;align-items:center;gap:6px;white-space:nowrap}
+.pbx-r{display:flex;flex-direction:column;gap:10px;overflow:auto;min-height:0;scrollbar-width:thin}
+.pbx-st{background:var(--bg);border-radius:14px;padding:12px 14px} .pbx-st .who{display:flex;align-items:center;gap:6px;font-weight:700;margin-bottom:6px}
+.pbx-st dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:0;font-size:12.5px} .pbx-st dt{color:var(--muted)} .pbx-st dd{margin:0;text-align:right;font-weight:600;font-variant-numeric:tabular-nums}
+.pbx-top h4{margin:4px 0 6px;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em} .pbx-top ol{margin:0;padding:0;list-style:none}
+.pbx-top li{display:grid;grid-template-columns:16px 1fr auto;gap:8px;align-items:center;padding:4px 6px;border-radius:8px;font-size:12.5px} .pbx-top li:hover,.pbx-top li.on{background:var(--bg)} .pbx-top li .n{color:var(--muted)} .pbx-top li b{font-variant-numeric:tabular-nums}
+.pbx .est{color:var(--warn);font-weight:700}
+@media (max-width:760px){.pbx{padding:10px}.pbx-win{height:calc(100vh - 20px);padding:14px 14px 16px}.pbx-bd{display:block;overflow:auto}.pbx-l{display:block}.pbx-r{margin-top:16px}.pbx-ch{height:min(52vh,340px)}.pbx-lg{margin-top:8px}.pbx-r{overflow:visible}.pbx-nav button{padding:4px 7px}}
 .pb-chips{display:flex;flex-wrap:wrap;gap:8px} .pb-cw{display:inline-flex;align-items:center;gap:6px;cursor:help}
 .pb-empty{height:100%;min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
 .pb-empty svg{width:100%;height:110px;opacity:.22} .pb-empty p{margin:0;text-align:center;font-size:13px;color:var(--muted)} .pb-empty p b{display:block;color:var(--text);font-size:14px}
@@ -444,11 +469,11 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-feed{position:relative}
 .ss-feed::before{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;margin-left:-1px;background:var(--grid)}
 .ss-wg{position:relative;margin-bottom:6px}
-.ss-wgh{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:minmax(0,1fr) 210px minmax(0,1fr);align-items:center;gap:14px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:8px 0}
-.ss-wgh .wm{justify-self:center;display:flex;flex-direction:column;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:5px 16px;transition:border-color .2s,box-shadow .2s}
-.ss-wgh:hover .wm,.ss-wgh:focus-visible .wm{border-color:var(--text-2);box-shadow:0 4px 14px rgba(0,0,0,.06)} .ss-wgh .wm b{font-size:13.5px} .ss-wgh .wm span{font-size:12px;color:var(--muted)}
-.ss-wgh .cv{margin-top:2px;color:var(--muted);transition:transform .35s var(--ease)} .ss-wg.open .ss-wgh .cv{transform:rotate(180deg)}
-.ss-wgh .ws{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--muted)} .ss-wgh .ws.L{justify-content:flex-end} .ss-wgh .ws b{font-size:16px;color:var(--text)}
+.ss-wgh{position:relative;z-index:1;width:100%;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:14px;border:0;background:none;font:inherit;color:inherit;cursor:pointer;padding:5px 0;min-height:40px}
+.ss-wgh .wm{justify-self:center;display:flex;align-items:center;gap:8px;white-space:nowrap;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:4px 14px;transition:border-color .2s,box-shadow .2s}
+.ss-wgh:hover .wm,.ss-wgh:focus-visible .wm{border-color:var(--text-2);box-shadow:0 4px 14px rgba(0,0,0,.06)} .ss-wgh .wm b{font-size:13px} .ss-wgh .wm span{font-size:12px;color:var(--muted)}
+.ss-wgh .cv{flex:none;color:var(--muted);transition:transform .35s var(--ease)} .ss-wg.open .ss-wgh .cv{transform:rotate(180deg)}
+.ss-wgh .ws{display:flex;align-items:baseline;gap:8px;font-size:13px;color:var(--muted)} .ss-wgh .ws.L{justify-content:flex-end} .ss-wgh .ws b{font-size:15px;color:var(--text)}
 .ss-wg.open .ss-wgh .ws{opacity:.55}
 .ss-wgb{display:grid;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease)} .ss-wg.open .ss-wgb{grid-template-rows:1fr} .ss-wgb > div{overflow:hidden}
 .ss-fr{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 150px minmax(0,1fr);align-items:center;gap:14px;padding:6px 0;cursor:pointer}
@@ -523,8 +548,8 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-nd,.ss-gn{transform:translate(150px,66px) rotate(-180deg)} .ss-nd{transition:transform 1.3s cubic-bezier(.34,1.4,.64,1)} .ss-tc.in .ss-nd,.ss-tc.in .ss-gn{transform:translate(150px,66px) rotate(var(--deg))}
 @media (max-width:900px){.ss-tg{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:640px){.ss-tg,.ss-verdict{grid-template-columns:minmax(0,1fr)}.ss-vd.L{text-align:left}
-  .ss-fr,.ss-wgh{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.ss-sc{padding:8px 10px;gap:8px}.ss-sc .meta{display:none}.ss-sc .km{font-size:17px}.ss-sc .ss-ringc{display:none}
-  .ss-wgh .ws{flex-direction:column;gap:0}.ss-wgh .ws.L{align-items:flex-end}.ss-wgh .wm{padding:5px 8px}
+  .ss-fr{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr);gap:8px}.ss-wgh{gap:8px}.ss-wgh .wm>span,.ss-wgh .ws>span{display:none}.ss-sc{padding:8px 10px;gap:8px}.ss-sc .meta{display:none}.ss-sc .km{font-size:17px}.ss-sc .ss-ringc{display:none}
+  .ss-wgh .wm{padding:4px 10px}
   .ss-vt{grid-template-columns:0 minmax(0,1fr) 84px minmax(0,1fr) 0;column-gap:6px}.ss-vt .bb{visibility:hidden;border:0!important}.ss-vt .v{font-size:16px}
   .ss-mir{grid-template-columns:minmax(0,1fr) 84px minmax(0,1fr)}.ss-dtop{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}.ss-dtop .mid{grid-column:1/-1;order:-1}}
 
@@ -676,12 +701,12 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
   <section class="card c4"><h3>Body Battery <small>pagi</small></h3><div class="insight" id="in-bb"></div><div class="chart" id="ch-bb"></div></section>
 </div>
 
-<div class="section"><div><h2>Progres terbaik</h2><p>Segmen tercepat di dalam lari mana pun. Grafik naik = makin cepat.</p></div></div>
+<div class="section"><div><h2>Progres terbaik</h2><p>Segmen tercepat di dalam setiap lari. Grafik naik = makin cepat. Klik kartu untuk detail.</p></div></div>
 <div class="grid">
-  <section class="card c3"><h3>5K</h3><div class="pb num" id="pb-5K"></div><div class="insight" id="in-5K"></div><div class="chart" id="ch-5K"></div></section>
-  <section class="card c3"><h3>10K</h3><div class="pb num" id="pb-10K"></div><div class="insight" id="in-10K"></div><div class="chart" id="ch-10K"></div></section>
-  <section class="card c3"><h3>Half</h3><div class="pb num" id="pb-Half"></div><div class="insight" id="in-Half"></div><div class="chart" id="ch-Half"></div></section>
-  <section class="card c3"><h3>Full <small>estimasi</small></h3><div class="pb num" id="pb-Full"></div><div class="insight" id="in-Full"></div><div class="chart" id="ch-Full"></div></section>
+  <section class="card c3 pbc" data-k="5K" tabindex="0" role="button" aria-label="Detail 5K"><h3>5K</h3><div class="pb num" id="pb-5K"></div><div class="insight" id="in-5K"></div><div class="chart" id="ch-5K"></div></section>
+  <section class="card c3 pbc" data-k="10K" tabindex="0" role="button" aria-label="Detail 10K"><h3>10K</h3><div class="pb num" id="pb-10K"></div><div class="insight" id="in-10K"></div><div class="chart" id="ch-10K"></div></section>
+  <section class="card c3 pbc" data-k="Half" tabindex="0" role="button" aria-label="Detail Half"><h3>Half</h3><div class="pb num" id="pb-Half"></div><div class="insight" id="in-Half"></div><div class="chart" id="ch-Half"></div></section>
+  <section class="card c3 pbc" data-k="Full" tabindex="0" role="button" aria-label="Detail estimasi maraton"><h3>Full <small>estimasi</small></h3><div class="pb num" id="pb-Full"></div><div class="insight" id="in-Full"></div><div class="chart" id="ch-Full"></div></section>
 </div>
 
 <div class="section"><div><h2>Badge</h2><p id="bd-n"></p></div></div>
@@ -706,6 +731,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
   <div class="xb" id="xdec-b"><div id="xdec-in"></div></div>
   <div class="sbar" id="xdec-sbar" aria-hidden="true"></div>
 </div>
+<div class="pbx" id="pbx" aria-hidden="true"><div class="pbx-win" id="pbx-win" role="dialog" aria-modal="true" aria-labelledby="pbx-h"></div></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
   <div class="panel">
     <div class="pv-head">
@@ -732,7 +758,7 @@ const tgl = s => { const d = D(s); return d.getDate() + " " + BULAN[d.getMonth()
 const hari = s => { const d = D(s); return `${HARI[d.getDay()]} ${d.getDate()} ${BULAN[d.getMonth()]}`; };
 const hms = s => { if (s == null) return "–"; s = Math.round(s); const h = Math.floor(s/3600), m = Math.floor(s%3600/60), x = s%60;
   return h ? `${h}:${String(m).padStart(2,"0")}:${String(x).padStart(2,"0")}` : `${m}:${String(x).padStart(2,"0")}`; };
-const hm = s => { if (s == null) return "–"; const h = Math.floor(s/3600), m = Math.round(s%3600/60); return `${h}:${String(m).padStart(2,"0")}`; };
+const hm = s => { if (s == null) return "–"; const t = Math.round(s / 60), h = Math.floor(t / 60), m = t % 60; return `${h}:${String(m).padStart(2,"0")}`; };   // round first: 1:59:40 -> 2:00, never 1:60
 const f1 = v => v == null ? "–" : (Math.round(v*10)/10).toFixed(1);
 const pct = v => v == null ? "–" : Math.round(v*100) + "%";
 const mean = a => { a = a.filter(v => v != null); return a.length ? a.reduce((x, y) => x + y, 0) / a.length : null; };
@@ -979,11 +1005,13 @@ function draw(id, {x, series, h = 220, ymin, ymax, invert = false, refs = [], ba
       const d = g.length === 1 ? "" : smooth(g);
       if (se.target) { if (d) s += `<path class="ar" d="${d}" fill="none" stroke="var(--${c})" stroke-width="1.6" stroke-dasharray="5 5" stroke-opacity=".6"/>`; return; }
       // all efforts: small faded dots; the fastest gets a ring and its value
-      if (se.scatter) { const b = g.reduce((m, q) => (invert ? q[1] < m[1] : q[1] > m[1]) ? q : m), bv = se.v.reduce((m, p) => p[1] != null && (m == null || (invert ? p[1] < m : p[1] > m)) ? p[1] : m, null);
-        g.forEach((q, i) => { if (q !== b) s += `<circle class="pt" style="transition-delay:${500 + i*25}ms" cx="${q[0]}" cy="${q[1]}" r="2.8" fill="var(--${c})" opacity=".45"/>`; });
+      if (se.scatter) { const bp = se.v.reduce((m, p) => p[1] != null && (!m || (invert ? p[1] < m[1] : p[1] > m[1])) ? p : m, null), b = [xs(bp[0]), ys(bp[1])], bv = (bp[2] ? "≈" : "") + fmtV(bp[1]);
+        se.v.forEach((p, i) => { if (p === bp || p[1] == null) return; const cx = xs(p[0]), cy = ys(p[1]);
+          s += p[2] ? `<circle class="pt" style="transition-delay:${500 + i*25}ms" cx="${cx}" cy="${cy}" r="2.4" fill="var(--surface)" stroke="var(--${c})" stroke-width="1.2" stroke-dasharray="1.6 1.4"/>`
+                    : `<circle class="pt" style="transition-delay:${500 + i*25}ms" cx="${cx}" cy="${cy}" r="2.2" fill="var(--${c})" opacity=".45"/>`; });
         const rt = b[0] > W - P.r - 70;
         s += `<circle class="pt end" style="transition-delay:1100ms" cx="${b[0]}" cy="${b[1]}" r="6.5" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.5"/><circle class="pt end" style="transition-delay:1100ms" cx="${b[0]}" cy="${b[1]}" r="2.6" fill="var(--${c})"/>
-          <text class="pt end" style="transition-delay:1150ms" x="${b[0] + (rt ? -10 : 10)}" y="${b[1] - 9}" text-anchor="${rt ? "end" : "start"}" font-size="12" font-weight="700" fill="var(--${c})">${fmtV(bv)}</text>`; return; }
+          <text class="pt end" style="transition-delay:1150ms" x="${b[0] + (rt ? -10 : 10)}" y="${b[1] - 9}" text-anchor="${rt ? "end" : "start"}" font-size="12" font-weight="700" fill="var(--${c})">${bv}</text>`; return; }
       // running best as a thin staircase
       if (se.step) { const d2 = g.map((q, i) => i ? `H${q[0].toFixed(1)}V${q[1].toFixed(1)}` : `M${q[0].toFixed(1)},${q[1].toFixed(1)}`).join("");
         s += `<path class="ar" d="${d2}" fill="none" stroke="var(--${c})" stroke-width="1.6" stroke-opacity=".5" stroke-linejoin="round"/>`; return; }
@@ -1130,7 +1158,7 @@ function daily() {
 // ---------------------------------------------------------------- level 4: best efforts
 function renderPB() {
   ["5K", "10K", "Half"].forEach(k => {
-    $("pb-" + k).innerHTML = V().map(a => { const p = a.pb[k] || []; return `<span><i class="dot ${a.c}"></i> <b>${num(p.length ? p[p.length-1].sec : null, "hms")}</b></span>`; }).join("");
+    $("pb-" + k).innerHTML = V().map(a => { const p = a.pb[k] || [], l = p[p.length-1]; return `<span><i class="dot ${a.c}"></i> <b>${l && l.est ? "≈" : ""}${num(l ? l.sec : null, "hms")}</b></span>`; }).join("");
     const n = a => (a.eff && a.eff[k] || []).length;
     $("in-" + k).innerHTML = V().map(a => { const p = a.pb[k] || []; if (p.length < 2) return line(a, `<span class="muted">${p.length ? `baru 1 catatan · ${n(a)} lari` : "belum ada"}</span>`);
       const gain = p[0].sec - p[p.length-1].sec; return line(a, `<span><b>−${hms(gain)}</b> sejak ${tgl(p[0].date)} · ${n(a)} lari</span>`); }).join("");
@@ -1138,8 +1166,9 @@ function renderPB() {
     const has = V().some(a => n(a)), now = D(DATA.today).getTime();
     if (!has) return pbEmpty(k);
     chart("ch-" + k, {xnum: true, invert: true, time: true, h: 180, fmtY: hms, fmtV: hms, label: `Semua usaha ${k} dari waktu ke waktu; titik bercincin = tercepat`,
-      detail: (a, x, v) => { const b = Math.min(...(a.eff[k] || []).map(p => p[1])); return v === b ? "tercepat" : ""; },
-      series: V().flatMap(a => { const E = (a.eff && a.eff[k] || []).map(p => [D(p[0]).getTime(), p[1]]); if (!E.length) return [];
+      detail: (a, x, v) => { const E = a.eff[k] || [], b = Math.min(...E.map(p => p[1])), p = E.find(q => D(q[0]).getTime() === x && q[1] === v);
+        return [v === b ? "tercepat" : "", p && p[2] ? "≈ jarak GPS kurang, disetarakan" : ""].filter(Boolean).join(" · "); },
+      series: V().flatMap(a => { const E = (a.eff && a.eff[k] || []).map(p => [D(p[0]).getTime(), p[1], p[2] || 0]); if (!E.length) return [];
         let best = Infinity; const st = []; E.forEach(p => { if (p[1] < best) { best = p[1]; st.push([p[0], best]); } }); st.push([now, best]);
         return [{c: a.c, v: st, step: true, area: false}, {c: a.c, v: E, scatter: true, area: false}]; })});
   });
@@ -1160,6 +1189,83 @@ function pbEmpty(k) { delete CHARTS["ch-" + k]; const ev = (DATA.all_events || [
   const km = {"5K": "5", "10K": "10", Half: "21,1"}[k], d = ev ? Math.round((D(ev.date) - D(DATA.today)) / 864e5) : null;
   $("ch-" + k).innerHTML = `<div class="pb-empty"><svg viewBox="0 0 200 90" preserveAspectRatio="none" aria-hidden="true"><path d="M4 70 L50 66 L92 66 L130 40 L196 36" fill="none" stroke="var(--t)" stroke-width="2"/><path d="M4 50 L60 50 L110 46 L160 30 L196 30" fill="none" stroke="var(--r)" stroke-width="2"/></svg>
     <p>${ev ? `<b>${esc(calm(ev.event))} · ${tgl(ev.date)}</b>${d} hari lagi · ` : ""}titik pertama muncul setelah lari ≥ ${km} km</p></div>`; }
+// ---------------- best-progress detail window (E2): the card flies to the centre; large chart fills the window
+const PBK = ["5K", "10K", "Half", "Full"], PBD = {"5K": 5000, "10K": 10000, Half: 21097.5};
+let PBX = null;   // {k, per, from}
+function pbPts(a, k) { return k === "Full" ? (a.est.series || []).map(p => ({t: D(p.date).getTime(), v: p.sec, est: false, from: p.from}))
+  : (a.eff && a.eff[k] || []).map(p => ({t: D(p[0]).getTime(), v: p[1], est: !!p[2]})); }
+function pbStats(a, k) { const P = pbPts(a, k); if (!P.length) return `<div class="pbx-st"><div class="who"><i class="dot ${a.c}"></i>${a.name}</div><span class="muted" style="font-size:12.5px">belum ada data</span></div>`;
+  const b = P.reduce((m, p) => p.v < m.v ? p : m), f = P[0], since = D(DATA.today).getTime() - 28 * 864e5, l4 = P.filter(p => p.t >= since).map(p => p.v).sort((x, y) => x - y);
+  const ds = t => tgl(iso(new Date(t))), F = k === "Full" ? hm : hms, est = p => p.est ? '<span class="est">≈</span>' : "";
+  const rows = [["tercepat", `${est(b)}${F(b.v)} · ${ds(b.t)}`], ["pertama", `${est(f)}${F(f.v)} · ${ds(f.t)}`], ["membaik", f.v > b.v ? "−" + F(f.v - b.v) : "–"]];
+  if (l4.length && k !== "Full") rows.push(["median 4 mgg", F(l4[l4.length >> 1])]);
+  rows.push(["jumlah", `${P.length} ${k === "Full" ? "estimasi" : "lari"}`]);
+  if (k !== "Full") rows.push(["prediksi maraton", hm(b.v * Math.pow(42195 / PBD[k], 1.06))]);
+  else { const T = a.targets || {}; ["A", "B", "C"].filter(x => T[x] && T[x].hi).forEach(x => rows.push([`target ${x}`, "≤ " + hm(T[x].hi)])); }
+  return `<div class="pbx-st"><div class="who"><i class="dot ${a.c}"></i>${a.name}</div><dl>${rows.map(([t, d]) => `<dt>${t}</dt><dd>${d}</dd>`).join("")}</dl></div>`; }
+function pbTop(k) { if (k === "Full") return ""; const L = V().flatMap(a => pbPts(a, k).map(p => [a, p])).sort((x, y) => x[1].v - y[1].v).slice(0, 5); if (!L.length) return "";
+  return `<div class="pbx-top"><h4>5 tercepat</h4><ol>${L.map(([a, p], i) => `<li data-i="${a.c}-${p.t}-${p.v}"><span class="n">${i + 1}</span><span><i class="dot ${a.c}"></i> ${tgl(iso(new Date(p.t)))}</span><b>${p.est ? '<span class="est">≈</span>' : ""}${hms(p.v)}</b></li>`).join("")}</ol></div>`; }
+function pbHtml(k) { const per = PBX.per;
+  return `<div class="pbx-hd"><h3 id="pbx-h">${k === "Full" ? "Full · estimasi" : k}</h3><nav class="pbx-nav" aria-label="Jarak">${PBK.map(x => `<button data-go="${x}" aria-current="${x === k}">${x}</button>`).join("")}</nav>
+      <button class="pbx-x" data-close aria-label="Tutup">×</button></div>
+    <div class="pbx-bd"><div class="pbx-l"><div class="pbx-per" role="group" aria-label="Periode">${[[28, "4 mgg"], [84, "12 mgg"], [0, "semua"]].map(([d, l]) => `<button data-per="${d}" aria-pressed="${per === d}">${l}</button>`).join("")}</div>
+      <div class="pbx-ch" id="pbx-ch"></div>
+      <div class="pbx-lg"><span><svg width="12" height="12"><circle cx="6" cy="6" r="3" fill="var(--muted)" opacity=".6"/></svg>${k === "Full" ? "estimasi akhir bulan" : "satu lari"}</span>
+        <span><svg width="16" height="16"><circle cx="8" cy="8" r="6" fill="none" stroke="var(--muted)" stroke-width="2"/><circle cx="8" cy="8" r="2.4" fill="var(--muted)"/></svg>tercepat</span>
+        ${k === "Full" ? "" : `<span><svg width="12" height="12"><circle cx="6" cy="6" r="3.5" fill="none" stroke="var(--muted)" stroke-dasharray="1.6 1.4"/></svg>≈ jarak GPS kurang, disetarakan</span><span><svg width="18" height="8"><path d="M0 6H8V2H18" fill="none" stroke="var(--muted)"/></svg>rekor berjalan</span>`}</div></div>
+      <div class="pbx-r">${V().map(a => pbStats(a, k)).join("")}${pbTop(k)}</div></div>`; }
+// chart sized to its box: the box takes all the height the window has left
+function pbChart() { const host = $("pbx-ch"); if (!host || !PBX) return; const k = PBX.k, W = Math.max(280, host.clientWidth), H = Math.max(220, host.clientHeight);
+  const now = D(DATA.today).getTime(), x0 = PBX.per ? now - PBX.per * 864e5 : null;
+  const S = V().map(a => ({a, P: pbPts(a, k).filter(p => x0 == null || p.t >= x0)})).filter(q => q.P.length);
+  if (!S.length) { const ev = (DATA.all_events || []).find(e => e.date >= DATA.today && new RegExp(k === "Half" ? "half" : k, "i").test(e.event));
+    host.innerHTML = `<div class="pb-empty" style="height:100%"><p>${ev ? `<b>${esc(calm(ev.event))} · ${tgl(ev.date)}</b>` : ""}Belum ada data ${k} di periode ini.</p></div>`; return; }
+  const all = S.flatMap(q => q.P), lo0 = Math.min(...all.map(p => p.v)), hi0 = Math.max(...all.map(p => p.v)), pad = Math.max(30, (hi0 - lo0) * .08);
+  const [lo, hi, st] = niceTime(lo0 - pad, hi0 + pad), t0 = x0 ?? Math.min(...all.map(p => p.t)), t1 = now, L = 58, R = 16, T = 14, B = 26;
+  const X = t => L + (t1 === t0 ? .5 : (t - t0) / (t1 - t0)) * (W - L - R), Y = v => T + (v - lo) / (hi - lo) * (H - T - B), F = k === "Full" ? hm : hms;
+  let g = ""; for (let v = lo; v <= hi + 1e-9; v += st) g += `<line x1="${L}" x2="${W - R}" y1="${Y(v)}" y2="${Y(v)}" stroke="var(--grid)"/><text x="${L - 8}" y="${Y(v) + 4}" text-anchor="end">${F(v)}</text>`;
+  let lastX = -99; for (let d = new Date(t0); d.getTime() <= t1; d.setDate(d.getDate() + 1)) if (d.getDate() === 1 || d.getTime() === t0) { const x = X(d.getTime()); if (x - lastX < 44) continue; lastX = x;
+    g += `<text x="${x}" y="${H - 6}" text-anchor="middle">${BULAN[d.getMonth()]}</text>`; }
+  if (k === "Full") V().filter(a => a.target && a.target.hi).forEach(a => { const y1 = Y(a.target.lo || a.target.hi - 600), y2 = Y(a.target.hi);
+    if (Math.max(y1, y2) > T && Math.min(y1, y2) < H - B) g += `<rect x="${L}" y="${Math.max(T, Math.min(y1, y2))}" width="${W - L - R}" height="${Math.abs(y2 - y1)}" rx="6" fill="var(--${a.c})" opacity=".14"/>`; });
+  const pts = [];
+  S.forEach(({a, P}) => { const c = a.c, b = P.reduce((m, p) => p.v < m.v ? p : m);
+    if (k === "Full") g += `<path d="${P.map((p, i) => (i ? "L" : "M") + X(p.t).toFixed(1) + " " + Y(p.v).toFixed(1)).join(" ")}" fill="none" stroke="var(--${c})" stroke-width="2" stroke-dasharray="6 5"/>`;
+    else { let run = Infinity, d = ""; P.forEach((p, i) => { run = Math.min(run, p.v); d += i ? `H${X(p.t).toFixed(1)}V${Y(run).toFixed(1)}` : `M${X(p.t).toFixed(1)},${Y(run).toFixed(1)}`; });
+      g += `<path d="${d}H${X(t1).toFixed(1)}" fill="none" stroke="var(--${c})" stroke-width="1.6" stroke-opacity=".5"/>`; }
+    P.forEach(p => { pts.push({a, p, x: X(p.t), y: Y(p.v)}); if (p === b) return;
+      g += p.est ? `<circle cx="${X(p.t)}" cy="${Y(p.v)}" r="2.6" fill="var(--surface)" stroke="var(--${c})" stroke-width="1.3" stroke-dasharray="1.6 1.4"/>` : `<circle cx="${X(p.t)}" cy="${Y(p.v)}" r="2.6" fill="var(--${c})" opacity=".5"/>`; });
+    const rt = X(b.t) > W - 100;
+    g += `<circle cx="${X(b.t)}" cy="${Y(b.v)}" r="8" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.5"/><circle cx="${X(b.t)}" cy="${Y(b.v)}" r="3.2" fill="var(--${c})"/>
+      <text x="${X(b.t) + (rt ? -12 : 12)}" y="${Y(b.v) - 10}" text-anchor="${rt ? "end" : "start"}" style="fill:var(--${c});font-weight:700;font-size:13px">${b.est ? "≈" : ""}${F(b.v)}</text>`; });
+  host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${k}: semua usaha, titik bercincin = tercepat">${g}<circle id="pbx-hl" r="9" fill="none" stroke-width="2.5" opacity="0"/></svg><div class="pbx-tt" id="pbx-tt"></div>`;
+  const svg = host.querySelector("svg"), hl = $("pbx-hl"), tt = $("pbx-tt"), win = $("pbx-win");
+  const show = q => { win.querySelectorAll(".pbx-top li").forEach(l => l.classList.toggle("on", !!q && l.dataset.i === `${q.a.c}-${q.p.t}-${q.p.v}`));
+    if (!q) { hl.setAttribute("opacity", 0); tt.classList.remove("on"); return; }
+    hl.setAttribute("cx", q.x); hl.setAttribute("cy", q.y); hl.setAttribute("stroke", `var(--${q.a.c})`); hl.setAttribute("opacity", 1);
+    tt.innerHTML = `<i class="dot ${q.a.c}"></i> ${q.a.name} · ${tgl(iso(new Date(q.p.t)))}<br><b class="num">${q.p.est ? "≈" : ""}${F(q.p.v)}</b>${q.p.est ? "<small>jarak GPS kurang, disetarakan</small>" : q.p.from ? `<small>dari usaha ${q.p.from}</small>` : ""}`;
+    tt.style.left = (q.x > W - 190 ? q.x - 180 : q.x + 14) + "px"; tt.style.top = Math.max(0, q.y - 64) + "px"; tt.classList.add("on"); };
+  // the nearest point within 28 px is the one under the pointer: small dots stay easy to reach
+  svg.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+    let best = null, bd = 28; pts.forEach(q => { const d = Math.hypot(q.x - mx, q.y - my); if (d < bd) { bd = d; best = q; } }); show(best); });
+  svg.addEventListener("pointerleave", () => show(null));
+  win.querySelectorAll(".pbx-top li").forEach(l => { l.onpointerenter = () => show(pts.find(q => `${q.a.c}-${q.p.t}-${q.p.v}` === l.dataset.i)); l.onpointerleave = () => show(null); }); }
+function pbFill(k) { PBX.k = k; $("pbx-win").innerHTML = pbHtml(k); requestAnimationFrame(pbChart); }
+function pbOpen(k, card) { PBX = {k, per: 0, from: card}; const ov = $("pbx"), win = $("pbx-win"); pbFill(k);
+  ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false"); document.documentElement.style.overflow = "hidden";
+  const a = card.getBoundingClientRect(), b = win.getBoundingClientRect();
+  if (!REDUCED) { win.style.transition = "none"; win.style.opacity = ".4"; win.style.transform = `translate(${a.left - b.left}px,${a.top - b.top}px) scale(${a.width / b.width},${a.height / b.height})`; }
+  requestAnimationFrame(() => requestAnimationFrame(() => { win.style.transition = REDUCED ? "none" : "transform .5s var(--ease),opacity .3s"; win.style.transform = ""; win.style.opacity = ""; ov.classList.add("open"); win.querySelector(".pbx-x").focus(); })); }
+function pbClose() { if (!PBX) return; const ov = $("pbx"), card = PBX.from; ov.classList.remove("open"); $("pbx-win").style.opacity = "0"; PBX = null;
+  setTimeout(() => { ov.style.display = "none"; ov.setAttribute("aria-hidden", "true"); $("pbx-win").innerHTML = ""; $("pbx-win").style.opacity = ""; document.documentElement.style.overflow = ""; card && card.focus({preventScroll: true}); }, 420); }
+document.querySelectorAll(".pbc").forEach(c => { c.addEventListener("click", e => { if (!e.target.closest(".pb-cw")) pbOpen(c.dataset.k, c); });
+  c.addEventListener("keydown", e => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pbOpen(c.dataset.k, c); } }); });
+$("pbx").addEventListener("click", e => { if (e.target === $("pbx") || e.target.closest("[data-close]")) return pbClose();
+  const go = e.target.closest("[data-go]"); if (go) return pbFill(go.dataset.go);
+  const per = e.target.closest("[data-per]"); if (per) { PBX.per = +per.dataset.per; pbFill(PBX.k); } });
+addEventListener("keydown", e => { if (!PBX) return; if (e.key === "Escape") pbClose();
+  if (e.key === "ArrowRight" || e.key === "ArrowLeft") { const i = PBK.indexOf(PBX.k); pbFill(PBK[(i + (e.key === "ArrowRight" ? 1 : PBK.length - 1)) % PBK.length]); } });
+addEventListener("resize", () => PBX && pbChart());
 // the four cards share one height (the tallest, usually Full); the other charts take the room that is left
 function pbFit() { ["5K", "10K", "Half"].forEach(k => { const el = $("ch-" + k), o = CHARTS["ch-" + k]; if (!o) return;
   el.innerHTML = ""; el.style.flex = "1 1 auto"; const h = Math.max(180, Math.floor(el.clientHeight)); o.h = h; draw("ch-" + k, o); }); }
@@ -1472,7 +1578,7 @@ function bounce(scroller, content, bar) {
   const lim = () => Math.min(140, (page ? innerHeight : scroller.clientHeight) * .18);
   const atEnd = dir => { const st = page ? scrollY : scroller.scrollTop, h = page ? innerHeight : scroller.clientHeight, sh = page ? document.documentElement.scrollHeight : scroller.scrollHeight;
     return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
-  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin,.ss-box")));
+  const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin,.ss-box,.pbx")));
   const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
     content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
     if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
@@ -1809,24 +1915,29 @@ $("p-sesi").addEventListener("click", e => {
   const wh = e.target.closest(".ss-wgh");
   if (wh) { const g = wh.parentElement, o = !g.classList.contains("open"), had = [...$("ss-feed").querySelectorAll(".ss-wg.open")].some(x => x !== g);
     $("ss-feed").querySelectorAll(".ss-wg.open").forEach(x => { x.classList.remove("open"); x.querySelector(".ss-wgh").setAttribute("aria-expanded", false); });
-    ssCloseDay(); if (o) { g.classList.add("open"); wh.setAttribute("aria-expanded", true); ssBoxTo(g, had ? 520 : 60); }
-    ssFocus(); return; }
+    ssCloseDay(); ssPark(); if (o) { g.classList.add("open"); wh.setAttribute("aria-expanded", true); ssBoxTo(g, had ? 520 : 60); }
+    ssFocus(); setTimeout(ssBoxSize, 560); return; }
   const fr = e.target.closest(".ss-fr"); if (!fr || fr.classList.contains("plan") || e.target.closest(".ss-det")) return;
   const host = fr.querySelector(".ss-det"), s = fr.dataset.d, was = SSOPEN && SSOPEN !== host && SSOPEN.classList.contains("open");
   if (SSOPEN === host && host.classList.contains("open")) { ssCloseDay(); ssFocus(); return; }
   ssCloseDay(); host.firstElementChild.innerHTML = ssDetail(s); SSOPEN = host; fr.classList.add("on"); ssFocus();
   const w = host.querySelector(".ss-bfw"); w.innerHTML = ssBf(s, host.firstElementChild); ssAnimate(host);
   // box under the compact header, the day at the top of the box (after a closing day above has settled)
-  const box = $("ss-box"), top = box.getBoundingClientRect().top + scrollY - ($("st-mini").offsetHeight + 10);
-  if (Math.abs(scrollY - top) > 40) scrollTo({top, behavior: REDUCED ? "auto" : "smooth"});
-  ssBoxTo(fr, was ? 580 : 80);
+  ssPark(); ssBoxTo(fr, was ? 580 : 80);
 });
 function ssCloseDay() { if (SSOPEN) SSOPEN.classList.remove("open"); SSOPEN = null; $("ss-feed").querySelectorAll(".ss-fr.on").forEach(x => x.classList.remove("on")); }
 function ssFocus() { const b = $("ss-box"); b.classList.toggle("fx", !!$("ss-feed").querySelector(".ss-wg.open")); b.classList.toggle("fx2", !!SSOPEN); }
 function ssBoxTo(el, delay) { setTimeout(() => { const b = $("ss-box"); b.scrollTo({top: b.scrollTop + el.getBoundingClientRect().top - b.getBoundingClientRect().top - 4, behavior: REDUCED ? "auto" : "smooth"}); }, delay); }
-// box height = 10 closed weeks (capped at 78% of the screen on phones); fades at the edges show there is more
+// fades at the edges show there is more
 function ssBoxSize() { const b = $("ss-box"), hs = [...b.querySelectorAll(".ss-wgh")]; if (!hs.length) return;
-  const h = hs[0].offsetHeight + 6; b.style.height = hs.length > 10 ? (innerWidth < 640 ? Math.min(h * 10 + 4, innerHeight * .78) : h * 10 + 4) + "px" : ""; ssEdges(); ssBox.size(); }
+  const closed = b.querySelector(".ss-wg:not(.open) .ss-wgh") || hs[0], row = closed.offsetHeight + 6, op = b.querySelector(".ss-wg.open");
+  const ten = (op ? op.querySelector(".ss-wgh").offsetHeight + 6 + op.querySelector(".ss-wgb > div").scrollHeight + row * 9 : row * 10) + 4;
+  const room = innerHeight - $("st-mini").offsetHeight - 24;
+  b.style.height = hs.length > 10 || ten > room ? Math.min(ten, room) + "px" : ""; ssEdges(); ssBox.size(); }
+// using the box (wheel, touch, a click) parks it right under the compact header, so page and box never scroll at once
+function ssPark() { const top = $("ss-box").getBoundingClientRect().top - $("st-mini").offsetHeight - 10; if (Math.abs(top) < 8) return;
+  scrollTo({top: scrollY + top, behavior: REDUCED ? "auto" : "smooth"}); }
+$("ss-box").addEventListener("wheel", ssPark, {passive: true}); $("ss-box").addEventListener("touchstart", ssPark, {passive: true});
 function ssEdges() { const b = $("ss-box"); b.classList.toggle("ft", b.scrollTop > 2); b.classList.toggle("fb", b.scrollTop + b.clientHeight < b.scrollHeight - 2); }
 const ssBox = ownScroll($("ss-box"), $("ss-sbar"), document.querySelector(".ss-boxw"));
 $("ss-box").addEventListener("scroll", ssEdges, {passive: true});
