@@ -6,6 +6,14 @@ Dashboard marathon Taofik & Reza: satu file HTML offline dari data Garmin Person
 
 Paling mudah: klik dua kali **`Update Dashboard.bat`**. Data ditarik, dashboard dibuat, lalu terbuka di browser.
 
+**Analisa satu hari di Claude chat**
+- Cepat: di tab Sesi buka harinya → **Simpan untuk Claude** → file `.md` (kedua pelari / satu pelari) atau salin teks.
+  Isi: konteks program, rencana sel Excel, profil (zona, pace, cadence), kondisi pagi, ringkasan Garmin, lap jam, per km,
+  zona HR, decoupling, penilaian pelatih dashboard, minggu itu. Tanpa key, akun Garmin, atau GPS.
+- Lengkap: klik dua kali **`Ekspor Sesi.bat`**, isi tanggal → `ekspor\NewPaceLab_<tanggal>.zip` berisi `ringkasan.md`,
+  CSV per detik (tanpa GPS), CSV lap, dan file FIT asli dari jam (berisi GPS; bisa dilewati). Butuh internet + key
+  untuk FIT asli; tanpa itu dipakai salinan lokal. Penilaian pelatih hanya ada di file dari tombol dashboard.
+
 **Versi portable** (Python sudah di dalamnya, tidak perlu install): unduh
 `NewPaceLab-portable-win-amd64.zip` (Intel/AMD) atau `-win-arm64.zip` (Windows ARM) dari
 halaman *Releases → portable*. Dibuat otomatis oleh GitHub Actions (`tools/make_portable.py`).
@@ -18,6 +26,7 @@ python pacelab.py build      # buat ulang dashboard dari data yang sudah ada
 python pacelab.py check      # cek field Garmin yang terbaca (hanya jumlah & nama field) + daftar lari tanpa data per detik
 python pacelab.py demo       # dashboard dari data rekaan, tanpa key/internet
 python pacelab.py inspect    # struktur respons Garmin (nama field & tipe, tanpa nilai); untuk lari terakhir: kepadatan data per detik, boleh/tidaknya unduh file FIT (jumlah lap)
+python pacelab.py ekspor 2026-10-27   # lari satu hari untuk Claude chat → ekspor\NewPaceLab_2026-10-27.zip (--tanpa-fit)
 ```
 
 Opsi: `--who TAOFIK|REZA|ALL`, `--since 2026-03-23`.
@@ -31,7 +40,7 @@ Python 3.8+ saja, tanpa `pip install`.
 2. **Program latihan** ditaruh di `programs/`:
    `Program_Marathon_TAOFIK.xlsx`, `Program_Marathon_PRAMANA.xlsx` (nama file bisa diubah di `config.json`).
 
-`keys/`, `programs/*.xlsx`, `data/`, `.token_cache/` dan `dist/` tidak pernah di-commit.
+`keys/`, `programs/*.xlsx`, `data/`, `.token_cache/`, `dist/` dan `ekspor/` tidak pernah di-commit.
 
 ## Isi dashboard
 
@@ -158,6 +167,7 @@ pacelab/garmin.py     client Personal API (token 24 jam, retry, key tidak pernah
 pacelab/sync.py       sync inkremental → data/<ATLET>/
 pacelab/program.py    pembaca Excel program (xlsx.py: pembaca .xlsx tanpa library)
 pacelab/metrics.py    semua perhitungan
+pacelab/export.py     ekspor lari satu hari (zip untuk Claude chat)
 pacelab/fit.py        pembaca file FIT Garmin (lap, sesi, data per detik) tanpa library
 tools/fitgen.py       penulis file FIT kecil untuk server tiruan dan tes
 pacelab/build.py      data → dist/dashboard.html (web/template.html)

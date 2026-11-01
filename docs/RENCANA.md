@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 14. Simpan aktivitas satu hari untuk Claude chat — mockup siap, menunggu pilihan + "gas"
+## 14. Simpan aktivitas satu hari untuk Claude chat — **sudah dibuat** (X1 + X2)
 
 Mockup: [`docs/mockup/ekspor-sesi.html`](mockup/ekspor-sesi.html). X1 tombol "Simpan untuk Claude" di detail hari →
 file .md (kedua pelari / satu pelari / salin teks): konteks program, rencana Excel, profil, kondisi pagi, ringkasan Garmin,

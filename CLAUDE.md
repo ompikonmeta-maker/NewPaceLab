@@ -16,5 +16,5 @@ Dashboard marathon Taofik & Reza (lihat README.md). Bahasa UI: Indonesia, ringka
 - **Setiap rencana baru selalu dibuat mockup-nya dulu** (juga saat omPik belum memilih opsi: mockup semua opsi).
   Jangan eksekusi sebelum omPik bilang "gas".
 - Sertakan bukti (screenshot) saat melapor. Beri opsi dan tanya bila ragu; jangan berasumsi.
-- Jangan pernah mencetak atau commit key Garmin, `keys/`, `programs/*.xlsx`, `data/`, `.token_cache/`, `dist/`.
+- Jangan pernah mencetak atau commit key Garmin, `keys/`, `programs/*.xlsx`, `data/`, `.token_cache/`, `dist/`, `ekspor/`.
 - Tes: `python -m unittest discover -s tests` (Python 3.8+ tanpa library tambahan).

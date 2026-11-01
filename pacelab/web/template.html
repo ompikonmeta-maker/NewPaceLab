@@ -396,6 +396,16 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .ssx .chip{display:inline-block;font-size:10.5px;padding:0 6px;border-radius:6px;background:var(--bg);color:var(--muted);font-weight:600} .ssx .chip.lap{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
 .ssx-diff{margin-top:12px;background:var(--bg);border-radius:12px;padding:10px 14px;font-size:13.5px} .ssx-how{font-size:12.5px;color:var(--muted);margin:10px 0 0}
 @media (max-width:640px){.ssx{padding:10px}.ssx-win{height:calc(100vh - 20px);padding:14px 14px 0}.ssx table{font-size:11.5px}.ssx th,.ssx td{padding:3px 4px}.ssx td:nth-child(2){white-space:nowrap;max-width:96px;overflow:hidden;text-overflow:ellipsis}.ssx-wk>button .d{display:none}}
+/* "Simpan untuk Claude" */
+.ss-mdw{position:relative;margin-top:8px;display:flex;justify-content:center}
+.ss-md{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit;font-size:12.5px;font-weight:600;border-radius:999px;padding:5px 13px;cursor:pointer;transition:border-color .2s,transform .25s cubic-bezier(.34,1.4,.64,1)}
+.ss-md:hover,.ss-md:focus-visible,.ss-mdw.on .ss-md{border-color:var(--text);transform:translateY(-1px)} .ss-md svg{width:15px;height:15px}
+.ss-mdm{position:absolute;top:calc(100% + 6px);left:50%;width:300px;transform:translateX(-50%) translateY(-6px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:6px;opacity:0;pointer-events:none;transition:opacity .2s,transform .3s var(--ease);z-index:6;text-align:left}
+.ss-mdw.on .ss-mdm{opacity:1;pointer-events:auto;transform:translateX(-50%)}
+.ss-mdm button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;color:inherit;padding:8px 10px;border-radius:10px;cursor:pointer} .ss-mdm button:hover,.ss-mdm button:focus-visible{background:var(--bg)}
+.ss-mdm b{display:block;font-size:13px} .ss-mdm small{display:block;color:var(--muted);font-size:12px}
+.ss-toast{position:fixed;left:50%;bottom:24px;z-index:90;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--surface);border-radius:999px;padding:8px 16px;font-size:13px;opacity:0;pointer-events:none;transition:opacity .3s,transform .4s var(--ease);max-width:calc(100vw - 32px)}
+.ss-toast.on{opacity:.92;transform:translateX(-50%)}
 .pb-chips{display:flex;flex-wrap:wrap;gap:8px} .pb-cw{display:inline-flex;align-items:center;gap:6px;cursor:help}
 .pb-empty{height:100%;min-height:180px;display:flex;flex-direction:column;justify-content:flex-end;gap:10px}
 .pb-empty svg{width:100%;height:110px;opacity:.22} .pb-empty p{margin:0;text-align:center;font-size:13px;color:var(--muted)} .pb-empty p b{display:block;color:var(--text);font-size:14px}
@@ -768,6 +778,7 @@ footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;f
 <div class="ssx" id="ssx" aria-hidden="true"><div class="ssx-win" role="dialog" aria-modal="true" aria-labelledby="ssx-h">
   <div class="pbx-hd"><h3 id="ssx-h"></h3><span class="ss-vw" id="ssx-who" role="group" aria-label="Pelari"></span><button class="pbx-x" data-close aria-label="Tutup">×</button></div>
   <div class="ssx-body" id="ssx-body"><div></div></div><div class="sbar" id="ssx-sbar" aria-hidden="true"></div></div></div>
+<div class="ss-toast" id="ss-toast" role="status" aria-live="polite"></div>
 <div class="pbx" id="pbx" aria-hidden="true"><div class="pbx-win" id="pbx-win" role="dialog" aria-modal="true" aria-labelledby="pbx-h"></div></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
   <div class="panel">
@@ -1953,6 +1964,76 @@ function ssBf(s, host) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x =>
     g += `<rect class="h" x="0" y="${y}" width="${W}" height="${RH}" data-sh="<span class='t1'>km ${j + 1}</span><span class='kmt'>${tt}</span>"/>`; }
   return `<svg class="ss-bfs" viewBox="0 0 ${W} ${H}" width="100%">${g}</svg>`; }
 
+// ---------------- "Simpan untuk Claude": one day's sessions as a Markdown file for a deep analysis in Claude chat
+const mdTxt = h => { const d = document.createElement("div");
+  d.innerHTML = String(h).replace(/<svg[\s\S]*?<\/svg>/g, " → ").replace(/<br\s*\/?>/g, " · ").replace(/<small>/g, " · ").replace(/<\/span>/g, "</span> ");
+  return d.textContent.replace(/\s+/g, " ").replace(/ · · /g, " · ").trim(); };
+const mdNum = v => String(v).replace(".", ",");
+const mdRow = c => `| ${c.join(" | ")} |`;
+const mdTab = (head, rows) => rows.length ? [mdRow(head), mdRow(head.map(() => "---")), ...rows.map(mdRow)].join("\n") : "";
+function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, ph = phaseOf(ms), W = (A[0].plan || []).find(w => w.ms === ms) || {};
+  const ev = (DATA.all_events || []).some(e => Math.floor((D(e.date) - D(DATA.ms1)) / 864e5 / 7) === ms - 1);
+  const year = D(s).getFullYear(), left = Math.round((D(DATA.race_date) - D(s)) / 864e5);
+  const L = [`# Sesi lari — ${hariF(s)} ${year} (MS${ms}${ph ? " · " + ph.name : ""})`, "",
+    "> Tolong analisa sesi ini secara mendalam sebagai pelatih maraton: apakah sesuai rencana, apa yang bagus,",
+    "> apa yang perlu diperbaiki, dan saran untuk sesi berikutnya. Data di bawah apa adanya dari Garmin + program Excel,",
+    "> ditambah hitungan dan penilaian dashboard NewPaceLab (ditandai).", "",
+    "## Konteks program", `- Maraton: ${hariF(DATA.race_date)} ${D(DATA.race_date).getFullYear()} (${left} hari setelah sesi ini)`,
+    `- Minggu program: MS${ms}${ph ? ", fase " + ph.name : ""}${W.down ? " · minggu ringan" : ""}${ev || W.event ? " · minggu lomba/tes" : ""}`];
+  const evs = (DATA.all_events || []).filter(e => e.date >= s).slice(0, 3); if (evs.length) L.push(`- Tes/lomba berikutnya: ${evs.map(e => `${calm(e.event).replace(/(\d)k\b/g, "$1K")} (${tgl(e.date)})`).join(", ")}`);
+  const run = A.filter(a => who === "both" ? V().includes(a) : a.c === who);
+  run.forEach(a => { const pl0 = parsePlan(planCell(a, s)), pl = planFill(a, pl0), C = a.coach || {}, P = a.pace || {}, z = a.zones || [], T = a.targets || {};
+    L.push("", `## ${a.name}`, "", "### Rencana hari ini (sel Excel, apa adanya)");
+    const cell = planCell(a, s); L.push(cell ? cell.split("\n").map(x => "> " + x.trim()).filter(x => x.length > 2).join("\n") : "> (tidak ada rencana di Excel untuk tanggal ini)");
+    L.push("", "### Profil (config.json)");
+    if (z.length > 3) L.push(`- Zona HR: Z1 < ${z[0]} · Z2 ${z[0]}–${z[1] - 1} · Z3 ${z[1]}–${z[2] - 1} · Z4 ${z[2]}–${z[3] - 1} · Z5 ≥ ${z[3]}`);
+    const pr = [["recovery", "rec"], ["easy/long", "easy"], ["MP", "mp"], ["tempo", "tempo"], ["interval", "interval"]].filter(([, k]) => P[k]).map(([n, k]) => `${n} ${paceS(P[k][0])}–${paceS(P[k][1])}`);
+    if (pr.length) L.push(`- Pace: ${pr.join(" · ")}${P.hr_leads ? " · HR jadi patokan" : ""}`);
+    if (a.cadence) L.push(`- Target cadence: ${a.cadence[0]}–${a.cadence[1]} spm`);
+    const tg = ["A", "B", "C"].filter(k => T[k] && T[k].hi).map(k => `${k} ≤ ${hm(T[k].hi)}`); if (tg.length) L.push(`- Target maraton: ${tg.join(" · ")} · estimasi sekarang ${a.est && a.est.sec ? hm(a.est.sec) : "–"}`);
+    const w = wellOf(a, s); L.push("", "### Kondisi pagi");
+    L.push(w ? `- Tidur ${w.sleep_h ? mdNum(f1(w.sleep_h)) + " j" : "–"} · HRV ${w.hrv ?? "–"} ms${w.hrv_status ? " (" + w.hrv_status + ")" : ""} · Body Battery ${w.bb ?? "–"} · RHR ${w.rhr ?? "–"} · lampu ${w.level || "–"}` : "- (tidak ada data pagi itu di dashboard)");
+    const xs = (a.sessions || []).filter(x => x.date === s);
+    if (!xs.length) L.push("", "### Lari", "- Tidak ada lari tercatat di Garmin pada tanggal ini.");
+    xs.forEach((x, n) => { const g = x.g || {};
+      L.push("", `### Lari${xs.length > 1 ? " " + (n + 1) : ""}${x.time ? " · mulai " + x.time : ""}${x.name && !/^(lari|running|run)$/i.test(x.name.trim()) ? " · " + x.name : ""}`, "", "**Ringkasan Garmin (apa adanya)**", "",
+        mdTab(["Jarak", "Waktu", "Pace", "HR rata / maks", "Cadence", "Efek latihan", "Beban"],
+          [[`${x.km.toFixed(2)} km`, hms(x.sec), `${paceS(x.sec / x.km)}/km`, `${x.hr ?? "–"} / ${g.hr_max ?? "–"}`, g.cad != null ? Math.round(g.cad) + " spm" : "–",
+            g.te_aer != null ? `${mdNum(f1(g.te_aer))} aerobik · ${mdNum(f1(g.te_ana || 0))} anaerobik${g.te_label ? " (" + (TEL[g.te_label] || g.te_label) + ")" : ""}` : "–", g.load != null ? Math.round(g.load) : "–"]]));
+      const more = GROWS.filter(r => g[r[2]] != null).map(r => `${SSG[r[1]] ? SSG[r[1]][0] : r[1]} ${r[4] ? r[4](g[r[2]], g) : g[r[2]]}${r[3] ? " " + r[3] : ""}`);
+      if (more.length) L.push("", "Lainnya: " + more.join(" · "));
+      if (x.laps && x.laps.length) { const TRG = {a: "auto", m: "manual", e: "akhir", t: "waktu", p: "posisi", w: "lap"};
+        L.push("", "**Lap jam (file FIT, apa adanya)**", "", mdTab(["Lap", "Jarak", "Waktu", "Pace", "HR", "Cadence", "Asal"],
+          x.laps.map((l, i) => [i + 1, l[0] >= 1 ? mdNum(l[0].toFixed(2)) + " km" : Math.round(l[0] * 1000) + " m", hms(l[1]), paceS(l[1] / l[0]), l[2] ?? "–", l[3] ?? "–", TRG[l[4]] || "lap"]))); }
+      if (x.splits.length) { L.push("", "**Per km (hitungan dashboard dari data per detik)**", "", mdTab(["Km", "Jarak", "Waktu", "Pace", "HR", "Cadence", "Elevasi akhir km"],
+          x.splits.map((p, i) => [i + 1, mdNum(p[0].toFixed(2)) + " km", hms(p[1]), paceS(p[1] / p[0]), p[2] ?? "–", p[3] ?? "–", p[4] != null ? p[4] + " m" : "–"])));
+        if (z.length) { const zz = [0, 0, 0, 0, 0]; let tt = 0; x.splits.forEach(p => { if (p[2]) { zz[zoneOf(a, p[2])] += p[1]; tt += p[1]; } });
+          if (tt) L.push("", "Waktu di zona HR (dashboard, per km): " + zz.map((v, i) => v ? `Z${i + 1} ${Math.round(v / tt * 100)}%` : "").filter(Boolean).join(" · ")); } }
+      if (x.dec != null) L.push(`Decoupling (dashboard, dokumen §6): ${mdNum(f1(x.dec))}% tanpa 3 km pertama${x.dec_full != null ? " · " + mdNum(f1(x.dec_full)) + "% data penuh" : ""}`);
+      const ck = ssChecks(a, x, pl0, ev || W.event, s) || [];
+      if (ck.length) { L.push("", "**Penilaian pelatih (dashboard NewPaceLab)**");
+        ck.forEach(([lab, st, v]) => L.push(`- ${mdTxt(lab)}: ${mdTxt(v)} ${st === "ok" ? "✓" : st === "wn" ? "! perlu perhatian" : "(tidak dinilai)"}`));
+        L.push(`- Kesimpulan: ${mdTxt(ssVerdict(a, x, pl0, s))}`); } });
+    // the week around it
+    const wk = (a.weeks || []).find(q => q.ms === ms), st = addDays(DATA.ms1, (ms - 1) * 7), wx = (a.sessions || []).filter(x => x.date >= st && x.date <= addDays(st, 6));
+    L.push("", `### Minggu MS${ms} (${tgl(st)} – ${tgl(addDays(st, 6))})`);
+    if (wk) L.push(`- Km dijalani ${wk.km != null ? mdNum(f1(wk.km)) : "–"} / target ${wk.km_t ?? "–"} · long run ${wk.lr != null ? mdNum(f1(wk.lr)) : "–"} / target ${wk.lr_t ?? "–"}`);
+    wx.forEach(x => L.push(`- ${HARI3[D(x.date).getDay()]} ${tgl(x.date)}: ${mdNum(f1(x.km))} km · ${paceS(x.sec / x.km)}/km · HR ${x.hr ?? "–"}${x.date === s ? " ← sesi ini" : ""}`)); });
+  L.push("", "---", `Dibuat oleh NewPaceLab ${DATA.generated.replace("T", " ")} · sync ${A.map(a => a.name + " " + (a.sync || "–").replace("T", " ").slice(0, 16)).join(", ")}`);
+  return L.join("\n").replace(/(\d)\.(\d)/g, "$1,$2"); }   // Indonesian decimal comma
+function ssMdSave(s, f) { const who = f === "copy" ? "both" : f, txt = ssMd(s, who), name = `NewPaceLab_${s}_${who === "both" ? A.filter(a => V().includes(a)).map(a => a.name).join("-") : A.find(a => a.c === who).name}.md`;
+  if (f === "copy") { const done = () => ssToast("Teks tersalin — tempel di Claude chat");
+    const fall = () => { const t = document.createElement("textarea"); t.value = txt; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch (e) { ssToast("Gagal menyalin; pakai Simpan file"); } t.remove(); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fall); else fall(); return; }
+  const url = URL.createObjectURL(new Blob([txt], {type: "text/markdown;charset=utf-8"})), aEl = document.createElement("a");
+  aEl.href = url; aEl.download = name; document.body.appendChild(aEl); aEl.click(); aEl.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); ssToast("Tersimpan: " + name); }
+let ssToastT = 0;
+function ssToast(t) { const el = $("ss-toast"); el.textContent = t; el.classList.add("on"); clearTimeout(ssToastT); ssToastT = setTimeout(() => el.classList.remove("on"), 2600); }
+document.addEventListener("click", e => { const b = e.target.closest(".ss-md"), f = e.target.closest(".ss-mdm [data-mdf]");
+  if (f) { const w = f.closest(".ss-mdw"); w.classList.remove("on"); w.querySelector(".ss-md").setAttribute("aria-expanded", "false"); return ssMdSave(w.querySelector(".ss-md").dataset.md, f.dataset.mdf); }
+  document.querySelectorAll(".ss-mdw.on").forEach(w => { if (!b || !w.contains(b)) { w.classList.remove("on"); w.querySelector(".ss-md").setAttribute("aria-expanded", "false"); } });
+  if (b) { const w = b.parentElement, o = !w.classList.contains("on"); w.classList.toggle("on", o); b.setAttribute("aria-expanded", o); } });
+
 // ---------------- duel detail of one day
 function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c === "r"), vis = V().map(a => a.c);
   const T = vis.includes("t") ? sessOf(ta, s) : null, R = vis.includes("r") ? sessOf(ra, s) : null;
@@ -1978,7 +2059,8 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const zbar = (a, x, side) => { const z = x && zs(a, x); return `<div class="ss-zb ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-sh="<span class='t1'>${a.name} · Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .15 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`; };
   const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), hasLap = [T, R].some(x => x && x.laps && x.laps.length);
   return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small></div>` : ""}</div>
-      <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span></div>
+      <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span>${(T || R) ? `<div class="ss-mdw"><button class="ss-md" data-md="${s}" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
+        <div class="ss-mdm" role="menu">${T && R ? `<button role="menuitem" data-mdf="both"><b>Kedua pelari (.md)</b><small>duel lengkap, untuk perbandingan</small></button>` : ""}${T ? `<button role="menuitem" data-mdf="t"><b>Taofik saja (.md)</b><small>analisa satu pelari</small></button>` : ""}${R ? `<button role="menuitem" data-mdf="r"><b>Reza saja (.md)</b><small>analisa satu pelari</small></button>` : ""}<button role="menuitem" data-mdf="copy"><b>Salin teks</b><small>langsung tempel ke Claude chat tanpa file</small></button></div></div>` : ""}</div>
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ssGarmin(T, R, ta, ra)}

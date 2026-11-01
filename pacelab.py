@@ -7,6 +7,7 @@
   python pacelab.py check        laporkan field Garmin yang terbaca (tanpa nilai pribadi)
   python pacelab.py demo         dashboard dari data rekaan (tanpa key, tanpa internet)
   python pacelab.py inspect      struktur respons Garmin (nama field saja, tanpa nilai)
+  python pacelab.py ekspor 2026-10-27   simpan lari satu hari untuk Claude chat (ekspor/*.zip; --tanpa-fit)
 
 Opsi: --who TAOFIK|REZA|ALL   --since YYYY-MM-DD   --config config.json
 """
@@ -164,6 +165,34 @@ def cmd_build(cfg, athletes, today=None, out=None):
     return path
 
 
+def cmd_ekspor(cfg, athletes, day, with_fit=True, base=BASE, data_dir=None):
+    """One day's runs for Claude chat: ekspor/NewPaceLab_<day>.zip (summary, per-second CSV, laps, original FIT)."""
+    from pacelab.export import export_day
+    from pacelab.program import ProgramError, load_program
+    cfg = dict(cfg, data_dir=data_dir or cfg["data_dir"])
+    prog = None
+    src = athletes[0]["program"] if athletes else None
+    if isinstance(src, dict):
+        prog = src
+    elif src and Path(src).is_file():
+        try:
+            prog = load_program(src)
+        except ProgramError as e:
+            print("[!] %s" % e)
+
+    def client_for(a):
+        key = load_key(a["id"], cfg["keys_dir"])
+        if not key:
+            print("[!] %s: key tidak ada, file FIT asli dilewati" % a["name"])
+            return None
+        return Client(a["id"], key, base=base, cache_dir=str(Path(cfg["data_dir"]).parent / ".token_cache"))
+
+    out = export_day(cfg, athletes, day, prog, client_for if with_fit else None, with_fit)
+    print("[i] Ekspor: %s" % out)
+    print("    Unggah file zip ini (atau ringkasan.md di dalamnya) ke Claude chat.")
+    return out
+
+
 def cmd_demo(cfg, athletes):
     sys.path.insert(0, str(ROOT / "tools"))
     from mock_garmin import make_server
@@ -182,7 +211,9 @@ def cmd_demo(cfg, athletes):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", nargs="?", default="all", choices=["all", "sync", "build", "check", "demo", "inspect"])
+    ap.add_argument("command", nargs="?", default="all", choices=["all", "sync", "build", "check", "demo", "inspect", "ekspor"])
+    ap.add_argument("tanggal", nargs="?", help="untuk ekspor: YYYY-MM-DD (default hari ini)")
+    ap.add_argument("--tanpa-fit", action="store_true", help="ekspor tanpa file FIT asli (FIT memuat GPS)")
     ap.add_argument("--who", default="ALL")
     ap.add_argument("--since", help="tanggal awal (default dari config)")
     ap.add_argument("--config", default=str(ROOT / "config.json"))
@@ -201,6 +232,13 @@ def main(argv=None):
         cmd_inspect(cfg, athletes)
     if args.command == "demo":
         cmd_demo(cfg, cfg["athletes"])
+    if args.command == "ekspor":
+        try:
+            day = dt.date.fromisoformat(args.tanggal) if args.tanggal else dt.date.today()
+        except ValueError:
+            print("[x] Tanggal harus YYYY-MM-DD, contoh 2026-10-27")
+            return 1
+        cmd_ekspor(cfg, athletes, day, with_fit=not args.tanpa_fit)
     return 0 if ok else 1
 
 
