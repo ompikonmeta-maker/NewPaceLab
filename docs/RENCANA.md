@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 15. Usul Claude chat: cadence saat lari, menit jalan kaki, tukar sesi — mockup siap, menunggu pilihan + "gas"
+## 15. Usul Claude chat: cadence saat lari, menit jalan kaki, tukar sesi — dipilih C3 + W2 + T3, menunggu "gas"
 
 Mockup: [`docs/mockup/usul-cadence-jalan-tukar.html`](mockup/usul-cadence-jalan-tukar.html).
 - Cadence: C1 Garmin saja (sekarang) · C2 hanya detik dengan kecepatan > 1,5 m/s · C3 keduanya (lari dipakai untuk penilaian).
@@ -42,6 +42,12 @@ Mockup: [`docs/mockup/usul-cadence-jalan-tukar.html`](mockup/usul-cadence-jalan-
 - Tukar sesi: T1 otomatis (sesi yang dilewati di minggu yang sama dicocokkan dengan lari berjarak terdekat) · T2 manual
   ("Nilai sebagai…", disimpan di browser + config.json) · T3 otomatis + bisa diubah manual.
 - Ambang 1,5 m/s tidak ada di dokumen rumus → [keputusan omPik] bila dipilih.
+
+## 16. Tooltip tertutup stylus (tablet Windows, tangan kanan) — mockup siap, menunggu pilihan + "gas"
+
+Mockup: [`docs/mockup/tooltip-stylus.html`](mockup/tooltip-stylus.html). Hanya untuk pena/sentuhan (mouse tetap):
+P1 tooltip pindah ke kiri-atas ujung pena · P2 papan tetap di atas grafik · P3 ketuk untuk menyematkan di pojok kartu.
+Pilihan tangan kanan/kiri (disimpan di browser).
 
 ## 14. Simpan aktivitas satu hari untuk Claude chat — **sudah dibuat** (X1 + X2)
 

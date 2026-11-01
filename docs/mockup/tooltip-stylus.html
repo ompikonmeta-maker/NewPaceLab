@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: tooltip untuk stylus</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:900px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} p.sub{color:var(--muted);margin:0 0 12px;font-size:13.5px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 6px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.note{font-size:13px;color:var(--text-2);margin:2px 0 12px;min-height:40px}
+.card{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 20px;touch-action:none}
+.dock{position:sticky;top:0;z-index:4;margin:-4px 0 10px;min-height:46px;border-radius:12px;background:var(--bg);display:flex;align-items:center;gap:14px;padding:8px 12px;font-size:13px;color:var(--muted);transition:opacity .2s}
+.dock b{color:var(--text)} .dock.off{display:none}
+svg text{font-size:11.5px;fill:var(--muted)}
+.tt{position:fixed;z-index:9;pointer-events:none;background:var(--surface);border:1px solid var(--line);box-shadow:0 12px 30px rgba(0,0,0,.14);border-radius:12px;padding:8px 12px;font-size:13px;white-space:nowrap;opacity:0;transition:opacity .12s}
+.tt.on{opacity:1} .tt b{font-size:14px}
+.tt.pin{position:absolute;opacity:1;pointer-events:auto}
+.tt .x{margin-left:10px;color:var(--muted);cursor:pointer;pointer-events:auto}
+.pen{position:fixed;z-index:10;pointer-events:none;width:260px;height:260px;transform-origin:0 0;display:none}
+.hand{display:inline-flex;background:var(--bg);border-radius:10px;padding:3px;margin-left:6px} .hand button{border:0;background:none;font:inherit;font-size:12.5px;padding:3px 10px;border-radius:8px;color:var(--muted);cursor:pointer} .hand button[aria-pressed=true]{background:var(--surface);color:var(--text);font-weight:600}
+.row{display:flex;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:8px;font-size:13px;color:var(--muted)}
+</style></head><body><div class="wrap">
+<h1>Mockup: tooltip yang tidak tertutup stylus</h1>
+<p class="sub">Data rekaan. Gerakkan pena / jari / mouse di atas batang. Gambar pena ikut digambar supaya terlihat apa yang tertutup tangan. Berlaku untuk semua tooltip (grafik, lap, per km, Progres terbaik, rincian).</p>
+<div class="pills" id="opt" role="group"><button class="pill" aria-pressed="false" data-o="P0">Sekarang</button><button class="pill" aria-pressed="true" data-o="P1">P1 Pindah ke kiri-atas pena</button><button class="pill" aria-pressed="false" data-o="P2">P2 Papan tetap di atas grafik</button><button class="pill" aria-pressed="false" data-o="P3">P3 Ketuk untuk menyematkan</button></div>
+<p class="note" id="note"></p>
+<div class="row">Tangan yang memegang pena:<span class="hand" id="hand"><button data-h="R" aria-pressed="true">Kanan</button><button data-h="L" aria-pressed="false">Kiri</button></span> · hanya berlaku untuk pena dan sentuhan; mouse tetap seperti sekarang</div>
+<div class="card" id="card"><div class="dock off" id="dock">Sentuh batang dengan pena: datanya muncul di sini.</div><div id="ch"></div></div>
+</div>
+<div class="tt" id="tt"></div>
+<svg class="pen" id="pen" viewBox="0 0 260 260" aria-hidden="true"><path d="M0 0 L22 10 L250 238 L238 250 L10 22 Z" fill="#3a3a3a" opacity=".85"/><ellipse cx="200" cy="215" rx="60" ry="42" fill="#d9a77c" opacity=".7" transform="rotate(45 200 215)"/></svg>
+<script>
+const $ = id => document.getElementById(id);
+const K = Array.from({length: 14}, (_, i) => [i + 1, 520 + ((i * 37) % 60) - (i > 8 && i < 12 ? 120 : 0), 140 + ((i * 7) % 18), 168 + (i % 5)]);
+const P = s => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
+let O = "P1", H = "R", PIN = null;
+function draw() { const W = $("ch").clientWidth, RH = 26, H2 = K.length * RH + 10;
+  $("ch").innerHTML = `<svg viewBox="0 0 ${W} ${H2}" width="100%">${K.map(([k, s, h, c], i) => { const w = (700 - s) / 300 * (W - 90); return `<text x="0" y="${i * RH + 18}">km ${k}</text><rect data-i="${i}" x="60" y="${i * RH + 4}" width="${w}" height="${RH - 8}" rx="4" fill="var(--r)"/>`; }).join("")}</svg>`; }
+const info = i => { const [k, s, h, c] = K[i]; return `<b>Reza · km ${k}</b><br>${P(s)}/km · ${h} bpm · ${c} spm · jalan –`; };
+function place(e, i) { const tt = $("tt"), pen = e.pointerType === "pen" || e.pointerType === "touch" || $("pen").style.display === "block";
+  if (O === "P2" && pen) { $("dock").innerHTML = info(i).replace("<br>", " · "); tt.classList.remove("on"); return; }
+  tt.innerHTML = info(i); tt.classList.add("on"); const w = tt.offsetWidth, h = tt.offsetHeight; let x, y;
+  if (O === "P1" && pen) { x = H === "R" ? e.clientX - w - 28 : e.clientX + 28; y = e.clientY - h - 28; }   // away from the hand
+  else { x = e.clientX + 14; y = e.clientY + 14; }                                                         // today: right-below
+  tt.style.left = Math.max(6, Math.min(innerWidth - w - 6, x)) + "px"; tt.style.top = Math.max(6, y) + "px"; }
+$("ch").addEventListener("pointermove", e => { const r = e.target.closest("rect"); movePen(e); if (O === "P3" && PIN != null) return; if (!r) return $("tt").classList.remove("on"); place(e, +r.dataset.i); });
+$("ch").addEventListener("pointerleave", () => { if (O !== "P3" || PIN == null) $("tt").classList.remove("on"); $("pen").style.display = "none"; });
+$("ch").addEventListener("pointerdown", e => { if (O !== "P3") return; const r = e.target.closest("rect"); const tt = $("tt");
+  if (!r) { PIN = null; tt.classList.remove("on", "pin"); return; } PIN = +r.dataset.i;
+  tt.innerHTML = info(PIN) + '<span class="x">× lepas</span>'; tt.classList.add("on"); tt.style.position = "fixed";
+  const card = $("card").getBoundingClientRect(); tt.style.left = (H === "R" ? card.left + 12 : card.right - tt.offsetWidth - 12) + "px"; tt.style.top = (card.top + 12) + "px"; });
+function movePen(e) { const p = $("pen"); p.style.display = "block"; p.style.left = e.clientX + "px"; p.style.top = e.clientY + "px"; p.style.transform = H === "R" ? "" : "scaleX(-1)"; }
+const NOTE = {P0: "Tooltip muncul di kanan-bawah ujung pena → tertutup tangan kanan (seperti di foto).",
+  P1: "Untuk pena dan sentuhan, tooltip pindah ke kiri-atas ujung pena (kanan-atas untuk tangan kiri). Mouse tetap kanan-bawah. Paling sedikit perubahan.",
+  P2: "Untuk pena dan sentuhan, isi tooltip tampil di papan tetap di atas grafik (tidak mengikuti pena). Tidak pernah tertutup, tapi mata harus melihat ke atas.",
+  P3: "Ketuk batang: isinya disematkan di pojok kiri-atas kartu (kanan-atas untuk tangan kiri) dan tetap di sana sampai ketuk di tempat lain. Enak untuk membaca lama / membandingkan."};
+function setO(o) { O = o; PIN = null; $("tt").classList.remove("on"); $("dock").classList.toggle("off", o !== "P2"); $("note").textContent = NOTE[o]; }
+$("opt").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; $("opt").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); setO(b.dataset.o); });
+$("hand").addEventListener("click", e => { const b = e.target.closest("[data-h]"); if (!b) return; $("hand").querySelectorAll("button").forEach(p => p.setAttribute("aria-pressed", p === b)); H = b.dataset.h; });
+draw(); setO("P1"); addEventListener("resize", draw);
+</script>
+</body></html>
