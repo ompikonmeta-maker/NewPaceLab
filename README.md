@@ -75,9 +75,11 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   sisa layar di bawah header ringkas. Begitu kotak dipakai (klik / scroll), halaman bergeser sampai judul "Linimasa sesi" pas di
   bawah header ringkas, dengan kotak tepat di bawahnya. Minggu aktif terbuka; membuka satu minggu menutup yang lain. Yang tidak sedang dibuka jadi abu-abu pudar dan sedikit mengecil. Warna kartu sesi memudar dari tepi
   luar: makin pekat = makin patuh rencana. Rencana yang belum dijalani = satu baris tipis.
-- **Klik hari** = duel sesi: jarak, pace, HR rata, cadence, meter per detak; penilaian pelatih per jenis sesi (✓ / !);
+- **Klik hari** = duel sesi: jarak, pace, HR rata, **cadence lari** (tanpa jalan kaki) dan **cadence Garmin** (termasuk
+  jalan, pembanding), **jalan kaki** (total), meter per detak; penilaian pelatih per jenis sesi (✓ / !);
   **Lap jam** (utama, dari file FIT): tiap lap jadi blok setinggi jaraknya dan selebar kecepatannya, kedua pelari sejajar
-  per km; lap manual / sisa akhir lebih pudar; sentuh blok untuk pace, jarak, waktu, HR, cadence, asal lap.
+  per km; lap manual / sisa akhir lebih pudar; sentuh blok untuk pace, jarak, waktu, HR, cadence, jalan kaki, asal lap.
+  Bagian jalan kaki diarsir (garis miring kuning) di ujung blok / batang dekat sumbu tengah, sepanjang porsi waktunya.
   **Per km** (cadangan, dari data per detik): batang = kecepatan. Pita = rentang pace rencana; garis HR / cadence / elevasi
   bisa dinyalakan/dimatikan, ditumpuk di jalur luar. Waktu di zona HR; kesimpulan + saran tiap pelari.
   **Efek latihan** dan **Data Garmin** (apa adanya, ditandai GARMIN): efek latihan aerobik / anaerobik (0–5) + label + beban
@@ -85,6 +87,17 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   osilasi & rasio vertikal, power, elevasi, suhu, kalori, langkah, perkiraan keringat, jumlah lap. Yang tidak dikirim
   jam salah satu pelari ditulis "–".
   Penilaian tempo dan pemanasan memakai lap bila ada (lap yang tengahnya di rentang rencana ± 300 m) [keputusan dashboard].
+- **Tukar sesi**: lari yang dijalani di hari lain dalam minggu program yang sama dinilai dengan rencana hari aslinya.
+  Tebakan otomatis: hari lari terencana yang sudah lewat tanpa lari mengambil lari di minggu itu yang jaraknya paling dekat
+  dengan rencananya (selisih ≤ 30%, `coach.swap_tol`) dan lebih cocok daripada rencana hari lari itu sendiri. Di linimasa:
+  tanda "dipindah dari Sabtu" di hari lari, "dipindah ke Minggu" di hari yang dilewati. Di detail hari: tombol
+  **⇄ Nilai sebagai…** per pelari untuk memilih rencana hari lain di minggu itu atau kembali ke tebakan otomatis; pilihan
+  manual disimpan di browser (tidak ikut `config.json` dan tidak ikut `Ekspor Sesi`). Penilaian pelatih, kepatuhan, jenis
+  sesi di Arah dan ekspor .md mengikuti tukar sesi. Hitungan "x/y sesi" minggu: hari terencana dihitung dijalani bila ada
+  lari yang dinilai dengannya; rencana asli hari lari yang dipindah (mis. pemulihan Minggu) tetap "tidak dijalani"
+  [keputusan dashboard].
+- **Tooltip dengan pena / sentuhan**: muncul di kiri-atas ujung pena (kanan-atas untuk tangan kiri) supaya tidak tertutup
+  tangan; mouse tetap kanan-bawah. Pilih tangan di footer ("Pena di tangan kanan / kiri"), disimpan di browser.
 - **Rincian hitungan** (tombol ⓘ di kartu Pace di zona 2 dan Meter per detak): tiap minggu, setiap sesi dan lap yang
   dipakai atau dicoret (dengan alasannya), jumlahnya, hasilnya, dan rumusnya, untuk dicocokkan dengan Garmin Connect.
 - **Arah** (8 minggu terakhir vs sekarang; angka biru = Taofik, oranye = Reza; ▲▼ dijelaskan saat disentuh):
@@ -101,7 +114,10 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 |---|---|---|
 | Pace di zona 2 | pace berbobot waktu (total waktu ÷ total km) dari **lap jam** (file FIT, ≥ 0,5 km) yang HR rata-ratanya di zona 2 (`zones[0] ≤ HR < zones[1]`, `config.json`), dari lari santai, long run, pemulihan; lari tanpa file FIT: potongan per km dari data per detik | [keputusan dashboard]; lap jam: keputusan omPik |
 | Meter per detak | (jarak ÷ waktu) ÷ (HR ÷ 60), rata-rata lari selain latihan keras per minggu | [keputusan dashboard] |
-| Cadence (sesi, kartu Arah) | cadence rata-rata dari Garmin per lari (`averageRunningCadenceInStepsPerMinute`), apa adanya; per minggu = rata-rata sesi. Hanya bila Garmin tidak mengirimnya: dari data per detik | keputusan omPik |
+| Cadence lari (sesi, kartu Arah, cek "cadence bertahan", per km) | rata-rata berbobot waktu dari detik dengan kecepatan > 1,5 m/s (`coach.walk_mps`, kecepatan dihaluskan ±2 sampel) saat jam berjalan; per minggu = rata-rata sesi. Lari tanpa data per detik: angka Garmin | 1,5 m/s [keputusan omPik] |
+| Cadence Garmin | `averageRunningCadenceInStepsPerMinute` per lari, apa adanya (langkah jalan kaki ikut); juga cadence per lap jam | keputusan omPik |
+| Jalan kaki | jumlah detik dengan kecepatan ≤ 1,5 m/s (`coach.walk_mps`) saat jam berjalan; per km, per lap (lap dibagi menurut waktu timer) dan total sesi | [keputusan omPik] |
+| Tukar sesi (tebakan otomatis) | selisih jarak ≤ 30% dari rencana hari yang dilewati (`coach.swap_tol`), dalam minggu program yang sama | [keputusan dashboard] |
 | Per km | km dipotong per 1000 m dari data per detik; HR rata berbobot waktu; potongan terakhir < 300 m dibuang | [keputusan dashboard] |
 
 Semua angka penilaian diambil dari **profil pelari di `config.json`**, bukan dari kode: blok `coach` (berlaku untuk semua,

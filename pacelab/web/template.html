@@ -676,7 +676,9 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .bd.on.r{border-color:var(--r);color:var(--text);background:color-mix(in srgb,var(--r) 14%,transparent)}
 .hint{position:fixed;pointer-events:none;background:var(--text);color:var(--bg);font-size:13px;padding:6px 10px;border-radius:8px;opacity:0;transition:opacity .15s;z-index:9;max-width:260px}
 .hint.on{opacity:1}
-footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;flex-wrap:wrap}
+footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
+footer .hand{display:inline-flex;align-items:center;gap:6px} footer .hsw{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:2px}
+footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;padding:2px 10px;border-radius:8px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s} footer .hsw button[aria-pressed=true]{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 @media (max-width:640px){
   .badges{grid-template-columns:52px repeat(9,minmax(0,1fr));gap:4px 2px}
   .bd{width:26px;height:26px} .bd svg{width:13px;height:13px}
@@ -847,11 +849,20 @@ const TIPS = {
   est: {warn: "Masih di target C. Jaga km mingguan dan long run; pace dikunci lagi setelah Half 23 Jan.", serious: "Di luar target C. Fokus konsisten dulu; target dievaluasi ulang setelah lomba kalibrasi."}};
 const tip = (k, lvl) => TIPS[k] && TIPS[k][lvl] ? `<span class="sug">${BULB}<b>Saran:</b> ${TIPS[k][lvl]}</span>` : "";
 
+// P1: with a pen or a finger the tooltip goes up-left of the tip (up-right for the left hand), away from the hand.
+// The mouse keeps the usual place. The hand is a per-browser setting (footer).
+let PEN = false, HAND = "R"; try { HAND = localStorage.getItem("pacelab-hand") === "L" ? "L" : "R"; } catch (e) {}
+const penSeen = e => { PEN = e.pointerType === "pen" || e.pointerType === "touch"; };
+["pointerdown", "pointermove"].forEach(n => document.addEventListener(n, penSeen, {capture: true, passive: true}));
+// box of size w x h next to the pointer (x, y) inside [x0, x1] x [y0, ...]; null for the mouse
+const penAt = (x, y, w, h, x0 = 8, x1 = innerWidth - 8, y0 = 8) => !PEN ? null :
+  [Math.max(x0, Math.min(x1 - w, HAND === "R" ? x - w - 28 : x + 28)), Math.max(y0, y - h - 28)];
 // hover hint for non-chart elements (badges, light cells, chips)
 const hint = $("hint");
 document.addEventListener("pointerover", e => { const t = e.target.closest("[data-hint]"); if (!t) return;
   hint.textContent = t.dataset.hint; hint.classList.add("on"); });
 document.addEventListener("pointermove", e => { if (!hint.classList.contains("on")) return;
+  const pp = penAt(e.clientX, e.clientY, hint.offsetWidth, hint.offsetHeight); if (pp) { hint.style.left = pp[0] + "px"; hint.style.top = pp[1] + "px"; return; }
   const x = Math.min(e.clientX + 14, innerWidth - hint.offsetWidth - 8); hint.style.left = x + "px"; hint.style.top = (e.clientY + 16) + "px"; });
 document.addEventListener("pointerout", e => { if (e.target.closest("[data-hint]")) hint.classList.remove("on"); });
 
@@ -867,7 +878,10 @@ document.addEventListener("pointerout", e => { if (e.target.closest("[data-hint]
   $("sub").innerHTML = `<span class="it">${ic(FLAG)}Minggu <b>${DATA.ms_cur}</b> dari ${DATA.total_weeks} · fase <b>${DATA.phase || "–"}</b></span>` +
     DATA.events.filter(e => !/maraton/i.test(e.event)).map(e => `<span class="pill it">${ic(CAL)}${e.event.replace(/^LOMBA /i,"").replace(/HALF MARATHON/i,"Half")} · ${tgl(e.date)}</span>`).join("");
   $("foot").innerHTML = `<span>Dibuat ${DATA.generated.replace("T"," ")}</span>` +
-    A.map(a => `<span>${a.name}: ${a.sync ? "sync " + a.sync.replace("T"," ").slice(0,16) : "belum ada data"}</span>`).join("");
+    A.map(a => `<span>${a.name}: ${a.sync ? "sync " + a.sync.replace("T"," ").slice(0,16) : "belum ada data"}</span>`).join("") +
+    `<span class="hand" data-hint="Untuk pena dan sentuhan: tooltip muncul di sisi yang tidak tertutup tangan. Mouse tidak berubah.">Pena di tangan <span class="hsw" role="group" aria-label="Tangan yang memegang pena"><button data-hand="R" aria-pressed="${HAND === "R"}">kanan</button><button data-hand="L" aria-pressed="${HAND === "L"}">kiri</button></span></span>`;
+  $("foot").addEventListener("click", e => { const b = e.target.closest("[data-hand]"); if (!b) return; HAND = b.dataset.hand;
+    try { localStorage.setItem("pacelab-hand", HAND); } catch (er) {} $("foot").querySelectorAll("[data-hand]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
 })();
 
 // ---------------------------------------------------------------- athlete toggles (shown / hidden)
@@ -1111,16 +1125,19 @@ function draw(id, {x, series, h = 220, ymin, ymax, invert = false, refs = [], ba
     const cands = [[qx + gap, 4], [qx - gap - tw, 4], [mid, top - R - gap - th], [mid, bot + R + gap]];
     const clear = ([l, t]) => l >= 0 && l + tw <= ew && t >= -th / 2 && t + th <= H * sc + th / 2 &&
       pys.every(y => qx + R < l || qx - R > l + tw || y + R < t || y - R > t + th);
-    const [l, t] = cands.find(clear) || cands[2];
+    let [l, t] = cands.find(clear) || cands[2];
+    if (PEN && lastP) { const er = el.getBoundingClientRect(), cd = el.closest(".card"), y0 = Math.max(8, cd ? cd.getBoundingClientRect().top + 6 : 8) - er.top;   // the card clips
+      const pp = penAt(lastP.x - er.left, lastP.y - er.top, tw, th, 0, ew, y0); l = pp[0]; t = pp[1]; }
     tip.style.transform = `translate(${l}px,${t}px)`;
   };
   const hide = () => { tip.classList.remove("on"); xh.setAttribute("opacity", "0"); svg.querySelectorAll(".hd").forEach(c => c.setAttribute("opacity", "0")); };
-  svg.onpointermove = e => { const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W;
+  let lastP = null;
+  svg.onpointermove = e => { lastP = {x: e.clientX, y: e.clientY}; const r = svg.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * W;
     cur = keys.reduce((best, k, i) => Math.abs(xs(k) - px) < Math.abs(xs(keys[best]) - px) ? i : best, 0); show(keys[cur]); };
   svg.onpointerleave = hide;
-  svg.onfocus = () => show(keys[cur]);
+  svg.onfocus = () => { lastP = null; show(keys[cur]); };
   svg.onblur = hide;
-  svg.onkeydown = e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { cur = Math.max(0, Math.min(keys.length - 1, cur + (e.key === "ArrowRight" ? 1 : -1))); show(keys[cur]); e.preventDefault(); } };
+  svg.onkeydown = e => { if (e.key === "ArrowLeft" || e.key === "ArrowRight") { lastP = null; cur = Math.max(0, Math.min(keys.length - 1, cur + (e.key === "ArrowRight" ? 1 : -1))); show(keys[cur]); e.preventDefault(); } };
 }
 
 // ---------------------------------------------------------------- level 3: training (weekly, period filter)
@@ -1297,17 +1314,19 @@ function pbChart() { const host = $("pbx-ch"); if (!host || !PBX) return; const 
     g += `<circle cx="${X(b.t)}" cy="${Y(b.v)}" r="8" fill="var(--surface)" stroke="var(--${c})" stroke-width="2.5"/><circle cx="${X(b.t)}" cy="${Y(b.v)}" r="3.2" fill="var(--${c})"/>
       <text x="${X(b.t) + (rt ? -12 : 12)}" y="${Y(b.v) - 10}" text-anchor="${rt ? "end" : "start"}" style="fill:var(--${c});font-weight:700;font-size:13px">${b.est ? "≈" : ""}${F(b.v)}</text>`; });
   host.innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${k}: semua usaha, titik bercincin = tercepat">${g}<circle id="pbx-hl" r="9" fill="none" stroke-width="2.5" opacity="0"/></svg><div class="pbx-tt" id="pbx-tt"></div>`;
-  const svg = host.querySelector("svg"), hl = $("pbx-hl"), tt = $("pbx-tt"), win = $("pbx-win");
+  const svg = host.querySelector("svg"), hl = $("pbx-hl"), tt = $("pbx-tt"), win = $("pbx-win"); let pm = null;
   const show = q => { win.querySelectorAll(".pbx-top li").forEach(l => l.classList.toggle("on", !!q && l.dataset.i === `${q.a.c}-${q.p.t}-${q.p.v}`));
     if (!q) { hl.setAttribute("opacity", 0); tt.classList.remove("on"); return; }
     hl.setAttribute("cx", q.x); hl.setAttribute("cy", q.y); hl.setAttribute("stroke", `var(--${q.a.c})`); hl.setAttribute("opacity", 1);
     tt.innerHTML = `<i class="dot ${q.a.c}"></i> ${q.a.name} · ${tgl(iso(new Date(q.p.t)))}<br><b class="num">${q.p.est ? "≈" : ""}${F(q.p.v)}</b>${q.p.est ? "<small>jarak GPS kurang, disetarakan</small>" : q.p.from ? `<small>dari usaha ${q.p.from}</small>` : ""}`;
-    tt.style.left = (q.x > W - 190 ? q.x - 180 : q.x + 14) + "px"; tt.style.top = Math.max(0, q.y - 64) + "px"; tt.classList.add("on"); };
+    tt.style.left = (q.x > W - 190 ? q.x - 180 : q.x + 14) + "px"; tt.style.top = Math.max(0, q.y - 64) + "px";
+    const pp = PEN && pm && penAt(pm[0], pm[1], tt.offsetWidth, tt.offsetHeight, 0, W, 0); if (pp) { tt.style.left = pp[0] + "px"; tt.style.top = pp[1] + "px"; }
+    tt.classList.add("on"); };
   // the nearest point within 28 px is the one under the pointer: small dots stay easy to reach
-  svg.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top;
+  svg.addEventListener("pointermove", e => { const r = svg.getBoundingClientRect(), mx = e.clientX - r.left, my = e.clientY - r.top; pm = [mx, my];
     let best = null, bd = 28; pts.forEach(q => { const d = Math.hypot(q.x - mx, q.y - my); if (d < bd) { bd = d; best = q; } }); show(best); });
   svg.addEventListener("pointerleave", () => show(null));
-  win.querySelectorAll(".pbx-top li").forEach(l => { l.onpointerenter = () => show(pts.find(q => `${q.a.c}-${q.p.t}-${q.p.v}` === l.dataset.i)); l.onpointerleave = () => show(null); }); }
+  win.querySelectorAll(".pbx-top li").forEach(l => { l.onpointerenter = () => { pm = null; show(pts.find(q => `${q.a.c}-${q.p.t}-${q.p.v}` === l.dataset.i)); }; l.onpointerleave = () => show(null); }); }
 function pbFill(k) { PBX.k = k; $("pbx-win").innerHTML = pbHtml(k); requestAnimationFrame(pbChart); }
 function pbOpen(k, card) { PBX = {k, per: 0, from: card}; const ov = $("pbx"), win = $("pbx-win"); pbFill(k);
   ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false"); document.documentElement.style.overflow = "hidden";
@@ -1434,6 +1453,7 @@ function renderProgram() {
 // rich hover detail for phases and week bars
 const ptip = $("ptip");
 function ptipShow(e, html) { ptip.innerHTML = html; ptip.classList.add("on");
+  const pp = penAt(e.clientX, e.clientY, ptip.offsetWidth, ptip.offsetHeight); if (pp) { ptip.style.left = pp[0] + "px"; ptip.style.top = pp[1] + "px"; return; }
   ptip.style.left = Math.min(e.clientX + 14, innerWidth - ptip.offsetWidth - 8) + "px";
   ptip.style.top = (e.clientY + 18 + ptip.offsetHeight > innerHeight ? e.clientY - ptip.offsetHeight - 12 : e.clientY + 18) + "px"; }
 document.addEventListener("pointermove", e => {
@@ -1749,8 +1769,8 @@ const hariF = s => { const d = D(s); return `${HARIF[d.getDay()]} ${d.getDate()}
 const paceS = s => s == null || !isFinite(s) ? "–" : `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
 const sstip = $("ss-tip");
 function ssShow(h, x, y) { sstip.innerHTML = h; sstip.classList.toggle("wide", h.includes("kmt")); sstip.classList.add("on");
-  const w = sstip.offsetWidth, hh = sstip.offsetHeight; let L = x + 14, T = y + 14;
-  if (L + w > innerWidth - 8) L = x - w - 14; if (T + hh > innerHeight - 8) T = y - hh - 14;
+  const w = sstip.offsetWidth, hh = sstip.offsetHeight, pp = penAt(x, y, w, hh); let L = x + 14, T = y + 14;
+  if (pp) [L, T] = pp; else { if (L + w > innerWidth - 8) L = x - w - 14; if (T + hh > innerHeight - 8) T = y - hh - 14; }
   sstip.style.left = Math.max(8, L) + "px"; sstip.style.top = Math.max(8, T) + "px"; }
 const WMPS = String((A[0].coach || {}).walk_mps ?? 1.5).replace(".", ",");   // config.json coach.walk_mps
 const SSG = {
