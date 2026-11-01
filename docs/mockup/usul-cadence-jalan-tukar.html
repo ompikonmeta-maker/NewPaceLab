@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: cadence, jalan kaki, tukar sesi</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--good:#0f8a0f;--warn:#9a6a00;--warn-bg:#fdf3dc;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f;--warn:#f2c14e;--warn-bg:#3a2f12}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:36px 0 4px} p.sub{color:var(--muted);margin:0 0 12px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 8px}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.note{font-size:13px;color:var(--text-2);margin:0 0 10px;min-height:20px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 20px}
+/* value table */
+.vt{display:grid;grid-template-columns:minmax(0,1fr) max-content 150px max-content minmax(0,1fr);column-gap:12px;align-items:center}
+.vt>span{height:40px;display:flex;align-items:center;border-top:1px solid var(--line)}
+.vt .bb{position:relative} .vt .bb i{position:absolute;top:50%;height:6px;margin-top:-3px;border-radius:3px} .vt .bb.L i{right:0;background:var(--t)} .vt .bb.R i{left:0;background:var(--r)}
+.vt .bb.L{border-right:1.5px dashed var(--line)} .vt .bb.R{border-left:1.5px dashed var(--line)}
+.vt .v{font-size:17px;font-weight:650;white-space:nowrap} .vt .v.L{justify-content:flex-end} .vt .v small{font-size:12px;font-weight:400;color:var(--muted);margin-left:3px}
+.vt .c{justify-content:center;text-align:center;font-size:12.5px;color:var(--muted);line-height:1.25}
+.new{display:inline-block;font-size:10px;font-weight:700;color:var(--warn);background:var(--warn-bg);border-radius:5px;padding:0 5px;margin-left:4px}
+/* per km */
+table{width:100%;border-collapse:collapse;font-size:13px} th{color:var(--muted);font-weight:600;text-align:right;padding:5px 8px;border-bottom:1px solid var(--line)} td{text-align:right;padding:5px 8px;border-bottom:1px solid var(--grid)}
+th:first-child,td:first-child{text-align:left}
+.bar{display:flex;height:12px;border-radius:4px;overflow:hidden;background:var(--grid);min-width:120px}
+.bar i{display:block;height:100%} .bar .run{background:var(--t)} .bar .walk{background:repeating-linear-gradient(135deg,var(--warn) 0 3px,transparent 3px 6px);opacity:.8}
+.wk{color:var(--warn);font-weight:700}
+.hide{display:none}
+/* swap */
+.feed{display:flex;flex-direction:column;gap:6px}
+.row{display:grid;grid-template-columns:1fr 190px 1fr;gap:12px;align-items:center}
+.sc{border-radius:14px;padding:9px 13px;background:var(--surface);border:1px solid var(--line);font-size:13.5px} .sc.L{text-align:right}
+.sc b{font-size:17px} .sc.ghost{border-style:dashed;color:var(--muted);background:transparent;text-align:center}
+.mid{text-align:center} .mid b{display:block;font-size:13.5px} .mid span{font-size:12px;color:var(--muted)}
+.tag{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;background:color-mix(in srgb,var(--t) 14%,transparent);color:var(--t)}
+.tag.o{background:var(--bg);color:var(--muted)}
+.sw{display:inline-flex;align-items:center;gap:6px;margin-top:6px;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:3px 10px;font:inherit;font-size:12px;color:var(--text-2);cursor:pointer}
+.sw:hover{border-color:var(--text)}
+.dd{position:relative;display:inline-block} .menu{position:absolute;top:calc(100% + 4px);left:50%;transform:translateX(-50%);width:240px;background:var(--surface);border:1px solid var(--line);border-radius:12px;box-shadow:0 14px 36px rgba(0,0,0,.14);padding:5px;text-align:left;z-index:3;display:none}
+.dd.on .menu{display:block} .menu button{display:block;width:100%;border:0;background:none;font:inherit;font-size:12.5px;text-align:left;padding:7px 9px;border-radius:9px;cursor:pointer;color:inherit} .menu button:hover{background:var(--bg)} .menu small{display:block;color:var(--muted)}
+.ck{margin-top:12px;font-size:13px;background:var(--bg);border-radius:12px;padding:10px 14px}
+.ck li{margin:2px 0}
+@media (max-width:640px){.card{overflow-x:auto}.bar{min-width:56px}th,td{padding:4px 5px}.row{grid-template-columns:1fr 110px 1fr}.vt{grid-template-columns:minmax(0,1fr) max-content 92px max-content minmax(0,1fr);column-gap:6px}}
+</style></head><body><div class="wrap">
+<h1>Mockup: usul dari Claude chat</h1>
+<p class="sub">Data rekaan. Tiga usul: (1) cadence hanya saat berlari, (2) menit jalan kaki per km, (3) tukar sesi. Ambang 1,5 m/s (≈ 11:07/km) belum diatur di dokumen rumus → perlu keputusan omPik.</p>
+
+<h2>1. Cadence hanya saat berlari (kecepatan &gt; 1,5 m/s)</h2>
+<p class="sub">Contoh long run dengan beberapa kali jalan kaki (minum, tanjakan). Angka Garmin ikut menghitung langkah saat jalan, jadi rata-ratanya turun.</p>
+<div class="pills" id="pc" role="group"><button class="pill" aria-pressed="false" data-o="C1">C1 Garmin saja (sekarang)</button><button class="pill" aria-pressed="false" data-o="C2">C2 Saat lari saja</button><button class="pill" aria-pressed="true" data-o="C3">C3 Keduanya</button></div>
+<p class="note" id="nc"></p>
+<div class="card"><div class="vt num" id="vtc"></div></div>
+
+<h2>2. Menit jalan kaki per km</h2>
+<p class="sub">Jalan kaki = detik dengan kecepatan ≤ 1,5 m/s saat jam tidak di-pause. Ditampilkan di tabel per km, tooltip, dan total sesi.</p>
+<div class="pills" id="pw" role="group"><button class="pill" aria-pressed="false" data-o="W1">W1 Angka saja</button><button class="pill" aria-pressed="true" data-o="W2">W2 Angka + arsir di batang</button></div>
+<div class="card"><table class="num"><thead><tr><th>Km</th><th>Pace</th><th>HR</th><th>Cadence lari</th><th>Jalan</th><th class="b2">Lari / jalan</th></tr></thead><tbody id="km"></tbody></table>
+<p class="sub" style="margin:10px 0 0">Total jalan sesi ini: <b class="wk">4:35</b> dari 2:18:10 (3%) · paling banyak di km 14 (1:40).</p></div>
+
+<h2>3. Tukar sesi</h2>
+<p class="sub">Long run Sabtu dipindah ke Minggu. Tanpa tukar sesi, lari 20 km hari Minggu dinilai sebagai “lari pemulihan 5 km” (jarak 400%, HR terlalu tinggi …).</p>
+<div class="pills" id="pt" role="group"><button class="pill" aria-pressed="false" data-o="T1">T1 Otomatis</button><button class="pill" aria-pressed="false" data-o="T2">T2 Manual</button><button class="pill" aria-pressed="true" data-o="T3">T3 Otomatis + bisa diubah manual</button></div>
+<p class="note" id="nt"></p>
+<div class="card"><div class="feed" id="feed"></div><div class="ck" id="ck"></div></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const C = {C1: "Satu angka dari Garmin (apa adanya), termasuk langkah saat jalan kaki.", C2: "Hanya detik dengan kecepatan > 1,5 m/s dari data per detik. Kartu Arah dan cek “cadence bertahan” juga memakai angka ini.",
+  C3: "Baris Cadence menulis dua angka: cadence saat lari (dipakai untuk penilaian dan kartu Arah) + angka Garmin di bawahnya sebagai pembanding."};
+function vt(o) { const row = (lab, a, b, ua, ub, sub) => `<span class="bb L"><i style="width:${a / 180 * 100}%"></i></span><span class="v L">${a}<small>${ua}</small></span><span class="c">${lab}${sub || ""}</span><span class="v R">${b}<small>${ub}</small></span><span class="bb R"><i style="width:${b / 180 * 100}%"></i></span>`;
+  let h = row("Jarak", 20.1, 20.0, "km", "km") ;
+  if (o === "C1") h += row("Cadence", 164, 168, "spm", "spm", "<br><small>Garmin</small>");
+  if (o === "C2") h += row("Cadence", 170, 174, "spm", "spm", '<br><small>saat lari</small><span class="new">baru</span>');
+  if (o === "C3") h += row("Cadence lari", 170, 174, "spm", "spm", '<span class="new">baru</span>') + row("Cadence Garmin", 164, 168, "spm", "spm", "<br><small>termasuk jalan</small>");
+  h += row("Jalan kaki", "4:35", "1:10", "", "", '<span class="new">baru</span>');
+  $("vtc").innerHTML = h; $("nc").textContent = C[o]; }
+function km(o) { const K = [[1, "9:42", 138, 168, 0], [2, "9:31", 141, 170, 0], [3, "9:20", 143, 171, 0], [7, "9:58", 147, 170, 35], [10, "9:15", 148, 171, 0], [14, "11:05", 152, 168, 100], [18, "10:12", 155, 167, 60], [20, "9:51", 156, 167, 20]];
+  $("km").innerHTML = K.map(([k, p, h, c, w]) => { const sec = +p.split(":")[0] * 60 + +p.split(":")[1], r = (sec - w) / sec * 100;
+    return `<tr><td>${k}${k === 3 ? " …" : ""}</td><td>${p}</td><td>${h}</td><td>${c}</td><td class="${w ? "wk" : ""}">${w ? Math.floor(w / 60) + ":" + String(w % 60).padStart(2, "0") : "–"}</td><td class="b2 ${o === "W1" ? "hide" : ""}"><div class="bar"><i class="run" style="width:${r}%"></i><i class="walk" style="width:${100 - r}%"></i></div></td></tr>`; }).join("");
+  document.querySelectorAll(".b2").forEach(e => e.classList.toggle("hide", o === "W1")); }
+const T = {T1: "Dashboard menebak sendiri: di minggu yang sama, sesi yang tidak dijalani (Sabtu, long run 20 km) dicocokkan dengan lari yang jaraknya paling dekat (Minggu 20 km). Tanpa klik apa pun.",
+  T2: "Tidak ada tebakan. Di detail hari ada tombol “Nilai sebagai…” untuk memilih rencana hari lain di minggu itu. Pilihan disimpan di browser dan di config.json saat Update.",
+  T3: "Dashboard menebak seperti T1 dan memberi tanda “dipindah dari Sabtu”; bila salah, tombol “Nilai sebagai…” membatalkan atau memilih hari lain."};
+function feed(o) { const auto = o !== "T2";
+  $("feed").innerHTML = `<div class="row"><div class="sc L num"><b>20,1</b> km · 9:42/km</div><div class="mid"><b>Minggu 1 Nov</b><span>${auto ? "Long run 20 km" : "Lari pemulihan 5 km"}</span>${auto ? '<br><span class="tag">dipindah dari Sabtu</span>' : ""}
+      <br><span class="dd" id="dd"><button class="sw">⇄ Nilai sebagai…</button><span class="menu"><button><b>Sabtu 31 Okt · Long run 20 km</b><small>${auto ? "dipilih otomatis" : "sesi yang dilewati"}</small></button><button><b>Minggu 1 Nov · Lari pemulihan 5 km</b><small>rencana asli hari ini</small></button><button><b>Kamis 29 Okt · Lari santai 7 km</b><small>sudah dijalani</small></button></span></span></div><div class="sc num"><b>20,0</b> km · 9:37/km</div></div>
+    <div class="row"><div class="sc ghost">${auto ? "dipindah ke Minggu" : "tidak lari"}</div><div class="mid"><b>Sabtu 31 Okt</b><span>Long run 20 km</span>${auto ? '<br><span class="tag o">→ Minggu</span>' : ""}</div><div class="sc ghost">${auto ? "dipindah ke Minggu" : "tidak lari"}</div></div>`;
+  $("ck").innerHTML = auto ? `<b>Penilaian pelatih (sebagai long run):</b><ul><li>Jarak 20,1 / 20 km ✓</li><li>Buka 3 km pelan ✓ · HR lewat batas hanya di 25% akhir, decoupling 5,0% ✓</li><li>Minggu MS19: sesi dijalani 4/4 (bukan 3/4)</li></ul>`
+    : `<b>Penilaian pelatih (sebagai lari pemulihan — sebelum ditukar):</b><ul><li>Jarak 20,1 / 5 km · 402% !</li><li>HR di atas batas pemulihan 78% km !</li><li>Minggu MS19: sesi dijalani 3/4, Sabtu “tidak lari”</li></ul>`;
+  $("nt").textContent = T[o];
+  $("dd").querySelector(".sw").onclick = e => { e.stopPropagation(); $("dd").classList.toggle("on"); }; }
+document.addEventListener("click", () => { const d = $("dd"); if (d) d.classList.remove("on"); });
+const wire = (id, f) => $(id).addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; $(id).querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); f(b.dataset.o); });
+wire("pc", vt); wire("pw", km); wire("pt", feed); vt("C3"); km("W2"); feed("T3");
+</script>
+</body></html>
