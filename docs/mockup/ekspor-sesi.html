@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: simpan sesi untuk Claude</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--good:#0f8a0f;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 20px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:34px 0 4px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 20px}
+.top{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:12px}
+.who{display:flex;align-items:center;gap:10px} .who.R{justify-content:flex-end;text-align:right} .who b{font-size:16px} .who small{display:block;color:var(--muted);font-size:12px}
+.mid{text-align:center} .mid b{display:block;font-size:16px} .mid span{font-size:13px;color:var(--muted)}
+.ring{width:44px;height:44px;border-radius:50%;border:5px solid var(--grid);display:grid;place-items:center;font-weight:700;font-size:12px}
+.act{display:flex;justify-content:center;gap:8px;margin-top:10px;position:relative}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:6px 14px;cursor:pointer;transition:border-color .2s,transform .25s cubic-bezier(.34,1.4,.64,1)}
+.btn:hover{border-color:var(--text);transform:translateY(-1px)} .btn svg{width:16px;height:16px}
+.btn.done{border-color:var(--good);color:var(--good)}
+.menu{position:absolute;top:44px;left:50%;transform:translateX(-50%) translateY(-6px);background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:6px;width:330px;opacity:0;pointer-events:none;transition:opacity .2s,transform .3s var(--ease);z-index:3}
+.menu.on{opacity:1;pointer-events:auto;transform:translateX(-50%)}
+.menu button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;color:inherit;padding:8px 10px;border-radius:10px;cursor:pointer}
+.menu button:hover{background:var(--bg)} .menu b{font-size:13.5px} .menu small{display:block;color:var(--muted);font-size:12px}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);background:var(--text);color:var(--surface);border-radius:999px;padding:8px 16px;font-size:13px;opacity:0;transition:opacity .3s,transform .4s var(--ease)}
+.toast.on{opacity:1;transform:translateX(-50%)}
+pre{background:var(--bg);border-radius:14px;padding:14px 16px;font:12.5px/1.55 Consolas,"Cascadia Mono",monospace;white-space:pre-wrap;max-height:520px;overflow:auto;margin:0}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.opt{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.05em;text-transform:uppercase;margin:0 0 6px}
+ul{margin:6px 0 0;padding-left:18px;font-size:13.5px;color:var(--text-2)} li{margin:2px 0}
+.tree{font:12.5px/1.6 Consolas,"Cascadia Mono",monospace;background:var(--bg);border-radius:12px;padding:10px 14px;white-space:pre;overflow-x:auto} .grid2>div{min-width:0}
+@media (max-width:720px){.grid2{grid-template-columns:1fr}.menu{width:290px}}
+</style></head><body><div class="wrap">
+<h1>Mockup: simpan aktivitas satu hari untuk dianalisa Claude</h1>
+<p class="sub">Data rekaan. Dua cara: X1 tombol di dashboard (cepat, satu file teks) dan X2 perintah ekspor lengkap (file asli jam + data per detik). Bisa dipakai dua-duanya.</p>
+
+<h2>X1 · Tombol “Simpan untuk Claude” di detail hari</h2>
+<p class="sub">Klik tombolnya. File <code>.md</code> (teks biasa) langsung terunduh: <code>NewPaceLab_2026-10-27_Taofik-Reza.md</code>. Unggah file itu ke Claude chat.</p>
+<div class="card">
+  <div class="top"><div class="who"><div class="ring" style="border-color:var(--t)">74</div><div><b>Taofik</b><small>6,7 j tidur · Body Battery 72</small></div></div>
+    <div class="mid"><b>Selasa 27 Okt</b><span>Latihan keras: tempo 3 km</span></div>
+    <div class="who R"><div><b>Reza</b><small>7,3 j tidur · Body Battery 60</small></div><div class="ring" style="border-color:var(--r)">81</div></div></div>
+  <div class="act"><button class="btn" id="b1"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
+    <div class="menu" id="menu">
+      <button data-f="both"><b>Kedua pelari (.md)</b><small>duel lengkap, untuk perbandingan</small></button>
+      <button data-f="t"><b>Taofik saja (.md)</b><small>analisa satu pelari</small></button>
+      <button data-f="r"><b>Reza saja (.md)</b><small>analisa satu pelari</small></button>
+      <button data-f="copy"><b>Salin teks</b><small>langsung tempel ke Claude chat tanpa file</small></button>
+    </div></div>
+</div>
+<div class="grid2" style="margin-top:14px">
+  <div><p class="opt">Isi file (pratinjau)</p><pre id="md"></pre></div>
+  <div><p class="opt">Yang ikut di file</p><ul>
+    <li>Pertanyaan pembuka untuk Claude + konteks program (MS, fase, tanggal lomba, target maraton)</li>
+    <li>Rencana hari itu dari sel Excel, apa adanya</li>
+    <li>Profil pelari: zona HR, rentang pace, target cadence (<code>config.json</code>)</li>
+    <li>Kondisi pagi: tidur, HRV + status, Body Battery, RHR, lampu</li>
+    <li>Ringkasan Garmin per lari (jarak, waktu, HR, cadence, langkah, power, efek latihan, beban, suhu, elevasi …)</li>
+    <li>Tabel lap jam (dari file FIT) dan tabel per km</li>
+    <li>Waktu di zona HR, decoupling (bila ada)</li>
+    <li>Penilaian pelatih dashboard + aturannya</li>
+    <li>Minggu itu: km dijalani / target, long run, sesi lain</li>
+  </ul><p class="sub" style="margin-top:10px">Tidak ada key, nama akun Garmin, atau koordinat GPS di file. Ukuran ±5–15 KB.</p></div>
+</div>
+
+<h2>X2 · Ekspor lengkap untuk analisa sangat dalam</h2>
+<p class="sub">Dobel-klik <b>Ekspor Sesi.bat</b> (atau <code>python pacelab.py ekspor 2026-10-27</code>), isi tanggal. Hasilnya satu file zip yang bisa diunggah ke Claude.</p>
+<div class="grid2">
+  <div class="tree">ekspor/NewPaceLab_2026-10-27.zip
+├─ ringkasan.md          (sama dengan X1)
+├─ taofik_per_detik.csv  (waktu, jarak, HR, pace,
+│                         cadence, elevasi, power …)
+├─ taofik_lap.csv
+├─ taofik_asli.fit       (file asli dari jam)
+├─ reza_per_detik.csv
+├─ reza_lap.csv
+└─ reza_asli.fit</div>
+  <div><ul>
+    <li>Data per detik lengkap (±4000 baris per lari) untuk analisa grafik, drift, pacing per detik.</li>
+    <li>File FIT asli dari Garmin (diunduh ulang saat ekspor) — berisi semua yang direkam jam.</li>
+    <li>Koordinat GPS <b>tidak</b> dimasukkan ke CSV (privasi); FIT asli tetap memuatnya — bisa dimatikan dengan pilihan “tanpa FIT”.</li>
+    <li>Butuh koneksi internet + key Garmin (sama seperti Update).</li>
+  </ul></div>
+</div>
+<div class="toast" id="toast">Tersimpan: NewPaceLab_2026-10-27_Taofik-Reza.md</div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const MD = `# Sesi lari — Selasa 27 Okt 2026 (MS19 · Support)
+
+> Tolong analisa sesi ini secara mendalam sebagai pelatih maraton: apakah sesuai rencana, apa yang bagus,
+> apa yang perlu diperbaiki, dan saran untuk sesi berikutnya. Data di bawah apa adanya dari Garmin + program Excel.
+
+## Konteks program
+- Maraton: Minggu 13 Jun 2027 (227 hari lagi) · target B 4:45–5:15
+- Minggu ini: MS19, fase Support · minggu ringan: tidak
+- Rencana Excel hari ini (Taofik): "LATIHAN KERAS: tempo 3 km · Pemanasan 2 km · Tempo 6:00 - 6:10/km
+  · Detak jantung 150 - 162 · Pendinginan 3 km · Total 8 km"
+
+## Taofik
+### Profil
+- Zona HR: Z1 < 133 · Z2 133–150 · Z3 151–161 · Z4 162–176 · Z5 ≥ 177
+- Pace: easy 8:40–9:15 · tempo 6:00–6:10 · target cadence 168–172
+
+### Kondisi pagi
+- Tidur 6,7 j · HRV 52 ms (BALANCED) · Body Battery 72 · RHR 52 · lampu Hijau
+
+### Ringkasan Garmin
+| Jarak | Waktu | Pace | HR rata / maks | Cadence | Efek latihan | Beban |
+|---|---|---|---|---|---|---|
+| 8,49 km | 1:06:20 | 7:49/km | 148 / 172 | 171 spm | 3,6 aerobik · 1,9 anaerobik (Tempo) | 142 |
+
+### Lap jam (file FIT)
+| Lap | Jarak | Waktu | Pace | HR | Cadence | Asal |
+|---|---|---|---|---|---|---|
+| 1 | 1,00 km | 8:42 | 8:42 | 132 | 168 | auto |
+| 2 | 1,00 km | 8:40 | 8:40 | 132 | 172 | auto |
+| 3 | 158 m | 1:21 | 8:30 | 140 | 136 | manual |
+| … | | | | | | |
+| 6 | 1,00 km | 6:11 | 6:11 | 154 | 174 | auto |
+| 7 | 1,00 km | 5:54 | 5:54 | 165 | 180 | auto |
+| 8 | 1,00 km | 5:50 | 5:50 | 168 | 178 | auto |
+
+### Penilaian pelatih dashboard
+- Jarak 8,5 / 8 km (106%) ✓
+- Pace tempo per lap 6:11 · 5:54 · 5:50 → 2 lap sedikit terlalu cepat (rentang 5:55–6:15) !
+- HR tempo maks 168 ≤ 162? → lewat batas di lap 8 !
+- Pemanasan 8:41/km · 132 bpm ✓
+
+### Waktu di zona
+Z1 12% · Z2 41% · Z3 22% · Z4 25%
+
+## Reza
+…
+
+## Minggu ini (sampai 27 Okt)
+- Taofik 9 / 34 km target · Reza 8 / 31 km target · long run Sabtu 31 Okt 22 km`;
+$("md").textContent = MD;
+$("b1").onclick = e => { e.stopPropagation(); $("menu").classList.toggle("on"); };
+$("menu").onclick = e => { const b = e.target.closest("[data-f]"); if (!b) return; $("menu").classList.remove("on");
+  $("toast").textContent = b.dataset.f === "copy" ? "Teks tersalin — tempel di Claude chat" : `Tersimpan: NewPaceLab_2026-10-27_${b.dataset.f === "t" ? "Taofik" : b.dataset.f === "r" ? "Reza" : "Taofik-Reza"}.md`;
+  $("toast").classList.add("on"); $("b1").classList.add("done"); setTimeout(() => { $("toast").classList.remove("on"); $("b1").classList.remove("done"); }, 2200); };
+document.addEventListener("click", () => $("menu").classList.remove("on"));
+</script>
+</body></html>

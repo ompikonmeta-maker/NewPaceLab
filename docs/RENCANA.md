@@ -34,6 +34,13 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 14. Simpan aktivitas satu hari untuk Claude chat — mockup siap, menunggu pilihan + "gas"
+
+Mockup: [`docs/mockup/ekspor-sesi.html`](mockup/ekspor-sesi.html). X1 tombol "Simpan untuk Claude" di detail hari →
+file .md (kedua pelari / satu pelari / salin teks): konteks program, rencana Excel, profil, kondisi pagi, ringkasan Garmin,
+lap, per km, zona, penilaian pelatih, minggu itu; tanpa key/akun/GPS. X2 `Ekspor Sesi.bat` / `pacelab.py ekspor <tanggal>`
+→ zip: ringkasan.md + CSV per detik + CSV lap + FIT asli per pelari (GPS hanya di FIT asli, bisa dimatikan).
+
 ## 13. Validasi kartu Arah (pace zona 2, meter per detak) — **sudah dibuat** (V1 + V2)
 
 omPik ragu dengan hasil hitungan. Usulan: V1 jendela "rincian hitungan" di tiap kartu (daftar sesi / km yang dipakai per
