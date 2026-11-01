@@ -25,6 +25,8 @@ PROFILES = {
 START = dt.date(2026, 3, 23)
 DETAILS_DAYS = 120   # like Garmin: per-second details only for recent runs; the FIT file always
 MS1 = dt.date(2026, 6, 22)
+# a long run moved within its week (tukar sesi): Saturday's run done on Sunday, Sunday's own run skipped
+MOVED = {("demo-taofik", dt.date(2026, 10, 24)): dt.date(2026, 10, 25), ("demo-taofik", dt.date(2026, 10, 25)): "skip"}
 
 
 def week_plan(ms):
@@ -81,9 +83,11 @@ class Athlete:
                 pace = p["easy"] * fitness * rnd.uniform(.97, 1.04)
                 if day == dt.date(2026, 10, 11):  # 5K race
                     dist, pace = 5.02, p["easy"] * fitness * .74
-                aid += 1
-                self._add_run(aid, day, dist, pace, rnd, race=day == dt.date(2026, 10, 11),
-                              tempo=day.weekday() == 1 and dist >= 6)
+                moved = MOVED.get((key, day))
+                if moved != "skip":
+                    aid += 1
+                    self._add_run(aid, moved or day, dist, pace, rnd, race=day == dt.date(2026, 10, 11),
+                                  tempo=day.weekday() == 1 and dist >= 6)
             self._add_day(day, rnd, prog)
             day += dt.timedelta(days=1)
 

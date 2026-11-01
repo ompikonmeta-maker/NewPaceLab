@@ -520,6 +520,15 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-sc.R:not(.ghost){border-color:transparent;background:linear-gradient(270deg,color-mix(in srgb,var(--r) calc(var(--cp,0) * 30%),var(--surface)),var(--surface) 75%)} .ss-sc .km{font-size:20px;font-weight:700;letter-spacing:-.01em} .ss-sc .km small{font-size:12px;font-weight:400;color:var(--muted)}
 .ss-sc .meta{font-size:12.5px;color:var(--muted);line-height:1.35} .ss-sc .sp2{flex:1}
 .ss-sc.ghost{border-style:dashed;background:transparent;color:var(--muted);font-size:13px;justify-content:center}
+.ss-tag{display:inline-block;margin:3px 2px 0;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;background:color-mix(in srgb,var(--t) 14%,transparent);color:var(--t);white-space:nowrap} .ss-tag.o{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
+.ss-fr .sp .ss-tag{display:table;margin:3px auto 0}
+.ss-swd{position:relative;display:inline-block} .ss-swb{margin-top:5px;display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font:inherit;font-size:12px;color:var(--text-2);cursor:pointer;transition:border-color .2s;white-space:nowrap}
+.ss-swb:hover,.ss-swb:focus-visible,.ss-swd.on .ss-swb{border-color:var(--text)}
+.ss-swm{position:absolute;top:calc(100% + 6px);left:0;width:270px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.14);padding:6px;z-index:7;text-align:left;opacity:0;pointer-events:none;transform:translateY(-6px);transition:opacity .2s,transform .3s var(--ease)}
+.who.R .ss-swm{left:auto;right:0} .ss-swd.on .ss-swm{opacity:1;pointer-events:auto;transform:none}
+.ss-swm button{display:block;width:100%;text-align:left;border:0;background:none;font:inherit;color:inherit;padding:7px 10px 7px 26px;border-radius:10px;cursor:pointer;position:relative} .ss-swm button:hover,.ss-swm button:focus-visible{background:var(--bg)}
+.ss-swm button[aria-checked=true]::before{content:"";position:absolute;left:9px;top:12px;width:8px;height:8px;border-radius:50%;background:var(--text)}
+.ss-dtop .ss-swm b{display:block;font-size:12.5px;font-weight:600;white-space:normal} .ss-dtop .ss-swm small{display:block;color:var(--muted);font-size:11.5px}
 .ss-sc.none{visibility:hidden}
 .ss-fr.today .sp .ic{border-color:var(--text);box-shadow:0 0 0 3px color-mix(in srgb,var(--text) 10%,transparent)}
 .ss-pln{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;padding:0 14px} .ss-pln.L{text-align:right}
@@ -1793,8 +1802,37 @@ document.addEventListener("pointermove", e => { if (!e.target.closest) return; c
   if (h) return ssShow(h.dataset.sh, e.clientX, e.clientY); sstip.classList.remove("on"); });
 
 // plan of one day, read from the Excel schedule text (Mon-first)
-function planCell(a, s) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, w = (a.plan || []).find(x => x.ms === ms);
+function planRaw(a, s) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, w = (a.plan || []).find(x => x.ms === ms);
   return w && w.days && w.days.length === 7 ? w.days[(D(s).getDay() + 6) % 7] : null; }
+// T3 tukar sesi: a run is judged against the plan of the day it replaced (same program week).
+// planCell(a, run day) follows the swap; planRaw(a, day) is always the Excel cell of that day.
+const planCell = (a, s) => planRaw(a, swapOf(a, s));
+let SWAPM = {}; try { SWAPM = JSON.parse(localStorage.getItem("pacelab-swap") || "{}") || {}; } catch (e) {}
+const SWAPC = {};
+const wkDays = s => { const st = addDays(DATA.ms1, (Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7)) * 7); return [0, 1, 2, 3, 4, 5, 6].map(i => addDays(st, i)); };
+// automatic guess, per program week: a planned run day that was missed (before today) takes the run of the same week
+// whose distance is closest to its plan, within coach.swap_tol, and closer than to the run's own plan
+function swapAuto(a) { if (SWAPC[a.c]) return SWAPC[a.c]; const out = {}, tol = (a.coach || {}).swap_tol, seen = new Set();
+  if (tol == null) return SWAPC[a.c] = out;
+  const ran = s => (a.sessions || []).some(x => x.date === s), err = (x, pl) => Math.abs(x.km - pl.km) / pl.km;
+  (a.sessions || []).forEach(x0 => { const days = wkDays(x0.date); if (seen.has(days[0])) return; seen.add(days[0]);
+    const P = days.map(s => parsePlan(planRaw(a, s)));
+    const miss = days.map((s, i) => [s, P[i]]).filter(([s, pl]) => s < DATA.today && pl && RUNK(pl.k) && pl.km && !ran(s)).sort((p, q) => q[1].km - p[1].km);
+    const used = new Set();
+    miss.forEach(([m, pl]) => { let best = null;
+      days.forEach((r, i) => { const x = ran(r) && sessOf(a, r); if (!x || used.has(r)) return; const own = P[i];
+        if (own && RUNK(own.k) && !own.km) return;                     // own plan is a run without a distance: leave it
+        const e = err(x, pl), eo = own && RUNK(own.k) ? err(x, own) : Infinity;
+        if (e <= tol && e < eo && (!best || e < best[1])) best = [r, e]; });
+      if (best) { out[best[0]] = m; used.add(best[0]); } }); });
+  return SWAPC[a.c] = out; }
+// plan day a run on day s is judged against (s itself when nothing moved); a manual choice wins over the guess
+function swapOf(a, s) { const m = (SWAPM[a.c] || {})[s]; if (m) return m; return swapAuto(a)[s] || s; }
+const swapOn = (a, s) => !!(a.sessions || []).some(x => x.date === s) && swapOf(a, s) !== s;
+const movedTo = (a, p) => wkDays(p).find(s => s !== p && swapOn(a, s) && swapOf(a, s) === p) || null;
+function swapSet(a, s, p) { const m = SWAPM[a.c] = SWAPM[a.c] || {}, auto = swapAuto(a)[s] || s;
+  if (p === auto) delete m[s]; else m[s] = p;
+  try { localStorage.setItem("pacelab-swap", JSON.stringify(SWAPM)); } catch (e) {} }
 function parsePlan(cell, ev) { if (!cell) return null;
   const L = cell.split("\n").map(x => x.trim()).filter(Boolean), t = L[0] || "", k = sessionKind(t), txt = L.join("\n"), num = x => +String(x).replace(",", ".");
   if (k === "rest" || k === "str") return {k, title: calm(t)};
@@ -1994,7 +2032,7 @@ function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) 
   const evs = (DATA.all_events || []).filter(e => e.date >= s).slice(0, 3); if (evs.length) L.push(`- Tes/lomba berikutnya: ${evs.map(e => `${calm(e.event).replace(/(\d)k\b/g, "$1K")} (${tgl(e.date)})`).join(", ")}`);
   const run = A.filter(a => who === "both" ? V().includes(a) : a.c === who);
   run.forEach(a => { const pl0 = parsePlan(planCell(a, s)), pl = planFill(a, pl0), C = a.coach || {}, P = a.pace || {}, z = a.zones || [], T = a.targets || {};
-    L.push("", `## ${a.name}`, "", "### Rencana hari ini (sel Excel, apa adanya)");
+    L.push("", `## ${a.name}`, "", swapOn(a, s) ? `### Rencana yang dipakai: ${hariF(swapOf(a, s))} (tukar sesi, sel Excel apa adanya)` : "### Rencana hari ini (sel Excel, apa adanya)");
     const cell = planCell(a, s); L.push(cell ? cell.split("\n").map(x => "> " + x.trim()).filter(x => x.length > 2).join("\n") : "> (tidak ada rencana di Excel untuk tanggal ini)");
     L.push("", "### Profil (config.json)");
     if (z.length > 3) L.push(`- Zona HR: Z1 < ${z[0]} · Z2 ${z[0]}–${z[1] - 1} · Z3 ${z[1]}–${z[2] - 1} · Z4 ${z[2]}–${z[3] - 1} · Z5 ≥ ${z[3]}`);
@@ -2046,11 +2084,30 @@ document.addEventListener("click", e => { const b = e.target.closest(".ss-md"), 
   document.querySelectorAll(".ss-mdw.on").forEach(w => { if (!b || !w.contains(b)) { w.classList.remove("on"); w.querySelector(".ss-md").setAttribute("aria-expanded", "false"); } });
   if (b) { const w = b.parentElement, o = !w.classList.contains("on"); w.classList.toggle("on", o); b.setAttribute("aria-expanded", o); } });
 
+// "⇄ Nilai sebagai…": pick which planned day of the week this run is judged against
+function ssSwapBtn(a, x, s) { if (!x) return ""; const cur = swapOf(a, s), auto = swapAuto(a)[s] || s, man = (SWAPM[a.c] || {})[s];
+  const opts = wkDays(s).map(p => [p, parsePlan(planRaw(a, p))]).filter(([p, pl]) => p <= DATA.today && pl && RUNK(pl.k));
+  if (!opts.length || opts.length === 1 && opts[0][0] === s) return "";
+  const why = p => p === auto && auto !== s ? "dipilih otomatis" : p === s ? "rencana asli hari ini" : sessOf(a, p) && !swapOn(a, p) ? "sudah dijalani" : movedTo(a, p) ? "dipindah ke hari lain" : "dilewati";
+  return `<span class="ss-swd"><button class="ss-swb" aria-haspopup="menu" aria-expanded="false">⇄ Nilai sebagai…</button><span class="ss-swm" role="menu">${opts.map(([p, pl]) =>
+    `<button role="menuitemradio" aria-checked="${p === cur}" data-swc="${a.c}" data-swd="${s}" data-swp="${p}"><b>${HARIF[D(p).getDay()]} ${tgl(p)} · ${esc(pl.title)}</b><small>${why(p)}</small></button>`).join("")}${man ? `<button role="menuitem" data-swc="${a.c}" data-swd="${s}" data-swp="${auto}"><b>Kembalikan ke tebakan otomatis</b><small>${auto === s ? "rencana hari ini" : "dari " + HARIF[D(auto).getDay()]}</small></button>` : ""}</span></span>`; }
+document.addEventListener("click", e => { const b = e.target.closest(".ss-swb"), o = e.target.closest(".ss-swm [data-swp]");
+  document.querySelectorAll(".ss-swd.on").forEach(w => { if (!b || !w.contains(b)) { w.classList.remove("on"); w.querySelector(".ss-swb").setAttribute("aria-expanded", "false"); } });
+  if (b) { e.stopPropagation(); const w = b.parentElement, on = !w.classList.contains("on"); w.classList.toggle("on", on); b.setAttribute("aria-expanded", on); return; }
+  if (!o) return; e.stopPropagation(); const a = A.find(x => x.c === o.dataset.swc), s = o.dataset.swd;
+  swapSet(a, s, o.dataset.swp); ssReswap(s); }, true);
+// re-draw the timeline and Arah after a swap, keeping the day open where it was
+function ssReswap(s) { const b = $("ss-box"), top = b.scrollTop; SSOPEN = null; ssFeed(); ssArah();
+  const fr = $("ss-feed").querySelector(`.ss-fr[data-d="${s}"]`); if (!fr) return;
+  $("ss-feed").querySelectorAll(".ss-wg").forEach(g => { const o = g.contains(fr); g.classList.toggle("open", o); g.querySelector(".ss-wgh").setAttribute("aria-expanded", o); });
+  ssBoxSize(); b.scrollTop = top; const host = fr.querySelector(".ss-det");
+  host.firstElementChild.innerHTML = ssDetail(s); SSOPEN = host; fr.classList.add("on"); ssFocus();
+  const w = host.querySelector(".ss-bfw"); w.innerHTML = ssBf(s, host.firstElementChild); ssAnimate(host); }
 // ---------------- duel detail of one day
 function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c === "r"), vis = V().map(a => a.c);
   const T = vis.includes("t") ? sessOf(ta, s) : null, R = vis.includes("r") ? sessOf(ra, s) : null;
   const ev = (DATA.all_events || []).some(e => Math.floor((D(e.date) - D(DATA.ms1)) / 864e5 / 7) === Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7));
-  const PT = parsePlan(planCell(ta, s)), PR = parsePlan(planCell(ra, s)), pl0 = PT || PR;
+  const PT = parsePlan(planCell(ta, s)), PR = parsePlan(planCell(ra, s)), sw = swapTag(s, vis), pl0 = sw.pl || (T ? PT : null) || (R ? PR : null) || PT || PR;
   const morn = (a, x) => { if (!x) return vis.includes(a.c) ? "tidak lari" : ""; const w = wellOf(a, s); return w ? `${w.sleep_h ? f1(w.sleep_h).replace(".", ",") + " j tidur" : ""}${w.bb != null ? " · Body Battery " + w.bb : ""}` : ""; };
   const M = [["Jarak", x => x.km, v => `${f1(v)}<small>km</small>`, 1], ["Pace", x => x.sec / x.km, v => `${paceS(v)}<small>/km</small>`, -1], ["HR rata", x => x.hr, v => `${v}<small>bpm</small>`, 0],
     [ssTerm("cad", "Cadence lari"), ssCadRun, v => `${Math.round(v)}<small>spm</small>`, 1]];
@@ -2073,10 +2130,10 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const zs = (a, x) => { const z = [0, 0, 0, 0, 0]; let t = 0; x.splits.forEach(p => { if (p[2] && a.zones) { z[zoneOf(a, p[2])] += p[1]; t += p[1]; } }); return t ? z.map(v => v / t) : null; };
   const zbar = (a, x, side) => { const z = x && zs(a, x); return `<div class="ss-zb ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-sh="<span class='t1'>${a.name} · Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .15 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`; };
   const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), hasLap = [T, R].some(x => x && x.laps && x.laps.length);
-  return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small></div>` : ""}</div>
-      <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span>${(T || R) ? `<div class="ss-mdw"><button class="ss-md" data-md="${s}" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
+  return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small>${ssSwapBtn(ta, T, s)}</div>` : ""}</div>
+      <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span>${sw.tag ? `<div>${sw.tag}</div>` : ""}${(T || R) ? `<div class="ss-mdw"><button class="ss-md" data-md="${s}" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
         <div class="ss-mdm" role="menu">${T && R ? `<button role="menuitem" data-mdf="both"><b>Kedua pelari (.md)</b><small>duel lengkap, untuk perbandingan</small></button>` : ""}${T ? `<button role="menuitem" data-mdf="t"><b>Taofik saja (.md)</b><small>analisa satu pelari</small></button>` : ""}${R ? `<button role="menuitem" data-mdf="r"><b>Reza saja (.md)</b><small>analisa satu pelari</small></button>` : ""}<button role="menuitem" data-mdf="copy"><b>Salin teks</b><small>langsung tempel ke Claude chat tanpa file</small></button></div></div>` : ""}</div>
-      <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small></div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
+      <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small>${ssSwapBtn(ra, R, s)}</div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ssGarmin(T, R, ta, ra)}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
@@ -2089,32 +2146,42 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
     <div class="ss-mir"><div>${zbar(ta, T, "L")}</div><div class="c">Z1–5</div><div>${zbar(ra, R, "R")}</div></div>
     <div class="ss-verdict">${vis.includes("t") ? `<div class="ss-vd L">${ssVerdict(ta, T, PT, s)}</div>` : "<div></div>"}${vis.includes("r") ? `<div class="ss-vd">${ssVerdict(ra, R, PR, s)}</div>` : ""}</div></div>`; }
 
+// tag under the day's title: "dipindah dari Sabtu" on the run day, "→ Minggu" on the missed day; the runner's name when only one moved
+function swapTag(s, vis) { const W = A.filter(a => vis.includes(a.c)), ran = W.filter(a => sessOf(a, s)), from = ran.filter(a => swapOn(a, s)), to = W.filter(a => !sessOf(a, s) && movedTo(a, s));
+  const day = q => HARIF[D(q).getDay()], tags = (L, q, f) => { const one = new Set(L.map(q)).size === 1 && L.length === W.length;
+    return [...new Set(L.map(a => `<span class="ss-tag${f ? "" : " o"}">${one ? "" : a.name + ": "}${f ? "dipindah dari " : "→ "}${day(q(a))}</span>`))].join(""); };
+  if (from.length) { const src = new Set(from.map(a => swapOf(a, s)));
+    return {pl: src.size === 1 && from.length === ran.length ? parsePlan(planRaw(from[0], swapOf(from[0], s))) : null, tag: tags(from, a => swapOf(a, s), true)}; }
+  if (to.length) return {pl: null, tag: tags(to, a => movedTo(a, s), false)};
+  return {pl: null, tag: ""}; }
 // ---------------- feed: program weeks (newest first), the active week open
 function ssFeed() { const vis = V().map(a => a.c), today = DATA.today, ta = A.find(x => x.c === "t"), ra = A.find(x => x.c === "r");
   const first = A.flatMap(a => (a.sessions || []).map(x => x.date)).sort()[0] || DATA.ms1, weeks = [];
   const msOf = s => Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, curMs = msOf(today);
   for (let ms = curMs; ms >= Math.max(1, msOf(first)); ms--) { const st = addDays(DATA.ms1, (ms - 1) * 7), days = [];
-    for (let i = 6; i >= 0; i--) { const s = addDays(st, i), pT = parsePlan(planCell(ta, s)), pR = parsePlan(planCell(ra, s));
+    for (let i = 6; i >= 0; i--) { const s = addDays(st, i), pT = parsePlan(planRaw(ta, s)), pR = parsePlan(planRaw(ra, s));
       const run = RUNK((pT || {}).k) || RUNK((pR || {}).k), xT = sessOf(ta, s), xR = sessOf(ra, s);
-      if (!run && !xT && !xR) continue; if (s > today && !run) continue; days.push({s, pT, pR, xT, xR}); }
+      if (!run && !xT && !xR) continue; if (s > today && !run) continue;
+      days.push({s, pT, pR, xT, xR, eT: xT ? parsePlan(planCell(ta, s)) : pT, eR: xR ? parsePlan(planCell(ra, s)) : pR}); }
     if (days.length) weeks.push({ms, st, days}); }
   let i = 0;
   const card = (a, x, pl, side, d) => { if (!vis.includes(a.c)) return `<div class="ss-sc none"></div>`;
     if (!x && d.s >= DATA.today) return `<div class="ss-pln ${side}">${pl && pl.km ? pl.km + " km" : ""}</div>`;
-    if (!x) return `<div class="ss-sc ghost" style="--i:${i}">tidak lari</div>`;
+    if (!x) { const mv = movedTo(a, d.s); return `<div class="ss-sc ghost${mv ? " mv" : ""}" style="--i:${i}">${mv ? "dipindah ke " + HARIF[D(mv).getDay()] : "tidak lari"}</div>`; }
     const cp = ssComp(a, x, pl);
     return `<div class="ss-sc ${side}" style="--i:${i};--cp:${(cp || 0) / 100}">${ssRing(a.c, cp, 40)}<div class="sp2"><div class="km num">${f1(x.km)}<small> km</small></div>
       <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? ` · dec ${f1(x.dec)}%` : ""}</div></div></div>`; };
+  // a planned day counts as run when some run of the week is judged against it (moved runs included)
   const sum = (a, W) => { if (!vis.includes(a.c)) return ""; const pl = W.days.filter(d => d.s < DATA.today && RUNK(((a.c === "t" ? d.pT : d.pR) || {}).k));
-    const done = pl.filter(d => a.c === "t" ? d.xT : d.xR), km = W.days.reduce((q, d) => q + ((a.c === "t" ? d.xT : d.xR) || {km: 0}).km, 0);
+    const cov = new Set(W.days.filter(d => a.c === "t" ? d.xT : d.xR).map(d => swapOf(a, d.s))), done = pl.filter(d => cov.has(d.s)), km = W.days.reduce((q, d) => q + ((a.c === "t" ? d.xT : d.xR) || {km: 0}).km, 0);
     return `<b class="num">${Math.round(km)} km</b><span class="num">${done.length}/${pl.length} sesi</span>`; };
   $("ss-feed").innerHTML = weeks.map(W => { const cur = W.ms === curMs, en = addDays(W.st, 6), ph = (phaseOf(W.ms) || {}).name;
     return `<section class="ss-wg${cur ? " open" : ""}"><button class="ss-wgh" aria-expanded="${cur}"><span class="ws L">${sum(ta, W)}</span>
         <span class="wm"><b>MS${W.ms}${cur ? " · minggu ini" : ph ? " · " + ph : ""}</b><span>${tgl(W.st)} – ${tgl(en)}</span><svg class="cv" viewBox="0 0 24 24" width="14" height="14"><path d="M6 9l6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>
         <span class="ws R">${sum(ra, W)}</span></button>
-      <div class="ss-wgb"><div>${W.days.map(d => { i++; const pl = d.pT || d.pR, fut = d.s >= DATA.today && !d.xT && !d.xR, k = pl ? pl.k : "easy";
-        return `<div class="ss-fr${d.s === DATA.today ? " today" : ""}${fut ? " plan" : ""}" data-d="${d.s}">${card(ta, d.xT, d.pT, "L", d)}
-          <div class="sp"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">${SICON[k] || SICON.easy}</svg></div><b>${hariF(d.s)}</b><span>${pl ? esc(pl.title) : "di luar jadwal"}</span></div>${card(ra, d.xR, d.pR, "R", d)}
+      <div class="ss-wgb"><div>${W.days.map(d => { i++; const fut = d.s >= DATA.today && !d.xT && !d.xR, sw = swapTag(d.s, vis), pl = sw.pl || d.pT || d.pR, k = pl ? pl.k : "easy";
+        return `<div class="ss-fr${d.s === DATA.today ? " today" : ""}${fut ? " plan" : ""}" data-d="${d.s}">${card(ta, d.xT, d.eT, "L", d)}
+          <div class="sp"><div class="ic"><svg viewBox="0 0 24 24" aria-hidden="true">${SICON[k] || SICON.easy}</svg></div><b>${hariF(d.s)}</b><span>${pl ? esc(pl.title) : "di luar jadwal"}</span>${sw.tag}</div>${card(ra, d.xR, d.eR, "R", d)}
           ${fut ? "" : `<div class="ss-fx ss-det"><div></div></div>`}</div>`; }).join("")}</div></div></section>`; }).join("") || `<p class="muted" style="text-align:center">Belum ada sesi.</p>`;
   $("tab-cnt").textContent = A.filter(a => vis.includes(a.c)).reduce((q, a) => q + (a.sessions || []).filter(x => x.date > addDays(DATA.today, -7)).length, 0) || "";
 }
