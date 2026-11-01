@@ -151,11 +151,15 @@ def summary(day, people, prog):
                              l.get("hr") or "–", l.get("cad") or "–", TRIG.get(l.get("trigger"), l.get("trigger") or "")]
                             for i, l in enumerate(laps, 1) if l.get("km") and l.get("sec")])
             if stream:
-                sp = m.per_km(stream)
+                walk = (a.get("coach") or {}).get("walk_mps")
+                sp = m.per_km(stream, walk)
                 L += ["", "**Per km (hitungan dari data per detik)**", ""]
-                L += table(["Km", "Jarak", "Waktu", "Pace", "HR", "Cadence", "Elevasi akhir km"],
-                           [[i, "%s km" % num(s[0], 2), hms(s[1]), pace(s[1] / s[0]), s[2] or "–", s[3] or "–", "%s m" % s[4] if s[4] is not None else "–"]
-                            for i, s in enumerate(sp, 1)])
+                L += table(["Km", "Jarak", "Waktu", "Pace", "HR", "Cadence lari" if walk else "Cadence", "Jalan kaki", "Elevasi akhir km"],
+                           [[i, "%s km" % num(s[0], 2), hms(s[1]), pace(s[1] / s[0]), s[2] or "–", s[3] or "–", hms(s[5]) if s[5] else "–",
+                             "%s m" % s[4] if s[4] is not None else "–"] for i, s in enumerate(sp, 1)])
+                if walk:
+                    rw = m.run_walk(stream, walk)
+                    L += ["", "Jalan kaki (kecepatan ≤ %s m/s): %s · cadence saat lari %s spm" % (num(walk), hms(rw["walk_s"]), round(rw["cad_run"]) if rw["cad_run"] else "–")]
                 if len(z) > 3:
                     zt, tt = [0] * 5, 0
                     for s in sp:

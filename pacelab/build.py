@@ -89,24 +89,34 @@ def athlete_data(a, data_dir, today):
         "last_done_ms": last_done["ms"] if last_done else None,
         "sync": _read(folder / "state.json", {}).get("last_sync"),
         "run_days": _run_days(in_program),
-        "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None)) for r in in_program],
+        "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None), (a.get("coach") or {}).get("walk_mps"))
+                     for r in in_program],
     }
 
 
 LAP_TRIG = {"distance": "a", "manual": "m", "session_end": "e", "time": "t", "position": "p"}
 
 
-def _session(r, stream, laps=None):
+def _session(r, stream, laps=None, walk=None):
     """One run for the Sesi tab: totals, the watch's laps (from its FIT file), per-km splits and (for runs of
     10 km or more) decoupling. "g" holds the run summary exactly as Garmin reports it."""
     s = {"id": r["id"], "date": r["date"], "time": (r.get("start") or "")[11:16], "km": round(r["km"], 2),
          "sec": round(r["sec"]), "hr": r.get("avg_hr"), "splits": [], "dec": None, "dec_full": None,
          "g": r.get("g") or {}, "name": r.get("name"),
-         # [km, seconds (timer), mean HR, mean cadence, trigger a=auto-lap distance m=manual e=end t=time p=position w=other]
+         # [km, seconds (timer), mean HR, mean cadence, trigger a=auto-lap distance m=manual e=end t=time p=position w=other,
+         #  walking seconds (added below when there is per-second data)]
          "laps": [[l["km"], l["sec"], l.get("hr"), l.get("cad"), LAP_TRIG.get(l.get("trigger"), "w")]
                   for l in (laps or {}).get("laps", []) if l.get("km") is not None and l.get("sec")]}
     if stream:
-        s["splits"] = m.per_km(stream)
+        s["splits"] = m.per_km(stream, walk)      # [km, s, HR, cadence (running only with walk), elevation, walking s]
+        if walk:
+            s.update(m.run_walk(stream, walk))
+            if s["laps"]:                     # walking per lap: lap edges in timer time = running sums of lap times
+                edges = [0.0]
+                for l in s["laps"]:
+                    edges.append(edges[-1] + l[1])
+                for l, w in zip(s["laps"], m.walk_in(stream, walk, edges)):
+                    l.append(w)
         if r["km"] >= m.LONG_RUN_MIN_KM:
             dd = m.decoupling_detail(stream)
             if dd:

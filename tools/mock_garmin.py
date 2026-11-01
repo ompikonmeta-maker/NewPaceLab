@@ -94,9 +94,12 @@ class Athlete:
         while d < total:
             frac = d / total
             hard = tempo and 2500 <= d < 5500           # a tempo block after warm-up and strides
-            v = 1000 / (pace * (.8 if hard else 1) * (1 + rnd.uniform(-.03, .03)))
+            walking = km >= 14 and d > 4000 and d % 5000 < 70    # long runs: a short walk every 5 km (drink)
+            v = 1.15 if walking else 1000 / (pace * (.8 if hard else 1) * (1 + rnd.uniform(-.03, .03)))
             h = self.p["hr"] * (1.12 if race or hard else 1) * (1 + drift * frac) + rnd.uniform(-2, 2)
             cad = (172 if self.p["hr"] > 145 else 168) + rnd.uniform(-2, 2) - (5 * frac if km >= 15 else 1 * frac)
+            if walking:
+                cad = 112 + rnd.uniform(-3, 3)
             ele = 15 + 8 * math.sin(d / 1700.0) + 4 * math.sin(d / 430.0)
             rows.append([t, round(d, 1), round(h), round(v, 3), round(cad), round(ele, 1)])
             t += step

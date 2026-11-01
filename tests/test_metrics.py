@@ -76,6 +76,20 @@ class StreamTest(unittest.TestCase):
         self.assertAlmostEqual(k[-1][0], .5, delta=.01)
         self.assertEqual(m.per_km(stream(540, 1.2))[-1][0], 1.0)  # 200 m tail dropped
 
+    def test_walking_left_out_of_cadence(self):
+        run, walk = stream(360, 2), stream(1000 / 1.0, .12)          # 2 km at 6:00/km, then 2 min walking at 1 m/s
+        t0, d0 = run["t"][-1], run["d"][-1]
+        s = {"t": run["t"] + [t0 + t for t in walk["t"][1:]], "d": run["d"] + [d0 + d for d in walk["d"][1:]]}
+        s["hr"] = [140] * len(s["t"])
+        s["cad"] = [170] * len(run["t"]) + [110] * (len(walk["t"]) - 1)
+        rw = m.run_walk(s, 1.5)
+        self.assertAlmostEqual(rw["walk_s"], 120, delta=12)
+        self.assertAlmostEqual(rw["cad_run"], 170, delta=1)            # the walking steps do not pull it down
+        k = m.per_km(s, 1.5)
+        self.assertEqual(k[0][5], 0)
+        self.assertEqual(k[1][3], 170)
+        self.assertEqual(m.per_km(s)[0][5], 0)                         # without a threshold nothing is walking
+
     def test_decoupling_filters_records(self):
         s = stream(540, 15, hr=lambda t: 70 if t < 1000 else 150)  # HR <= 80 is dropped
         self.assertAlmostEqual(m.decoupling(s), 0.0, delta=0.2)

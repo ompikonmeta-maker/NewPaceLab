@@ -49,31 +49,79 @@ def best_effort(stream, dist_m):
     return best
 
 
-def per_km(stream):
-    """Splits per kilometre from a per-second stream: [km length, seconds, mean HR, mean cadence, elevation at the end].
-    HR and cadence are time-weighted; a last part shorter than 300 m is dropped."""
+def _speeds(t, x):
+    """Speed (m/s) at each sample, smoothed over +-2 samples so GPS jitter does not look like walking."""
+    n, out = min(len(t), len(x)), []
+    for i in range(n):
+        a, b = max(0, i - 2), min(n - 1, i + 2)
+        out.append((x[b] - x[a]) / (t[b] - t[a]) if t[b] > t[a] else None)
+    return out
+
+
+def per_km(stream, walk=None):
+    """Splits per kilometre from a per-second stream:
+    [km length, seconds, mean HR, mean cadence, elevation at the end, walking seconds].
+    HR and cadence are time-weighted. With walk (m/s), samples at or below that speed count as walking
+    and are left out of the cadence (running cadence only). A last part shorter than 300 m is dropped."""
     t, x, hr = stream.get("t") or [], stream.get("d") or [], stream.get("hr") or []
     cad, el = stream.get("cad") or [], stream.get("el") or []
-    out, k, t0, x0, acc = [], 1, t[0] if t else 0, x[0] if x else 0, [0.0, 0.0, 0.0, 0.0]  # hr*dt, dt(hr), cad*dt, dt(cad)
+    v = _speeds(t, x) if walk else []
+    out, k, t0, x0, acc = [], 1, t[0] if t else 0, x[0] if x else 0, [0.0, 0.0, 0.0, 0.0, 0.0]  # hr*dt, dt(hr), cad*dt, dt(cad), walk dt
 
     def close(i):
         h = round(acc[0] / acc[1]) if acc[1] else None
         c = round(acc[2] / acc[3]) if acc[3] else None
         e = el[i] if i < len(el) else None
-        out.append([round((x[i] - x0) / 1000, 3), round(t[i] - t0), h, c, None if e is None else round(e)])
+        out.append([round((x[i] - x0) / 1000, 3), round(t[i] - t0), h, c, None if e is None else round(e), round(acc[4])])
     for i in range(1, min(len(t), len(x))):
         dtt = t[i] - t[i - 1]
         if 0 < dtt <= 30:
+            walking = walk is not None and v[i] is not None and v[i] <= walk
+            if walking:
+                acc[4] += dtt
             if i < len(hr) and hr[i]:
                 acc[0] += hr[i] * dtt; acc[1] += dtt
-            if i < len(cad) and cad[i]:
+            if i < len(cad) and cad[i] and not walking:
                 acc[2] += cad[i] * dtt; acc[3] += dtt
         if x[i] >= k * 1000:
             close(i)
-            k, t0, x0, acc = k + 1, t[i], x[i], [0.0, 0.0, 0.0, 0.0]
+            k, t0, x0, acc = k + 1, t[i], x[i], [0.0, 0.0, 0.0, 0.0, 0.0]
     if len(t) > 1 and x[-1] - x0 >= 300:
         close(len(t) - 1)
     return out
+
+
+def walk_in(stream, walk, edges):
+    """Walking seconds inside each [edges[i], edges[i+1]) of timer time (lap boundaries = running sums of lap times)."""
+    t, x = stream.get("t") or [], stream.get("d") or []
+    v = _speeds(t, x)
+    out, j = [0.0] * (len(edges) - 1), 0
+    for i in range(1, min(len(t), len(x))):
+        dtt = t[i] - t[i - 1]
+        if not 0 < dtt <= 30 or v[i] is None or v[i] > walk:
+            continue
+        while j < len(out) - 1 and t[i] > edges[j + 1]:
+            j += 1
+        if edges[0] <= t[i] <= edges[-1] + 1:
+            out[j] += dtt
+    return [round(w) for w in out]
+
+
+def run_walk(stream, walk):
+    """{"cad_run": time-weighted cadence while running (speed > walk), "walk_s": seconds at or below walk}."""
+    t, x, cad = stream.get("t") or [], stream.get("d") or [], stream.get("cad") or []
+    v = _speeds(t, x)
+    c = w = ws = 0.0
+    for i in range(1, min(len(t), len(x))):
+        dtt = t[i] - t[i - 1]
+        if not 0 < dtt <= 30:
+            continue
+        if v[i] is not None and v[i] <= walk:
+            ws += dtt
+        elif i < len(cad) and cad[i]:
+            c += cad[i] * dtt
+            w += dtt
+    return {"cad_run": round(c / w, 1) if w else None, "walk_s": round(ws)}
 
 
 DEC_SKIP_M = 3000      # the rated version leaves out the first 3 km (docs/RUMUS-BATAS-SUMBER.md §6)
