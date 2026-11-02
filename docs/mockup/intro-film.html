@@ -1,0 +1,344 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: film intro PaceLab Duo</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--dark:#0d0d0c;--ease:cubic-bezier(.22,1,.36,1)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1100px;margin:0 auto;padding:24px 16px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:30px 0 8px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+
+/* the 16:9 film; drawn on a fixed 1280 x 720 canvas and scaled to fit */
+.frame{position:relative;width:100%;aspect-ratio:16/9;border-radius:18px;overflow:hidden;background:var(--dark);box-shadow:0 20px 60px rgba(0,0,0,.18)}
+#st{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;font-family:"Segoe UI",Roboto,system-ui,sans-serif}
+.layer{position:absolute;inset:0;overflow:hidden}
+.ab{position:absolute}
+.skip{position:absolute;right:22px;top:16px;z-index:20;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.25);color:#fff;font:inherit;font-size:15px;border-radius:999px;padding:5px 14px;cursor:pointer;backdrop-filter:blur(6px)}
+.skip.lt{border-color:var(--line);background:rgba(255,255,255,.6);color:var(--text-2)}
+
+/* the two runners: the main characters (same icon as the dashboard) */
+.rn{position:absolute;left:0;top:0;z-index:12;pointer-events:none}
+.ry{position:absolute;left:0;top:0;transform-origin:0 0}
+.bx{position:absolute;left:-30px;top:-60px;width:60px;height:60px}
+.bx svg.ic{position:absolute;inset:0;width:60px;height:60px;overflow:visible}
+.rn.t .ic{fill:var(--t)} .rn.r .ic{fill:var(--r)}
+.rn.go .ic{animation:bob .3s ease-in-out infinite alternate} .rn.r.go .ic{animation-delay:-.15s}
+@keyframes bob{from{transform:translateY(0) rotate(0)}to{transform:translateY(-6px) rotate(-5deg)}}
+.rn.idle .ic{animation:breathe 1.6s ease-in-out infinite alternate} @keyframes breathe{to{transform:scaleY(.96) translateY(1px)}}
+.wind{position:absolute;left:-18px;top:16px;width:20px;height:30px;opacity:0;transition:opacity .25s}
+.rn.go .wind{opacity:.7} .wind i{position:absolute;height:3px;border-radius:2px;background:currentColor;animation:wd .35s linear infinite alternate}
+.rn.t .wind{color:var(--t)} .rn.r .wind{color:var(--r)}
+.wind i:nth-child(1){top:0;left:6px;width:12px}.wind i:nth-child(2){top:10px;left:0;width:16px;animation-delay:-.1s}.wind i:nth-child(3){top:20px;left:4px;width:12px;animation-delay:-.2s}
+@keyframes wd{to{transform:translateX(-5px);opacity:.4}}
+.trail{position:absolute;right:46px;top:32px;height:7px;width:0;border-radius:4px;filter:blur(.6px)}
+.rn.t .trail{background:linear-gradient(90deg,transparent,var(--t));box-shadow:0 0 18px color-mix(in srgb,var(--t) 60%,transparent)}
+.rn.r .trail{background:linear-gradient(90deg,transparent,var(--r));box-shadow:0 0 18px color-mix(in srgb,var(--r) 60%,transparent)}
+
+/* kinetic type */
+.cap{position:absolute;line-height:1.08}
+.cap .ln{display:block;white-space:nowrap} .w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+.w > span{display:inline-block;transform:translateY(110%)}
+.chip{position:absolute;border-radius:999px;padding:6px 16px;font-size:17px;font-weight:600;white-space:nowrap;background:var(--surface);border:1px solid var(--line);color:var(--text)}
+
+/* wipe between scenes */
+#wipe{position:absolute;left:0;top:-200px;width:2600px;height:1120px;z-index:10;transform:translateX(-2800px) skewX(-18deg);pointer-events:none;
+  background:linear-gradient(90deg,var(--t) 0 30%,var(--dark) 30% 70%,var(--r) 70%)}
+
+/* controls */
+.ctrl{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:12px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:6px 12px;font:inherit;font-size:13px;cursor:pointer}
+.btn[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.chs{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-top:10px}
+.chs button{border:0;background:none;padding:0;text-align:left;cursor:pointer;font:inherit;color:var(--muted);font-size:12px}
+.chs button i{display:block;height:4px;border-radius:2px;background:var(--line);overflow:hidden;margin-bottom:4px} .chs button i b{display:block;height:100%;width:0;background:var(--text)}
+.chs button.on{color:var(--text);font-weight:600}
+.tw{overflow-x:auto} table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top} th{color:var(--muted);font-weight:600}
+ul{padding-left:20px;font-size:14px;color:var(--text-2)} li{margin:3px 0} li b{color:var(--text)}
+@media (max-width:640px){.chs{grid-template-columns:repeat(4,1fr)}}
+</style></head><body><div class="wrap">
+<h1>Mockup: film intro “PaceLab Duo · Road to 42K”</h1>
+<p class="sub">Data rekaan (demo). ±40 detik, 7 babak. Tokoh utama: dua ikon pelari dari dashboard. Semua digambar dengan kode (SVG/CSS), tanpa video, tanpa internet. Klik babak di bawah untuk lompat.</p>
+<div class="frame" id="frame"><div id="st"><div id="wipe"></div></div></div>
+<div class="chs" id="chs"></div>
+<div class="ctrl"><button class="btn" id="pp">❚❚ Jeda</button><button class="btn" id="rp">↺ Ulang</button><button class="btn" id="spd" aria-pressed="false">0,5× lambat</button><button class="btn" id="snd" aria-pressed="false">♪ Suara</button></div>
+
+<h2>Alur cerita</h2>
+<div class="tw"><table>
+<thead><tr><th>Babak</th><th>Detik</th><th>Yang dilakukan pelari</th><th>Yang diperkenalkan</th></tr></thead>
+<tbody>
+<tr><td><b>1 Mulai</b></td><td>0–4,5</td><td>Berlari kencang di kegelapan, jejak cahaya biru dan oranye</td><td>“42K dimulai jauh sebelum garis start.”</td></tr>
+<tr><td><b>2 Tujuan</b></td><td>4,5–10</td><td>Lantai berubah jadi garis program; berlari sampai “hari ini”; tonggak lomba muncul di depan</td><td>Hitung mundur 223 hari, 10K · Half · Tes 10K · 42K</td></tr>
+<tr><td><b>3 Rencana</b></td><td>10–15,5</td><td>Melompat dari batang ke batang minggu, mendarat di minggu 20</td><td>51 minggu, 9 fase, target km dari Excel pelatih</td></tr>
+<tr><td><b>4 Pagi</b></td><td>15,5–21</td><td>Berpisah: masing-masing berdiri di kartunya, “bangun pagi”</td><td>Tidur, HRV, Body Battery → lampu Hijau / Kuning</td></tr>
+<tr><td><b>5 Duel sesi</b></td><td>21–27</td><td>Berlari di atas sumbu, lap tumbuh ke kiri dan kanan</td><td>Lap jam (FIT), jalan kaki diarsir, penilaian pelatih, kepatuhan</td></tr>
+<tr><td><b>6 Progres</b></td><td>27–32,5</td><td>Berlari di atas garis progres masing-masing</td><td>Progres terbaik 5K, estimasi maraton vs target</td></tr>
+<tr><td><b>7 42K</b></td><td>32,5–40</td><td>Berlari menuju gerbang 42K yang mendekat (belum sampai)</td><td>Nama, empat fitur utama, “Masuk dashboard”</td></tr>
+</tbody></table></div>
+
+<h2>Di dashboard nanti</h2>
+<ul>
+<li><b>Angka asli:</b> hari lagi, minggu, tonggak lomba, lampu pagi, lap, estimasi diambil dari data saat itu (bukan rekaman).</li>
+<li><b>Kapan diputar:</b> pertama kali file dibuka di browser itu, dan kapan saja lewat tombol “▶ Tentang PaceLab Duo” di footer.</li>
+<li><b>Selalu bisa dilewati</b> (tombol, klik, Esc). Babak bisa diloncati. Suara mati sampai dinyalakan (browser memblokir suara otomatis).</li>
+<li><b>Kurangi gerakan</b> (pengaturan Windows): tampil sebagai 7 kartu diam yang bisa digeser.</li>
+<li><b>HP:</b> film 16:9 mengecil; versi tegak (9:16) bisa dibuat terpisah kalau perlu.</li>
+</ul>
+</div>
+<script>
+const $ = id => document.getElementById(id), st = $("st"), E = "cubic-bezier(.22,1,.36,1)", OUT = "cubic-bezier(.16,1,.3,1)", INOUT = "cubic-bezier(.65,0,.35,1)";
+const RUNP = '<path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/>';
+const fit = () => st.style.transform = `scale(${$("frame").clientWidth / 1280})`; addEventListener("resize", fit); fit();
+
+// ------------------------------------------------ clock: film time drives callbacks, counters and the chapter bar (pause / seek / slow-mo safe)
+let t = 0, rate = 1, playing = true, last = performance.now(), cur = -1, base = 0, Q = [], TK = [], LAYER = null, PAUSED = [];
+const A = (el, kf, o) => { const a = el.animate(kf, o); a.playbackRate = rate; return a; };
+const at = (ms, fn) => Q.push({t: base + ms, fn});
+const ticker = fn => TK.push(fn);
+const mk = (p, cls, css, html) => { const e = document.createElement("div"); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; p.appendChild(e); return e; };
+const pop = (e, d = 0, from = .6, ms = 520) => A(e, [{opacity: 0, transform: `scale(${from})`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "both"});
+const rise = (e, d = 0, dy = 24, ms = 600) => A(e, [{opacity: 0, transform: `translateY(${dy}px)`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: OUT, fill: "both"});
+const fade = (e, d = 0, ms = 400, to = 0) => A(e, [{opacity: getComputedStyle(e).opacity}, {opacity: to}], {duration: ms, delay: d, easing: "ease", fill: "forwards"});
+function count(e, to, ms, fmt, d = 0) { const s0 = base + d; ticker(T => { if (T < s0) return; const k = Math.min(1, (T - s0) / ms), v = to * (1 - Math.pow(1 - k, 3)); e.textContent = fmt(v, k); return k < 1; }); }
+// kinetic caption: lines of words sliding up out of a mask
+function cap(L, lines, x, y, d = 0, o = {}) { const c = mk(L, "cap", `left:${x}px;top:${y}px;${o.align ? "text-align:" + o.align + ";transform:translateX(-50%)" : ""}`);
+  let k = 0; lines.forEach(([txt, size, weight, color]) => { const ln = mk(c, "ln", `font-size:${size}px;font-weight:${weight};color:${color};letter-spacing:${size > 40 ? "-.02em" : "0"}`);
+    txt.split(" ").forEach(w => { const s = document.createElement("span"); s.className = "w"; s.innerHTML = `<span>${w}</span>`; ln.appendChild(s); ln.appendChild(document.createTextNode(" "));
+      A(s.firstChild, [{transform: "translateY(110%)"}, {transform: "none"}], {duration: 650, delay: d + k++ * 45, easing: OUT, fill: "both"}); }); });
+  return c; }
+
+// ------------------------------------------------ sound (off until switched on): tiny synth, no files
+let AC = null, SND = false;
+function sfx(k) { if (!SND || !AC) return; const n = AC.currentTime, g = AC.createGain(); g.connect(AC.destination);
+  if (k === "noise") { const b = AC.createBuffer(1, AC.sampleRate * .6, AC.sampleRate), d = b.getChannelData(0); for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    const s = AC.createBufferSource(), f = AC.createBiquadFilter(); s.buffer = b; f.type = "bandpass"; f.Q.value = 1.2; f.frequency.setValueAtTime(300, n); f.frequency.exponentialRampToValueAtTime(3500, n + .5);
+    g.gain.setValueAtTime(0, n); g.gain.linearRampToValueAtTime(.18, n + .25); g.gain.linearRampToValueAtTime(0, n + .6); s.connect(f); f.connect(g); s.start(n); return; }
+  const o = AC.createOscillator(); o.connect(g);
+  if (k === "thump") { o.type = "sine"; o.frequency.setValueAtTime(140, n); o.frequency.exponentialRampToValueAtTime(42, n + .3); g.gain.setValueAtTime(.55, n); g.gain.exponentialRampToValueAtTime(.001, n + .4); o.start(n); o.stop(n + .42); }
+  if (k === "tick") { o.type = "triangle"; o.frequency.setValueAtTime(1500, n); g.gain.setValueAtTime(.07, n); g.gain.exponentialRampToValueAtTime(.001, n + .06); o.start(n); o.stop(n + .07); }
+  if (k === "pop") { o.type = "sine"; o.frequency.setValueAtTime(520, n); o.frequency.exponentialRampToValueAtTime(980, n + .08); g.gain.setValueAtTime(.09, n); g.gain.exponentialRampToValueAtTime(.001, n + .14); o.start(n); o.stop(n + .15); } }
+const whoosh = () => sfx("noise");
+
+// ------------------------------------------------ the runners
+const R = {}, P = {};
+["t", "r"].forEach(c => { const e = mk(st, "rn " + c); e.innerHTML = `<div class="ry"><div class="bx"><i class="trail"></i><span class="wind"><i></i><i></i><i></i></span><svg class="ic" viewBox="0 0 24 24">${RUNP}</svg></div></div>`; R[c] = e; P[c] = {x: -200, y: 400, s: 1}; });
+function go(c, x, y, s = 1, ms = 0, o = {}) { const e = R[c], ry = e.firstElementChild, a = P[c], X = `translateX(${x}px)`, Y = `translateY(${y}px) scale(${s})`;
+  [e._a, ry._a].forEach(q => q && q.cancel()); e.style.transform = X; ry.style.transform = Y; P[c] = {x, y, s}; if (!ms) return;
+  const d = o.delay || 0;
+  e._a = A(e, [{transform: `translateX(${a.x}px)`}, {transform: X}], {duration: ms, delay: d, easing: o.arc ? "linear" : (o.ease || E), fill: "both"});
+  ry._a = A(ry, o.arc ? [{transform: `translateY(${a.y}px) scale(${a.s})`, easing: "cubic-bezier(.33,.66,.6,1)"}, {transform: `translateY(${Math.min(a.y, y) - o.arc}px) scale(${(a.s + s) / 2})`, offset: .5, easing: "cubic-bezier(.4,0,.67,.34)"}, {transform: Y}]
+    : [{transform: `translateY(${a.y}px) scale(${a.s})`}, {transform: Y}], {duration: ms, delay: d, easing: o.arc ? "linear" : (o.ease || E), fill: "both"});
+  if (o.arc) Q.push({t: t + d + ms, fn: () => sfx("tick")}); }
+const pair = (x, y, s = 1, ms = 0, o = {}) => { go("t", x - 20 * s, y, s, ms, o); go("r", x + 20 * s, y, s, ms, Object.assign({}, o, {delay: (o.delay || 0) + (o.lag || 0)})); };
+const run = on => ["t", "r"].forEach(c => { R[c].classList.toggle("go", on); R[c].classList.remove("idle"); });
+const idle = () => ["t", "r"].forEach(c => { R[c].classList.remove("go"); R[c].classList.add("idle"); });
+const trail = (w, ms, d = 0) => ["t", "r"].forEach(c => { const tr = R[c].querySelector(".trail"); A(tr, [{width: getComputedStyle(tr).width}, {width: w + "px"}], {duration: ms, delay: d, easing: E, fill: "forwards"}); });
+const show = (on, ms = 300) => ["t", "r"].forEach(c => A(R[c], [{opacity: getComputedStyle(R[c]).opacity}, {opacity: on ? 1 : 0}], {duration: ms, fill: "forwards"}));
+
+// ------------------------------------------------ data (demo)
+const DAYS = 223, WEEK = 20, NW = 51, X0 = 120, TW = 1040, XW = w => X0 + TW * w / NW;
+const PH = [["Awal", 1, 6], ["Base", 7, 15], ["Support", 16, 21], ["Build", 22, 31], ["Absorb", 32, 33], ["Ramadan", 34, 38], ["Rebuild", 39, 42], ["Marathon", 43, 48], ["Taper", 49, 51]];
+const DOWN = new Set([10, 14, 21, 25, 29, 34, 35, 36, 37, 38, 46, 49, 50]);
+const KM = i => { const w = i + 1; let k = Math.min(56, 22 + w * .7) * (DOWN.has(w) ? .7 : 1); if (w > 48) k *= .6; return k; };
+const BH = (i, c) => KM(i) * (c === "r" ? .94 + (i % 3) * .03 : 1) / 58 * 210;
+
+// ------------------------------------------------ scenes
+const SC = [
+{n: "Mulai", dur: 4500, run(L) {
+  L.style.background = "var(--dark)";
+  const g42 = mk(L, "ab", "left:560px;top:40px;font-size:430px;font-weight:900;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.07);white-space:nowrap", "42K");
+  A(g42, [{transform: "translateX(120px)"}, {transform: "translateX(-260px)"}], {duration: 4500, easing: "linear", fill: "both"});
+  for (let i = 0; i < 9; i++) { const s = mk(L, "ab", `left:0;top:${70 + i * 44}px;height:${i % 3 ? 1 : 2}px;width:${180 + (i * 97) % 340}px;background:linear-gradient(90deg,transparent,rgba(255,255,255,${.1 + (i % 4) * .05}))`);
+    A(s, [{transform: "translateX(1400px)"}, {transform: "translateX(-600px)"}], {duration: 650 + (i * 131) % 600, delay: -(i * 173) % 900, iterations: Infinity, easing: "linear"}); }
+  const gnd = mk(L, "ab", "left:0;top:470px;width:1280px;height:2px;background:rgba(255,255,255,.28)");
+  const dsh = mk(L, "ab", "left:0;top:484px;width:2560px;height:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.3) 0 46px,transparent 46px 128px)");
+  A(dsh, [{transform: "translateX(0)"}, {transform: "translateX(-1280px)"}], {duration: 700, iterations: Infinity, easing: "linear"});
+  go("t", -160, 470, 2.3); go("r", -90, 470, 2.3); run(true);
+  go("t", 470, 470, 2.3, 1200, {ease: OUT}); go("r", 590, 470, 2.3, 1200, {ease: OUT, delay: 120}); trail(420, 1000, 150);
+  at(0, () => sfx("thump")); at(150, whoosh);
+  const c = cap(L, [["42K dimulai", 76, 900, "#fff"], ["jauh sebelum garis start.", 46, 600, "rgba(255,255,255,.75)"]], 80, 110, 1300);
+  at(1300, () => sfx("thump"));
+  at(3500, () => { fade(c, 0, 300); fade(g42, 0, 500); L.querySelectorAll(".ab").forEach(e => e !== gnd && e !== dsh && fade(e, 0, 400));
+    A(L, [{backgroundColor: "#0d0d0c"}, {backgroundColor: "#f3f3f1"}], {duration: 800, easing: INOUT, fill: "forwards"});
+    A(gnd, [{top: "470px", background: "rgba(255,255,255,.28)", height: "2px", left: "0px", width: "1280px"}, {top: "376px", background: "#ebeae6", height: "8px", left: "120px", width: "1040px"}], {duration: 900, easing: INOUT, fill: "forwards"});
+    fade(dsh, 0, 300); trail(0, 700); go("t", X0 - 30, 374, 1.15, 900, {ease: INOUT}); go("r", X0 + 6, 374, 1.15, 900, {ease: INOUT}); whoosh(); }); } },
+
+{n: "Tujuan", dur: 5500, run(L) {
+  L.style.background = "var(--bg)"; go("t", X0 - 30, 374, 1.15); go("r", X0 + 6, 374, 1.15); run(true);
+  const trk = mk(L, "ab", `left:${X0}px;top:376px;width:${TW}px;height:8px;border-radius:4px;background:var(--grid)`);
+  const today = XW(WEEK - .9), fill = mk(L, "ab", `left:${X0}px;top:376px;height:8px;width:0;border-radius:4px;background:linear-gradient(90deg,var(--t),var(--r))`);
+  mk(L, "ab", `left:${X0}px;top:376px;width:${TW}px;height:8px;background:repeating-linear-gradient(90deg,transparent 0 ${TW / NW - 2}px,var(--bg) ${TW / NW - 2}px ${TW / NW}px)`);
+  A(fill, [{width: "0px"}, {width: today - X0 + "px"}], {duration: 1800, easing: INOUT, fill: "both"});
+  go("t", today - 30, 374, 1.15, 1800, {ease: INOUT}); go("r", today + 6, 374, 1.15, 1800, {ease: INOUT});
+  at(1800, () => { idle(); sfx("thump"); });
+  const hc = mk(L, "chip", `left:${today - 70}px;top:400px;font-size:14px;background:var(--text);color:var(--surface);border:0`, "Hari ini · 2 Nov"); pop(hc, 1700);
+  [["Tes 5K", "10 Okt", 15.7], ["10K", "7 Nov", 19.7], ["Half", "23 Jan", 30.7], ["Tes 10K", "10 Apr", 41.7], ["42K", "13 Jun 2027", 51]].forEach(([n, d, w], i) => {
+    const big = n === "42K", x = XW(w), post = mk(L, "ab", `left:${x - 1.5}px;top:${big ? 312 : 342}px;width:3px;height:${big ? 64 : 34}px;background:var(--text);border-radius:2px;transform-origin:bottom`);
+    const lb = mk(L, "ab", `left:${x}px;top:${big ? 250 : 290}px;transform:translateX(-50%);text-align:center;white-space:nowrap;font-size:${big ? 30 : 16}px;font-weight:800;line-height:1.1`, `${n}<div style="font-size:${big ? 15 : 13}px;font-weight:500;color:var(--muted)">${d}</div>`);
+    const dl = 700 + i * 300; A(post, [{transform: "scaleY(0)"}, {transform: "none"}], {duration: 420, delay: dl, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "both"});
+    A(lb, [{opacity: 0, transform: "translate(-50%,14px)"}, {opacity: 1, transform: "translate(-50%,0)"}], {duration: 500, delay: dl + 60, easing: OUT, fill: "both"});
+    if (w < 19) A(post, [{background: "var(--text)"}, {background: "var(--muted)"}], {duration: 10, delay: dl + 400, fill: "forwards"});
+    at(dl, () => sfx("tick")); });
+  const eb = mk(L, "ab", "left:640px;top:58px;transform:translateX(-50%);font-size:18px;color:var(--muted);white-space:nowrap", "Maraton · Minggu, 13 Juni 2027"); rise(eb, 1900, 12);
+  const n = mk(L, "ab num", "left:640px;top:84px;transform:translateX(-50%);font-size:150px;font-weight:900;letter-spacing:-.05em;line-height:1", "0"); rise(n, 1900, 30);
+  const hl = mk(L, "ab", "left:640px;top:236px;transform:translateX(-50%);font-size:24px;color:var(--text-2);white-space:nowrap", "hari lagi"); rise(hl, 2100, 12);
+  count(n, DAYS, 1500, v => Math.round(v), 1900); at(3400, () => sfx("thump"));
+  cap(L, [["Satu tujuan.", 46, 900, "var(--text)"], ["Perjalanan 51 minggu yang terukur.", 24, 500, "var(--muted)"]], X0, 500, 2600);
+  at(4700, () => { [...L.children].forEach(e => A(e, [{opacity: 1, transform: getComputedStyle(e).transform === "none" ? "none" : getComputedStyle(e).transform}, {opacity: 0, transform: (getComputedStyle(e).transform === "none" ? "" : getComputedStyle(e).transform) + " translateY(-40px)"}], {duration: 600, easing: INOUT, fill: "forwards"}));
+    run(true); go("t", 108, 560, 1, 750, {arc: 60}); go("r", 140, 560, 1, 750, {arc: 60, delay: 60}); whoosh(); }); } },
+
+{n: "Rencana", dur: 5500, run(L) {
+  L.style.background = "var(--bg)"; go("t", 108, 560, 1); go("r", 140, 560, 1); idle();
+  const B = 560, ww = TW / NW, bars = [];
+  for (let i = 0; i < NW; i++) ["t", "r"].forEach((c, j) => { const done = i < WEEK - 1, now = i === WEEK - 1, h = BH(i, c);
+    const b = mk(L, "ab", `left:${X0 + i * ww + 2 + j * (ww / 2 - 1)}px;top:${B - h}px;width:${ww / 2 - 3}px;height:${h}px;border-radius:3px 3px 0 0;transform-origin:bottom;
+      background:${now ? `var(--${c})` : `color-mix(in srgb,var(--${c}) ${done ? 72 : 20}%,var(--surface))`}`);
+    A(b, [{transform: "scaleY(0)"}, {transform: "none"}], {duration: 560, delay: 120 + i * 16, easing: "cubic-bezier(.34,1.4,.64,1)", fill: "both"}); bars.push([i, b]); });
+  PH.forEach(([n, a, z], j) => { const x1 = X0 + (a - 1) * ww + 2, w = (z - a + 1) * ww - 4, cur = n === "Support", done = z < WEEK - 1;
+    const s = mk(L, "ab", `left:${x1}px;top:${B + 8}px;width:${w}px;height:16px`, `<svg width="${w}" height="16" style="overflow:visible"><path d="M1 0 V6 Q1 12 7 12 H${w - 7} Q${w - 1} 12 ${w - 1} 6 V0" fill="none" stroke="${cur ? "var(--text)" : "var(--line)"}" stroke-width="${cur ? 2 : 1.5}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`);
+    A(s.querySelector("path"), [{strokeDashoffset: 1}, {strokeDashoffset: 0}], {duration: 500, delay: 900 + j * 110, easing: OUT, fill: "both"});
+    const lb = mk(L, "ab", `left:${x1 + w / 2}px;top:${B + 28}px;transform:translateX(-50%);font-size:${cur ? 15 : 13}px;font-weight:${cur ? 800 : 500};color:${cur ? "var(--text)" : "var(--muted)"};white-space:nowrap`, (done ? '<span style="color:var(--good)">✓ </span>' : "") + n);
+    A(lb, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 1000 + j * 110, fill: "both"}); });
+  // hop along the bar tops to this week
+  const top = i => B - Math.max(BH(i, "t"), BH(i, "r")) - 2, cx = i => X0 + i * ww + ww / 2;
+  run(true); [3, 8, 13, 19].forEach((i, k) => { const d = 1000 + k * 430; at(d, () => { go("t", cx(i) - 16, top(i), 1, 400, {arc: 70}); go("r", cx(i) + 14, top(i), 1, 400, {arc: 70, delay: 50}); }); });
+  at(2750, () => { idle(); sfx("thump"); bars.filter(([i]) => i === WEEK - 1).forEach(([, b]) => A(b, [{translate: "0 0"}, {translate: "0 -12px"}], {duration: 400, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "forwards"}));
+    go("t", cx(WEEK - 1) - 16, top(WEEK - 1) - 12, 1, 400); go("r", cx(WEEK - 1) + 14, top(WEEK - 1) - 12, 1, 400); });
+  const bx = mk(L, "ab", `left:${X0 + 15 * ww - 4}px;top:${B - 262}px;width:${6 * ww + 8}px;height:${262 + 50}px;border:2px solid var(--text);border-radius:14px`); pop(bx, 2800, .96, 500);
+  const ch = mk(L, "chip", `left:${X0 + 18 * ww}px;top:${B - 306}px;transform:translateX(-50%);font-size:16px`, "<b>Minggu 20</b> dari 51 · fase Support"); A(ch, [{opacity: 0, transform: "translate(-50%,10px)"}, {opacity: 1, transform: "translate(-50%,0)"}], {duration: 500, delay: 2900, easing: OUT, fill: "both"});
+  cap(L, [["51 minggu. 9 fase.", 46, 900, "var(--text)"], ["Rencana pelatih dari Excel: target km tiap minggu.", 22, 500, "var(--muted)"]], X0, 70, 400);
+  // tap the week, then it opens into the next scene
+  const tap = mk(L, "ab", `left:${cx(WEEK - 1) + 60}px;top:${B - 120}px;width:34px;height:34px;margin:-17px;border-radius:50%;border:2.5px solid var(--text);background:rgba(255,255,255,.5);opacity:0`);
+  at(4200, () => { A(tap, [{opacity: 0, transform: "translate(40px,40px)"}, {opacity: 1, transform: "none", offset: .6}, {opacity: 1, transform: "scale(.75)", offset: .8}, {opacity: 1, transform: "none"}], {duration: 650, easing: E, fill: "forwards"}); });
+  at(4750, () => { sfx("pop"); const o = mk(L, "ab", `left:${cx(WEEK - 1)}px;top:${B - 140}px;width:40px;height:40px;margin:-20px;border-radius:50%;background:var(--surface);z-index:5`);
+    A(o, [{transform: "scale(0)"}, {transform: "scale(64)"}], {duration: 750, easing: "cubic-bezier(.7,0,.84,0)", fill: "forwards"});
+    run(true); go("t", 615, 236, 1.1, 750, {arc: 90}); go("r", 665, 236, 1.1, 750, {arc: 90, delay: 40}); }); } },
+
+{n: "Pagi", dur: 5500, run(L) {
+  L.style.background = "var(--surface)"; go("t", 615, 236, 1.1); go("r", 665, 236, 1.1); run(true);
+  const card = (x, c, nm, rows, lamp, lc, note, d) => { const R2 = c === "t", k = mk(L, "ab", `left:${x}px;top:240px;width:460px;height:330px;border-radius:26px;background:var(--bg);padding:26px 30px;text-align:${R2 ? "right" : "left"}`);
+    rise(k, d, 40, 650);
+    mk(k, "", "font-size:26px;font-weight:800", R2 ? `${nm} <span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--t)"></span>` : `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--r)"></span> ${nm}`);
+    rows.forEach(([l, v, ok, bb], j) => { const r = mk(k, "", `display:flex;justify-content:space-between;flex-direction:${R2 ? "row-reverse" : "row"};align-items:center;margin-top:${j ? 10 : 18}px;font-size:18px;color:var(--text-2)`,
+      `<span>${l}</span><b style="color:${ok ? "var(--text)" : "var(--warn)"};font-size:22px" class="num">${v}${ok ? ' <span style="color:var(--good)">✓</span>' : ' <span>!</span>'}</b>`);
+      rise(r, d + 700 + j * 230, 14, 450); at(d + 700 + j * 230, () => sfx("tick"));
+      if (bb != null) { const bar = mk(k, "", `height:8px;border-radius:4px;background:var(--grid);margin-top:6px;overflow:hidden;direction:${R2 ? "rtl" : "ltr"}`, `<i style="display:block;height:100%;width:0;border-radius:4px;background:${ok ? "var(--good)" : "var(--warn)"}"></i>`);
+        A(bar.firstChild, [{width: "0%"}, {width: bb + "%"}], {duration: 900, delay: d + 1000 + j * 230, easing: E, fill: "both"}); } });
+    const lp = mk(k, "ab", `${R2 ? "right" : "left"}:30px;bottom:56px;font-size:30px;font-weight:900;letter-spacing:.06em;border-radius:999px;padding:6px 26px;background:var(--${lc}-bg);color:var(--${lc})`, lamp);
+    A(lp, [{opacity: 0, transform: "scale(2.4) rotate(-6deg)"}, {opacity: 1, transform: "scale(.94)", offset: .7}, {opacity: 1, transform: "none"}], {duration: 520, delay: d + 1900, easing: "cubic-bezier(.2,.8,.3,1)", fill: "both"});
+    at(d + 1900, () => sfx("thump"));
+    const nt = mk(k, "ab", `${R2 ? "right" : "left"}:32px;bottom:24px;font-size:16px;color:var(--text-2)`, note); rise(nt, d + 2200, 8, 400); };
+  card(140, "t", "Taofik", [["Tidur", "7 j 40 m", 1], ["HRV", "seimbang", 1], ["Body Battery", "79", 1, 79]], "HIJAU", "good", "Siap latihan sesuai rencana.", 0);
+  card(680, "r", "Reza", [["Tidur", "5 j 40 m", 0], ["HRV", "rendah", 0], ["Body Battery", "26", 0, 26]], "KUNING", "warn", "Latihan keras jadi easy.", 120);
+  at(150, () => { go("t", 540, 240, 1.1, 650, {arc: 80}); go("r", 740, 240, 1.1, 650, {arc: 80, delay: 60}); });
+  at(850, idle);
+  const vs = mk(L, "ab", "left:640px;top:390px;width:58px;height:58px;margin:-29px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center;font-weight:800;color:var(--muted);font-size:16px", "VS"); pop(vs, 600);
+  cap(L, [["Setiap pagi, satu pertanyaan:", 22, 500, "var(--muted)"], ["latihan keras, atau cukup easy?", 44, 900, "var(--text)"]], 640, 70, 200, {align: "center"});
+  // wipe out with the runners riding it
+  at(5050, () => { whoosh(); A($("wipe"), [{transform: "translateX(-2800px) skewX(-18deg)"}, {transform: "translateX(1500px) skewX(-18deg)"}], {duration: 900, easing: INOUT, fill: "none"});
+    run(true); go("t", 600, 128, 1, 900, {ease: INOUT}); go("r", 640, 128, 1, 900, {ease: INOUT}); }); } },
+
+{n: "Duel sesi", dur: 6000, run(L) {
+  L.style.background = "var(--bg)"; go("t", 600, 128, 1); go("r", 640, 128, 1); run(true); go("t", 618, 132, 1, 500); go("r", 662, 132, 1, 500);
+  const T = [300, 306, 300, 296, 238, 302, 298, 304, 290, 232], Rr = [250, 252, 248, 246, 196, 250, 244, 240, 236, 190], top = 150, h = 38;
+  mk(L, "ab", "left:278px;top:146px;width:44px;height:438px;border-radius:6px;background:color-mix(in srgb,var(--t) 12%,transparent)");
+  mk(L, "ab", "left:912px;top:146px;width:40px;height:438px;border-radius:6px;background:color-mix(in srgb,var(--r) 12%,transparent)");
+  mk(L, "ab", "left:639px;top:146px;width:2px;height:440px;background:var(--line)");
+  T.forEach((w, i) => { const y = top + i * (h + 6), d = 300 + i * 70;
+    const l = mk(L, "ab", `left:${600 - w}px;top:${y}px;width:${w}px;height:${h}px;border-radius:6px;background:var(--t);transform-origin:right;opacity:.92`);
+    const r = mk(L, "ab", `left:680px;top:${y}px;width:${Rr[i]}px;height:${h}px;border-radius:6px;background:var(--r);transform-origin:left;opacity:.92`);
+    [l, r].forEach(b => A(b, [{transform: "scaleX(0)"}, {transform: "none"}], {duration: 600, delay: d, easing: "cubic-bezier(.34,1.3,.64,1)", fill: "both"}));
+    const n = mk(L, "ab", `left:640px;top:${y + 9}px;transform:translateX(-50%);font-size:15px;color:var(--muted)`, i + 1); A(n, [{opacity: 0}, {opacity: 1}], {duration: 300, delay: d, fill: "both"});
+    mk(l, "ab", `left:12px;top:9px;font-size:15px;font-weight:700;color:#fff`, ["6:48", "6:50", "6:48", "6:50", "7:15", "6:48", "6:49", "6:48", "6:52", "7:23"][i]);
+    mk(r, "ab", `right:12px;top:9px;font-size:15px;font-weight:700;color:#fff`, ["8:04", "8:04", "8:05", "8:03", "8:20", "8:04", "8:06", "8:08", "8:10", "8:23"][i]);
+    if (i === 4 || i === 9) [[l, "right:0"], [r, "left:0"]].forEach(([b, side]) => { const hz = mk(b, "ab", `${side};top:0;bottom:0;width:46px;border-radius:6px;background:repeating-linear-gradient(135deg,var(--warn) 0 4px,rgba(255,255,255,.55) 4px 8px)`);
+      A(hz, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 1800, fill: "both"}); }); });
+  const tag = mk(L, "chip", "left:530px;top:612px;font-size:14px;color:var(--warn);border-color:var(--warn)", "▨ arsir = jalan kaki"); A(tag, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 1900, fill: "both"});
+  const ring = (x, c, v, d) => { const g = mk(L, "ab", `left:${x - 60}px;top:270px;width:120px;height:120px`, `<svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--grid)" stroke-width="10"/><circle cx="60" cy="60" r="50" fill="none" stroke="var(--${c})" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 60 60)"/></svg><b class="num" style="position:absolute;inset:0;display:grid;place-items:center;font-size:32px">0</b><div style="text-align:center;font-size:14px;color:var(--muted);margin-top:4px">patuh rencana</div>`);
+    pop(g, d); A(g.querySelectorAll("circle")[1], [{strokeDasharray: "0 100"}, {strokeDasharray: `${v} ${100 - v}`}], {duration: 1100, delay: d + 200, easing: E, fill: "both"}); count(g.querySelector("b"), v, 1100, q => Math.round(q), d + 200); };
+  ring(150, "t", 86, 1200); ring(1130, "r", 74, 1300);
+  [["Jarak 20,6 / 20 km ✓", 70], ["HR tidak lewat batas ✓", 330], ["Cadence lari 165 · 169 spm", 600], ["Buka 3 km pelan ✓", 900]].forEach(([s, x], k) => {
+    const c = mk(L, "chip", `left:${x + 120}px;top:660px;font-size:15px`, s); rise(c, 2500 + k * 220, 18, 450); at(2500 + k * 220, () => sfx("pop")); });
+  cap(L, [["Setiap lari diadu,", 38, 900, "var(--text)"], ["lap demi lap.", 38, 900, "var(--text)"], ["Lap asli dari jam Garmin, dinilai", 18, 500, "var(--muted)"], ["dengan rencana pelatih.", 18, 500, "var(--muted)"]], 50, 36, 300);
+  const sc = mk(L, "chip", "left:1230px;top:40px;transform:translateX(-100%);font-size:16px", "<b>Sab 31 Okt</b> · Long run 20 km"); A(sc, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 400, fill: "both"});
+  at(5300, () => { [...L.children].forEach(e => fade(e, 0, 450)); go("t", 160, 470, 1, 700, {arc: 80}); go("r", 160, 520, 1, 700, {arc: 80, delay: 50}); whoosh(); }); } },
+
+{n: "Progres", dur: 5500, run(L) {
+  L.style.background = "var(--bg)"; go("t", 160, 470, 1); go("r", 160, 520, 1); show(false, 1);
+  const cx0 = 160, cx1 = 760, Yt = m => 200 + (m - 24) / 9 * 380, xs = k => cx0 + k * (cx1 - cx0) / 7;
+  const T = [27.7, 27.2, 27.2, 26.4, 26.0, 26.0, 25.5, 25.2], Rv = [31.5, 31.1, 30.4, 30.4, 29.9, 29.6, 29.6, 29.1];
+  const step = v => v.map((m, k) => k ? `H${xs(k)} V${Yt(m)}` : `M${xs(0)} ${Yt(m)}`).join(" ") + ` H${cx1 + 20}`;
+  const svg = mk(L, "ab", "left:0;top:0;width:1280px;height:720px", `<svg width="1280" height="720">${[25, 27, 29, 31].map(m => `<line x1="${cx0}" x2="${cx1 + 20}" y1="${Yt(m)}" y2="${Yt(m)}" stroke="var(--grid)"/><text x="${cx0 - 14}" y="${Yt(m) + 5}" text-anchor="end" font-size="14" fill="var(--muted)">${m}:00</text>`).join("")}
+    <path id="pt" d="${step(T)}" fill="none" stroke="var(--t)" stroke-width="4" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>
+    <path id="pr" d="${step(Rv)}" fill="none" stroke="var(--r)" stroke-width="4" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`);
+  ["pt", "pr"].forEach((id, k) => A(svg.querySelector("#" + id), [{strokeDashoffset: 1}, {strokeDashoffset: 0}], {duration: 2200, delay: 300 + k * 150, easing: "cubic-bezier(.45,0,.55,1)", fill: "both"}));
+  // riders: the runners ride their own progress line
+  [["t", T], ["r", Rv]].forEach(([c, v], k) => { const rd = mk(L, "ab", `left:0;top:0;width:44px;height:44px;offset-path:path('${step(v)}');offset-rotate:0deg;offset-anchor:50% 100%;z-index:3`, `<svg viewBox="0 0 24 24" width="44" height="44" style="fill:var(--${c});animation:bob .3s ease-in-out infinite alternate">${RUNP}</svg>`);
+    A(rd, [{offsetDistance: "0%"}, {offsetDistance: "100%"}], {duration: 2200, delay: 300 + k * 150, easing: "cubic-bezier(.45,0,.55,1)", fill: "both"});
+    v.forEach((m, j) => { if (!j || m < v[j - 1]) { const d = mk(L, "ab", `left:${xs(j) - 6}px;top:${Yt(m) - 6}px;width:12px;height:12px;border-radius:50%;background:var(--${c})`); pop(d, 300 + k * 150 + j * 290, .2, 380); at(300 + k * 150 + j * 290, () => sfx("tick")); } });
+    const pb = mk(L, "ab", `left:${cx1 + 30}px;top:${Yt(v[7]) - 14}px;font-size:18px;font-weight:800;color:var(--${c});white-space:nowrap`, `PB ${Math.floor(v[7])}:${String(Math.round(v[7] % 1 * 60)).padStart(2, "0")}`); rise(pb, 2600 + k * 120, 10); });
+  const ch = mk(L, "chip", `left:${cx0}px;top:150px;font-size:15px`, "Progres terbaik · <b>5K</b>"); rise(ch, 200, 10);
+  // estimate card
+  const k = mk(L, "ab", "left:840px;top:170px;width:380px;height:400px;border-radius:26px;background:var(--surface);border:1px solid var(--line);box-shadow:0 30px 60px rgba(0,0,0,.08);padding:28px 30px");
+  A(k, [{opacity: 0, transform: "translateX(80px)"}, {opacity: 1, transform: "none"}], {duration: 700, delay: 2500, easing: OUT, fill: "both"});
+  mk(k, "", "font-size:17px;color:var(--muted)", "Estimasi maraton");
+  [["t", "Taofik", 247], ["r", "Reza", 292]].forEach(([c, nm, mins], j) => { const r = mk(k, "", "margin-top:22px");
+    r.innerHTML = `<div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:16px;font-weight:700;color:var(--${c})">${nm}</span><b class="num" style="margin-left:auto;font-size:54px;font-weight:900;letter-spacing:-.03em;color:var(--${c})">0:00</b></div>
+      <div style="position:relative;height:10px;border-radius:5px;background:var(--grid);margin-top:6px"><i style="position:absolute;left:${(285 - 225) / 120 * 100}%;width:${30 / 120 * 100}%;top:0;bottom:0;border-radius:5px;background:color-mix(in srgb,var(--text) 18%,transparent)"></i><i class="mk" style="position:absolute;top:-5px;width:4px;height:20px;border-radius:2px;background:var(--${c});left:0"></i></div>
+      <div style="font-size:13px;color:var(--muted);margin-top:4px">target 4:45–5:15</div>`;
+    count(r.querySelector("b"), mins, 1200, v => `${Math.floor(v / 60)}:${String(Math.round(v % 60)).padStart(2, "0")}`, 2900 + j * 200);
+    A(r.querySelector(".mk"), [{left: "0%"}, {left: (mins - 225) / 120 * 100 + "%"}], {duration: 1200, delay: 2900 + j * 200, easing: OUT, fill: "both"}); at(4100 + j * 200, () => sfx("thump")); });
+  cap(L, [["Makin cepat, makin dekat.", 42, 900, "var(--text)"], ["Progres terbaik dan estimasi maraton, dibandingkan target.", 20, 500, "var(--muted)"]], cx0, 52, 300);
+  at(4800, () => { A(L, [{backgroundColor: "#f3f3f1"}, {backgroundColor: "#0d0d0c"}], {duration: 700, easing: INOUT, fill: "forwards"}); [...L.children].forEach(e => fade(e, 0, 400)); whoosh(); }); } },
+
+{n: "42K", dur: 7500, run(L) {
+  L.style.background = "var(--dark)"; show(true, 400); go("t", 300, 540, 1.9); go("r", 400, 540, 1.9); run(true); trail(300, 900, 200);
+  mk(L, "ab", "left:0;top:540px;width:1280px;height:2px;background:rgba(255,255,255,.25)");
+  const dsh = mk(L, "ab", "left:0;top:556px;width:2560px;height:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.28) 0 46px,transparent 46px 128px)");
+  const sp = A(dsh, [{transform: "translateX(0)"}, {transform: "translateX(-1280px)"}], {duration: 700, iterations: Infinity, easing: "linear"});
+  const gate = mk(L, "ab", "left:900px;top:250px;width:300px;height:292px", `<i style="position:absolute;left:0;top:0;width:6px;height:292px;border-radius:3px;background:linear-gradient(var(--t),rgba(255,255,255,.2))"></i><i style="position:absolute;right:0;top:0;width:6px;height:292px;border-radius:3px;background:linear-gradient(var(--r),rgba(255,255,255,.2))"></i>
+    <div style="position:absolute;left:-14px;right:-14px;top:0;height:64px;border-radius:12px;background:linear-gradient(90deg,var(--t),var(--r));display:grid;place-items:center;font-size:40px;font-weight:900;color:#fff;letter-spacing:.04em;box-shadow:0 0 40px rgba(235,104,52,.35)">42K</div>`);
+  A(gate, [{transform: "translateX(700px) scale(.7)", opacity: 0}, {transform: "none", opacity: 1}], {duration: 3200, delay: 300, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both"});
+  at(3500, () => { sp.updatePlaybackRate(.45 * rate); });
+  const tt = mk(L, "ab", "left:80px;top:70px;font-size:104px;font-weight:900;letter-spacing:-.045em;color:#fff;line-height:1");
+  "PaceLab Duo".split("").forEach((ch, i) => { const s = document.createElement("span"); s.textContent = ch; s.style.display = "inline-block"; if (ch === " ") s.style.width = ".28em"; tt.appendChild(s);
+    A(s, [{opacity: 0, transform: "translateY(50px) rotate(8deg)"}, {opacity: 1, transform: "none"}], {duration: 650, delay: 900 + i * 45, easing: "cubic-bezier(.34,1.4,.64,1)", fill: "both"}); });
+  at(900, () => sfx("thump"));
+  const sb = mk(L, "ab", "left:84px;top:186px;font-size:38px;font-weight:800;letter-spacing:.02em;background:linear-gradient(90deg,var(--t),var(--r));-webkit-background-clip:text;background-clip:text;color:transparent", "ROAD TO 42K"); rise(sb, 1600, 16);
+  ["Rencana 51 minggu", "Lampu pagi", "Duel sesi", "Progres & estimasi"].forEach((s, k) => { const c = mk(L, "ab", `left:${84 + [0, 230, 380, 520][k]}px;top:254px;font-size:17px;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 15px;white-space:nowrap`, s);
+    rise(c, 2300 + k * 160, 14, 450); at(2300 + k * 160, () => sfx("pop")); });
+  const dd = mk(L, "ab", "left:84px;top:312px;font-size:19px;color:rgba(255,255,255,.65)", "223 hari lagi · Garmin + Excel pelatih · offline, satu file"); rise(dd, 3200, 10);
+  const b = mk(L, "ab", "left:84px;top:620px;font-size:20px;font-weight:700;background:#fff;color:#111;border-radius:14px;padding:12px 24px;cursor:pointer", "Masuk dashboard →"); pop(b, 4200, .8);
+  b.onclick = () => { playing = false; b.textContent = "(di dashboard: intro tertutup)"; };
+  at(4200, () => sfx("thump"));
+  at(2000, () => { go("t", 520, 540, 1.9, 2600, {ease: "cubic-bezier(.3,0,.2,1)"}); go("r", 620, 540, 1.9, 2600, {ease: "cubic-bezier(.3,0,.2,1)"}); }); } }];
+
+// ------------------------------------------------ player
+let acc = 0; const START = SC.map(s => { const a = acc; acc += s.dur; return a; }), TOTAL = acc;
+$("chs").innerHTML = SC.map((s, i) => `<button data-i="${i}"><i><b></b></i>${i + 1} ${s.n}</button>`).join("");
+const fills = [...$("chs").querySelectorAll("b")], chb = [...$("chs").querySelectorAll("button")];
+function startScene(i) { cur = i; base = START[i]; const old = LAYER; LAYER = document.createElement("div"); LAYER.className = "layer"; st.insertBefore(LAYER, R.t);
+  if (old) at(900, () => old.remove()); SC[i].run(LAYER);
+  if (window.sk) { sk.classList.toggle("lt", i > 0 && i < SC.length - 1); sk.style.visibility = i === SC.length - 1 ? "hidden" : ""; } }
+function seek(i) { document.getAnimations().forEach(a => { if (!(a instanceof CSSAnimation)) a.cancel(); }); st.querySelectorAll(".layer").forEach(l => l.remove());
+  LAYER = null; Q = []; TK = []; PAUSED = []; ["t", "r"].forEach(c => { R[c]._a = R[c].firstElementChild._a = null; R[c].style.opacity = 1; R[c].querySelector(".trail").style.width = "0px"; });
+  t = START[i]; playing = true; $("pp").textContent = "❚❚ Jeda"; startScene(i); }
+function frame(now) { const dt = now - last; last = now;
+  if (playing) { t = Math.min(TOTAL, t + dt * rate);
+    while (cur < SC.length - 1 && t >= START[cur + 1]) startScene(cur + 1);
+    Q.sort((a, b) => a.t - b.t); while (Q.length && Q[0].t <= t) Q.shift().fn();
+    TK = TK.filter(f => f(t) !== false); if (t >= TOTAL) playing = false; }
+  SC.forEach((s, i) => { fills[i].style.width = Math.max(0, Math.min(1, (t - START[i]) / s.dur)) * 100 + "%"; chb[i].classList.toggle("on", i === cur); });
+  requestAnimationFrame(frame); }
+$("chs").onclick = e => { const b = e.target.closest("[data-i]"); if (b) seek(+b.dataset.i); };
+$("rp").onclick = () => seek(0);
+$("pp").onclick = () => { if (playing) { playing = false; PAUSED = document.getAnimations().filter(a => a.playState === "running"); PAUSED.forEach(a => a.pause()); $("pp").textContent = "▶ Putar"; }
+  else { if (t >= TOTAL) return seek(0); playing = true; PAUSED.forEach(a => a.play()); PAUSED = []; $("pp").textContent = "❚❚ Jeda"; } };
+$("spd").onclick = () => { rate = rate === 1 ? .5 : 1; $("spd").setAttribute("aria-pressed", rate !== 1); document.getAnimations().forEach(a => a.updatePlaybackRate(a instanceof CSSAnimation ? 1 : rate * (a._k || 1))); };
+$("snd").onclick = () => { SND = !SND; $("snd").setAttribute("aria-pressed", SND); if (SND && !AC) AC = new (window.AudioContext || window.webkitAudioContext)(); };
+window.sk = mk(st, "skip", "", "Lewati ›"); sk.onclick = () => seek(SC.length - 1);
+addEventListener("keydown", e => { if (e.key === "Escape") seek(SC.length - 1); if (e.key === " ") { e.preventDefault(); $("pp").click(); } });
+seek(0); requestAnimationFrame(frame);
+</script>
+</body></html>

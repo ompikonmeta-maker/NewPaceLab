@@ -34,7 +34,14 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 17. Intro dashboard — mockup siap, menunggu pilihan + "gas"
+## 17b. Film intro "PaceLab Duo · Road to 42K" — mockup siap, menunggu "gas"
+
+Mockup: [`docs/mockup/intro-film.html`](mockup/intro-film.html). Presentasi animasi ±40 dtk, 7 babak, dua ikon pelari
+sebagai tokoh utama: Mulai → Tujuan (hitung mundur, tonggak lomba) → Rencana (51 minggu, fase) → Pagi (lampu) →
+Duel sesi (lap, jalan kaki, penilaian) → Progres (PB 5K, estimasi) → 42K (nama, 4 fitur, Masuk dashboard).
+Dibuat dengan kode, angka dari data saat itu; diputar saat pertama dibuka + tombol "Tentang" di footer; suara opsional.
+
+## 17. Intro dashboard — mockup siap, digantikan 17b; menunggu pilihan + "gas"
 
 Mockup: [`docs/mockup/intro.html`](mockup/intro.html). I1 Garis start (hitung mundur + dua pelari, mendarat jadi header) ·
 I2 Dua detak (garis detak jantung) · I3 Kabar pagi (lampu pagi + rencana hari ini + lari baru) · I4 Perjalanan 51 minggu ·
