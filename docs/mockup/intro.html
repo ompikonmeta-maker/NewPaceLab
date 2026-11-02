@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: intro NewPaceLab</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--ease:cubic-bezier(.22,1,.36,1)}
+:root[data-theme=dark]{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:34px 0 8px} p.sub{color:var(--muted);margin:0 0 12px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.bar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:8px 0}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.pill.rec::after{content:"saran";margin-left:6px;font-size:10.5px;font-weight:700;color:var(--good);background:var(--good-bg);border-radius:5px;padding:0 5px}
+.pill[aria-pressed=true].rec::after{background:var(--surface)}
+.ctl{margin-left:auto;display:flex;gap:6px}
+.btn{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:5px 12px;font:inherit;font-size:13px;cursor:pointer}
+.note{font-size:13.5px;color:var(--text-2);margin:4px 0 12px;min-height:42px}
+
+/* stage = the dashboard behind the intro */
+.stage{position:relative;height:540px;border-radius:20px;border:1px solid var(--line);background:var(--bg);overflow:hidden;isolation:isolate}
+.dash{position:absolute;inset:0;padding:26px 28px}
+.dash .eb{font-size:12.5px;color:var(--muted)} .dash .cnt{display:flex;align-items:baseline;gap:8px;margin:2px 0}
+.dash .cnt b{font-size:56px;font-weight:800;letter-spacing:-.03em;line-height:1} .dash .cnt span{font-size:16px;color:var(--text-2)}
+.dash .sb{font-size:13.5px;color:var(--text-2)} .dash .tg{position:absolute;right:28px;top:56px;display:flex;gap:8px}
+.dash .tg span{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600;display:flex;align-items:center;gap:6px}
+.dot{width:9px;height:9px;border-radius:50%;display:inline-block} .dot.t{background:var(--t)} .dot.r{background:var(--r)}
+.dash .trk{position:absolute;left:28px;right:28px;top:190px;height:8px;border-radius:4px;background:var(--grid)}
+.dash .trk i{position:absolute;left:0;top:0;bottom:0;width:39%;border-radius:4px;background:linear-gradient(90deg,color-mix(in srgb,var(--t) 70%,var(--surface)),color-mix(in srgb,var(--r) 70%,var(--surface)))}
+.dash .rp{position:absolute;top:150px;width:58px;height:30px;left:calc(28px + (100% - 56px) * .39 - 34px)}
+.dash .wk{position:absolute;left:28px;right:28px;top:236px;height:70px;display:flex;align-items:flex-end;gap:3px}
+.dash .wk i{flex:1;border-radius:2px 2px 0 0;background:var(--grid)} .dash .wk i.d{background:color-mix(in srgb,var(--t) 55%,var(--surface))} .dash .wk i.d:nth-child(2n){background:color-mix(in srgb,var(--r) 55%,var(--surface))}
+.dash .cards{position:absolute;left:28px;right:28px;top:336px;display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.dash .cards div{height:170px;border-radius:16px;background:var(--surface);border:1px solid var(--line)}
+svg.run{overflow:visible} svg.run .t{fill:var(--t)} svg.run .r{fill:var(--r)}
+
+/* intro overlay */
+.intro{position:absolute;inset:0;z-index:5;background:var(--bg);display:grid;place-items:center;cursor:pointer}
+.skip{position:absolute;right:14px;top:12px;z-index:6;border:0;background:none;color:var(--muted);font:inherit;font-size:12.5px;cursor:pointer;padding:4px 8px;border-radius:8px}
+.skip:hover{color:var(--text);background:var(--surface)}
+.hint{position:absolute;left:0;right:0;bottom:12px;text-align:center;font-size:12px;color:var(--muted)}
+
+/* I1 */
+.i1{width:min(760px,88%);text-align:center}
+.i1 .eb{font-size:13px;color:var(--muted);letter-spacing:.02em}
+.i1 .big{font-size:96px;font-weight:800;letter-spacing:-.04em;line-height:1;margin:6px 0 2px;display:inline-block}
+.i1 .lbl{font-size:18px;color:var(--text-2)} .i1 .vs{margin-top:14px;font-size:14px;color:var(--text-2);display:flex;gap:10px;justify-content:center;align-items:center}
+.i1 .vs b{font-weight:700} .i1 .vs .x{font-size:11px;font-weight:700;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 7px}
+.i1 .road{position:relative;height:60px;margin-top:30px}
+.i1 .road .ln{position:absolute;left:0;right:0;bottom:8px;height:6px;border-radius:3px;background:var(--grid)}
+.i1 .road .fl{position:absolute;left:0;bottom:8px;height:6px;border-radius:3px;width:0;background:linear-gradient(90deg,var(--t),var(--r))}
+.i1 .road .fin{position:absolute;right:-2px;bottom:4px;width:3px;height:22px;background:var(--text);border-radius:2px}
+.i1 .road .fin::after{content:"42K";position:absolute;right:-6px;top:-18px;font-size:11px;font-weight:700}
+.i1 .road svg{position:absolute;bottom:16px;width:34px;height:34px}
+
+/* I2 */
+.i2{width:min(820px,92%)}
+.i2 .row{display:grid;grid-template-columns:110px 1fr 110px;align-items:center;gap:10px;margin:10px 0}
+.i2 .nm{font-weight:700;font-size:15px} .i2 .nm small{display:block;font-weight:400;color:var(--muted);font-size:12px}
+.i2 .row .R{text-align:right}
+.i2 svg{width:100%;height:80px;overflow:visible}
+.i2 path{fill:none;stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round}
+.i2 .cap{text-align:center;margin-top:18px;font-size:22px;font-weight:700;letter-spacing:-.01em;opacity:0}
+.i2 .cap small{display:block;font-size:13.5px;font-weight:400;color:var(--muted);margin-top:2px}
+
+/* I3 */
+.i3{width:min(680px,92%);background:var(--surface);border:1px solid var(--line);border-radius:22px;box-shadow:0 30px 70px rgba(0,0,0,.14);padding:22px 24px 18px;cursor:default;position:relative;overflow:hidden}
+.i3 .hd{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.i3 .hd b{font-size:20px;display:block} .i3 .hd span{font-size:13px;color:var(--muted)}
+.i3 .dd{text-align:right;white-space:nowrap} .i3 .dd b{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1} .i3 .dd span{display:block}
+.i3 .mir{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}
+.i3 .who{background:var(--bg);border-radius:16px;padding:12px 14px}
+.i3 .who .n{display:flex;align-items:center;gap:7px;font-weight:700}
+.i3 .lamp{margin-left:auto;font-size:12px;font-weight:700;border-radius:999px;padding:2px 9px}
+.i3 .lamp.g{background:var(--good-bg);color:var(--good)} .i3 .lamp.y{background:var(--warn-bg);color:var(--warn)}
+.i3 .who p{margin:6px 0 0;font-size:13px;color:var(--text-2)} .i3 .who .pl{margin-top:8px;font-size:13.5px} .i3 .who .pl small{display:block;color:var(--muted);font-size:12px}
+.i3 .new{margin-top:12px;font-size:13px;color:var(--text-2);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.i3 .new .c{border:1px solid var(--line);border-radius:999px;padding:2px 10px;font-size:12.5px}
+.i3 .go{display:flex;justify-content:flex-end;margin-top:14px} .i3 .go button{border:0;background:var(--text);color:var(--surface);font:inherit;font-size:14px;font-weight:600;border-radius:12px;padding:8px 16px;cursor:pointer}
+.i3 .tm{position:absolute;left:0;bottom:0;height:3px;background:linear-gradient(90deg,var(--t),var(--r));width:0}
+.i3 > *{opacity:0;transform:translateY(8px)}
+
+/* I4 */
+.i4{width:min(860px,92%);text-align:center}
+.i4 .wk{display:flex;align-items:flex-end;gap:3px;height:120px}
+.i4 .wk i{flex:1;border-radius:3px 3px 0 0;background:var(--grid);transform:scaleY(0);transform-origin:bottom}
+.i4 .ph{display:flex;margin-top:8px;font-size:11.5px;color:var(--muted)} .i4 .ph span{text-align:center;border-top:1.5px solid var(--line);padding-top:4px;opacity:0}
+.i4 .ph span.on{color:var(--text);font-weight:700;border-color:var(--text)}
+.i4 .lab{margin-top:22px;font-size:15px;color:var(--text-2);opacity:0} .i4 .lab b{font-size:28px;color:var(--text);display:block;letter-spacing:-.01em}
+.i4 .pr{position:relative;height:0}
+.i4 .pr svg{position:absolute;top:0;width:52px;height:26px;opacity:0}
+
+/* principles + table */
+ul.pr{margin:6px 0 0;padding-left:20px;font-size:14px;color:var(--text-2)} ul.pr li{margin:3px 0} ul.pr b{color:var(--text)}
+table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px} th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top} th{color:var(--muted);font-weight:600}
+.tw{overflow-x:auto}
+.whenb{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:6px}
+.whenb div{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;font-size:13px;color:var(--text-2)} .whenb b{display:block;color:var(--text);font-size:13.5px}
+.whenb div.on{border-color:var(--text)}
+@media (max-width:640px){.stage{height:620px}.dash .cnt b{font-size:40px}.dash .tg{display:none}.dash .trk{top:150px}.dash .rp{top:110px}.dash .wk{top:190px}.dash .cards{top:290px;grid-template-columns:1fr}
+  .i1 .big{font-size:72px}.i2 .row{grid-template-columns:72px 1fr 72px}.i3 .mir{grid-template-columns:1fr}.i4 .ph span{font-size:0}.i4 .ph span.on{font-size:11px}.i3 .hd b{font-size:17px}.whenb{grid-template-columns:1fr}.ctl{margin-left:0}}
+</style></head><body><div class="wrap">
+<h1>Mockup: intro NewPaceLab</h1>
+<p class="sub">Data rekaan. Intro diputar di atas dashboard (gambar sketsa di belakang). Klik di mana saja atau tekan tombol apa pun untuk melewati.</p>
+
+<h2 style="margin-top:18px">Menurut saya, intro NewPaceLab harus…</h2>
+<ul class="pr">
+  <li><b>Bercerita inti tool dalam sekali lihat:</b> dua pelari, satu garis finis 42K, hitung mundur hari. Bukan logo besar.</li>
+  <li><b>Singkat dan bisa dilewati:</b> ±2 detik, klik / tombol apa pun langsung masuk. Dashboard dibuka hampir tiap hari; intro tidak boleh menghalangi.</li>
+  <li><b>Berubah menjadi dashboard</b>, bukan layar terpisah: angka hari dan garis program "mendarat" di tempatnya di header.</li>
+  <li><b>Pakai angka asli</b> dari data (hari lagi, minggu ke berapa, lampu pagi), bukan slogan.</li>
+  <li><b>Tidak setiap kali dibuka:</b> sekali sehari, atau setelah Update membawa lari baru. Tanpa animasi kalau Windows diatur "kurangi gerakan". Tetap offline (tanpa font / gambar dari internet).</li>
+</ul>
+
+<h2>Opsi</h2>
+<div class="bar" id="opt" role="group" aria-label="Opsi intro">
+  <button class="pill" data-o="I1" aria-pressed="false">I1 Garis start</button>
+  <button class="pill" data-o="I2" aria-pressed="false">I2 Dua detak</button>
+  <button class="pill" data-o="I3" aria-pressed="false">I3 Kabar pagi</button>
+  <button class="pill" data-o="I4" aria-pressed="false">I4 Perjalanan 51 minggu</button>
+  <button class="pill rec" data-o="I5" aria-pressed="true">I5 = I1 + I3</button>
+  <span class="ctl"><button class="btn" id="replay">▶ Putar ulang</button><button class="btn" id="theme">Gelap</button></span>
+</div>
+<p class="note" id="note"></p>
+<div class="stage" id="stage">
+  <div class="dash" aria-hidden="true">
+    <div class="eb">Maraton · Min 13 Jun 2027</div>
+    <div class="cnt"><b class="num" id="dnum">223</b><span>hari lagi</span></div>
+    <div class="sb">Minggu <b>20</b> dari 51 · fase <b>Support</b> · 10K Sab 7 Nov</div>
+    <div class="tg"><span><i class="dot t"></i>Taofik</span><span><i class="dot r"></i>Reza</span></div>
+    <svg class="run rp" id="drun" viewBox="-8 0 52 24"><g transform="translate(20 0)"><g class="r"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></g></g><g class="t"><path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/></g></svg>
+    <div class="trk" id="dtrk"><i></i></div>
+    <div class="wk" id="dwk"></div>
+    <div class="cards"><div></div><div></div></div>
+  </div>
+</div>
+
+<h2>Kapan intro muncul</h2>
+<div class="whenb"><div><b>Setiap kali dibuka</b>Paling terasa "aplikasi", tapi cepat membosankan untuk dashboard harian.</div>
+  <div class="on"><b>Sekali sehari (saran)</b>Pagi pertama kali dibuka. Cocok dengan I3: kabar pagi memang hanya penting sekali sehari.</div>
+  <div><b>Hanya setelah Update</b>Muncul bila ada lari / data baru dari Garmin; "2 lari baru" ikut ditulis.</div></div>
+
+<h2>Perbandingan</h2>
+<div class="tw"><table>
+<thead><tr><th>Opsi</th><th>Durasi</th><th>Isi</th><th>Kelebihan</th><th>Kekurangan</th></tr></thead>
+<tbody>
+<tr><td><b>I1 Garis start</b></td><td>±2 dtk</td><td>Hitung mundur hari, dua pelari lari ke posisi hari ini di garis menuju 42K</td><td>Paling "NewPaceLab": duel + perjalanan; mendarat jadi header</td><td>Hanya pembuka, tidak memberi info baru</td></tr>
+<tr><td><b>I2 Dua detak</b></td><td>±2,5 dtk</td><td>Garis detak jantung biru dan oranye, lalu kalimat pendek</td><td>Mengingatkan bahwa data dari jam / jantung</td><td>Lebih abstrak; kurang menjelaskan tujuan maraton</td></tr>
+<tr><td><b>I3 Kabar pagi</b></td><td>sampai ditutup (otomatis 6 dtk)</td><td>Hari ini, lampu pagi tiap pelari, rencana hari ini, lari baru sejak terakhir dibuka</td><td>Paling berguna; menjawab "hari ini harus apa?"</td><td>Lebih seperti kartu info daripada intro; ada yang perlu dibaca</td></tr>
+<tr><td><b>I4 Perjalanan 51 minggu</b></td><td>±3 dtk</td><td>51 batang minggu tumbuh, fase menyala, pelari mendarat di minggu ini</td><td>Gambaran besar program: sudah sejauh apa</td><td>Mirip grafik di bawah header; paling lama</td></tr>
+<tr><td><b>I5 = I1 + I3 (saran)</b></td><td>±1,5 dtk + kartu</td><td>Garis start singkat, lalu kartu kabar pagi</td><td>Cerita + berguna; sekali sehari</td><td>Paling banyak dibuat</td></tr>
+</tbody></table></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const RUNP = '<path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-3.6 13.9l1-4.4 2.1 2v6h2v-7.5l-2.1-2 .6-3c1.3 1.5 3.3 2.5 5.5 2.5v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1l-5.2 2.2v4.7h2v-3.4l1.8-.7-1.6 8.1-4.9-1-.4 2 7 1.4z"/>';
+const runner = c => `<svg class="run" viewBox="0 0 24 24"><g class="${c}">${RUNP}</g></svg>`;
+const E = "cubic-bezier(.22,1,.36,1)", REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const DAYS = 223, WEEK = 20, WEEKS = 51;
+// sketch behind
+$("dwk").innerHTML = Array.from({length: WEEKS}, (_, i) => `<i class="${i < WEEK ? "d" : ""}" style="height:${30 + ((i * 37) % 40) + (i > 40 ? 15 : 0)}%"></i>`).join("");
+
+let O = "I5", T = [], ov = null;
+const later = (f, ms) => T.push(setTimeout(f, ms));
+const NOTE = {
+  I1: "Angka hari lagi menghitung naik, dua pelari berlari ke posisi hari ini di garis menuju 42K, lalu angka dan garis mendarat di tempatnya di header. ±2 detik.",
+  I2: "Dua garis detak jantung (Taofik biru, Reza oranye) tergambar berdampingan, lalu mendatar jadi satu garis: “Dua jantung, satu garis finis.” ±2,5 detik.",
+  I3: "Kartu kabar pagi: hari dan minggu program, lampu pagi + rencana hari ini tiap pelari, lari baru sejak terakhir dibuka. Tutup sendiri setelah 6 detik (berhenti saat disentuh) atau klik “Masuk”.",
+  I4: "51 batang minggu program tumbuh berurutan, fase menyala satu per satu, pelari mendarat di minggu ini; lalu jadi garis program di header. ±3 detik.",
+  I5: "Saran saya: garis start I1 yang dipersingkat (±1,5 detik), lalu kartu kabar pagi I3. Muncul sekali sehari; hari berikutnya dibuka lagi = langsung dashboard."};
+
+function close(fast) { if (!ov) return; T.forEach(clearTimeout); T = []; const o = ov; ov = null;
+  o.animate([{opacity: 1}, {opacity: 0}], {duration: fast || REDUCED ? 160 : 420, easing: "ease", fill: "forwards"}).onfinish = () => o.remove();
+  // the dashboard settles in
+  document.querySelector(".dash").animate([{opacity: .4, transform: "translateY(6px)"}, {opacity: 1, transform: "none"}], {duration: REDUCED ? 1 : 500, easing: E}); }
+function mount(html, cls) { if (ov) ov.remove(); T.forEach(clearTimeout); T = [];
+  ov = document.createElement("div"); ov.className = "intro"; ov.innerHTML = html + `<button class="skip" type="button">Lewati ›</button>`;
+  $("stage").appendChild(ov); ov.addEventListener("click", e => { if (e.target.closest(".i3") && !e.target.closest(".go button")) return; close(true); });
+  return ov; }
+const count = (el, to, ms) => { if (REDUCED) { el.textContent = to; return; } const t0 = performance.now();
+  const f = t => { const k = Math.min(1, (t - t0) / ms), v = Math.round(to * (1 - Math.pow(1 - k, 3))); el.textContent = v; if (k < 1 && ov) requestAnimationFrame(f); }; requestAnimationFrame(f); };
+// FLIP: an element of the intro flies to the matching element of the dashboard
+function land(from, to, ms) { const a = from.getBoundingClientRect(), b = to.getBoundingClientRect(), s = b.height / a.height;
+  return from.animate([{transform: "none"}, {transform: `translate(${b.left - a.left + (b.width - a.width * s) / 2 * 0}px,${b.top - a.top}px) scale(${s})`}], {duration: ms, easing: E, fill: "forwards"}); }
+
+function I1(short) {
+  const o = mount(`<div class="i1"><div class="eb">Taofik &amp; Reza · Maraton 13 Juni 2027</div><div class="big num" id="i1n">0</div><div class="lbl">hari lagi</div>
+    <div class="road"><div class="ln"></div><div class="fl" id="i1f"></div><div class="fin"></div><span id="i1t" style="position:absolute;left:0;bottom:0">${runner("t")}</span><span id="i1r" style="position:absolute;left:0;bottom:0">${runner("r")}</span></div>
+    <div class="vs"><span><i class="dot t"></i> <b>Taofik</b></span><span class="x">VS</span><span><b>Reza</b> <i class="dot r"></i></span></div></div><div class="hint">klik di mana saja untuk masuk</div>`);
+  const k = WEEK / WEEKS, road = o.querySelector(".road"), W = road.clientWidth, D = short ? 1100 : 1500;
+  count($("i1n"), DAYS, D * .9);
+  $("i1f").animate([{width: 0}, {width: k * 100 + "%"}], {duration: D, easing: E, fill: "forwards"});
+  [["i1t", -26, 0], ["i1r", 6, 120]].forEach(([id, dx, dl]) => $(id).animate([{transform: "translateX(-40px)", opacity: 0}, {opacity: 1, offset: .15}, {transform: `translateX(${k * W + dx - 17}px)`, opacity: 1}], {duration: D, delay: dl, easing: E, fill: "forwards"}));
+  o.querySelectorAll(".eb,.lbl,.vs").forEach((e, i) => e.animate([{opacity: 0, transform: "translateY(8px)"}, {opacity: 1, transform: "none"}], {duration: 500, delay: 100 + i * 120, easing: E, fill: "backwards"}));
+  return new Promise(res => later(() => { if (!ov) return res(); land($("i1n"), $("dnum"), 520); o.querySelectorAll(".road,.eb,.lbl,.vs,.hint").forEach(e => e.animate([{opacity: 1}, {opacity: 0}], {duration: 260, fill: "forwards"}));
+    later(() => res(), 380); }, D + 250)); }
+
+function I2() {
+  const beat = (y, amp, n, phase) => { let d = `M0 ${y}`, x = 0, step = 1000 / n; for (let i = 0; i < n; i++) { const b = x + step * (.45 + phase);
+    d += ` L${b - 14} ${y} L${b - 7} ${y - amp * .18} L${b} ${y + amp * .2} L${b + 7} ${y - amp} L${b + 14} ${y + amp * .45} L${b + 22} ${y} L${x + step} ${y}`; x += step; } return d; };
+  const flat = y => `M0 ${y} L1000 ${y}`;
+  const o = mount(`<div class="i2"><div class="row"><div class="nm" style="color:var(--t)">Taofik<small>RHR 52 · HRV seimbang</small></div><svg viewBox="0 0 1000 80" preserveAspectRatio="none"><path id="h1" stroke="var(--t)" d="${beat(48, 40, 7, 0)}"/></svg><div></div></div>
+    <div class="row"><div></div><svg viewBox="0 0 1000 80" preserveAspectRatio="none"><path id="h2" stroke="var(--r)" d="${beat(48, 40, 8, .12)}"/></svg><div class="nm R" style="color:var(--r)">Reza<small>RHR 61 · HRV rendah</small></div></div>
+    <div class="cap" id="i2c">Dua jantung, satu garis finis.<small>223 hari lagi · Minggu 20 dari 51</small></div></div><div class="hint">klik di mana saja untuk masuk</div>`);
+  ["h1", "h2"].forEach((id, i) => { const p = $(id), L = p.getTotalLength(); p.style.strokeDasharray = L; p.animate([{strokeDashoffset: L}, {strokeDashoffset: 0}], {duration: REDUCED ? 1 : 1300, delay: i * 180, easing: "linear", fill: "both"}); });
+  later(() => { $("h1").animate([{d: `path("${$("h1").getAttribute("d")}")`}, {d: `path("${flat(48)}")`}], {duration: 600, easing: E, fill: "forwards"});
+    $("h2").animate([{d: `path("${$("h2").getAttribute("d")}")`}, {d: `path("${flat(48)}")`}], {duration: 600, easing: E, fill: "forwards"});
+    $("i2c").animate([{opacity: 0, transform: "translateY(10px)"}, {opacity: 1, transform: "none"}], {duration: 600, easing: E, fill: "forwards"}); }, 1600);
+  return new Promise(res => later(res, 3000)); }
+
+function I3(standalone) {
+  const o = mount(`<div class="i3" role="dialog" aria-label="Kabar pagi"><div class="hd"><div><b>Senin, 2 November</b><span>Minggu 20 dari 51 · fase Support · minggu lomba</span></div><div class="dd"><b class="num">5</b><span>hari ke 10K</span></div></div>
+    <div class="mir"><div class="who"><div class="n"><i class="dot t"></i>Taofik<span class="lamp g">Hijau</span></div><p>Siap latihan sesuai rencana.</p><div class="pl">Lari santai 6 km<small>7:30–8:10/km · HR di bawah 151</small></div></div>
+      <div class="who"><div class="n"><i class="dot r"></i>Reza<span class="lamp y">Kuning</span></div><p>Tidur 5 j 40 m: latihan keras jadi easy.</p><div class="pl">Lari santai 6 km<small>8:30–9:10/km · HR di bawah 147</small></div></div></div>
+    <div class="new">Sejak terakhir dibuka:<span class="c">Taofik 20,6 km · Sab</span><span class="c">Reza 22,1 km · Sab</span><span class="c">jalan kaki 3:45</span></div>
+    <div class="go"><button type="button">Masuk dashboard →</button></div><div class="tm" id="tm"></div></div>`);
+  if (standalone) o.style.background = "var(--bg)"; else o.style.background = "color-mix(in srgb,var(--bg) 82%,transparent)";
+  const card = o.querySelector(".i3");
+  card.animate([{opacity: 0, transform: "translateY(24px) scale(.97)"}, {opacity: 1, transform: "none"}], {duration: REDUCED ? 1 : 600, easing: "cubic-bezier(.34,1.2,.64,1)", fill: "both"});
+  [...card.children].filter(c => !c.classList.contains("tm")).forEach((c, i) => c.animate([{opacity: 0, transform: "translateY(8px)"}, {opacity: 1, transform: "none"}], {duration: REDUCED ? 1 : 500, delay: 150 + i * 90, easing: E, fill: "forwards"}));
+  const tm = $("tm").animate([{width: "0%"}, {width: "100%"}], {duration: 6000, delay: 600, easing: "linear", fill: "forwards"});
+  card.addEventListener("pointerenter", () => tm.pause()); card.addEventListener("pointerleave", () => tm.play());
+  tm.onfinish = () => close(); card.querySelector(".go button").onclick = e => { e.stopPropagation(); close(true); }; }
+
+function I4() {
+  const PH = [["Awal", 6], ["Base", 9], ["Support", 6], ["Build", 10], ["Absorb", 2], ["Ramadan", 5], ["Rebuild", 4], ["Marathon", 6], ["Taper", 3]];
+  const o = mount(`<div class="i4"><div class="pr"><svg class="run" id="i4p" viewBox="-8 0 52 24"><g transform="translate(20 0)"><g class="r">${RUNP}</g></g><g class="t">${RUNP}</g></svg></div>
+    <div class="wk" id="i4w">${Array.from({length: WEEKS}, (_, i) => `<i style="height:${30 + ((i * 37) % 40) + (i > 40 ? 22 : 0)}%"></i>`).join("")}</div>
+    <div class="ph" id="i4h">${PH.map(([n, w]) => `<span style="flex:${w}">${n}</span>`).join("")}</div>
+    <div class="lab" id="i4l"><b>Minggu 20 dari 51</b>39% perjalanan · 223 hari lagi menuju 13 Jun 2027</div></div><div class="hint">klik di mana saja untuk masuk</div>`);
+  const bars = [...$("i4w").children], st = REDUCED ? 0 : 26;
+  bars.forEach((b, i) => { b.animate([{transform: "scaleY(0)"}, {transform: "scaleY(1)"}], {duration: 500, delay: i * st, easing: E, fill: "forwards"});
+    if (i < WEEK) later(() => b.style.background = `color-mix(in srgb,${i % 2 ? "var(--r)" : "var(--t)"} 60%,var(--surface))`, 700 + i * st * 1.3); });
+  let acc = 0; [...$("i4h").children].forEach((s, i) => { const at = acc; acc += PH[i][1];
+    s.animate([{opacity: 0}, {opacity: 1}], {duration: 300, delay: 200 + at * st, fill: "forwards"}); if (at <= WEEK - 1 && WEEK - 1 < acc) later(() => s.classList.add("on"), 1500); });
+  later(() => { const b = bars[WEEK - 1], r = b.getBoundingClientRect(), w = $("i4w").getBoundingClientRect(), p = $("i4p");
+    p.style.left = (r.left - w.left + r.width / 2 - 26) + "px"; p.style.top = (r.top - w.top - 30) + "px";
+    p.animate([{opacity: 0, transform: "translateY(-40px)"}, {opacity: 1, transform: "none"}], {duration: 600, easing: "cubic-bezier(.34,1.3,.64,1)", fill: "forwards"});
+    $("i4l").animate([{opacity: 0, transform: "translateY(8px)"}, {opacity: 1, transform: "none"}], {duration: 500, easing: E, fill: "forwards"}); }, 1500);
+  return new Promise(res => later(res, 3200)); }
+
+async function play() { const o = O;
+  if (o === "I1") { await I1(); close(); } else if (o === "I2") { await I2(); close(); } else if (o === "I3") I3(true);
+  else if (o === "I4") { await I4(); close(); } else { await I1(true); if (ov && O === "I5") I3(false); } }
+$("opt").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return;
+  $("opt").querySelectorAll("[data-o]").forEach(x => x.setAttribute("aria-pressed", x === b)); O = b.dataset.o; $("note").textContent = NOTE[O]; play(); });
+$("replay").onclick = play;
+$("theme").onclick = () => { const d = document.documentElement.dataset.theme === "dark"; document.documentElement.dataset.theme = d ? "light" : "dark"; $("theme").textContent = d ? "Gelap" : "Terang"; };
+addEventListener("keydown", e => { if (ov && !e.target.closest("button")) close(true); });
+$("note").textContent = NOTE[O]; play();
+</script>
+</body></html>

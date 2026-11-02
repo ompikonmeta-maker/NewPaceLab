@@ -34,6 +34,13 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 17. Intro dashboard — mockup siap, menunggu pilihan + "gas"
+
+Mockup: [`docs/mockup/intro.html`](mockup/intro.html). I1 Garis start (hitung mundur + dua pelari, mendarat jadi header) ·
+I2 Dua detak (garis detak jantung) · I3 Kabar pagi (lampu pagi + rencana hari ini + lari baru) · I4 Perjalanan 51 minggu ·
+I5 = I1 + I3 (saran). Kapan muncul: setiap buka / sekali sehari (saran) / hanya setelah Update. Selalu bisa dilewati,
+tanpa animasi bila "kurangi gerakan".
+
 ## 15. Usul Claude chat: cadence saat lari, menit jalan kaki, tukar sesi — **sudah dibuat** (C3 + W2 + T3)
 
 Mockup: [`docs/mockup/usul-cadence-jalan-tukar.html`](mockup/usul-cadence-jalan-tukar.html).
