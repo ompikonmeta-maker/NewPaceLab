@@ -59,10 +59,10 @@ ul{padding-left:20px;font-size:14px;color:var(--text-2)} li{margin:3px 0} li b{c
 @media (max-width:640px){.chs{grid-template-columns:repeat(4,1fr)}}
 </style></head><body><div class="wrap">
 <h1>Mockup: film intro “PaceLab Duo · Road to 42K”</h1>
-<p class="sub">Data rekaan (demo). ±40 detik, 7 babak. Tokoh utama: dua ikon pelari dari dashboard. Semua digambar dengan kode (SVG/CSS), tanpa video, tanpa internet. Klik babak di bawah untuk lompat.</p>
+<p class="sub">Data rekaan (demo). ±40 detik (atau ringkas 25 detik: semua dipercepat sama rata), 7 babak. Tokoh utama: dua ikon pelari dari dashboard. Semua digambar dengan kode (SVG/CSS), tanpa video, tanpa internet. Klik babak di bawah untuk lompat.</p>
 <div class="frame" id="frame"><div id="st"><div id="wipe"></div></div></div>
 <div class="chs" id="chs"></div>
-<div class="ctrl"><button class="btn" id="pp">❚❚ Jeda</button><button class="btn" id="rp">↺ Ulang</button><button class="btn" id="spd" aria-pressed="false">0,5× lambat</button><button class="btn" id="snd" aria-pressed="false">♪ Suara</button></div>
+<div class="ctrl"><button class="btn" id="pp">❚❚ Jeda</button><button class="btn" id="rp">↺ Ulang</button><button class="btn" id="len" aria-pressed="false">Ringkas 25 dtk</button><button class="btn" id="spd" aria-pressed="false">0,5× lambat</button><button class="btn" id="snd" aria-pressed="false">♪ Suara</button></div>
 
 <h2>Alur cerita</h2>
 <div class="tw"><table>
@@ -92,15 +92,15 @@ const RUNP = '<path d="M13.49 5.48c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm-
 const fit = () => st.style.transform = `scale(${$("frame").clientWidth / 1280})`; addEventListener("resize", fit); fit();
 
 // ------------------------------------------------ clock: film time drives callbacks, counters and the chapter bar (pause / seek / slow-mo safe)
-let t = 0, rate = 1, playing = true, last = performance.now(), cur = -1, base = 0, Q = [], TK = [], LAYER = null, PAUSED = [];
-const A = (el, kf, o) => { const a = el.animate(kf, o); a.playbackRate = rate; return a; };
-const at = (ms, fn) => Q.push({t: base + ms, fn});
+let K = 1, t = 0, rate = 1, playing = true, last = performance.now(), cur = -1, base = 0, Q = [], TK = [], LAYER = null, PAUSED = [];
+const A = (el, kf, o) => { o = Object.assign({}, o); if (o.duration) o.duration *= K; if (o.delay) o.delay *= K; const a = el.animate(kf, o); a.playbackRate = rate; return a; };   // K: 1 = full film, .625 = 25 s
+const at = (ms, fn) => Q.push({t: base + ms * K, fn});
 const ticker = fn => TK.push(fn);
 const mk = (p, cls, css, html) => { const e = document.createElement("div"); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; p.appendChild(e); return e; };
 const pop = (e, d = 0, from = .6, ms = 520) => A(e, [{opacity: 0, transform: `scale(${from})`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "both"});
 const rise = (e, d = 0, dy = 24, ms = 600) => A(e, [{opacity: 0, transform: `translateY(${dy}px)`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: OUT, fill: "both"});
 const fade = (e, d = 0, ms = 400, to = 0) => A(e, [{opacity: getComputedStyle(e).opacity}, {opacity: to}], {duration: ms, delay: d, easing: "ease", fill: "forwards"});
-function count(e, to, ms, fmt, d = 0) { const s0 = base + d; ticker(T => { if (T < s0) return; const k = Math.min(1, (T - s0) / ms), v = to * (1 - Math.pow(1 - k, 3)); e.textContent = fmt(v, k); return k < 1; }); }
+function count(e, to, ms, fmt, d = 0) { const s0 = base + d * K; ticker(T => { if (T < s0) return; const k = Math.min(1, (T - s0) / ms / K), v = to * (1 - Math.pow(1 - k, 3)); e.textContent = fmt(v, k); return k < 1; }); }
 // kinetic caption: lines of words sliding up out of a mask
 function cap(L, lines, x, y, d = 0, o = {}) { const c = mk(L, "cap", `left:${x}px;top:${y}px;${o.align ? "text-align:" + o.align + ";transform:translateX(-50%)" : ""}`);
   let k = 0; lines.forEach(([txt, size, weight, color]) => { const ln = mk(c, "ln", `font-size:${size}px;font-weight:${weight};color:${color};letter-spacing:${size > 40 ? "-.02em" : "0"}`);
@@ -129,7 +129,7 @@ function go(c, x, y, s = 1, ms = 0, o = {}) { const e = R[c], ry = e.firstElemen
   e._a = A(e, [{transform: `translateX(${a.x}px)`}, {transform: X}], {duration: ms, delay: d, easing: o.arc ? "linear" : (o.ease || E), fill: "both"});
   ry._a = A(ry, o.arc ? [{transform: `translateY(${a.y}px) scale(${a.s})`, easing: "cubic-bezier(.33,.66,.6,1)"}, {transform: `translateY(${Math.min(a.y, y) - o.arc}px) scale(${(a.s + s) / 2})`, offset: .5, easing: "cubic-bezier(.4,0,.67,.34)"}, {transform: Y}]
     : [{transform: `translateY(${a.y}px) scale(${a.s})`}, {transform: Y}], {duration: ms, delay: d, easing: o.arc ? "linear" : (o.ease || E), fill: "both"});
-  if (o.arc) Q.push({t: t + d + ms, fn: () => sfx("tick")}); }
+  if (o.arc) Q.push({t: t + (d + ms) * K, fn: () => sfx("tick")}); }
 const pair = (x, y, s = 1, ms = 0, o = {}) => { go("t", x - 20 * s, y, s, ms, o); go("r", x + 20 * s, y, s, ms, Object.assign({}, o, {delay: (o.delay || 0) + (o.lag || 0)})); };
 const run = on => ["t", "r"].forEach(c => { R[c].classList.toggle("go", on); R[c].classList.remove("idle"); });
 const idle = () => ["t", "r"].forEach(c => { R[c].classList.remove("go"); R[c].classList.add("idle"); });
@@ -315,7 +315,7 @@ const SC = [
   at(2000, () => { go("t", 520, 540, 1.9, 2600, {ease: "cubic-bezier(.3,0,.2,1)"}); go("r", 620, 540, 1.9, 2600, {ease: "cubic-bezier(.3,0,.2,1)"}); }); } }];
 
 // ------------------------------------------------ player
-let acc = 0; const START = SC.map(s => { const a = acc; acc += s.dur; return a; }), TOTAL = acc;
+let START = [], TOTAL = 0; const layout = () => { let acc = 0; START = SC.map(s => { const a = acc; acc += s.dur * K; return a; }); TOTAL = acc; }; layout();
 $("chs").innerHTML = SC.map((s, i) => `<button data-i="${i}"><i><b></b></i>${i + 1} ${s.n}</button>`).join("");
 const fills = [...$("chs").querySelectorAll("b")], chb = [...$("chs").querySelectorAll("button")];
 function startScene(i) { cur = i; base = START[i]; const old = LAYER; LAYER = document.createElement("div"); LAYER.className = "layer"; st.insertBefore(LAYER, R.t);
@@ -329,10 +329,11 @@ function frame(now) { const dt = now - last; last = now;
     while (cur < SC.length - 1 && t >= START[cur + 1]) startScene(cur + 1);
     Q.sort((a, b) => a.t - b.t); while (Q.length && Q[0].t <= t) Q.shift().fn();
     TK = TK.filter(f => f(t) !== false); if (t >= TOTAL) playing = false; }
-  SC.forEach((s, i) => { fills[i].style.width = Math.max(0, Math.min(1, (t - START[i]) / s.dur)) * 100 + "%"; chb[i].classList.toggle("on", i === cur); });
+  SC.forEach((s, i) => { fills[i].style.width = Math.max(0, Math.min(1, (t - START[i]) / s.dur / K)) * 100 + "%"; chb[i].classList.toggle("on", i === cur); });
   requestAnimationFrame(frame); }
 $("chs").onclick = e => { const b = e.target.closest("[data-i]"); if (b) seek(+b.dataset.i); };
 $("rp").onclick = () => seek(0);
+$("len").onclick = () => { K = K === 1 ? .625 : 1; $("len").setAttribute("aria-pressed", K !== 1); layout(); seek(0); };
 $("pp").onclick = () => { if (playing) { playing = false; PAUSED = document.getAnimations().filter(a => a.playState === "running"); PAUSED.forEach(a => a.pause()); $("pp").textContent = "▶ Putar"; }
   else { if (t >= TOTAL) return seek(0); playing = true; PAUSED.forEach(a => a.play()); PAUSED = []; $("pp").textContent = "❚❚ Jeda"; } };
 $("spd").onclick = () => { rate = rate === 1 ? .5 : 1; $("spd").setAttribute("aria-pressed", rate !== 1); document.getAnimations().forEach(a => a.updatePlaybackRate(a instanceof CSSAnimation ? 1 : rate * (a._k || 1))); };

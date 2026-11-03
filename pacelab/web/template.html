@@ -676,6 +676,31 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .bd.on.r{border-color:var(--r);color:var(--text);background:color-mix(in srgb,var(--r) 14%,transparent)}
 .hint{position:fixed;pointer-events:none;background:var(--text);color:var(--bg);font-size:13px;padding:6px 10px;border-radius:8px;opacity:0;transition:opacity .15s;z-index:9;max-width:260px}
 .hint.on{opacity:1}
+/* intro film (INTRO): fixed overlay, a 1280 x 720 canvas scaled to fit, letterboxed on charcoal */
+#intro{position:fixed;inset:0;z-index:300;background:#0d0d0c;display:grid;place-items:center;overflow:hidden}
+#intro .iv-fr{position:relative;overflow:hidden} #intro .iv-st{position:absolute;left:0;top:0;width:1280px;height:720px;transform-origin:0 0;overflow:hidden;color:var(--text);font-family:var(--font)}
+#intro .iv-layer{position:absolute;inset:0;overflow:hidden} #intro .iv-ab{position:absolute}
+#intro .iv-skip{position:absolute;right:18px;top:14px;z-index:5;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.3);color:#fff;font:inherit;font-size:14px;border-radius:999px;padding:5px 14px;cursor:pointer;backdrop-filter:blur(6px);transition:opacity .3s}
+#intro .iv-wipe{position:absolute;left:0;top:-200px;width:2600px;height:1120px;z-index:10;transform:translateX(-2800px) skewX(-18deg);pointer-events:none;background:linear-gradient(90deg,var(--t) 0 30%,#0d0d0c 30% 70%,var(--r) 70%)}
+#intro .iv-rn{position:absolute;left:0;top:0;z-index:12;pointer-events:none} #intro .iv-ry{position:absolute;left:0;top:0;transform-origin:0 0}
+#intro .iv-bx{position:absolute;left:-30px;top:-60px;width:60px;height:60px} #intro .iv-ic{position:absolute;inset:0;width:60px;height:60px;overflow:visible}
+#intro .iv-rn.t .iv-ic{fill:var(--t)} #intro .iv-rn.r .iv-ic{fill:var(--r)}
+#intro .iv-go .iv-ic,#intro .iv-ride{animation:ivbob .3s ease-in-out infinite alternate} #intro .iv-rn.r.iv-go .iv-ic{animation-delay:-.15s}
+@keyframes ivbob{from{transform:translateY(0) rotate(0)}to{transform:translateY(-6px) rotate(-5deg)}}
+#intro .iv-idle .iv-ic{animation:ivbreathe 1.6s ease-in-out infinite alternate} @keyframes ivbreathe{to{transform:scaleY(.96) translateY(1px)}}
+#intro .iv-wind{position:absolute;left:-18px;top:16px;width:20px;height:30px;opacity:0;transition:opacity .25s} #intro .iv-go .iv-wind{opacity:.7}
+#intro .iv-wind i{position:absolute;height:3px;border-radius:2px;background:currentColor;animation:ivwd .35s linear infinite alternate}
+#intro .iv-rn.t .iv-wind{color:var(--t)} #intro .iv-rn.r .iv-wind{color:var(--r)}
+#intro .iv-wind i:nth-child(1){top:0;left:6px;width:12px} #intro .iv-wind i:nth-child(2){top:10px;left:0;width:16px;animation-delay:-.1s} #intro .iv-wind i:nth-child(3){top:20px;left:4px;width:12px;animation-delay:-.2s}
+@keyframes ivwd{to{transform:translateX(-5px);opacity:.4}}
+#intro .iv-trail{position:absolute;right:46px;top:32px;height:7px;width:0;border-radius:4px;filter:blur(.6px)}
+#intro .iv-rn.t .iv-trail{background:linear-gradient(90deg,transparent,var(--t));box-shadow:0 0 18px color-mix(in srgb,var(--t) 60%,transparent)}
+#intro .iv-rn.r .iv-trail{background:linear-gradient(90deg,transparent,var(--r));box-shadow:0 0 18px color-mix(in srgb,var(--r) 60%,transparent)}
+#intro .iv-cap{position:absolute;line-height:1.08} #intro .iv-ln{display:block;white-space:nowrap} #intro .iv-w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
+#intro .iv-w > span{display:inline-block;transform:translateY(110%)}
+#intro .iv-chip{position:absolute;border-radius:999px;padding:6px 16px;font-size:17px;font-weight:600;white-space:nowrap;background:var(--surface);border:1px solid var(--line);color:var(--text)}
+footer .about{display:inline-flex;gap:6px;align-items:center} footer .about button{border:1px solid var(--line);background:var(--surface);color:var(--text);font:inherit;font-size:12.5px;border-radius:999px;padding:3px 12px;cursor:pointer;transition:border-color .2s}
+footer .about button:hover,footer .about button:focus-visible{border-color:var(--text)} footer .about button + button{color:var(--muted)}
 footer{margin-top:28px;color:var(--muted);font-size:13px;display:flex;gap:18px;flex-wrap:wrap;align-items:center}
 footer .hand{display:inline-flex;align-items:center;gap:6px} footer .hsw{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:2px}
 footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;padding:2px 10px;border-radius:8px;color:var(--muted);cursor:pointer;transition:background .2s,color .2s} footer .hsw button[aria-pressed=true]{background:var(--surface);color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
@@ -879,8 +904,11 @@ document.addEventListener("pointerout", e => { if (e.target.closest("[data-hint]
     DATA.events.filter(e => !/maraton/i.test(e.event)).map(e => `<span class="pill it">${ic(CAL)}${e.event.replace(/^LOMBA /i,"").replace(/HALF MARATHON/i,"Half")} · ${tgl(e.date)}</span>`).join("");
   $("foot").innerHTML = `<span>Dibuat ${DATA.generated.replace("T"," ")}</span>` +
     A.map(a => `<span>${a.name}: ${a.sync ? "sync " + a.sync.replace("T"," ").slice(0,16) : "belum ada data"}</span>`).join("") +
-    `<span class="hand" data-hint="Untuk pena dan sentuhan: tooltip muncul di sisi yang tidak tertutup tangan. Mouse tidak berubah.">Pena di tangan <span class="hsw" role="group" aria-label="Tangan yang memegang pena"><button data-hand="R" aria-pressed="${HAND === "R"}">kanan</button><button data-hand="L" aria-pressed="${HAND === "L"}">kiri</button></span></span>`;
-  $("foot").addEventListener("click", e => { const b = e.target.closest("[data-hand]"); if (!b) return; HAND = b.dataset.hand;
+    `<span class="hand" data-hint="Untuk pena dan sentuhan: tooltip muncul di sisi yang tidak tertutup tangan. Mouse tidak berubah.">Pena di tangan <span class="hsw" role="group" aria-label="Tangan yang memegang pena"><button data-hand="R" aria-pressed="${HAND === "R"}">kanan</button><button data-hand="L" aria-pressed="${HAND === "L"}">kiri</button></span></span>` +
+    `<span class="about"><button type="button" data-intro="0">▶ Tentang PaceLab Duo</button><button type="button" data-intro="1" title="film yang sama, dipercepat">ringkas · 25 dtk</button></span>`;
+  $("foot").addEventListener("click", e => { const ib = e.target.closest("[data-intro]");
+    if (ib) { document.body.classList.remove("ready"); void document.body.offsetWidth; INTRO.play(ib.dataset.intro === "1", dashIn); return; }
+    const b = e.target.closest("[data-hand]"); if (!b) return; HAND = b.dataset.hand;
     try { localStorage.setItem("pacelab-hand", HAND); } catch (er) {} $("foot").querySelectorAll("[data-hand]").forEach(x => x.setAttribute("aria-pressed", x === b)); });
 })();
 
@@ -2434,9 +2462,259 @@ const ro = new ResizeObserver(es => es.forEach(e => { const id = e.target.id, w 
   if (CHARTS[id] && w && w !== e.target._w) { clearTimeout(e.target._t); e.target._t = setTimeout(() => draw(id, CHARTS[id]), 80); } }));
 Object.keys(CHARTS).forEach(id => ro.observe($(id)));
 
-// header entrance + countdown
-document.body.classList.add("ready");
-if (!REDUCED) { const el = $("days"), to = +el.textContent; el.dataset.to = to; el.dataset.fmt = "int"; setTimeout(() => countUp(el), 250); }
+// ---------------------------------------------------------------- intro film "PaceLab Duo · Road to 42K" (mockup docs/mockup/intro-film.html)
+// 7 scenes, the two runners are the main characters; every number is read from DATA when it plays.
+// Plays once per browser (pacelab-intro), again from the footer button. Ends by handing the runners over to the program track.
+const INTRO = (() => {
+  const E = "cubic-bezier(.22,1,.36,1)", OUT = "cubic-bezier(.16,1,.3,1)", INOUT = "cubic-bezier(.65,0,.35,1)", SPR = "cubic-bezier(.34,1.56,.64,1)";
+  let K = 1, t = 0, playing = false, last = 0, cur = -1, base = 0, Q = [], TK = [], LAYER = null, START = [], TOTAL = 0, ov = null, st = null, R = {}, P = {}, I = null, raf = 0, done = null, ending = false;
+  const AN = (el, kf, o) => { o = Object.assign({}, o); if (o.duration) o.duration *= K; if (o.delay) o.delay *= K; return el.animate(kf, o); };
+  const at = (ms, fn) => Q.push({t: base + ms * K, fn});
+  const mk = (p, cls, css, html) => { const e = document.createElement("div"); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; p.appendChild(e); return e; };
+  const pop = (e, d = 0, from = .6, ms = 520) => AN(e, [{opacity: 0, transform: `scale(${from})`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: SPR, fill: "both"});
+  const rise = (e, d = 0, dy = 24, ms = 600) => AN(e, [{opacity: 0, transform: `translateY(${dy}px)`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: OUT, fill: "both"});
+  const fade = (e, d = 0, ms = 400) => AN(e, [{opacity: getComputedStyle(e).opacity}, {opacity: 0}], {duration: ms, delay: d, easing: "ease", fill: "forwards"});
+  const count = (e, to, ms, fmt, d = 0) => { const s0 = base + d * K; TK.push(T => { if (T < s0) return; const k = Math.min(1, (T - s0) / ms / K); e.textContent = fmt(to * (1 - Math.pow(1 - k, 3))); return k < 1; }); };
+  const cap = (L, lines, x, y, d = 0, center) => { const c = mk(L, "iv-cap", `left:${x}px;top:${y}px;${center ? "text-align:center;transform:translateX(-50%)" : ""}`); let k = 0;
+    lines.forEach(([txt, size, weight, color]) => { const ln = mk(c, "iv-ln", `font-size:${size}px;font-weight:${weight};color:${color};letter-spacing:${size > 40 ? "-.02em" : "0"}`);
+      txt.split(" ").forEach(w => { const s = document.createElement("span"); s.className = "iv-w"; s.innerHTML = `<span>${esc(w)}</span>`; ln.appendChild(s); ln.appendChild(document.createTextNode(" "));
+        AN(s.firstChild, [{transform: "translateY(110%)"}, {transform: "none"}], {duration: 650, delay: d + k++ * 45, easing: OUT, fill: "both"}); }); });
+    return c; };
+  // runners: outer element moves on x, inner on y + scale, so a jump is a real arc
+  function go(c, x, y, s = 1, ms = 0, o = {}) { const e = R[c], ry = e.firstElementChild, a = P[c], X = `translateX(${x}px)`, Y = `translateY(${y}px) scale(${s})`;
+    [e._a, ry._a].forEach(q => q && q.cancel()); e.style.transform = X; ry.style.transform = Y; P[c] = {x, y, s}; if (!ms) return;
+    const d = o.delay || 0, ea = o.arc ? "linear" : (o.ease || E);
+    e._a = AN(e, [{transform: `translateX(${a.x}px)`}, {transform: X}], {duration: ms, delay: d, easing: ea, fill: "both"});
+    ry._a = AN(ry, o.arc ? [{transform: `translateY(${a.y}px) scale(${a.s})`, easing: "cubic-bezier(.33,.66,.6,1)"}, {transform: `translateY(${Math.min(a.y, y) - o.arc}px) scale(${(a.s + s) / 2})`, offset: .5, easing: "cubic-bezier(.4,0,.67,.34)"}, {transform: Y}]
+      : [{transform: `translateY(${a.y}px) scale(${a.s})`}, {transform: Y}], {duration: ms, delay: d, easing: ea, fill: "both"}); }
+  const run = on => ["t", "r"].forEach(c => { R[c].classList.toggle("iv-go", on); R[c].classList.remove("iv-idle"); });
+  const idle = () => ["t", "r"].forEach(c => { R[c].classList.remove("iv-go"); R[c].classList.add("iv-idle"); });
+  const trail = (w, ms, d = 0) => ["t", "r"].forEach(c => { const tr = R[c].querySelector(".iv-trail"); AN(tr, [{width: getComputedStyle(tr).width}, {width: w + "px"}], {duration: ms, delay: d, easing: E, fill: "forwards"}); });
+  const show = (on, ms = 300) => ["t", "r"].forEach(c => AN(R[c], [{opacity: getComputedStyle(R[c]).opacity}, {opacity: on ? 1 : 0}], {duration: ms, fill: "forwards"}));
+  const col = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+  const mmss = s => `${Math.floor(s / 60)}:${String(Math.round(s % 60)).padStart(2, "0")}`;
+
+  // ---------------- what the film shows, from DATA
+  function data() { const ta = A.find(x => x.c === "t") || A[0], ra = A.find(x => x.c === "r") || A[A.length - 1];
+    const S = DATA.ms1, Rd = DATA.race_date, span = D(Rd) - D(S), frac = s => Math.max(0, Math.min(1, (D(s) - D(S)) / span));
+    const ms = (DATA.all_events || DATA.events || []).filter(e => !/maraton/i.test(e.event) && !/keringat/i.test(e.event) && e.date >= S && e.date <= Rd)
+      .map(e => [e.event.replace(/^LOMBA /i, "").replace(/HALF MARATHON/i, "Half"), tgl(e.date), frac(e.date)]).concat([["42K", `${tgl(Rd)} ${D(Rd).getFullYear()}`, 1]]);
+    const nw = DATA.total_weeks || 51, wk = DATA.ms_cur || 1, ph = (DATA.phases || []).map(p => [p.name, p.a, p.b]);
+    const km = a => Array.from({length: nw}, (_, i) => { const w = (a.plan || []).find(p => p.ms === i + 1); return w && w.km ? w.km : 0; });
+    const HRVL = {BALANCED: "seimbang", UNBALANCED: "tidak seimbang", LOW: "rendah", POOR: "buruk"};
+    const morn = a => { const l = a.today && a.today.light; if (!l) return {rows: [["Tidur", "–", 1], ["HRV", "–", 1], ["Body Battery", "–", 1]], lamp: "–", cls: "muted", note: "Belum ada data pagi ini."};
+      const ok = k => { const c = (l.checks || []).find(q => q.k === k); return !c || c.s === "ok"; }, L = LIGHT[l.level] || ["muted", l.level, ""];
+      const sl = l.sleep_s != null ? `${Math.floor(l.sleep_s / 3600)} j ${Math.round(l.sleep_s % 3600 / 60)} m` : "–";
+      return {rows: [["Tidur", sl, ok("sleep")], ["HRV", HRVL[l.hrv_status] || (l.hrv != null ? l.hrv + " ms" : "–"), ok("hrv")], ["Body Battery", l.bb ?? "–", ok("bb"), l.bb]],
+        lamp: L[1].toUpperCase(), cls: L[0], note: L[2] ? L[2][0].toUpperCase() + L[2].slice(1) + "." : ""}; };
+    // the duel: the biggest day both ran in the last four weeks (usually the long run)
+    let duel = null; const from = addDays(DATA.today, -28);
+    (ta.sessions || []).filter(x => x.date >= from).forEach(x => { const y = sessOf(ra, x.date), z = sessOf(ta, x.date); if (!y || !z) return; const v = z.km + y.km; if (!duel || v > duel.v) duel = {v, s: x.date, T: z, R: y}; });
+    if (duel) { const pl = parsePlan(planCell(ta, duel.s)) || parsePlan(planCell(ra, duel.s)), blocks = x => x.laps && x.laps.length ? x.laps : x.splits.map(p => [p[0], p[1], p[2], p[3], "k", p[5]]);
+      duel.title = `${hariF(duel.s)}${pl ? " · " + pl.title : ""}`; duel.bt = blocks(duel.T); duel.br = blocks(duel.R);
+      duel.ct = ssComp(ta, duel.T, parsePlan(planCell(ta, duel.s)), duel.s); duel.cr = ssComp(ra, duel.R, parsePlan(planCell(ra, duel.s)), duel.s);
+      const ck = (ssChecks(ta, duel.T, parsePlan(planCell(ta, duel.s)), false, duel.s) || []).filter(c => c[1] !== "na").slice(0, 3).map(c => `${c[0].replace(/HR tidak lewat \d+/, "HR tidak lewat batas")} ${c[1] === "ok" ? "✓" : "!"}`);
+      const cl = [ssCadRun(duel.T), ssCadRun(duel.R)]; if (cl.every(v => v != null)) ck.push(`Cadence lari ${Math.round(cl[0])} · ${Math.round(cl[1])} spm`); duel.ck = ck; }
+    const pb = a => ((a.pb || {})["5K"] || []).slice(-8).map(p => p.sec);
+    return {ta, ra, days: Math.round((D(Rd) - D(DATA.today)) / 864e5), Rd, wk, nw, ph, ms, today: frac(DATA.today), km: [km(ta), km(ra)], mo: [morn(ta), morn(ra)], duel, pb: [pb(ta), pb(ra)],
+      est: [ta, ra].map(a => ({sec: a.est && a.est.sec, lo: a.target && a.target.lo, hi: a.target && a.target.hi, txt: a.target && a.target.text}))}; }
+
+  // ---------------- scenes (1280 x 720 canvas)
+  const X0 = 120, TW = 1040;
+  const SC = [
+  {n: "Mulai", dur: 4500, run(L) {
+    L.style.background = "#0d0d0c";
+    const g42 = mk(L, "iv-ab", "left:560px;top:40px;font-size:430px;font-weight:900;letter-spacing:-.05em;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.07);white-space:nowrap", "42K");
+    AN(g42, [{transform: "translateX(120px)"}, {transform: "translateX(-260px)"}], {duration: 4500, easing: "linear", fill: "both"});
+    for (let i = 0; i < 9; i++) { const s = mk(L, "iv-ab", `left:0;top:${70 + i * 44}px;height:${i % 3 ? 1 : 2}px;width:${180 + (i * 97) % 340}px;background:linear-gradient(90deg,transparent,rgba(255,255,255,${.1 + (i % 4) * .05}))`);
+      AN(s, [{transform: "translateX(1400px)"}, {transform: "translateX(-600px)"}], {duration: 650 + (i * 131) % 600, delay: -(i * 173) % 900, iterations: Infinity, easing: "linear"}); }
+    const gnd = mk(L, "iv-ab", "left:0;top:470px;width:1280px;height:2px;background:rgba(255,255,255,.28)");
+    const dsh = mk(L, "iv-ab", "left:0;top:484px;width:2560px;height:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.3) 0 46px,transparent 46px 128px)");
+    AN(dsh, [{transform: "translateX(0)"}, {transform: "translateX(-1280px)"}], {duration: 700, iterations: Infinity, easing: "linear"});
+    go("t", -160, 470, 2.3); go("r", -90, 470, 2.3); run(true);
+    go("t", 470, 470, 2.3, 1200, {ease: OUT}); go("r", 590, 470, 2.3, 1200, {ease: OUT, delay: 120}); trail(420, 1000, 150);
+    const c = cap(L, [["42K dimulai", 76, 900, "#fff"], ["jauh sebelum garis start.", 46, 600, "rgba(255,255,255,.75)"]], 80, 110, 1300);
+    at(3500, () => { fade(c, 0, 300); [...L.children].forEach(e => e !== gnd && e !== c && fade(e, 0, 400));
+      AN(L, [{backgroundColor: "#0d0d0c"}, {backgroundColor: col("--bg")}], {duration: 800, easing: INOUT, fill: "forwards"});
+      AN(gnd, [{top: "470px", background: "rgba(255,255,255,.28)", height: "2px", left: "0px", width: "1280px"}, {top: "376px", background: col("--grid"), height: "8px", left: "120px", width: "1040px"}], {duration: 900, easing: INOUT, fill: "forwards"});
+      trail(0, 700); go("t", X0 - 30, 374, 1.15, 900, {ease: INOUT}); go("r", X0 + 6, 374, 1.15, 900, {ease: INOUT}); }); } },
+
+  {n: "Tujuan", dur: 5500, run(L) {
+    L.style.background = "var(--bg)"; go("t", X0 - 30, 374, 1.15); go("r", X0 + 6, 374, 1.15); run(true);
+    mk(L, "iv-ab", `left:${X0}px;top:376px;width:${TW}px;height:8px;border-radius:4px;background:var(--grid)`);
+    const today = X0 + TW * I.today, fill = mk(L, "iv-ab", `left:${X0}px;top:376px;height:8px;width:0;border-radius:4px;background:linear-gradient(90deg,var(--t),var(--r))`);
+    mk(L, "iv-ab", `left:${X0}px;top:376px;width:${TW}px;height:8px;background:repeating-linear-gradient(90deg,transparent 0 ${TW / I.nw - 2}px,var(--bg) ${TW / I.nw - 2}px ${TW / I.nw}px)`);
+    AN(fill, [{width: "0px"}, {width: today - X0 + "px"}], {duration: 1800, easing: INOUT, fill: "both"});
+    go("t", today - 30, 374, 1.15, 1800, {ease: INOUT}); go("r", today + 6, 374, 1.15, 1800, {ease: INOUT}); at(1800, idle);
+    const hc = mk(L, "iv-chip", `left:${today}px;top:400px;transform:translateX(-50%);font-size:14px;background:var(--text);color:var(--surface);border:0`, `Hari ini · ${tgl(DATA.today)}`); pop(hc, 1700);
+    let prev = -1e9; I.ms.forEach(([n, d, f], i) => { const big = n === "42K", x = X0 + TW * f, lift = !big && x - prev < 90 ? 44 : 0; prev = lift ? -1e9 : x;
+      const post = mk(L, "iv-ab", `left:${x - 1.5}px;top:${big ? 312 : 342 - lift}px;width:3px;height:${big ? 64 : 34 + lift}px;background:${f < I.today ? "var(--muted)" : "var(--text)"};border-radius:2px;transform-origin:bottom`);
+      const lb = mk(L, "iv-ab", `left:${x}px;top:${(big ? 250 : 290) - lift}px;transform:translateX(-50%);text-align:center;white-space:nowrap;font-size:${big ? 30 : 16}px;font-weight:800;line-height:1.1;color:var(--text)`, `${esc(n)}<div style="font-size:${big ? 15 : 13}px;font-weight:500;color:var(--muted)">${d}</div>`);
+      const dl = 700 + i * 300; AN(post, [{transform: "scaleY(0)"}, {transform: "none"}], {duration: 420, delay: dl, easing: SPR, fill: "both"});
+      AN(lb, [{opacity: 0, transform: "translate(-50%,14px)"}, {opacity: 1, transform: "translate(-50%,0)"}], {duration: 500, delay: dl + 60, easing: OUT, fill: "both"}); });
+    const eb = mk(L, "iv-ab", "left:640px;top:58px;transform:translateX(-50%);font-size:18px;color:var(--muted);white-space:nowrap", `Maraton · ${hariF(I.Rd)} ${D(I.Rd).getFullYear()}`); rise(eb, 1900, 12);
+    const n = mk(L, "iv-ab num", "left:640px;top:84px;transform:translateX(-50%);font-size:150px;font-weight:900;letter-spacing:-.05em;line-height:1;color:var(--text)", "0"); rise(n, 1900, 30);
+    const hl = mk(L, "iv-ab", "left:640px;top:236px;transform:translateX(-50%);font-size:24px;color:var(--text-2);white-space:nowrap", "hari lagi"); rise(hl, 2100, 12);
+    count(n, I.days, 1500, v => Math.round(v), 1900);
+    cap(L, [["Satu tujuan.", 46, 900, "var(--text)"], [`Perjalanan ${I.nw} minggu yang terukur.`, 24, 500, "var(--muted)"]], X0, 500, 2600);
+    at(4700, () => { [...L.children].forEach(e => fade(e, 0, 500)); run(true); go("t", 108, 560, 1, 750, {arc: 60}); go("r", 140, 560, 1, 750, {arc: 60, delay: 60}); }); } },
+
+  {n: "Rencana", dur: 5500, run(L) {
+    L.style.background = "var(--bg)"; go("t", 108, 560, 1); go("r", 140, 560, 1); idle();
+    const B = 560, ww = TW / I.nw, mx = Math.max(1, ...I.km[0], ...I.km[1]), H = (i, j) => Math.max(4, I.km[j][i] / mx * 210), cw = I.wk - 1;
+    const sel = [];
+    for (let i = 0; i < I.nw; i++) ["t", "r"].forEach((c, j) => { const h = H(i, j), now = i === cw;
+      const b = mk(L, "iv-ab", `left:${X0 + i * ww + 2 + j * (ww / 2 - 1)}px;top:${B - h}px;width:${Math.max(2, ww / 2 - 3)}px;height:${h}px;border-radius:3px 3px 0 0;transform-origin:bottom;background:${now ? `var(--${c})` : `color-mix(in srgb,var(--${c}) ${i < cw ? 72 : 20}%,var(--surface))`}`);
+      AN(b, [{transform: "scaleY(0)"}, {transform: "none"}], {duration: 560, delay: 120 + i * 16, easing: "cubic-bezier(.34,1.4,.64,1)", fill: "both"}); if (now) sel.push(b); });
+    const cph = I.ph.find(p => p[1] <= I.wk && I.wk <= p[2]);
+    I.ph.forEach(([n, a, z], j) => { const x1 = X0 + (a - 1) * ww + 2, w = (z - a + 1) * ww - 4, on = cph && n === cph[0], dn = z < I.wk;
+      const s = mk(L, "iv-ab", `left:${x1}px;top:${B + 8}px;width:${w}px;height:16px`, `<svg width="${w}" height="16" style="overflow:visible"><path d="M1 0 V6 Q1 12 7 12 H${w - 7} Q${w - 1} 12 ${w - 1} 6 V0" fill="none" stroke="${on ? "var(--text)" : "var(--line)"}" stroke-width="${on ? 2 : 1.5}" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/></svg>`);
+      AN(s.querySelector("path"), [{strokeDashoffset: 1}, {strokeDashoffset: 0}], {duration: 500, delay: 900 + j * 110, easing: OUT, fill: "both"});
+      const lb = mk(L, "iv-ab", `left:${x1 + w / 2}px;top:${B + 28}px;transform:translateX(-50%);font-size:${on ? 15 : 13}px;font-weight:${on ? 800 : 500};color:${on ? "var(--text)" : "var(--muted)"};white-space:nowrap`, (dn ? '<span style="color:var(--good)">✓ </span>' : "") + esc(n));
+      AN(lb, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 1000 + j * 110, fill: "both"}); });
+    const top = i => B - Math.max(H(i, 0), H(i, 1)) - 2, cx = i => X0 + i * ww + ww / 2;
+    run(true); [...new Set([.2, .45, .72].map(f => Math.max(0, Math.round(cw * f))).concat([cw]))].forEach((i, k) => at(1000 + k * 430, () => { go("t", cx(i) - 16, top(i), 1, 400, {arc: 70}); go("r", cx(i) + 14, top(i), 1, 400, {arc: 70, delay: 50}); }));
+    at(2750, () => { idle(); sel.forEach(b => AN(b, [{translate: "0 0"}, {translate: "0 -12px"}], {duration: 400, easing: SPR, fill: "forwards"})); go("t", cx(cw) - 16, top(cw) - 12, 1, 400); go("r", cx(cw) + 14, top(cw) - 12, 1, 400); });
+    if (cph) { const bx = mk(L, "iv-ab", `left:${X0 + (cph[1] - 1) * ww - 4}px;top:${B - 262}px;width:${(cph[2] - cph[1] + 1) * ww + 8}px;height:312px;border:2px solid var(--text);border-radius:14px`); pop(bx, 2800, .96, 500); }
+    const ch = mk(L, "iv-chip", `left:${Math.min(1100, Math.max(180, cx(cw)))}px;top:${B - 306}px;transform:translateX(-50%);font-size:16px`, `<b>Minggu ${I.wk}</b> dari ${I.nw}${cph ? " · fase " + esc(cph[0]) : ""}`);
+    AN(ch, [{opacity: 0, transform: "translate(-50%,10px)"}, {opacity: 1, transform: "translate(-50%,0)"}], {duration: 500, delay: 2900, easing: OUT, fill: "both"});
+    cap(L, [[`${I.nw} minggu. ${I.ph.length} fase.`, 46, 900, "var(--text)"], ["Rencana pelatih dari Excel: target km tiap minggu.", 22, 500, "var(--muted)"]], X0, 70, 400);
+    const tap = mk(L, "iv-ab", `left:${cx(cw) + 60}px;top:${B - 120}px;width:34px;height:34px;margin:-17px;border-radius:50%;border:2.5px solid var(--text);background:color-mix(in srgb,var(--surface) 50%,transparent);opacity:0`);
+    at(4200, () => AN(tap, [{opacity: 0, transform: "translate(40px,40px)"}, {opacity: 1, transform: "none", offset: .6}, {opacity: 1, transform: "scale(.75)", offset: .8}, {opacity: 1, transform: "none"}], {duration: 650, easing: E, fill: "forwards"}));
+    at(4750, () => { const o = mk(L, "iv-ab", `left:${cx(cw)}px;top:${B - 140}px;width:40px;height:40px;margin:-20px;border-radius:50%;background:var(--surface);z-index:5`);
+      AN(o, [{transform: "scale(0)"}, {transform: "scale(64)"}], {duration: 750, easing: "cubic-bezier(.7,0,.84,0)", fill: "forwards"});
+      run(true); go("t", 615, 236, 1.1, 750, {arc: 90}); go("r", 665, 236, 1.1, 750, {arc: 90, delay: 40}); }); } },
+
+  {n: "Pagi", dur: 5500, run(L) {
+    L.style.background = "var(--surface)"; go("t", 615, 236, 1.1); go("r", 665, 236, 1.1); run(true);
+    const card = (x, c, a, m, d) => { const left = c === "t", k = mk(L, "iv-ab", `left:${x}px;top:240px;width:460px;height:330px;border-radius:26px;background:var(--bg);padding:26px 30px;text-align:${left ? "right" : "left"};color:var(--text)`);
+      rise(k, d, 40, 650); const dot = `<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:var(--${c})"></span>`;
+      mk(k, "", "font-size:26px;font-weight:800", left ? `${esc(a.name)} ${dot}` : `${dot} ${esc(a.name)}`);
+      m.rows.forEach(([l, v, ok, bb], j) => { const r = mk(k, "", `display:flex;justify-content:space-between;flex-direction:${left ? "row-reverse" : "row"};align-items:center;margin-top:${j ? 10 : 18}px;font-size:18px;color:var(--text-2)`,
+        `<span>${l}</span><b style="color:${ok ? "var(--text)" : "var(--warn)"};font-size:22px" class="num">${v}${v === "–" ? "" : ok ? ' <span style="color:var(--good)">✓</span>' : " !"}</b>`);
+        rise(r, d + 700 + j * 230, 14, 450);
+        if (bb != null) { const bar = mk(k, "", `height:8px;border-radius:4px;background:var(--grid);margin-top:6px;overflow:hidden;direction:${left ? "rtl" : "ltr"}`, `<i style="display:block;height:100%;width:0;border-radius:4px;background:${ok ? "var(--good)" : "var(--warn)"}"></i>`);
+          AN(bar.firstChild, [{width: "0%"}, {width: Math.min(100, bb) + "%"}], {duration: 900, delay: d + 1000 + j * 230, easing: E, fill: "both"}); } });
+      const lp = mk(k, "iv-ab", `${left ? "right" : "left"}:30px;bottom:56px;font-size:30px;font-weight:900;letter-spacing:.06em;border-radius:999px;padding:6px 26px;background:var(--${m.cls}-bg,var(--grid));color:var(--${m.cls},var(--muted))`, m.lamp);
+      AN(lp, [{opacity: 0, transform: "scale(2.4) rotate(-6deg)"}, {opacity: 1, transform: "scale(.94)", offset: .7}, {opacity: 1, transform: "none"}], {duration: 520, delay: d + 1900, easing: "cubic-bezier(.2,.8,.3,1)", fill: "both"});
+      rise(mk(k, "iv-ab", `${left ? "right" : "left"}:32px;bottom:24px;font-size:16px;color:var(--text-2)`, esc(m.note)), d + 2200, 8, 400); };
+    card(140, "t", I.ta, I.mo[0], 0); card(680, "r", I.ra, I.mo[1], 120);
+    at(150, () => { go("t", 540, 240, 1.1, 650, {arc: 80}); go("r", 740, 240, 1.1, 650, {arc: 80, delay: 60}); }); at(850, idle);
+    pop(mk(L, "iv-ab", "left:640px;top:390px;width:58px;height:58px;margin:-29px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);display:grid;place-items:center;font-weight:800;color:var(--muted);font-size:16px", "VS"), 600);
+    cap(L, [["Setiap pagi, satu pertanyaan:", 22, 500, "var(--muted)"], ["latihan keras, atau cukup easy?", 44, 900, "var(--text)"]], 640, 70, 200, true);
+    at(5050, () => { AN(st.querySelector(".iv-wipe"), [{transform: "translateX(-2800px) skewX(-18deg)"}, {transform: "translateX(1500px) skewX(-18deg)"}], {duration: 900, easing: INOUT});
+      run(true); go("t", 600, 128, 1, 900, {ease: INOUT}); go("r", 640, 128, 1, 900, {ease: INOUT}); }); } },
+
+  {n: "Duel sesi", dur: 6000, run(L) {
+    L.style.background = "var(--bg)"; go("t", 600, 128, 1); go("r", 640, 128, 1); run(true); go("t", 618, 132, 1, 500); go("r", 662, 132, 1, 500);
+    const du = I.duel;
+    if (!du) { cap(L, [["Setiap lari diadu,", 52, 900, "var(--text)"], ["lap demi lap.", 52, 900, "var(--text)"]], 640, 260, 200, true); at(5300, () => { [...L.children].forEach(e => fade(e, 0, 450)); go("t", 160, 470, 1, 700, {arc: 80}); go("r", 160, 520, 1, 700, {arc: 80, delay: 50}); }); return; }
+    const n = Math.max(du.bt.length, du.br.length), gap = n > 14 ? 3 : 6, h = Math.min(38, (440 - gap * (n - 1)) / n), top = 150;
+    const all = du.bt.concat(du.br).filter(l => l[0] >= .2).map(l => l[1] / l[0]), slow = Math.max(...all) + 20, fast = Math.min(...all) - 10, w = l => 40 + (slow - l[1] / l[0]) / (slow - fast) * 300;
+    mk(L, "iv-ab", `left:639px;top:146px;width:2px;height:${n * (h + gap) + 4}px;background:var(--line)`);
+    [[du.bt, "t", true], [du.br, "r", false]].forEach(([bl, c, left]) => bl.forEach((l, i) => { const y = top + i * (h + gap), d = 300 + i * Math.min(70, 900 / n), ww = l[0] < .2 ? 30 : w(l);
+      const b = mk(L, "iv-ab", `left:${left ? 600 - ww : 680}px;top:${y}px;width:${ww}px;height:${h}px;border-radius:${Math.min(6, h / 2)}px;background:var(--${c});transform-origin:${left ? "right" : "left"};opacity:${l[4] === "m" || l[4] === "e" || l[0] < .5 ? .55 : .92}`);
+      AN(b, [{transform: "scaleX(0)"}, {transform: "none"}], {duration: 600, delay: d, easing: "cubic-bezier(.34,1.3,.64,1)", fill: "both"});
+      if (h >= 20) mk(b, "iv-ab", `${left ? "left" : "right"}:12px;top:${h / 2 - 10}px;font-size:15px;font-weight:700;color:#fff`, paceS(l[1] / l[0]));
+      if (l[5]) { const hz = mk(b, "iv-ab", `${left ? "right" : "left"}:0;top:0;bottom:0;width:${Math.max(4, ww * l[5] / l[1])}px;border-radius:inherit;background:repeating-linear-gradient(135deg,var(--warn) 0 4px,rgba(255,255,255,.55) 4px 8px)`);
+        AN(hz, [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 1800, fill: "both"}); }
+      if (c === "t" && h >= 14) AN(mk(L, "iv-ab", `left:640px;top:${y + h / 2 - 9}px;transform:translateX(-50%);font-size:13px;color:var(--muted)`, i + 1), [{opacity: 0}, {opacity: 1}], {duration: 300, delay: d, fill: "both"}); }));
+    if (du.bt.concat(du.br).some(l => l[5])) AN(mk(L, "iv-chip", "left:640px;top:606px;transform:translateX(-50%);font-size:14px;color:var(--warn);border-color:var(--warn)", "▨ arsir = jalan kaki"), [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 1900, fill: "both"});
+    const ring = (x, c, v, d) => { if (v == null) return; const g = mk(L, "iv-ab", `left:${x - 60}px;top:270px;width:120px;height:120px`, `<svg viewBox="0 0 120 120" width="120" height="120"><circle cx="60" cy="60" r="50" fill="none" stroke="var(--grid)" stroke-width="10"/><circle cx="60" cy="60" r="50" fill="none" stroke="var(--${c})" stroke-width="10" stroke-linecap="round" pathLength="100" stroke-dasharray="0 100" transform="rotate(-90 60 60)"/></svg><b class="num" style="position:absolute;left:0;top:0;width:120px;height:120px;display:grid;place-items:center;font-size:32px;color:var(--text)">0</b><div style="text-align:center;font-size:14px;color:var(--muted);margin-top:4px">patuh rencana</div>`);
+      pop(g, d); AN(g.querySelectorAll("circle")[1], [{strokeDasharray: "0 100"}, {strokeDasharray: `${v} ${100 - v}`}], {duration: 1100, delay: d + 200, easing: E, fill: "both"}); count(g.querySelector("b"), v, 1100, q => Math.round(q), d + 200); };
+    ring(150, "t", du.ct, 1200); ring(1130, "r", du.cr, 1300);
+    const row = mk(L, "iv-ab", "left:640px;top:656px;transform:translateX(-50%);display:flex;gap:10px;white-space:nowrap");
+    du.ck.forEach((s, k) => rise(mk(row, "iv-chip", "position:static;font-size:15px", esc(s)), 2500 + k * 220, 18, 450));
+    cap(L, [["Setiap lari diadu,", 38, 900, "var(--text)"], ["lap demi lap.", 38, 900, "var(--text)"], ["Lap asli dari jam Garmin, dinilai", 18, 500, "var(--muted)"], ["dengan rencana pelatih.", 18, 500, "var(--muted)"]], 50, 36, 300);
+    AN(mk(L, "iv-chip", "left:1230px;top:40px;transform:translateX(-100%);font-size:16px", esc(du.title)), [{opacity: 0}, {opacity: 1}], {duration: 400, delay: 400, fill: "both"});
+    at(5300, () => { [...L.children].forEach(e => fade(e, 0, 450)); go("t", 160, 470, 1, 700, {arc: 80}); go("r", 160, 520, 1, 700, {arc: 80, delay: 50}); }); } },
+
+  {n: "Progres", dur: 5500, run(L) {
+    L.style.background = "var(--bg)"; go("t", 160, 470, 1); go("r", 160, 520, 1); show(false, 1);
+    const cx0 = 160, cx1 = 760, v = I.pb.flat(), lo = v.length ? Math.min(...v) : 1500, hi = v.length ? Math.max(...v) : 2000, pad = Math.max(30, (hi - lo) * .08);
+    const Yt = s => 200 + (s - lo + pad) / (hi - lo + 2 * pad) * 360, xs = (k, n) => cx0 + k * (cx1 - cx0) / Math.max(1, n - 1);
+    const step = a => a.map((s, k) => k ? `H${xs(k, a.length)} V${Yt(s)}` : `M${xs(0, a.length)} ${Yt(s)}`).join(" ") + ` H${cx1 + 20}`;
+    const ticks = [0, 1, 2, 3].map(k => lo - pad + (hi - lo + 2 * pad) * (k + .5) / 4);
+    mk(L, "iv-ab", "left:0;top:0;width:1280px;height:720px", `<svg width="1280" height="720">${ticks.map(s => `<line x1="${cx0}" x2="${cx1 + 20}" y1="${Yt(s)}" y2="${Yt(s)}" stroke="var(--grid)"/><text x="${cx0 - 14}" y="${Yt(s) + 5}" text-anchor="end" font-size="14" fill="var(--muted)">${mmss(s)}</text>`).join("")}
+      ${I.pb.map((a, k) => a.length ? `<path class="iv-pl" d="${step(a)}" fill="none" stroke="var(--${k ? "r" : "t"})" stroke-width="4" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>` : "").join("")}</svg>`);
+    L.querySelectorAll(".iv-pl").forEach((p, k) => AN(p, [{strokeDashoffset: 1}, {strokeDashoffset: 0}], {duration: 2200, delay: 300 + k * 150, easing: "cubic-bezier(.45,0,.55,1)", fill: "both"}));
+    I.pb.forEach((a, k) => { if (!a.length) return; const c = k ? "r" : "t";
+      const rd = mk(L, "iv-ab", `left:0;top:0;width:44px;height:44px;offset-path:path('${step(a)}');offset-rotate:0deg;offset-anchor:50% 100%;z-index:3`, `<svg viewBox="0 0 24 24" width="44" height="44" class="iv-ride" style="fill:var(--${c})">${RUN}</svg>`);
+      AN(rd, [{offsetDistance: "0%"}, {offsetDistance: "100%"}], {duration: 2200, delay: 300 + k * 150, easing: "cubic-bezier(.45,0,.55,1)", fill: "both"});
+      a.forEach((s, j) => pop(mk(L, "iv-ab", `left:${xs(j, a.length) - 6}px;top:${Yt(s) - 6}px;width:12px;height:12px;border-radius:50%;background:var(--${c})`), 300 + k * 150 + j * 2000 / a.length, .2, 380));
+      rise(mk(L, "iv-ab", `left:${cx1 + 30}px;top:${Yt(a[a.length - 1]) - 14}px;font-size:18px;font-weight:800;color:var(--${c});white-space:nowrap`, `PB ${mmss(Math.min(...a))}`), 2600 + k * 120, 10); });
+    rise(mk(L, "iv-chip", `left:${cx0}px;top:150px;font-size:15px`, "Progres terbaik · <b>5K</b>"), 200, 10);
+    const k = mk(L, "iv-ab", "left:840px;top:170px;width:380px;height:400px;border-radius:26px;background:var(--surface);border:1px solid var(--line);box-shadow:0 30px 60px rgba(0,0,0,.08);padding:28px 30px;color:var(--text)");
+    AN(k, [{opacity: 0, transform: "translateX(80px)"}, {opacity: 1, transform: "none"}], {duration: 700, delay: 2500, easing: OUT, fill: "both"});
+    mk(k, "", "font-size:17px;color:var(--muted)", "Estimasi maraton");
+    const ev = I.est.flatMap(e => [e.sec, e.lo, e.hi]).filter(Boolean), s0 = Math.min(...ev) - 900, s1 = Math.max(...ev) + 900, pc = s => (s - s0) / (s1 - s0) * 100;
+    [[I.ta, "t", I.est[0]], [I.ra, "r", I.est[1]]].forEach(([a, c, e], j) => { const r = mk(k, "", "margin-top:22px");
+      r.innerHTML = `<div style="display:flex;align-items:baseline;gap:10px"><span style="font-size:16px;font-weight:700;color:var(--${c})">${esc(a.name)}</span><b class="num" style="margin-left:auto;font-size:54px;font-weight:900;letter-spacing:-.03em;color:var(--${c})">${e.sec ? "0:00" : "–"}</b></div>
+        <div style="position:relative;height:10px;border-radius:5px;background:var(--grid);margin-top:6px">${e.lo ? `<i style="position:absolute;left:${pc(e.lo)}%;width:${Math.max(1.5, pc(e.hi || e.lo) - pc(e.lo))}%;top:0;bottom:0;border-radius:5px;background:color-mix(in srgb,var(--text) 22%,transparent)"></i>` : ""}<i class="iv-mk" style="position:absolute;top:-5px;width:4px;height:20px;border-radius:2px;background:var(--${c});left:0"></i></div>
+        <div style="font-size:13px;color:var(--muted);margin-top:4px">${e.txt ? "target " + esc(e.txt) : ""}</div>`;
+      if (e.sec) { count(r.querySelector("b"), e.sec, 1200, s => hm(s), 2900 + j * 200);
+        AN(r.querySelector(".iv-mk"), [{left: "0%"}, {left: pc(e.sec) + "%"}], {duration: 1200, delay: 2900 + j * 200, easing: OUT, fill: "both"}); } });
+    cap(L, [["Makin cepat, makin dekat.", 42, 900, "var(--text)"], ["Progres terbaik dan estimasi maraton, dibandingkan target.", 20, 500, "var(--muted)"]], cx0, 52, 300);
+    at(4800, () => { AN(L, [{backgroundColor: col("--bg")}, {backgroundColor: "#0d0d0c"}], {duration: 700, easing: INOUT, fill: "forwards"}); [...L.children].forEach(e => fade(e, 0, 400)); }); } },
+
+  {n: "42K", dur: 7500, run(L) {
+    L.style.background = "#0d0d0c"; show(true, 400); go("t", 300, 540, 1.9); go("r", 400, 540, 1.9); run(true); trail(300, 900, 200);
+    mk(L, "iv-ab", "left:0;top:540px;width:1280px;height:2px;background:rgba(255,255,255,.25)");
+    const dsh = mk(L, "iv-ab", "left:0;top:556px;width:2560px;height:4px;background:repeating-linear-gradient(90deg,rgba(255,255,255,.28) 0 46px,transparent 46px 128px)");
+    const sp = AN(dsh, [{transform: "translateX(0)"}, {transform: "translateX(-1280px)"}], {duration: 700, iterations: Infinity, easing: "linear"});
+    const gate = mk(L, "iv-ab", "left:900px;top:250px;width:300px;height:292px", `<i style="position:absolute;left:0;top:0;width:6px;height:292px;border-radius:3px;background:linear-gradient(var(--t),rgba(255,255,255,.2))"></i><i style="position:absolute;right:0;top:0;width:6px;height:292px;border-radius:3px;background:linear-gradient(var(--r),rgba(255,255,255,.2))"></i>
+      <div style="position:absolute;left:-14px;right:-14px;top:0;height:64px;border-radius:12px;background:linear-gradient(90deg,var(--t),var(--r));display:grid;place-items:center;font-size:40px;font-weight:900;color:#fff;letter-spacing:.04em;box-shadow:0 0 40px rgba(235,104,52,.35)">42K</div>`);
+    AN(gate, [{transform: "translateX(700px) scale(.7)", opacity: 0}, {transform: "none", opacity: 1}], {duration: 3200, delay: 300, easing: "cubic-bezier(.2,.7,.2,1)", fill: "both"});
+    at(3500, () => sp.updatePlaybackRate(.45));
+    const tt = mk(L, "iv-ab", "left:80px;top:70px;font-size:104px;font-weight:900;letter-spacing:-.045em;color:#fff;line-height:1");
+    (document.title || "PaceLab Duo").split("").forEach((ch, i) => { const s = document.createElement("span"); s.textContent = ch; s.style.display = "inline-block"; if (ch === " ") s.style.width = ".28em"; tt.appendChild(s);
+      AN(s, [{opacity: 0, transform: "translateY(50px) rotate(8deg)"}, {opacity: 1, transform: "none"}], {duration: 650, delay: 900 + i * 45, easing: "cubic-bezier(.34,1.4,.64,1)", fill: "both"}); });
+    rise(mk(L, "iv-ab", "left:84px;top:186px;font-size:38px;font-weight:800;letter-spacing:.02em;background:linear-gradient(90deg,var(--t),var(--r));-webkit-background-clip:text;background-clip:text;color:transparent", "ROAD TO 42K"), 1600, 16);
+    ["Rencana " + I.nw + " minggu", "Lampu pagi", "Duel sesi", "Progres & estimasi"].forEach((s, k) => rise(mk(L, "iv-ab", `left:${84 + [0, 230, 380, 520][k]}px;top:254px;font-size:17px;font-weight:600;color:#fff;border:1px solid rgba(255,255,255,.3);border-radius:999px;padding:5px 15px;white-space:nowrap`, s), 2300 + k * 160, 14, 450));
+    rise(mk(L, "iv-ab", "left:84px;top:312px;font-size:19px;color:rgba(255,255,255,.65)", `${I.days} hari lagi · Garmin + Excel pelatih · offline, satu file`), 3200, 10);
+    const b = mk(L, "iv-ab iv-go-btn", "left:84px;top:620px;font-size:20px;font-weight:700;background:#fff;color:#111;border-radius:14px;padding:12px 24px;cursor:pointer;pointer-events:auto", "Masuk dashboard →");
+    b.setAttribute("role", "button"); b.tabIndex = 0; b.onclick = () => end(); pop(b, 4200, .8);
+    at(2000, () => { go("t", 520, 540, 1.9, 2600, {ease: "cubic-bezier(.3,0,.2,1)"}); go("r", 620, 540, 1.9, 2600, {ease: "cubic-bezier(.3,0,.2,1)"}); });
+    at(7400, () => end()); } }];
+
+  // ---------------- player
+  function startScene(i) { cur = i; base = START[i]; const old = LAYER; LAYER = document.createElement("div"); LAYER.className = "iv-layer"; st.insertBefore(LAYER, R.t);
+    if (old) at(900, () => old.remove()); SC[i].run(LAYER); }
+  function frame(now) { const dt = Math.min(100, now - last); last = now;
+    if (playing) { t = Math.min(TOTAL, t + dt); while (cur < SC.length - 1 && t >= START[cur + 1]) startScene(cur + 1);
+      Q.sort((a, b) => a.t - b.t); while (Q.length && Q[0].t <= t) Q.shift().fn(); TK = TK.filter(f => f(t) !== false); }
+    if (ov) raf = requestAnimationFrame(frame); }
+  const fit = () => { if (!ov) return; const k = Math.min(innerWidth / 1280, innerHeight / 720), fr = ov.querySelector(".iv-fr");
+    fr.style.width = 1280 * k + "px"; fr.style.height = 720 * k + "px"; st.style.transform = `scale(${k})`; };
+  const key = e => { if (e.key === "Escape") { e.preventDefault(); end(); } };
+  // the hand-over: the dark world folds into the program line, the runners land at its start and the dashboard runs on from there
+  function end() { if (!ov || ending) return; ending = true; playing = false; const o = ov, k = st.getBoundingClientRect().width / 1280, sr = st.getBoundingClientRect();
+    scrollTo(0, 0); const pr = document.querySelector("#tl .pair"), rr = document.querySelector("#tl .rail");
+    if (LAYER) [...LAYER.children].forEach(e => fade(e, 0, 300)); o.querySelector(".iv-skip").style.opacity = 0;
+    K = 1; base = t;   // the ending always runs at full length
+    if (pr && rr) { const p = pr.getBoundingClientRect(), rl = rr.getBoundingClientRect(), s = Math.max(.3, p.height * .9 / 60 / k), y = (p.bottom - sr.top) / k;
+      run(true); trail(0, 300); go("t", (p.left + p.width * .3 - sr.left) / k, y, s, 800, {ease: INOUT}); go("r", (p.left + p.width * .72 - sr.left) / k, y, s, 800, {ease: INOUT});
+      o.animate([{clipPath: "inset(0 0 0 0)"}, {clipPath: `inset(${rl.top - 4}px 0 ${innerHeight - rl.bottom - 4}px 0)`}], {duration: 750, delay: 250, easing: INOUT, fill: "forwards"});
+      o.animate([{backgroundColor: getComputedStyle(o).backgroundColor}, {backgroundColor: col("--grid")}], {duration: 750, delay: 250, easing: INOUT, fill: "forwards"}); }
+    setTimeout(() => { done && done(); }, 700);
+    o.animate([{opacity: 1}, {opacity: 0}], {duration: 350, delay: 1000, easing: "ease", fill: "forwards"}).onfinish = () => {
+      cancelAnimationFrame(raf); o.remove(); ov = null; removeEventListener("resize", fit); removeEventListener("keydown", key, true); document.documentElement.style.overflow = ""; }; }
+  function play(short, onDone) { if (ov) return; I = data(); K = short ? .625 : 1; ending = false; done = onDone;
+    let acc = 0; START = SC.map(s => { const a = acc; acc += s.dur * K; return a; }); TOTAL = acc;
+    ov = document.createElement("div"); ov.id = "intro"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Pengenalan PaceLab Duo");
+    ov.innerHTML = `<div class="iv-fr"><div class="iv-st"><div class="iv-wipe"></div></div></div><button class="iv-skip" type="button">Lewati ›</button>`;
+    document.body.appendChild(ov); st = ov.querySelector(".iv-st"); document.documentElement.style.overflow = "hidden";
+    ["t", "r"].forEach(c => { const e = document.createElement("div"); e.className = "iv-rn " + c; e.innerHTML = `<div class="iv-ry"><div class="iv-bx"><i class="iv-trail"></i><span class="iv-wind"><i></i><i></i><i></i></span><svg class="iv-ic" viewBox="0 0 24 24">${RUN}</svg></div></div>`; st.appendChild(e); R[c] = e; P[c] = {x: -200, y: 400, s: 1}; });
+    ov.querySelector(".iv-skip").onclick = () => end(); addEventListener("resize", fit); addEventListener("keydown", key, true); fit();
+    Q = []; TK = []; LAYER = null; t = 0; cur = -1; playing = true; last = performance.now(); startScene(0); raf = requestAnimationFrame(frame); }
+  return {play};
+})();
+
+// header entrance + countdown; the first visit in this browser starts with the intro film
+function dashIn() { document.body.classList.add("ready");
+  if (!REDUCED) { const el = $("days"), to = +(el.dataset.to || el.textContent); el.dataset.to = to; el.dataset.fmt = "int"; el._done = false; setTimeout(() => countUp(el), 250); } }
+{ let seen = true; try { seen = localStorage.getItem("pacelab-intro") === "1"; if (!seen) localStorage.setItem("pacelab-intro", "1"); } catch (e) {}
+  if (!seen && !REDUCED) INTRO.play(false, dashIn); else dashIn(); }
 
 // ---------------------------------------------------------------- theme (remembered per browser)
 (function(){

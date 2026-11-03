@@ -44,6 +44,15 @@ Python 3.8+ saja, tanpa `pip install`.
 
 ## Isi dashboard
 
+**Intro "PaceLab Duo · Road to 42K"**: film animasi ±40 detik, 7 babak, dengan kedua ikon pelari sebagai tokoh utama:
+Mulai → Tujuan (hitung mundur, tonggak lomba) → Rencana (minggu dan fase program) → Pagi (lampu tiap pelari) →
+Duel sesi (lap terbesar 4 minggu terakhir, jalan kaki, penilaian pelatih) → Progres (PB 5K, estimasi maraton vs target) →
+42K. Semua angka diambil dari data saat diputar. Diputar otomatis **sekali** di tiap browser (tidak diputar otomatis bila
+Windows diatur "kurangi gerakan"), lalu kapan saja lewat footer: **▶ Tentang PaceLab Duo** (penuh) atau **ringkas · 25 dtk**
+(film yang sama, dipercepat). **Lewati** / Esc / **Masuk dashboard**: layar gelap melipat menjadi garis program, kedua
+pelari mendarat di awal garis, lalu pelari dashboard berlari sampai "Hari ini" dan angka hari lagi menghitung naik.
+Mockup: `docs/mockup/intro-film.html`.
+
 Urutan dari atas: hitung mundur dan **lintasan program** (22 Jun → hari maraton, satu garis per minggu,
 tanda lomba, kedua pelari berdiri di tanggal hari ini). Di bawahnya **batang target km mingguan** kedua pelari
 dan **kurung fase** bertanggal (km & long run per fase, titik progres fase berjalan). Arahkan kursor ke batang
