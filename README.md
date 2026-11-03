@@ -51,7 +51,9 @@ Duel sesi (lap terbesar 4 minggu terakhir, jalan kaki, penilaian pelatih) → Pr
 Windows diatur "kurangi gerakan"), lalu kapan saja lewat footer: **▶ Tentang PaceLab Duo** (penuh) atau **ringkas · 25 dtk**
 (film yang sama, dipercepat). **Lewati** / Esc / **Masuk dashboard**: layar gelap melipat menjadi garis program, kedua
 pelari mendarat di awal garis, lalu pelari dashboard berlari sampai "Hari ini" dan angka hari lagi menghitung naik.
-Mockup: `docs/mockup/intro-film.html`.
+Layar tegak (tinggi > lebar, mis. HP) memutar versi 9:16 dengan isi, angka dan durasi yang sama; layar mendatar versi 16:9.
+Pelari di film sama persis dengan pelari di garis program (ikon diam, tiga garis angin, bergantian memimpin).
+Mockup: `docs/mockup/intro-film.html` (16:9) dan `docs/mockup/intro-film-hp.html` (9:16).
 
 Urutan dari atas: hitung mundur dan **lintasan program** (22 Jun → hari maraton, satu garis per minggu,
 tanda lomba, kedua pelari berdiri di tanggal hari ini). Di bawahnya **batang target km mingguan** kedua pelari

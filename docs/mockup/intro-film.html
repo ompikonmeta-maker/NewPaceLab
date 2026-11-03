@@ -96,7 +96,7 @@ const at = (ms, fn) => Q.push({t: base + ms * K, fn});
 const ticker = fn => TK.push(fn);
 const mk = (p, cls, css, html) => { const e = document.createElement("div"); if (cls) e.className = cls; if (css) e.style.cssText = css; if (html != null) e.innerHTML = html; p.appendChild(e); return e; };
 const pop = (e, d = 0, from = .6, ms = 520) => A(e, [{opacity: 0, transform: `scale(${from})`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: "cubic-bezier(.34,1.56,.64,1)", fill: "both"});
-const rise = (e, d = 0, dy = 24, ms = 600) => A(e, [{opacity: 0, transform: `translateY(${dy}px)`}, {opacity: 1, transform: "none"}], {duration: ms, delay: d, easing: OUT, fill: "both"});
+const rise = (e, d = 0, dy = 24, ms = 600) => A(e, [{opacity: 0, translate: `0 ${dy}px`}, {opacity: 1, translate: "0 0"}], {duration: ms, delay: d, easing: OUT, fill: "both"});   // translate, so a centring transform survives
 const fade = (e, d = 0, ms = 400, to = 0) => A(e, [{opacity: getComputedStyle(e).opacity}, {opacity: to}], {duration: ms, delay: d, easing: "ease", fill: "forwards"});
 function count(e, to, ms, fmt, d = 0) { const s0 = base + d * K; ticker(T => { if (T < s0) return; const k = Math.min(1, (T - s0) / ms / K), v = to * (1 - Math.pow(1 - k, 3)); e.textContent = fmt(v, k); return k < 1; }); }
 // kinetic caption: lines of words sliding up out of a mask

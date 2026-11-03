@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 17c. Film intro versi HP tegak (9:16) — mockup siap, menunggu "gas"
+## 17c. Film intro versi HP tegak (9:16) — **sudah dibuat** (layar tegak otomatis 9:16)
 
 Mockup: [`docs/mockup/intro-film-hp.html`](mockup/intro-film-hp.html). Cerita, pelari dan durasi sama; tata letak tegak.
 Rencana: layar tegak otomatis memutar versi 9:16. Revisi pelari (**sudah dibuat**): pelari intro sama persis dengan pelari
