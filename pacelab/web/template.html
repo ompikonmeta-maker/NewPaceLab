@@ -682,18 +682,17 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 #intro .iv-layer{position:absolute;inset:0;overflow:hidden} #intro .iv-ab{position:absolute}
 #intro .iv-skip{position:absolute;right:18px;top:14px;z-index:5;border:1px solid rgba(255,255,255,.25);background:rgba(0,0,0,.3);color:#fff;font:inherit;font-size:14px;border-radius:999px;padding:5px 14px;cursor:pointer;backdrop-filter:blur(6px);transition:opacity .3s}
 #intro .iv-wipe{position:absolute;left:0;top:-200px;width:2600px;height:1120px;z-index:10;transform:translateX(-2800px) skewX(-18deg);pointer-events:none;background:linear-gradient(90deg,var(--t) 0 30%,#0d0d0c 30% 70%,var(--r) 70%)}
-#intro .iv-rn{position:absolute;left:0;top:0;z-index:12;pointer-events:none} #intro .iv-ry{position:absolute;left:0;top:0;transform-origin:0 0}
-#intro .iv-bx{position:absolute;left:-30px;top:-60px;width:60px;height:60px} #intro .iv-ic{position:absolute;inset:0;width:60px;height:60px;overflow:visible}
-#intro .iv-rn.t .iv-ic{fill:var(--t)} #intro .iv-rn.r .iv-ic{fill:var(--r)}
-#intro .iv-go .iv-ic,#intro .iv-ride{animation:ivbob .3s ease-in-out infinite alternate} #intro .iv-rn.r.iv-go .iv-ic{animation-delay:-.15s}
-@keyframes ivbob{from{transform:translateY(0) rotate(0)}to{transform:translateY(-6px) rotate(-5deg)}}
-#intro .iv-idle .iv-ic{animation:ivbreathe 1.6s ease-in-out infinite alternate} @keyframes ivbreathe{to{transform:scaleY(.96) translateY(1px)}}
-#intro .iv-wind{position:absolute;left:-18px;top:16px;width:20px;height:30px;opacity:0;transition:opacity .25s} #intro .iv-go .iv-wind{opacity:.7}
-#intro .iv-wind i{position:absolute;height:3px;border-radius:2px;background:currentColor;animation:ivwd .35s linear infinite alternate}
-#intro .iv-rn.t .iv-wind{color:var(--t)} #intro .iv-rn.r .iv-wind{color:var(--r)}
-#intro .iv-wind i:nth-child(1){top:0;left:6px;width:12px} #intro .iv-wind i:nth-child(2){top:10px;left:0;width:16px;animation-delay:-.1s} #intro .iv-wind i:nth-child(3){top:20px;left:4px;width:12px;animation-delay:-.2s}
-@keyframes ivwd{to{transform:translateX(-5px);opacity:.4}}
-#intro .iv-trail{position:absolute;right:46px;top:32px;height:7px;width:0;border-radius:4px;filter:blur(.6px)}
+#intro .iv-rn{position:absolute;left:0;top:0;z-index:12;pointer-events:none} #intro .iv-rn.t{color:var(--t)} #intro .iv-rn.r{color:var(--r)}
+#intro .iv-ry{position:absolute;left:0;top:0;transform-origin:0 0} #intro .iv-ld{position:absolute;left:0;top:0}
+#intro .iv-bx{position:absolute;left:-50px;top:-60px;width:80px;height:60px} #intro .iv-ic{position:absolute;inset:0;width:80px;height:60px;overflow:visible}
+/* the runner exactly as on the program track (.tl): still icon, the same three wind lines, the pair trading the lead (x2.5 for the bigger icon) */
+#intro .iv-ic .rn path{fill:currentColor}
+#intro .iv-ic .wind line{stroke:currentColor;stroke-width:1.3;stroke-linecap:round;opacity:0;animation:wind .55s linear infinite}
+#intro .iv-ic .wind line:nth-child(2){animation-delay:-.18s} #intro .iv-ic .wind line:nth-child(3){animation-delay:-.36s}
+#intro .duel .iv-rn.t .iv-ld{animation:ivleadT 6s ease-in-out infinite} #intro .duel .iv-rn.r .iv-ld{animation:ivleadR 6s ease-in-out infinite}
+@keyframes ivleadT{0%,100%{transform:translateX(-5px)}50%{transform:translateX(40px)}}
+@keyframes ivleadR{0%,100%{transform:translateX(5px)}50%{transform:translateX(-40px)}}
+#intro .iv-trail{position:absolute;right:62px;top:32px;height:7px;width:0;border-radius:4px;filter:blur(.6px)}
 #intro .iv-rn.t .iv-trail{background:linear-gradient(90deg,transparent,var(--t));box-shadow:0 0 18px color-mix(in srgb,var(--t) 60%,transparent)}
 #intro .iv-rn.r .iv-trail{background:linear-gradient(90deg,transparent,var(--r));box-shadow:0 0 18px color-mix(in srgb,var(--r) 60%,transparent)}
 #intro .iv-cap{position:absolute;line-height:1.08} #intro .iv-ln{display:block;white-space:nowrap} #intro .iv-w{display:inline-block;overflow:hidden;vertical-align:bottom;padding-bottom:.08em}
@@ -2639,7 +2638,7 @@ const INTRO = (() => {
       ${I.pb.map((a, k) => a.length ? `<path class="iv-pl" d="${step(a)}" fill="none" stroke="var(--${k ? "r" : "t"})" stroke-width="4" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"/>` : "").join("")}</svg>`);
     L.querySelectorAll(".iv-pl").forEach((p, k) => AN(p, [{strokeDashoffset: 1}, {strokeDashoffset: 0}], {duration: 2200, delay: 300 + k * 150, easing: "cubic-bezier(.45,0,.55,1)", fill: "both"}));
     I.pb.forEach((a, k) => { if (!a.length) return; const c = k ? "r" : "t";
-      const rd = mk(L, "iv-ab", `left:0;top:0;width:44px;height:44px;offset-path:path('${step(a)}');offset-rotate:0deg;offset-anchor:50% 100%;z-index:3`, `<svg viewBox="0 0 24 24" width="44" height="44" class="iv-ride" style="fill:var(--${c})">${RUN}</svg>`);
+      const rd = mk(L, "iv-ab", `left:0;top:0;width:59px;height:44px;offset-path:path('${step(a)}');offset-rotate:0deg;offset-anchor:62.5% 100%;z-index:3`, `<svg class="iv-ic" viewBox="-8 0 32 24" width="59" height="44" style="position:static;width:59px;height:44px;color:var(--${c})"><g class="wind"><line x1="3" y1="8" x2="-3" y2="8"/><line x1="2" y1="12.5" x2="-5" y2="12.5"/><line x1="3" y1="17" x2="-2" y2="17"/></g><g class="rn">${RUN}</g></svg>`);
       AN(rd, [{offsetDistance: "0%"}, {offsetDistance: "100%"}], {duration: 2200, delay: 300 + k * 150, easing: "cubic-bezier(.45,0,.55,1)", fill: "both"});
       a.forEach((s, j) => pop(mk(L, "iv-ab", `left:${xs(j, a.length) - 6}px;top:${Yt(s) - 6}px;width:12px;height:12px;border-radius:50%;background:var(--${c})`), 300 + k * 150 + j * 2000 / a.length, .2, 380));
       rise(mk(L, "iv-ab", `left:${cx1 + 30}px;top:${Yt(a[a.length - 1]) - 14}px;font-size:18px;font-weight:800;color:var(--${c});white-space:nowrap`, `PB ${mmss(Math.min(...a))}`), 2600 + k * 120, 10); });
@@ -2679,7 +2678,7 @@ const INTRO = (() => {
 
   // ---------------- player
   function startScene(i) { cur = i; base = START[i]; const old = LAYER; LAYER = document.createElement("div"); LAYER.className = "iv-layer"; st.insertBefore(LAYER, R.t);
-    if (old) at(900, () => old.remove()); SC[i].run(LAYER); }
+    if (old) at(900, () => old.remove()); st.classList.toggle("duel", [0, 1, 4, 6].includes(i)); SC[i].run(LAYER); }
   function frame(now) { const dt = Math.min(100, now - last); last = now;
     if (playing) { t = Math.min(TOTAL, t + dt); while (cur < SC.length - 1 && t >= START[cur + 1]) startScene(cur + 1);
       Q.sort((a, b) => a.t - b.t); while (Q.length && Q[0].t <= t) Q.shift().fn(); TK = TK.filter(f => f(t) !== false); }
@@ -2704,7 +2703,7 @@ const INTRO = (() => {
     ov = document.createElement("div"); ov.id = "intro"; ov.setAttribute("role", "dialog"); ov.setAttribute("aria-label", "Pengenalan PaceLab Duo");
     ov.innerHTML = `<div class="iv-fr"><div class="iv-st"><div class="iv-wipe"></div></div></div><button class="iv-skip" type="button">Lewati ›</button>`;
     document.body.appendChild(ov); st = ov.querySelector(".iv-st"); document.documentElement.style.overflow = "hidden";
-    ["t", "r"].forEach(c => { const e = document.createElement("div"); e.className = "iv-rn " + c; e.innerHTML = `<div class="iv-ry"><div class="iv-bx"><i class="iv-trail"></i><span class="iv-wind"><i></i><i></i><i></i></span><svg class="iv-ic" viewBox="0 0 24 24">${RUN}</svg></div></div>`; st.appendChild(e); R[c] = e; P[c] = {x: -200, y: 400, s: 1}; });
+    ["t", "r"].forEach(c => { const e = document.createElement("div"); e.className = "iv-rn " + c; e.innerHTML = `<div class="iv-ry"><div class="iv-ld"><div class="iv-bx"><i class="iv-trail"></i><svg class="iv-ic" viewBox="-8 0 32 24"><g class="wind"><line x1="3" y1="8" x2="-3" y2="8"/><line x1="2" y1="12.5" x2="-5" y2="12.5"/><line x1="3" y1="17" x2="-2" y2="17"/></g><g class="rn">${RUN}</g></svg></div></div></div>`; st.appendChild(e); R[c] = e; P[c] = {x: -200, y: 400, s: 1}; });
     ov.querySelector(".iv-skip").onclick = () => end(); addEventListener("resize", fit); addEventListener("keydown", key, true); fit();
     Q = []; TK = []; LAYER = null; t = 0; cur = -1; playing = true; last = performance.now(); startScene(0); raf = requestAnimationFrame(frame); }
   return {play};
