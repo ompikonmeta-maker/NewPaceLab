@@ -1,0 +1,253 @@
+<!doctype html><html lang="id"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Pegas dan Kalkulator</title>
+<style>
+:root{color-scheme:light;--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--good:#0f8a0f;--warn:#9a6a00;--crit:#c22f2f;--focus:#2a78d6;--font:"Segoe UI",Roboto,system-ui,sans-serif}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){color-scheme:dark;--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f;--warn:#f2c14e;--crit:#ff7b7b;--focus:#6aa8f0}}
+:root[data-theme="dark"]{color-scheme:dark;--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f;--warn:#f2c14e;--crit:#ff7b7b;--focus:#6aa8f0}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:28px 20px 48px}
+h1{font-size:26px;margin:0 0 4px;letter-spacing:-.01em} h2{font-size:19px;margin:34px 0 4px} .lead{color:var(--text-2);margin:0 0 14px;max-width:820px}
+.muted{color:var(--muted)} .num{font-variant-numeric:tabular-nums}
+.top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;flex-wrap:wrap}
+.theme{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:6px 14px;font:inherit;font-size:13px;cursor:pointer}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+@media (max-width:820px){.cols{grid-template-columns:1fr}}
+.col h3{margin:0 0 6px;font-size:15px;display:flex;gap:8px;align-items:center}
+.tag{font-size:12px;font-weight:600;border-radius:999px;padding:1px 9px}
+.tag.old{background:color-mix(in srgb,var(--crit) 14%,transparent);color:var(--crit)} .tag.new{background:color-mix(in srgb,var(--good) 14%,transparent);color:var(--good)}
+.note{font-size:13px;color:var(--text-2);margin:8px 0 0} .note b{color:var(--text)}
+.screen{background:color-mix(in srgb,#08061a 38%,var(--bg));border-radius:18px;padding:14px;display:flex;justify-content:center}
+/* window, copied from the dashboard */
+.ssx-win{position:relative;width:100%;height:470px;display:flex;flex-direction:column;background:var(--surface);border-radius:20px;padding:16px 20px 0;box-shadow:0 30px 80px rgba(0,0,0,.25);overflow:hidden}
+.pbx-hd{display:flex;align-items:center;gap:12px;flex:none;flex-wrap:wrap} .pbx-hd h3{margin:0;font-size:20px}
+.pbx-x{margin-left:auto;width:36px;height:36px;border-radius:11px;border:1px solid var(--line);background:var(--surface);color:var(--text);cursor:pointer;font-size:20px;line-height:1}
+.ss-vw{display:inline-flex;background:var(--bg);border-radius:10px;padding:3px;vertical-align:middle;margin-right:6px}
+.ss-vw button{border:0;background:none;font:inherit;font-size:12.5px;font-weight:600;padding:3px 12px;border-radius:8px;color:var(--muted);cursor:pointer}
+.ss-vw button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.ssx-body{flex:1;min-height:0;overflow:auto;overscroll-behavior:contain;margin-top:10px;padding-bottom:18px}
+.ssx-body.native{scrollbar-width:thin}
+.ssx-body.own{scrollbar-width:none} .ssx-body.own::-webkit-scrollbar{display:none}
+.sbar{position:absolute;right:4px;top:0;width:12px;border-radius:6px;opacity:0;transition:opacity .45s;cursor:grab;touch-action:none;transform-origin:top;z-index:3}
+.sbar::before{content:"";position:absolute;right:2px;top:0;bottom:0;width:5px;border-radius:4px;background:color-mix(in srgb,var(--text) 32%,transparent);transition:width .2s,background .2s}
+.sbar.on{opacity:1} .sbar.sq-b{transform-origin:bottom}
+.sbar:hover::before,.sbar.drag::before{width:8px;background:color-mix(in srgb,var(--text) 50%,transparent)} .sbar.drag{cursor:grabbing}
+.rcf{display:grid;grid-template-columns:170px minmax(0,1fr);gap:8px 12px;align-items:center;font-size:13.5px;background:var(--bg);border-radius:14px;padding:12px 14px}
+.rcf label{color:var(--text-2)} .rcf select,.rcf input{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:6px 10px;font:inherit;font-size:13.5px}
+.rcf .auto{color:var(--muted);font-size:12.5px} .rcs{list-style:none;margin:12px 0 0;padding:0;font-size:13.5px} .rcs li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;padding:7px 0;border-bottom:1px solid var(--grid)} .rcs i{font-style:normal;color:var(--muted)}
+.rcr{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:12px 0 2px} .rcr small{font-size:13.5px;font-weight:400;color:var(--muted)}
+.rct{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px} .rct th,.rct td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--grid)} .rct th{color:var(--muted);font-weight:600}
+.rcn{font-size:12.5px;color:var(--muted);margin:10px 0 0} .rcc{margin-top:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:5px 14px;font:inherit;font-size:13px;cursor:pointer}
+@media (max-width:640px){.rcf{grid-template-columns:1fr}}
+/* pane for the spring test */
+.pane{position:relative;height:360px;background:var(--surface);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.pane .ssx-body{height:100%;margin:0;padding:6px 14px 10px}
+.row{display:grid;grid-template-columns:86px 1fr auto;gap:10px;padding:9px 0;border-bottom:1px solid var(--grid);font-size:14px}
+.row .d{color:var(--muted)} .row b{font-weight:600}
+.end{padding:12px 0 2px;color:var(--muted);font-size:12.5px;text-align:center}
+.trace{margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.trace canvas{display:block;width:100%;height:84px}
+.trace .lb{display:flex;justify-content:space-between;font-size:12.5px;color:var(--muted);gap:8px;flex-wrap:wrap} .trace .lb b{color:var(--text)}
+.bar{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0 12px}
+.go{border:0;background:var(--text);color:var(--bg);border-radius:999px;padding:8px 16px;font:inherit;font-weight:600;cursor:pointer}
+.go:active{transform:scale(.97)}
+.spec{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 16px;font-size:13.5px;color:var(--text-2);margin-top:14px}
+.spec table{width:100%;border-collapse:collapse} .spec td,.spec th{text-align:left;padding:6px 8px;border-bottom:1px solid var(--grid);vertical-align:top} .spec th{color:var(--muted);font-weight:600}
+</style></head><body><div class="wrap">
+<div class="top"><div><h1>Jendela kalkulator dan pegas ala iPhone</h1>
+<p class="lead">Mockup RENCANA 21 (10 Nov). Isi kalkulator diambil dari dashboard demo (angka Uji 10). Coba gulir sampai mentok di kedua sisi dengan touchpad, mouse, atau jari.</p></div>
+<button class="theme" id="theme">Ganti terang / gelap</button></div>
+
+<h2>1. Jendela kalkulator target lomba</h2>
+<p class="lead">Jendela sengaja dibuat lebih pendek supaya isinya bergulir, seperti di layar laptop.</p>
+<div class="cols">
+ <div class="col"><h3><span class="tag old">Sekarang</span> scrollbar bawaan, tanpa pegas</h3>
+  <div class="screen"><div class="ssx-win"><div class="pbx-hd"><h3 id="rcx-h">Target lomba</h3><span class="ss-vw" id="rcx-who" role="group" aria-label="Pelari"><button data-c="t" aria-pressed="true">Taofik</button><button data-c="r" aria-pressed="false">Reza</button></span><button class="pbx-x" data-close="" aria-label="Tutup">×</button></div>
+  <div class="ssx-body native" id="c-old"><div class="rcf"><label for="rc-race">Lomba</label><select id="rc-race"><option value="2026-10-10">Tes 5K · Sabtu 10 Okt 2026 (sudah lewat)</option><option value="2026-11-07" selected="">10K · Sabtu 7 Nov 2026 (sudah lewat)</option><option value="2027-01-23">Half · Sabtu 23 Jan 2027</option><option value="2027-04-10">Tes 10K · Sabtu 10 Apr 2027</option><option value="2027-06-13">MARATON · Minggu 13 Jun 2027</option></select>
+    <label for="rc-base">Dasar (lomba / tes utuh)</label><select id="rc-base"><option value="2026-10-105K" selected="">5K 31:29 · 10 Okt</option></select>
+    <label for="rc-ts">Suhu saat start (°C)</label><input id="rc-ts" type="number" step="0.5" value="29">
+    <label for="rc-st">Jam start</label><input id="rc-st" type="time" value="06:18">
+    <label for="rc-tl">Suhu km terakhir (°C)</label><input id="rc-tl" type="number" step="0.5" value="" placeholder="perkiraan 31.2 (start + 1 °C / 30 mnt)">
+    <label>Long run ≥ 18 km &lt; 7 hari</label><span class="auto">otomatis: 21.0 km · 1 Nov (6 hari sebelum)</span></div><ol class="rcs"><li><i>1</i><span>Riegel dari 5K 31:29 (10 Okt) · 31:29 × (10.0 / 5)<sup>1,06</sup></span><b class="num">1:05:38</b></li>
+    <li><i>2</i><span>Panas · suhu km terakhir 31.2 °C → +5% (start setelah 06:00, langkah 4)</span><b class="num">1:08:55</b></li>
+    <li><i>3</i><span>Kelelahan · long run 21.0 km · 1 Nov (6 hari sebelum) → +2%</span><b class="num">1:10:18</b></li>
+    <li><i>8</i><span>Cek silang · tidak lebih cepat dari Riegel tanpa koreksi (1:05:38)</span><b style="color:var(--good)">✓</b></li></ol><div class="rcr num">1:09–1:11 jam <small>target ditulis sebagai rentang (§3b langkah 7)</small></div><table class="rct"><thead><tr><th>Bagian</th><th>Batas HR</th><th>Cara lari</th></tr></thead><tbody>
+    <tr><td>km 1</td><td class="num">≤ 161</td><td>pace paling lambat dari rentang, atau lebih lambat</td></tr>
+    <tr><td>km 2</td><td class="num">≤ 170</td><td>km 1 terlalu cepat 10 dtk → km 2 lebih lambat 10 dtk</td></tr>
+    <tr><td>km 3–5</td><td class="num">≤ 174</td><td>dikunci HR, tanpa target pace</td></tr>
+    <tr><td>setelah km 5</td><td class="num">pace naik hanya bila HR ≤ 172</td><td>HR masih ≥ 4 di bawah LTHR 176</td></tr></tbody></table><button class="rcc" type="button" id="rc-copy">Salin untuk Claude chat</button><p class="rcn">Dokumen §3b. Rentang = ±1.5% dari hasil koreksi, dibulatkan ke menit [keputusan dashboard].</p></div></div></div>
+  <p class="note">Scrollbar abu-abu selalu tampil walau tidak dipakai. Saat mentok isi berhenti mendadak.</p></div>
+ <div class="col"><h3><span class="tag new">Baru</span> sama dengan jendela lain</h3>
+  <div class="screen"><div class="ssx-win" id="c-new-win"><div class="pbx-hd"><h3 id="rcx-h-2">Target lomba</h3><span class="ss-vw" id="rcx-who-2" role="group" aria-label="Pelari"><button data-c="t" aria-pressed="true">Taofik</button><button data-c="r" aria-pressed="false">Reza</button></span><button class="pbx-x" data-close="" aria-label="Tutup">×</button></div>
+  <div class="ssx-body own" id="c-new"><div><div class="rcf"><label for="rc-race-2">Lomba</label><select id="rc-race-2"><option value="2026-10-10">Tes 5K · Sabtu 10 Okt 2026 (sudah lewat)</option><option value="2026-11-07" selected="">10K · Sabtu 7 Nov 2026 (sudah lewat)</option><option value="2027-01-23">Half · Sabtu 23 Jan 2027</option><option value="2027-04-10">Tes 10K · Sabtu 10 Apr 2027</option><option value="2027-06-13">MARATON · Minggu 13 Jun 2027</option></select>
+    <label for="rc-base-2">Dasar (lomba / tes utuh)</label><select id="rc-base-2"><option value="2026-10-105K" selected="">5K 31:29 · 10 Okt</option></select>
+    <label for="rc-ts-2">Suhu saat start (°C)</label><input id="rc-ts-2" type="number" step="0.5" value="29">
+    <label for="rc-st-2">Jam start</label><input id="rc-st-2" type="time" value="06:18">
+    <label for="rc-tl-2">Suhu km terakhir (°C)</label><input id="rc-tl-2" type="number" step="0.5" value="" placeholder="perkiraan 31.2 (start + 1 °C / 30 mnt)">
+    <label>Long run ≥ 18 km &lt; 7 hari</label><span class="auto">otomatis: 21.0 km · 1 Nov (6 hari sebelum)</span></div><ol class="rcs"><li><i>1</i><span>Riegel dari 5K 31:29 (10 Okt) · 31:29 × (10.0 / 5)<sup>1,06</sup></span><b class="num">1:05:38</b></li>
+    <li><i>2</i><span>Panas · suhu km terakhir 31.2 °C → +5% (start setelah 06:00, langkah 4)</span><b class="num">1:08:55</b></li>
+    <li><i>3</i><span>Kelelahan · long run 21.0 km · 1 Nov (6 hari sebelum) → +2%</span><b class="num">1:10:18</b></li>
+    <li><i>8</i><span>Cek silang · tidak lebih cepat dari Riegel tanpa koreksi (1:05:38)</span><b style="color:var(--good)">✓</b></li></ol><div class="rcr num">1:09–1:11 jam <small>target ditulis sebagai rentang (§3b langkah 7)</small></div><table class="rct"><thead><tr><th>Bagian</th><th>Batas HR</th><th>Cara lari</th></tr></thead><tbody>
+    <tr><td>km 1</td><td class="num">≤ 161</td><td>pace paling lambat dari rentang, atau lebih lambat</td></tr>
+    <tr><td>km 2</td><td class="num">≤ 170</td><td>km 1 terlalu cepat 10 dtk → km 2 lebih lambat 10 dtk</td></tr>
+    <tr><td>km 3–5</td><td class="num">≤ 174</td><td>dikunci HR, tanpa target pace</td></tr>
+    <tr><td>setelah km 5</td><td class="num">pace naik hanya bila HR ≤ 172</td><td>HR masih ≥ 4 di bawah LTHR 176</td></tr></tbody></table><button class="rcc" type="button" id="rc-copy-2">Salin untuk Claude chat</button><p class="rcn">Dokumen §3b. Rentang = ±1.5% dari hasil koreksi, dibulatkan ke menit [keputusan dashboard].</p></div></div><div class="sbar" id="c-new-bar"></div></div></div>
+  <p class="note">Scrollbar tipis <b>muncul saat menggulir dan hilang setelah 1 detik diam</b> (juga muncul bila kursor di tepi kanan, bisa ditarik). Mentok di ujung → pegas baru di bawah.</p></div>
+</div>
+
+<h2>2. Pegas di ujung: lama vs baru</h2>
+<p class="lead">Grafik di bawah tiap panel mencatat seberapa jauh isi tertarik (garis) dan berapa lama sampai kembali. Tidak punya touchpad? Tekan tombol simulasi: gulir cepat dengan touchpad, lalu jari diangkat dan sisa dorongan masih mengalir 2 detik.</p>
+<div class="bar"><button class="go" id="sim">Simulasi gulir touchpad ke bawah</button><span class="muted" style="font-size:13px">dikirim ke kedua panel bersamaan</span></div>
+<div class="cols">
+ <div class="col"><h3><span class="tag old">Lama</span> dilepas setelah dorongan berhenti</h3>
+  <div class="pane"><div class="ssx-body own" id="p-old"><div id="l-old"></div></div><div class="sbar" id="p-old-bar"></div></div>
+  <div class="trace"><canvas id="t-old"></canvas><div class="lb"><span>tertarik maks <b id="m-old">–</b></span><span>lama tertahan <b id="d-old">–</b></span></div></div></div>
+ <div class="col"><h3><span class="tag new">Baru</span> pegas ala iPhone</h3>
+  <div class="pane"><div class="ssx-body own" id="p-new"><div id="l-new"></div></div><div class="sbar" id="p-new-bar"></div></div>
+  <div class="trace"><canvas id="t-new"></canvas><div class="lb"><span>tertarik maks <b id="m-new">–</b></span><span>lama tertahan <b id="d-new">–</b></span></div></div></div>
+</div>
+
+<div class="spec"><table><thead><tr><th></th><th>Lama</th><th>Baru (ala iPhone)</th></tr></thead><tbody>
+<tr><td>Tarikan</td><td>Makin berat (rumus eksponen), maks 18% tinggi jendela</td><td>Rumus karet iOS: <span class="num">(1 − 1/(x·0,55/t + 1))·t</span>, t = tinggi jendela. Makin jauh makin berat, tanpa batas keras</td></tr>
+<tr><td>Kapan kembali</td><td>140 ms setelah event gulir <b>terakhir</b>. Sisa dorongan touchpad (1–3 dtk) menahan isi tetap tertarik → terasa jeda</td><td>Begitu dorongan <b>melemah</b> (jari diangkat). Sisa dorongan setelah itu diabaikan</td></tr>
+<tr><td>Gerak balik</td><td>Kurva CSS 0,55 dtk yang sedikit melewati titik awal</td><td>Fisika pegas teredam kritis, ±0,45 dtk, berhenti tepat di titik awal tanpa lewat</td></tr>
+<tr><td>Menabrak ujung saat meluncur</td><td>Berhenti mendadak, lalu sisa dorongan menarik isi</td><td>Kecepatan saat menabrak jadi pantulan kecil (makin cepat makin jauh), lalu kembali</td></tr>
+<tr><td>Jari (HP)</td><td>Tarik, lepas → kurva CSS</td><td>Tarik, lepas → pegas mulai dari kecepatan jari</td></tr>
+<tr><td>Berlaku di</td><td colspan="2">Halaman, jendela jadwal, detail sesi, decoupling, linimasa, kalkulator. "Kurangi animasi" di Windows aktif → tanpa pegas (tetap seperti sekarang)</td></tr>
+</tbody></table></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const REDUCED = matchMedia("(prefers-reduced-motion: reduce)").matches;
+$("theme").onclick = () => { const r = document.documentElement, dark = r.dataset.theme ? r.dataset.theme === "dark" : matchMedia("(prefers-color-scheme:dark)").matches; r.dataset.theme = dark ? "light" : "dark"; };
+
+// ---- current dashboard bounce (copied as is)
+function bounceOld(scroller, content, bar) {
+  let raw = 0, tm = 0, ty = null;
+  const lim = () => Math.min(140, scroller.clientHeight * .18);
+  const atEnd = dir => { const st = scroller.scrollTop, h = scroller.clientHeight, sh = scroller.scrollHeight; return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
+  const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
+    content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
+    if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
+  const release = () => { if (!raw) return; raw = 0; const sp = "transform .55s cubic-bezier(.25,1.45,.45,1)";
+    content.style.transition = sp; content.style.transform = "translateY(0)";
+    if (bar) { bar.style.transition = sp + ",opacity .45s"; bar.style.transform = ""; }
+    setTimeout(() => { if (!raw) { content.style.transform = ""; content.style.transition = ""; } }, 600); };
+  scroller.addEventListener("wheel", e => { if (REDUCED || e.ctrlKey) return;
+    const dir = Math.sign(e.deltaY); if (!dir) return;
+    if (raw && Math.sign(raw) !== dir) return release();
+    if (!atEnd(dir)) return;
+    e.preventDefault(); raw += e.deltaY * (e.deltaMode === 1 ? 16 : 1) * .6; set(); clearTimeout(tm); tm = setTimeout(release, 140);
+  }, {passive: false});
+  scroller.addEventListener("touchstart", e => { ty = e.touches[0].clientY; }, {passive: true});
+  scroller.addEventListener("touchmove", e => { if (ty == null || REDUCED) return; const y = e.touches[0].clientY, dy = ty - y; ty = y;
+    if (!raw && !atEnd(Math.sign(dy))) return; e.preventDefault(); const was = Math.sign(raw); raw += dy; if (was && Math.sign(raw) !== was) raw = 0; set(); }, {passive: false});
+  scroller.addEventListener("touchend", () => { ty = null; release(); });
+}
+
+// ---- new bounce: iOS rubber band + critically damped spring, momentum-aware
+function bounceNew(scroller, content, bar) {
+  const W = 2 * Math.PI / .45;                // spring: response 0.45 s, damping ratio 1 (no overshoot)
+  let off = 0, raw = 0, mode = "idle", raf = 0, x0 = 0, v0 = 0, t0 = 0;
+  let last = 0, lastAbs = 0, falls = 0, mute = 0, rel = 0, ty = null, tv = 0, tt = 0;
+  let sTop = scroller.scrollTop, sT = 0, sV = 0;  // scroll velocity (px/s) from native scrolling
+  const H = () => scroller.clientHeight;
+  const rub = r => Math.sign(r) * (1 - 1 / (Math.abs(r) * .55 / H() + 1)) * H();
+  const unrub = o => Math.sign(o) * (1 / (1 - Math.min(.95, Math.abs(o) / H())) - 1) * H() / .55;
+  const atEnd = dir => { const st = scroller.scrollTop, sh = scroller.scrollHeight - H(); return dir > 0 ? st >= sh - 1 : dir < 0 && st <= 0; };
+  const paint = () => { content.style.transform = Math.abs(off) < .05 ? "" : `translateY(${(-off).toFixed(2)}px)`;
+    if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transform = off ? `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})` : ""; } };
+  const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+  const spring = (v = 0) => { stop(); mode = "spring"; x0 = off; v0 = v; t0 = performance.now(); raw = 0;
+    const step = now => { const t = (now - t0) / 1000, e = Math.exp(-W * t);
+      off = (x0 + (v0 + W * x0) * t) * e; const v = (v0 - W * (v0 + W * x0) * t) * e;
+      if (Math.abs(off) < .1 && Math.abs(v) < 5) { off = 0; mode = "idle"; paint(); raf = 0; return; }
+      paint(); raf = requestAnimationFrame(step); };
+    raf = requestAnimationFrame(step); };
+  const kick = v => { if (REDUCED) return; off = 0; spring(Math.max(-2600, Math.min(2600, v)) * .32); };  // hit the end while gliding
+  scroller.addEventListener("scroll", () => { const now = performance.now(), dt = now - sT;
+    if (dt > 0 && dt < 120) sV = (scroller.scrollTop - sTop) / dt * 1000 * .6 + sV * .4; else sV = 0;
+    sTop = scroller.scrollTop; sT = now;
+    if (mode === "idle" && Math.abs(sV) > 300 && atEnd(Math.sign(sV))) { mute = now + 160; kick(sV); } }, {passive: true});
+  scroller.addEventListener("wheel", e => { if (REDUCED || e.ctrlKey) return;
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H() : 1), dir = Math.sign(dy); if (!dir) return;
+    const now = performance.now(), gap = now - last, a = Math.abs(dy); last = now;
+    const rising = a > lastAbs * 1.15 + 1 || gap > 220; falls = a < lastAbs * .97 && gap < 60 ? falls + 1 : 0; lastAbs = a;
+    // leftover glide after the push ended: swallow it while it keeps fading
+    if (now < mute && !rising && (off ? Math.sign(off) === dir : atEnd(dir))) { e.preventDefault(); mute = now + 160; return; }
+    mute = 0;
+    if (off && Math.sign(off) !== dir) {            // pushing back the other way: unwind the stretch first
+      e.preventDefault(); stop(); mode = "drag"; raw = unrub(off) + dy; if (Math.sign(raw) !== Math.sign(off)) raw = 0; off = rub(raw); paint();
+      clearTimeout(rel); rel = setTimeout(() => off && spring(), 90); return; }
+    if (!off && !atEnd(dir)) return;
+    e.preventDefault();
+    if (mode === "spring") { stop(); raw = unrub(off); }
+    mode = "drag"; raw += dy; off = rub(raw); paint();
+    clearTimeout(rel);
+    if (falls >= 2) { mute = now + 160; spring(); return; }      // finger lifted: let go now, ignore the rest of the glide
+    rel = setTimeout(() => { if (mode === "drag") { mute = performance.now() + 160; spring(); } }, 90);
+  }, {passive: false});
+  scroller.addEventListener("touchstart", e => { ty = e.touches[0].clientY; tv = 0; tt = performance.now(); if (mode === "spring") { stop(); mode = "drag"; raw = unrub(off); } }, {passive: true});
+  scroller.addEventListener("touchmove", e => { if (ty == null || REDUCED) return; const y = e.touches[0].clientY, dy = ty - y, now = performance.now(); ty = y;
+    if (!off && !atEnd(Math.sign(dy))) return; e.preventDefault(); const was = Math.sign(raw); raw += dy; if (was && Math.sign(raw) !== was) raw = 0;
+    const o = off; off = rub(raw); tv = (off - o) / Math.max(1, now - tt) * 1000; tt = now; mode = "drag"; paint(); }, {passive: false});
+  scroller.addEventListener("touchend", () => { ty = null; if (off) spring(Math.max(-3000, Math.min(3000, tv))); else mode = "idle"; });
+}
+
+// ---- own scrollbar (copied from dashboard), with a choice of bounce
+function ownScroll(body, bar, host, bounce) { let t = 0;
+  const size = () => { const h = body.clientHeight, sh = body.scrollHeight;
+    if (sh <= h + 1) { bar.style.display = "none"; return; } bar.style.display = "";
+    const th = Math.max(36, h * h / sh); bar.style.height = th + "px";
+    bar.style.top = (body.offsetTop + 4 + (h - 8 - th) * (body.scrollTop / (sh - h))) + "px"; };
+  const flash = () => { size(); bar.classList.add("on"); clearTimeout(t); t = setTimeout(() => bar.matches(":hover,.drag") || bar.classList.remove("on"), 1000); };
+  body.addEventListener("scroll", flash, {passive: true});
+  host.addEventListener("pointermove", e => { if (e.pointerType === "mouse" && host.getBoundingClientRect().right - e.clientX < 24) flash(); });
+  bar.addEventListener("pointerleave", flash);
+  bar.addEventListener("pointerdown", e => { e.preventDefault(); bar.setPointerCapture(e.pointerId); bar.classList.add("drag");
+    const y0 = e.clientY, s0 = body.scrollTop, k = (body.scrollHeight - body.clientHeight) / Math.max(1, body.clientHeight - 8 - bar.offsetHeight);
+    const mv = ev => { body.scrollTop = s0 + (ev.clientY - y0) * k; };
+    bar.addEventListener("pointermove", mv);
+    bar.addEventListener("pointerup", () => { bar.classList.remove("drag"); bar.removeEventListener("pointermove", mv); flash(); }, {once: true}); });
+  addEventListener("resize", size); size();
+  bounce(body, body.firstElementChild, bar);
+}
+
+// calculator windows
+ownScroll($("c-new"), $("c-new-bar"), $("c-new-win"), bounceNew);
+// spring test panes
+const DAYS = ["Sen", "Sel", "Rab", "Kam", "Jum", "Sab", "Min"], RUN = ["Easy 6 km", "Interval 6 × 400 m", "Easy 8 km + strides", "Recovery 5 km", "Istirahat", "Long run 16 km", "Easy 5 km"];
+const rows = Array.from({length: 28}, (_, i) => `<div class="row"><span class="d">${DAYS[i % 7]} ${2 + i} Nov</span><b>${RUN[i % 7]}</b><span class="muted num">${["6,0", "7,2", "8,6", "5,0", "–", "16,0", "5,0"][i % 7]}</span></div>`).join("");
+for (const k of ["old", "new"]) { $("l-" + k).innerHTML = `<div class="end">awal daftar</div>${rows}<div class="end">akhir daftar</div>`;
+  ownScroll($("p-" + k), $("p-" + k + "-bar"), $("p-" + k).parentNode, k === "old" ? bounceOld : bounceNew); }
+
+// traces: read the content's live translateY every frame
+const TR = {}, SPAN = 3000;
+for (const k of ["old", "new"]) TR[k] = {cv: $("t-" + k), el: $("l-" + k), pts: [], ep: null};
+function offOf(el) { const m = new DOMMatrixReadOnly(getComputedStyle(el).transform); return -m.m42; }
+function tick(now) {
+  const css = getComputedStyle(document.body), col = css.getPropertyValue("--t").trim(), grid = css.getPropertyValue("--grid").trim(), mut = css.getPropertyValue("--muted").trim();
+  for (const k in TR) { const T = TR[k], o = offOf(T.el); T.pts.push([now, o]); while (T.pts.length && now - T.pts[0][0] > SPAN) T.pts.shift();
+    if (Math.abs(o) > 1) { if (!T.ep) T.ep = {s: now, m: 0}; T.ep.m = Math.max(T.ep.m, Math.abs(o)); T.ep.e = now; }
+    else if (T.ep && now - T.ep.e > 60) { $("m-" + k).textContent = Math.round(T.ep.m) + " px"; $("d-" + k).textContent = ((T.ep.e - T.ep.s) / 1000).toFixed(2).replace(".", ",") + " dtk"; T.ep = null; }
+    const c = T.cv, dpr = devicePixelRatio || 1, w = c.clientWidth, h = c.clientHeight;
+    if (c.width !== w * dpr) { c.width = w * dpr; c.height = h * dpr; }
+    const g = c.getContext("2d"); g.setTransform(dpr, 0, 0, dpr, 0, 0); g.clearRect(0, 0, w, h);
+    g.strokeStyle = grid; g.lineWidth = 1; g.beginPath(); g.moveTo(0, h - 12.5); g.lineTo(w, h - 12.5); g.stroke();
+    for (let s = 0; s <= 3; s++) { const x = w - s * 1000 / SPAN * w; g.fillStyle = mut; g.font = "11px Segoe UI, system-ui"; g.fillText(s ? `−${s} dtk` : "sekarang", Math.max(0, x - (s ? 26 : 50)), h - 1); }
+    g.strokeStyle = col; g.lineWidth = 2; g.beginPath();
+    T.pts.forEach(([t, v], i) => { const x = w - (now - t) / SPAN * w, y = h - 12.5 - Math.min(1, Math.abs(v) / 80) * (h - 18); i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.stroke(); }
+  requestAnimationFrame(tick); }
+requestAnimationFrame(tick);
+
+// simulation: a fast two-finger flick, then the trackpad's own glide (decaying deltas for ~2 s)
+$("sim").onclick = () => {
+  const els = ["p-old", "p-new"].map($); els.forEach(el => el.scrollTop = el.scrollHeight - el.clientHeight - 260);
+  const seq = []; for (let i = 0; i < 6; i++) seq.push(14 + i * 9); let d = 62; while (d > .8) { seq.push(d); d *= .955; }
+  let i = 0; const go = () => { if (i >= seq.length) return; const dy = seq[i++];
+    for (const el of els) { const ev = new WheelEvent("wheel", {deltaY: dy, deltaMode: 0, bubbles: true, cancelable: true});
+      if (el.dispatchEvent(ev)) el.scrollTop += dy; }
+    setTimeout(go, 16); };
+  go(); };
+</script></body></html>

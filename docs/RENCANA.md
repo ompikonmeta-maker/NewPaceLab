@@ -34,7 +34,10 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 21. Catatan omPik 10 Nov — belum dibuat, mockup dulu
+## 21. Catatan omPik 10 Nov — mockup siap, menunggu "gas"
+
+Mockup: [`docs/mockup/pegas-kalkulator.html`](mockup/pegas-kalkulator.html) (kalkulator sekarang vs baru; pegas lama vs baru
+dengan grafik tarikan dan tombol simulasi touchpad: lama tertahan 2,13 dtk, baru 0,37 dtk).
 
 1. **Kalkulator target lomba: jendela tidak mengikuti desain jendela lain.** Penyebab: `#rcx` memakai scrollbar bawaan
    browser (`.rcx .ssx-body{scrollbar-width:thin}`), bukan scrollbar sendiri `ownScroll` yang muncul saat menggulir dan
