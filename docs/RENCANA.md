@@ -34,6 +34,12 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 18. "Simpan untuk Claude" dengan semua data — mockup siap, menunggu pilihan + "gas"
+
+Mockup: [`docs/mockup/simpan-semua-data.html`](mockup/simpan-semua-data.html). D1 zip dari isi dashboard (md + CSV per km +
+CSV lap + JSON Garmin + JSON hari itu) · D2 D1 + data per detik 10 minggu terakhir ikut di dashboard.html (±3–8 MB) ·
+D3 D2 + pilihan yang menyalin perintah Ekspor Sesi untuk file FIT asli (dengan GPS).
+
 ## 17c. Film intro versi HP tegak (9:16) — **sudah dibuat** (layar tegak otomatis 9:16)
 
 Mockup: [`docs/mockup/intro-film-hp.html`](mockup/intro-film-hp.html). Cerita, pelari dan durasi sama; tata letak tegak.

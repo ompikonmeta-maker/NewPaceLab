@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: simpan semua data</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;--good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--ease:cubic-bezier(.22,1,.36,1)}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;--good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1000px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:17px;margin:30px 0 6px} p.sub{color:var(--muted);margin:0 0 14px;font-size:13.5px}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.note{font-size:13.5px;color:var(--text-2);margin:4px 0 12px;min-height:40px}
+.grid2{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:16px;align-items:start}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px 18px}
+.btn{display:inline-flex;align-items:center;gap:8px;border:1px solid var(--text);background:var(--surface);color:var(--text);font:inherit;font-size:13px;font-weight:600;border-radius:999px;padding:6px 14px}
+.btn svg{width:16px;height:16px}
+.menu{margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 40px rgba(0,0,0,.12);padding:6px}
+.menu div{padding:8px 10px;border-radius:10px} .menu div.new{background:var(--good-bg)} .menu b{display:block;font-size:13.5px} .menu small{display:block;color:var(--muted);font-size:12px}
+.menu .tag{display:inline-block;font-size:10.5px;font-weight:700;color:var(--good);border:1px solid var(--good);border-radius:5px;padding:0 5px;margin-left:6px;vertical-align:1px}
+.tree{font:12.5px/1.65 Consolas,"Cascadia Mono",monospace;background:var(--bg);border-radius:12px;padding:12px 14px;white-space:pre;overflow-x:auto;margin:0}
+.tree i{font-style:normal;color:var(--muted)} .tree b{color:var(--good);font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top} th{color:var(--muted);font-weight:600}
+td.y{color:var(--good);font-weight:700} td.n{color:var(--muted)} td.w{color:var(--warn);font-weight:600}
+.tw{overflow-x:auto}
+@media (max-width:700px){.grid2{grid-template-columns:minmax(0,1fr)}}
+</style></head><body><div class="wrap">
+<h1>Mockup: “Simpan untuk Claude” dengan semua data</h1>
+<p class="sub">Data rekaan. Sekarang file .md hanya berisi ringkasan, lap, per km dan penilaian. Data per detik dan file FIT asli tidak ada di dalam dashboard.html, jadi tombol di browser belum bisa memberikannya. Tiga cara untuk “semua data ikut”:</p>
+<div class="pills" id="opt" role="group"><button class="pill" aria-pressed="true" data-o="D1">D1 Paket dari dashboard (.zip)</button><button class="pill" aria-pressed="false" data-o="D2">D2 D1 + data per detik di dashboard</button><button class="pill" aria-pressed="false" data-o="D3">D3 D2 + tombol menyiapkan Ekspor Sesi (FIT asli)</button></div>
+<p class="note" id="note"></p>
+<div class="grid2">
+  <div class="card"><div style="text-align:center"><b>Sabtu 31 Okt</b><div style="font-size:13px;color:var(--muted)">Long run 20 km</div><div style="margin-top:8px"><span class="btn"><svg viewBox="0 0 24 24"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</span></div></div>
+    <div class="menu" id="menu"></div></div>
+  <div class="card"><div style="font-size:13px;color:var(--muted);margin-bottom:6px">Isi file yang diunduh</div><pre class="tree" id="tree"></pre></div>
+</div>
+
+<h2>Apa yang ikut</h2>
+<div class="tw"><table id="tab"></table></div>
+
+<h2>Akibatnya</h2>
+<div class="tw"><table>
+<thead><tr><th></th><th>D1</th><th>D2</th><th>D3</th></tr></thead>
+<tbody>
+<tr><td>Ukuran dashboard.html</td><td>tetap (±0,6–1 MB)</td><td>bertambah ±3–8 MB (data per detik 10 minggu terakhir, dipadatkan)</td><td>sama dengan D2</td></tr>
+<tr><td>Bisa di HP</td><td>ya</td><td>ya (file lebih besar)</td><td>zip ya; FIT asli hanya dari laptop</td></tr>
+<tr><td>Lari lebih lama dari 10 minggu</td><td>ringkasan, lap, per km</td><td>tanpa per detik (bisa lewat Ekspor Sesi)</td><td>lewat Ekspor Sesi</td></tr>
+<tr><td>GPS</td><td>tidak ada</td><td>tidak ada</td><td>ada di file FIT asli (dari jam)</td></tr>
+</tbody></table></div>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const M = {
+ D1: [["Kedua pelari (.md)", "ringkasan, seperti sekarang", 0], ["Semua data (.zip)", "md + CSV per km + CSV lap + JSON lengkap, kedua pelari", 1], ["Taofik saja (.md)", "analisa satu pelari", 0], ["Reza saja (.md)", "analisa satu pelari", 0], ["Salin teks", "langsung tempel ke Claude chat", 0]],
+ D2: [["Kedua pelari (.md)", "ringkasan, seperti sekarang", 0], ["Semua data (.zip)", "md + CSV per detik + CSV per km + CSV lap + JSON lengkap", 1], ["Taofik saja (.md)", "analisa satu pelari", 0], ["Reza saja (.md)", "analisa satu pelari", 0], ["Salin teks", "langsung tempel ke Claude chat", 0]],
+ D3: [["Kedua pelari (.md)", "ringkasan, seperti sekarang", 0], ["Semua data (.zip)", "md + CSV per detik + CSV per km + CSV lap + JSON lengkap", 1], ["Ditambah file FIT asli…", "salin perintah Ekspor Sesi untuk tanggal ini (dijalankan di laptop)", 1], ["Taofik saja (.md)", "analisa satu pelari", 0], ["Reza saja (.md)", "analisa satu pelari", 0], ["Salin teks", "langsung tempel ke Claude chat", 0]]};
+const T = {
+ D1: `NewPaceLab_2026-10-31.zip
+├─ ringkasan.md          <i>sama dengan "Kedua pelari (.md)"</i>
+├─ <b>Taofik_per_km.csv</b>     <i>km, waktu, pace, HR, cadence lari, elevasi, jalan</i>
+├─ <b>Taofik_lap.csv</b>        <i>lap jam: jarak, waktu, pace, HR, cadence, jalan, asal</i>
+├─ <b>Taofik_garmin.json</b>    <i>semua field ringkasan Garmin, apa adanya</i>
+├─ <b>Reza_per_km.csv</b>
+├─ <b>Reza_lap.csv</b>
+├─ <b>Reza_garmin.json</b>
+└─ <b>data_hari_ini.json</b>    <i>rencana Excel, kondisi pagi, penilaian, minggu itu</i>`,
+ D2: `NewPaceLab_2026-10-31.zip
+├─ ringkasan.md
+├─ <b>Taofik_per_detik.csv</b>  <i>detik, jarak, HR, kecepatan, pace, cadence, elevasi, jalan?</i>
+├─ Taofik_per_km.csv
+├─ Taofik_lap.csv
+├─ Taofik_garmin.json
+├─ <b>Reza_per_detik.csv</b>
+├─ Reza_per_km.csv
+├─ Reza_lap.csv
+├─ Reza_garmin.json
+└─ data_hari_ini.json`,
+ D3: `NewPaceLab_2026-10-31.zip   <i>(dari tombol, sama dengan D2)</i>
+├─ ringkasan.md
+├─ Taofik_per_detik.csv  ·  Taofik_per_km.csv  ·  Taofik_lap.csv  ·  Taofik_garmin.json
+├─ Reza_per_detik.csv    ·  Reza_per_km.csv    ·  Reza_lap.csv    ·  Reza_garmin.json
+└─ data_hari_ini.json
+
+<b>"Ditambah file FIT asli…"</b> menyalin perintah:
+  Ekspor Sesi.bat 2026-10-31
+lalu di laptop menghasilkan ekspor\\NewPaceLab_2026-10-31.zip
+  … + <b>Taofik_asli.fit</b>, <b>Reza_asli.fit</b>  <i>(file jam, berisi GPS)</i>`};
+const ROWS = [["Rencana Excel, profil, kondisi pagi", 1, 1, 1], ["Ringkasan Garmin (semua field)", 1, 1, 1], ["Lap jam (dari FIT)", 1, 1, 1], ["Per km + jalan kaki + cadence lari", 1, 1, 1], ["Penilaian pelatih, minggu itu", 1, 1, 1], ["Data per detik (HR, kecepatan, cadence, elevasi)", 0, "10 mgg", "10 mgg + semua lewat Ekspor"], ["File FIT asli (termasuk GPS)", 0, 0, "lewat Ekspor Sesi"]];
+const NOTE = {D1: "Menu mendapat pilihan baru “Semua data (.zip)”: semua yang sudah ada di dashboard untuk hari itu, dalam bentuk file yang bisa dibaca mesin (CSV, JSON). Ukuran dashboard tidak berubah.",
+  D2: "Seperti D1, ditambah data per detik. Untuk itu dashboard.html ikut membawa data per detik 10 minggu terakhir (dipadatkan), jadi file-nya lebih besar.",
+  D3: "Seperti D2, ditambah pilihan untuk file FIT asli dari jam. Browser tidak bisa mengunduh dari Garmin, jadi pilihan ini menyalin perintah Ekspor Sesi untuk tanggal itu; dijalankan di laptop."};
+function show(o) { $("menu").innerHTML = M[o].map(([b, s, n]) => `<div class="${n ? "new" : ""}"><b>${b}${n ? '<span class="tag">BARU</span>' : ""}</b><small>${s}</small></div>`).join("");
+  $("tree").innerHTML = T[o]; $("note").textContent = NOTE[o];
+  const k = {D1: 1, D2: 2, D3: 3}[o];
+  $("tab").innerHTML = `<thead><tr><th>Data</th><th>.md sekarang</th><th>Semua data (${o})</th></tr></thead><tbody>` + ROWS.map(r => { const v = r[k], now = r[1] && k ? "ya" : "–";
+    const cell = v === 1 ? '<td class="y">ya</td>' : v === 0 ? '<td class="n">–</td>' : `<td class="w">${v}</td>`;
+    return `<tr><td>${r[0]}</td><td class="${r[1] ? "y" : "n"}">${r[1] ? "ya" : "–"}</td>${cell}</tr>`; }).join("") + "</tbody>"; }
+$("opt").addEventListener("click", e => { const b = e.target.closest("[data-o]"); if (!b) return; $("opt").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); show(b.dataset.o); });
+show("D1");
+</script>
+</body></html>
