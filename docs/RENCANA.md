@@ -54,6 +54,9 @@ Sisa beda dokumen ↔ kode setelah jawaban itu:
 - §5b jalan kaki ≥10 dtk: dibaca sebagai total di segmen (Uji 1a menghitung km 7 yang hanya 0:08).
 - §3 tempo ≤4 km / ≥5 km: config.json perlu dua rentang tempo.
 
+Keputusan omPik ("ikuti arahan Claude project"): baris "ganti easy 8 km" dihapus (tidak ada di §7); jalan kaki ≥10 dtk = total
+di segmen, km yang ada jalan kakinya ditandai. Mockup: [`docs/mockup/penilaian-v3.html`](mockup/penilaian-v3.html) — menunggu "gas".
+
 Hasil cek kode (✔ benar · ◐ sebagian · ✖ sudah ada / tidak tepat):
 
 | # | Catatan | Hasil cek | Keterangan |

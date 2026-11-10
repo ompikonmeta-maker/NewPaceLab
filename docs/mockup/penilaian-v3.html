@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Mockup: penilaian v3</title>
+<style>
+:root{--bg:#f3f3f1;--surface:#fdfdfc;--line:#e3e2de;--grid:#ebeae6;--text:#111110;--text-2:#45443f;--muted:#6b6a65;--t:#2a78d6;--r:#eb6834;
+  --good:#0f8a0f;--good-bg:#e6f4e4;--warn:#9a6a00;--warn-bg:#fdf3dc;--serious:#b54a1f;--serious-bg:#fbe9e0;--crit:#c22f2f;--crit-bg:#fbe4e4}
+@media (prefers-color-scheme:dark){:root{--bg:#111110;--surface:#1b1b1a;--line:#2e2e2c;--grid:#272725;--text:#f2f1ee;--text-2:#cfcec6;--muted:#a3a29b;--t:#3987e5;--r:#d95926;
+  --good:#5fd35f;--good-bg:#173317;--warn:#f2c14e;--warn-bg:#3a2f12;--serious:#f0956d;--serious-bg:#3b2318;--crit:#ff7b7b;--crit-bg:#3d1c1c}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.5 "Segoe UI",Roboto,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+.wrap{max-width:1040px;margin:0 auto;padding:28px 16px 80px}
+h1{font-size:22px;margin:0 0 4px} h2{font-size:18px;margin:36px 0 4px} p.sub{color:var(--muted);margin:0 0 12px;font-size:13.5px}
+.num{font-variant-numeric:tabular-nums}
+.pills{display:flex;gap:6px;flex-wrap:wrap;margin:8px 0}
+.pill{border:1px solid var(--line);background:var(--surface);color:var(--text-2);border-radius:999px;padding:5px 13px;font:inherit;font-size:13px;cursor:pointer}
+.pill[aria-pressed=true]{background:var(--text);color:var(--surface);border-color:var(--text)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:18px 20px}
+.new{display:inline-block;font-size:10px;font-weight:700;color:var(--good);border:1px solid var(--good);border-radius:5px;padding:0 5px;margin-left:6px;vertical-align:2px}
+/* duel head */
+.top{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);align-items:center;gap:12px;margin-bottom:10px}
+.who b{font-size:17px} .who small{display:block;color:var(--muted);font-size:12.5px} .who.R{text-align:right}
+.mid{text-align:center} .mid b{display:block;font-size:16px} .mid span{font-size:13px;color:var(--muted)}
+.tag{display:inline-block;margin-top:3px;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;background:color-mix(in srgb,var(--t) 14%,transparent);color:var(--t)}
+.sec{font-size:12px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;margin:14px 0 6px}
+/* check rows, mirrored like the dashboard */
+.crow{display:grid;grid-template-columns:minmax(0,1fr) 190px minmax(0,1fr);gap:12px;align-items:center;padding:8px 0;border-top:1px solid var(--grid)}
+.crow .c{text-align:center;font-size:13.5px;color:var(--text-2);font-weight:600}
+.crow .L{display:flex;justify-content:flex-end;align-items:center;gap:8px;text-align:right} .crow .R{display:flex;align-items:center;gap:8px}
+.val{font-size:13.5px} .val small{display:block;color:var(--muted);font-size:12px}
+.ic{width:20px;height:20px;flex:none;border-radius:50%;display:grid;place-items:center;font-size:12px;font-weight:800}
+.ok{color:var(--good);background:var(--good-bg)} .wn{color:var(--warn);background:var(--warn-bg)} .bd{color:var(--crit);background:var(--crit-bg)} .na{color:var(--muted);background:var(--grid)}
+.crow.add{background:linear-gradient(90deg,transparent,color-mix(in srgb,var(--good) 6%,transparent),transparent)}
+.val{min-width:0} .kms{display:inline-flex;gap:3px;flex-wrap:wrap;vertical-align:middle} .kms span{flex:none;display:inline-block;font-size:11.5px;border-radius:5px;padding:0 5px;background:var(--grid)} .kms span.f{background:var(--warn-bg);color:var(--warn);font-weight:700} .kms span.x{opacity:.5}
+.flag{margin-top:12px;border-radius:14px;padding:10px 14px;background:var(--warn-bg);color:var(--text);font-size:13.5px} .flag b{color:var(--warn)}
+.verdict{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:12px} .verdict div{border:1px solid var(--line);border-radius:14px;padding:10px 14px;font-size:13.5px}
+/* morning cards */
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.lamp{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;border-radius:999px;padding:3px 12px}
+.L-h{background:var(--good-bg);color:var(--good)} .L-k{background:var(--warn-bg);color:var(--warn)} .L-o{background:var(--serious-bg);color:var(--serious)} .L-m{background:var(--crit-bg);color:var(--crit)}
+.why{margin:8px 0 0;padding:0;list-style:none;font-size:13px} .why li{display:flex;gap:8px;align-items:center;margin:4px 0} .why li .ic{width:18px;height:18px;font-size:11px}
+.act{margin-top:10px;border-top:1px solid var(--grid);padding-top:10px;font-size:13.5px;display:grid;grid-template-columns:auto 1fr;gap:4px 12px} .act span{color:var(--muted)} .act b small{font-weight:400;color:var(--muted)}
+.scale{display:flex;gap:4px;margin-top:10px} .scale span{flex:1;text-align:center;font-size:11.5px;border-radius:6px;padding:2px 0;opacity:.45} .scale span.me{opacity:1;font-weight:700}
+table{width:100%;border-collapse:collapse;font-size:13px} th,td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--grid);vertical-align:top} th{color:var(--muted);font-weight:600}
+/* hrv */
+.hv{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:8px 0} .hv div{background:var(--bg);border-radius:12px;padding:8px 10px} .hv b{font-size:22px;display:block} .hv small{color:var(--muted);font-size:12px}
+svg text{font-size:11px;fill:var(--muted)}
+/* calculator */
+.calc{display:grid;grid-template-columns:minmax(0,340px) minmax(0,1fr);gap:16px}
+.f{display:grid;grid-template-columns:150px 1fr;gap:8px 10px;align-items:center;font-size:13.5px} .f label{color:var(--text-2)}
+.inp{width:100%;min-width:0;border:1px solid var(--line);background:var(--bg);border-radius:10px;padding:6px 10px;font:inherit;font-size:13.5px;color:var(--text)} .inp.auto{color:var(--muted)}
+.steps{margin:0;padding:0;list-style:none;font-size:13.5px} .steps li{display:grid;grid-template-columns:24px 1fr auto;gap:8px;padding:6px 0;border-bottom:1px solid var(--grid)} .steps li i{font-style:normal;color:var(--muted)}
+.res{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:10px 0 0} .res small{font-size:14px;font-weight:400;color:var(--muted)}
+.where{font-size:12.5px;color:var(--muted);margin-top:8px}
+@media (max-width:760px){.crow{grid-template-columns:minmax(0,1fr) 110px minmax(0,1fr)}.grid2,.calc,.verdict{grid-template-columns:1fr}.top{grid-template-columns:1fr 1fr}.top .mid{grid-column:1/-1;order:-1}.f{grid-template-columns:1fr}}
+</style></head><body><div class="wrap">
+<h1>Mockup: penilaian v3 (RUMUS versi 10 Nov)</h1>
+<p class="sub">Angka dari <code>docs/KRITERIA-UJI.md</code>; angka lain (mis. HR per km, cadence) rekaan. Baris bertanda <span class="new">BARU</span> belum ada di dashboard sekarang. Tampilan mengikuti detail hari di tab Sesi (Taofik kiri, Reza kanan).</p>
+
+<h2>1. Penilaian sesi</h2>
+<div class="pills" id="ex" role="group"><button class="pill" aria-pressed="true" data-x="race">Lomba 10K · 7 Nov</button><button class="pill" aria-pressed="false" data-x="tempo">Tempo · 27 Okt</button><button class="pill" aria-pressed="false" data-x="long">Long run · 1 Nov</button><button class="pill" aria-pressed="false" data-x="strides">Lari santai + strides · 10 Nov</button></div>
+<div class="card" id="sess"></div>
+
+<h2>2. Kartu pagi: lampu 4 tingkat (§7b) dan aturan 110% (§4)</h2>
+<p class="sub">Lampu = yang paling ketat dari §7 dan §7b. "Long run Sabtu" tidak lagi dihitung dari data pagi hari lain.</p>
+<div class="grid2">
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Taofik</b><span class="lamp L-k">● Kuning</span></div>
+    <ul class="why"><li><span class="ic wn">!</span>Tidur 5 j 36 m (§7 baris 2: &lt; 6 j)</li><li><span class="ic ok">✓</span>Body Battery 58</li><li><span class="ic ok">✓</span>HRV semalam 44 · status Balanced</li><li><span class="ic ok">✓</span>RHR +2 dari rata-rata 7 hari</li></ul>
+    <div class="scale"><span class="L-h">Hijau</span><span class="L-k me">Kuning</span><span class="L-o">Oranye</span><span class="L-m">Merah</span></div>
+    <div class="act"><span>Hari ini (Sab)</span><b>Long run dipotong 20% → 17,6 km <small>dari 22 km, pace recovery</small></b><span>Latihan keras</span><b>Jadi lari santai</b>
+      <span>Aturan 110% <span class="new">BARU</span></span><b>Batas long run 23,1 km <small>terpanjang 30 hari: 21,02 km (1 Nov) · rencana 16 km ✓</small></b></div></div>
+  <div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>Reza</b><span class="lamp L-m">● Merah</span></div>
+    <ul class="why"><li><span class="ic ok">✓</span>Tidur 6 j 48 m · Body Battery 65 (§7 lolos)</li><li><span class="ic bd">✕</span>Status HRV LOW 4 hari berturut-turut (§7b: ≥3 hari → Merah)</li><li><span class="ic ok">✓</span>RHR +1 dari rata-rata 7 hari</li><li><span class="ic na">–</span>Garmin "Strained": belum tersedia</li></ul>
+    <div class="scale"><span class="L-h">Hijau</span><span class="L-k">Kuning</span><span class="L-o">Oranye</span><span class="L-m me">Merah</span></div>
+    <div class="act"><span>Hari ini (Sab)</span><b>Lari santai ≤ 8 km, atau istirahat <small>long run 21 km tidak dijalankan</small></b><span>Latihan keras</span><b>Istirahat atau lari santai</b>
+      <span>Aturan 110% <span class="new">BARU</span></span><b>Batas long run 23,1 km <small>terpanjang 30 hari: 21,02 km (1 Nov)</small></b></div></div>
+</div>
+<p class="sub" style="margin-top:8px">Hari selain hari long run: baris pertama menjadi "Long run Sabtu: dinilai Sabtu pagi" (Uji 3a), bukan hasil dari data pagi hari ini.</p>
+<div class="card" style="margin-top:12px"><b style="font-size:14px">Aturan lampu yang dipakai (§7b)</b>
+<table style="margin-top:6px"><thead><tr><th>Lampu</th><th>Penyebab (salah satu cukup)</th><th>Long run</th><th>Latihan keras</th></tr></thead><tbody>
+<tr><td><span class="lamp L-h">Hijau</span></td><td>semua lolos</td><td>sesuai rencana</td><td>sesuai rencana</td></tr>
+<tr><td><span class="lamp L-k">Kuning</span></td><td>tidur 5–6 j atau BB &lt;50 · HRV semalam di bawah batas bawah normal 1–2 malam · status UNBALANCED · RHR ≥ +5</td><td>potong 20%</td><td>lari santai</td></tr>
+<tr><td><span class="lamp L-o">Oranye</span></td><td>tidur &lt;5 j dan BB &lt;40 · RHR ≥ +7 · UNBALANCED ≥3 hari</td><td>potong 40%</td><td>lari santai</td></tr>
+<tr><td><span class="lamp L-m">Merah</span></td><td>status LOW/POOR ≥3 hari · Garmin "Strained" (bila tersedia)</td><td>lari santai ≤8 km / istirahat</td><td>istirahat / lari santai</td></tr>
+</tbody></table>
+<p class="sub" style="margin:6px 0 0">RHR dibanding rata-rata 7 hari sebelumnya (kurang dari 7 hari: RHR profil Taofik 55, Reza 61). Baris lama "ganti easy 8 km" dihapus karena tidak ada di §7.</p></div>
+
+<h2>3. Kartu HRV <span class="new">BARU</span></h2>
+<div class="grid2" id="hrv"></div>
+<p class="sub" style="margin-top:8px">Pita abu-abu = rentang normal pribadi dari Garmin. Garis tebal = rata-rata 7 hari (yang menentukan status). Titik = angka semalam.</p>
+
+<h2>4. Kalkulator target lomba (§3b) <span class="new">BARU</span></h2>
+<div class="card"><div class="calc">
+  <div class="f">
+    <label>Lomba</label><select class="inp"><option>10K · Sab 7 Nov 2026</option><option>Half · Sab 23 Jan 2027</option></select>
+    <label>Pelari</label><select class="inp"><option>Taofik</option><option>Reza</option></select>
+    <label>Dasar (lomba/tes utuh)</label><select class="inp"><option>5K 31:29 · 11 Okt (utuh)</option></select>
+    <label>Suhu saat start</label><input class="inp" value="29 °C">
+    <label>Jam start</label><input class="inp" value="06:18">
+    <label>Suhu km terakhir</label><input class="inp auto" value="31 °C (perkiraan: start + 1°C / 30 mnt)">
+    <label>Long run ≥18 km &lt;7 hari</label><span class="inp auto">otomatis: 21,02 km · 1 Nov (6 hari sebelum)</span>
+  </div>
+  <div><ol class="steps">
+    <li><i>1</i><span>Riegel dari 5K 31:29 utuh · 31:29 × 2<sup>1,06</sup></span><b class="num">65:38</b></li>
+    <li><i>2</i><span>Panas · km terakhir 31 °C → 30–32 °C → +5%</span><b class="num">68:55</b></li>
+    <li><i>3</i><span>Kelelahan · long run 21 km 6 hari sebelumnya → +2%</span><b class="num">70:18</b></li>
+    <li><i>8</i><span>Cek silang · tidak lebih cepat dari Riegel tanpa koreksi (65:38)</span><b style="color:var(--good)">✓</b></li></ol>
+    <div class="res num">69–71 menit <small>target ditulis sebagai rentang (§3b langkah 7)</small></div>
+    <table style="margin-top:10px"><thead><tr><th>Bagian</th><th>Batas</th><th>Cara lari</th></tr></thead><tbody>
+      <tr><td>km 1</td><td class="num">HR ≤ 161</td><td>pace paling lambat dari rentang, atau lebih lambat</td></tr>
+      <tr><td>km 2</td><td class="num">HR ≤ 170</td><td>kalau km 1 terlalu cepat 10 dtk, km 2 lebih lambat 10 dtk</td></tr>
+      <tr><td>km 3–5</td><td class="num">HR ≤ 174</td><td>dikunci HR, tanpa target pace</td></tr>
+      <tr><td>km 6–10</td><td class="num">HR ≤ 172 untuk naik pace</td><td>pace boleh naik hanya kalau HR ≥4 di bawah LTHR</td></tr></tbody></table>
+    <p class="where">Letak: tombol "Hitung target" di kartu lomba berikutnya (chip 10K / Half di header). Hasil bisa disalin untuk dibawa ke Claude chat.</p></div>
+</div></div>
+
+<h2>Yang berubah di balik layar</h2>
+<ul style="font-size:14px;color:var(--text-2);padding-left:20px">
+<li>Sync menyimpan kecepatan dari jam (<code>enhanced_speed</code>) dan suhu per detik, juga rata-rata HRV 7 hari dan rentang normal (unduh ulang sekali). Strides dan decoupling memakai kecepatan jam.</li>
+<li><code>overrides.json</code> (tanggal, pelari, jenis sesi, km) dibaca build, dashboard dan ekspor .md; pilihan "⇄ Nilai sebagai…" di browser tetap ada.</li>
+<li><code>config.json</code>: rentang tempo ≤4 km / ≥5 km, RHR profil, batas §5b.</li>
+<li><code>pacelab.py inspect</code> mencoba data "Strained" dan HRV mingguan; hasilnya dikirim ke Claude Code sekali.</li>
+</ul>
+</div>
+<script>
+const $ = id => document.getElementById(id);
+const I = {ok: "✓", wn: "!", bd: "✕", na: "–"};
+const row = (lab, a, b, add) => `<div class="crow${add ? " add" : ""}"><div class="L">${a ? `<span class="val">${a[1]}</span><span class="ic ${a[0]}">${I[a[0]]}</span>` : '<span class="ic na">–</span>'}</div><div class="c">${lab}${add ? '<span class="new">BARU</span>' : ""}</div><div class="R">${b ? `<span class="ic ${b[0]}">${I[b[0]]}</span><span class="val">${b[1]}</span>` : '<span class="ic na">–</span>'}</div></div>`;
+const kms = (L, bad) => `<span class="kms">${L.map((v, i) => `<span class="${bad.includes(i) ? "f" : ""}">${v}</span>`).join("")}</span>`;
+const X = {
+ race: {head: ["Taofik", "Lomba 10K · start 06:18", "Sabtu 7 Nov", "LOMBA 10K", "Reza", "Lomba 10K · start 06:18"], rows: [
+  ["Jarak", ["ok", "10,0 / 10 km<small>100%</small>"], ["bd", "5,00 / 10 km<small>50% · tidak selesai (&lt;90%)</small>"], 1],
+  ["Start km 1", ["ok", "6:08<small>tidak lebih cepat dari batas lambat rencana</small>"], ["wn", "6:17<small>68 dtk lebih cepat dari 7:25 · start terlalu cepat</small>"], 1],
+  ["HR paruh pertama (§3b)", ["ok", kms(["158", "168", "172", "174", "173"], []) + "<small>batas 161 · 170 · 174 · km 4 = 174 masih boleh</small>"], ["wn", kms(["163", "171", "176"], [0, 2]) + "<small>batas 158 · 167 · 171 · maks 176</small>"], 1],
+  ["Pace ambruk", ["wn", "31:21 → 37:23<small>paruh 2 lebih lambat +6:02 (+19%, batas 5%)</small>"], ["na", "tidak dinilai<small>tidak selesai</small>"], 1],
+  ["Jalan kaki", ["wn", "3:07<small>km " + kms(["5", "7", "8", "9", "10"], [0, 1, 2, 3, 4]) + "</small>"], ["ok", "tidak ada"], 1],
+  [`Decoupling`, ["na", "tidak berlaku<small>lomba</small>"], ["na", "tidak berlaku<small>lomba</small>"], 1],
+  ["Berhenti", ["na", "–"], ["na", "–"], 1]],
+  flag: "<b>Kemungkinan terbawa:</b> start keduanya 06:18, km 1 hanya beda 9 dtk (6:08 vs 6:17), dan km 1 Reza 68 dtk lebih cepat dari rencananya (§5b, cek pacing berdua).",
+  v: ["<b>Taofik:</b> start terkendali, tapi pace ambruk +19% dan jalan kaki 3:07 di paruh kedua. Bukan sesi bersih.", "<b>Reza:</b> start 68 dtk terlalu cepat, HR lewat LTHR, berhenti di 5 km."]},
+ tempo: {head: ["Taofik", "Tempo 3 km", "Selasa 27 Okt", "LATIHAN KERAS: Tempo 3 km", "Reza", "Tempo 3 km"], rows: [
+  ["Jarak", ["ok", "9,1 / 9 km<small>101%</small>"], ["ok", "8,8 / 9 km<small>98%</small>"], 0],
+  ["Pace tempo", ["ok", kms(["6:12", "5:54", "5:51"], [1, 2]) + "<small>2 lap sedikit terlalu cepat</small>"], ["na", kms(["6:50", "6:28", "6:53"], [1]) + "<small>HR jadi patokan</small>"], 0],
+  ["Start km 1", ["ok", "6:12"], ["wn", "6:50<small>lebih cepat dari 7:20 · start terlalu cepat</small>"], 1],
+  ["Melambat di akhir", ["ok", "tidak<small>lap terakhir tercepat</small>"], ["wn", "+25 dtk<small>6:53 vs tercepat 6:28 (batas 15 dtk)</small>"], 1],
+  ["Jalan kaki", ["ok", "tidak ada"], ["ok", "tidak ada"], 1],
+  ["Decoupling", ["na", "tidak berlaku<small>tempo (dulu 22,9%)</small>"], ["na", "tidak berlaku<small>tempo</small>"], 1]],
+  flag: "", v: ["<b>Taofik:</b> tempo sesuai, sedikit cepat di 2 lap terakhir.", "<b>Reza:</b> start terlalu cepat lalu melambat 25 dtk di lap terakhir. Km pertama di pace paling lambat."]},
+ long: {head: ["Taofik", "lampu Kuning · tidur 5 j 36 m", "Minggu 1 Nov", "LONG RUN 22 km", "Reza", "lampu Merah · HRV LOW 3 hari"], tag: "dari overrides.json: long run", rows: [
+  ["Jarak", ["ok", "21,02 / 22 km<small>95,5%</small>"], ["ok", "21,02 / 21 km<small>100%</small>"], 0],
+  ["Gerbang dilewati", ["wn", "+3,4 km<small>batas gerbang 17,6 km (potong 20%)</small>"], ["wn", "21 km saat lampu merah<small>batas: lari santai ≤ 8 km</small>"], 1],
+  ["Buka 3 km pelan", ["ok", "9:31/km"], ["ok", "9:42/km"], 0],
+  ["HR tidak lewat batas", ["ok", "km 18–21 di atas 150<small>hanya di 25% akhir · aturan B</small>"], ["ok", "lewat batas di 25% akhir<small>aturan B</small>"], 0],
+  ["Decoupling", ["ok", "4,9%<small>penuh 8,4%</small>"], ["ok", "2,8%<small>penuh 4,3% · kecepatan jam</small>"], 0],
+  ["Cadence bertahan", ["ok", "−2 spm"], ["ok", "−1 spm"], 0]],
+  flag: "", v: ["<b>Taofik:</b> long run rapi, tapi gerbang pagi meminta 17,6 km.", "<b>Reza:</b> long run rapi, tapi lampu merah meminta lari santai ≤ 8 km atau istirahat."]},
+ strides: {head: ["Taofik", "lari santai + strides", "Selasa 10 Nov", "Lari santai 6 km + 6 strides", "Reza", ""], rows: [
+  ["Jarak", ["ok", "6,89 / 6,9 km<small>100% · 6 km + 6 × 0,15 km strides</small>"], null, 0],
+  ["Strides", ["ok", "6 terdeteksi<small>16–23 dtk · puncak 4:40–5:49/km · kecepatan jam</small>"], null, 1],
+  ["HR tidak lewat batas", ["ok", "0 km di atas 150"], null, 0],
+  ["Decoupling", ["na", "tidak berlaku<small>lari dengan strides</small>"], null, 1],
+  ["Berhenti", ["na", "5:07<small>59:47 total − 54:40 bergerak · tidak dinilai</small>"], null, 1]],
+  flag: "", v: ["<b>Taofik:</b> jarak pas dengan strides, tidak ada alarm 110%.", "<b>Reza:</b> tidak lari."]}};
+function sess(k) { const x = X[k], h = x.head;
+  $("sess").innerHTML = `<div class="top"><div class="who"><b>${h[0]}</b><small>${h[1]}</small></div><div class="mid"><b>${h[2]}</b><span>${h[3]}</span>${x.tag ? `<div><span class="tag">${x.tag}</span></div>` : ""}</div><div class="who R"><b>${h[4]}</b><small>${h[5] || "tidak lari"}</small></div></div>
+    <div class="sec">Penilaian pelatih</div>${x.rows.map(r => row(r[0], r[1], r[2], r[3])).join("")}
+    ${x.flag ? `<div class="flag">${x.flag}<span class="new">BARU</span></div>` : ""}<div class="verdict"><div>${x.v[0]}</div><div>${x.v[1]}</div></div>`; }
+$("ex").addEventListener("click", e => { const b = e.target.closest("[data-x]"); if (!b) return; $("ex").querySelectorAll(".pill").forEach(p => p.setAttribute("aria-pressed", p === b)); sess(b.dataset.x); });
+sess("race");
+// HRV cards: nightly dots, 7-day mean line, personal normal band
+function hrv(name, c, night, avg, band, status, cls) { const W = 440, H = 120, N = night.length, lo = 25, hi = 60, X = i => 30 + i * (W - 40) / (N - 1), Y = v => H - 18 - (v - lo) / (hi - lo) * (H - 30);
+  const m = night.map((_, i) => { const s = night.slice(Math.max(0, i - 6), i + 1); return s.reduce((a, b) => a + b, 0) / s.length; });
+  return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center"><b>${name}</b><span class="lamp ${cls}">status ${status}</span></div>
+    <div class="hv"><div><small>semalam</small><b class="num">${night[N - 1]}</b><small>ms</small></div><div><small>rata-rata 7 hari</small><b class="num">${avg}</b><small>ms</small></div><div><small>rentang normal pribadi</small><b class="num">${band[0]}–${band[1]}</b><small>ms</small></div></div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%"><rect x="30" y="${Y(band[1])}" width="${W - 40}" height="${Y(band[0]) - Y(band[1])}" fill="var(--grid)" rx="4"/>
+      <path d="${m.map((v, i) => `${i ? "L" : "M"}${X(i)} ${Y(v)}`).join(" ")}" fill="none" stroke="var(--${c})" stroke-width="3"/>
+      ${night.map((v, i) => `<circle cx="${X(i)}" cy="${Y(v)}" r="3" fill="var(--surface)" stroke="var(--${c})" stroke-width="1.5"/>`).join("")}
+      <text x="26" y="${Y(band[1]) + 4}" text-anchor="end">${band[1]}</text><text x="26" y="${Y(band[0]) + 4}" text-anchor="end">${band[0]}</text><text x="30" y="${H - 2}">20 Okt</text><text x="${W - 10}" y="${H - 2}" text-anchor="end">2 Nov</text></svg>
+    <p style="margin:6px 0 0;font-size:12.5px;color:var(--muted)">Status = rata-rata 7 hari dibanding rentang pribadi, bukan angka semalam. Angka HRV dua pelari tidak bisa dibandingkan.</p></div>`; }
+$("hrv").innerHTML = hrv("Taofik", "t", [46, 44, 49, 45, 47, 43, 46, 48, 45, 44, 47, 41, 39, 37], 43, [41, 52], "Balanced", "L-h") + hrv("Reza", "r", [45, 47, 44, 46, 43, 42, 40, 38, 39, 37, 41, 40, 42, 43], 40, [42, 51], "Low", "L-m");
+</script>
+</body></html>
