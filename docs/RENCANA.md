@@ -34,6 +34,22 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 21. Catatan omPik 10 Nov — belum dibuat, mockup dulu
+
+1. **Kalkulator target lomba: jendela tidak mengikuti desain jendela lain.** Penyebab: `#rcx` memakai scrollbar bawaan
+   browser (`.rcx .ssx-body{scrollbar-width:thin}`), bukan scrollbar sendiri `ownScroll` yang muncul saat menggulir dan
+   hilang saat diam. Isinya juga tidak punya pegas di ujung, karena `bounce()` hanya dipasang lewat `ownScroll`.
+   Rencana: samakan dengan jendela detail sesi (`#ssx`): wadah isi + `.sbar` + `ownScroll(...)`.
+2. **Pegas di ujung terasa tidak halus, ada jeda beberapa detik.** Penyebab: `bounce()` baru melepas pegas 140 ms setelah
+   event wheel terakhir. Touchpad dan Magic Mouse terus mengirim event inersia selama 1–3 detik, jadi isi tertahan tertarik
+   sampai inersia habis. Pegas balik juga memakai kurva CSS dengan lewat-titik (overshoot), tidak seperti iPhone.
+   Rencana (perilaku iPhone): tarikan makin berat dengan rumus karet iOS `(1 − 1/(x·0,55/d + 1))·d`; event inersia
+   setelah mentok tidak menahan isi (pegas langsung balik begitu dorongan melemah); pegas balik pakai fisika pegas teredam
+   kritis (tanpa lewat titik nol, ±0,4–0,5 dtk); momentum saat menabrak ujung ikut jadi pantulan kecil. Berlaku untuk semua
+   tempat yang memakai `bounce()` (halaman, jadwal, detail sesi, decoupling, feed, kalkulator). `prefers-reduced-motion`
+   tetap tanpa pegas.
+3. **Decoupling cocok** dengan data asli (dicek omPik setelah Update).
+
 ## 20. Perbaikan kecil dari screenshot 7 Nov (10 Nov) — **sudah dibuat** (1–4)
 
 1. Detail hari: blok tengah (tanggal, judul rencana, tanda "dipindah dari…") mengulang baris linimasa tepat di atasnya → hapus
@@ -94,7 +110,7 @@ Hasil cek kode (✔ benar · ◐ sebagian · ✖ sudah ada / tidak tepat):
 | 13 | Long run pakai aturan B, A cadangan | ✖ | Sudah dibuat (0c, keputusan omPik) |
 | 14 | Cek pacing berdua (km 1) | baru | Belum ada |
 
-## 18. "Simpan untuk Claude" dengan semua data — mockup siap, menunggu pilihan + "gas"
+## 18. "Simpan untuk Claude" dengan semua data — **omPik pilih D3 (10 Nov)**, menunggu "gas"
 
 Mockup: [`docs/mockup/simpan-semua-data.html`](mockup/simpan-semua-data.html). D1 zip dari isi dashboard (md + CSV per km +
 CSV lap + JSON Garmin + JSON hari itu) · D2 D1 + data per detik 10 minggu terakhir ikut di dashboard.html (±3–8 MB) ·
