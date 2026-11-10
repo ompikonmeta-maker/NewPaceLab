@@ -34,6 +34,27 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 19. Catatan dari Claude project (10 Nov) — dicatat + diverifikasi ke kode, belum dikerjakan
+
+Hasil cek kode (✔ benar · ◐ sebagian · ✖ sudah ada / tidak tepat):
+
+| # | Catatan | Hasil cek | Keterangan |
+|---|---|---|---|
+| 1 | Lomba/tempo hanya dinilai dari jarak | ◐ | Lomba: benar, hanya "Jarak" (tidak ada cabang penilaian lomba). Tempo: sudah ada pace & HR per lap/km tempo + pemanasan. Belum ada: pace melambat di akhir, km dengan jalan kaki, target pace lomba |
+| 2 | Tidak ada tukar sesi | ✖/◐ | Sudah ada (T3: otomatis + "⇄ Nilai sebagai…"), tapi pilihan manual hanya di browser. `overrides.json` yang dibaca build (dan Claude project) belum ada |
+| 3 | Gerbang pagi tidak konsisten | ◐ | "Long run Sabtu" = aturan §7 (tidur + Body Battery) dan sesuai dokumen; lampu merah dari HRV/RHR (tabel Lampu harian) tidak ikut. Dokumen tidak mengatur lampu merah vs long run → keputusan omPik. Juga: "Long run Sabtu" dihitung dari data pagi terakhir, ditampilkan setiap hari |
+| 4 | Gerbang dilewati tidak ditandai | ✔ | Gerbang hanya menurunkan batas bawah jarak; lari penuh tetap "patuh" |
+| 5 | Alarm >110% karena strides/jalan kaki | ✔ | km rencana = "Total X km" atau "X km" pertama di sel; strides/pendinginan tidak dihitung kalau tidak tertulis |
+| 6 | Tidak ada kecepatan jam & suhu per detik | ✔ | stream: t, jarak, HR, cadence, elevasi saja; kecepatan dihitung dari selisih jarak |
+| 7 | Detik berhenti tidak tersimpan | ◐ | Stream memakai waktu timer (pause tidak ada); berhenti dengan timer jalan tetap tersimpan. Waktu total vs bergerak ada dari ringkasan Garmin |
+| 8 | Decoupling beda (3,6 vs 2,8%) | ◐ | Filter sudah sama dengan §6 (HR>80, >0,6 m/s, bagi dua per jumlah record, buang 3 km menurut jarak). Beda kemungkinan dari sumber kecepatan (selisih jarak vs `enhanced_speed`) dan kerapatan data (detail Garmin vs FIT) |
+| 9 | Decoupling untuk tempo/lomba | ✔ | Dinilai hanya untuk long run, tapi angkanya tetap tampil di kartu linimasa dan tabel detail untuk semua sesi; §6 bilang tidak berlaku |
+| 10 | Kalkulator target lomba | baru | Riegel & koreksi panas +5% ada di §3; "koreksi kelelahan" dan "§3b" tidak ada di dokumen |
+| 11 | Cek aturan 110% sebelum sesi | ✔ | Aturan ada di dokumen, belum ditampilkan di dashboard |
+| 12 | Tampilan HRV lebih jelas | ◐ | Grafik HRV semalam ada; rata-rata 7 hari dan rentang normal pribadi (`hrv_low` sudah disimpan) belum tampil |
+| 13 | Long run pakai aturan B, A cadangan | ✖ | Sudah dibuat (0c, keputusan omPik) |
+| 14 | Cek pacing berdua (km 1) | baru | Belum ada |
+
 ## 18. "Simpan untuk Claude" dengan semua data — mockup siap, menunggu pilihan + "gas"
 
 Mockup: [`docs/mockup/simpan-semua-data.html`](mockup/simpan-semua-data.html). D1 zip dari isi dashboard (md + CSV per km +
