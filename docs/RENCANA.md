@@ -60,6 +60,11 @@ boleh; jarak dan "gerbang dilewati" dua baris; lampu 4 tingkat §7b (RHR +5 Kuni
 UNBALANCED Kuning, ≥3 hari Oranye; LOW/POOR ≥3 hari Merah); "Strained" dicek lewat inspect; suhu km terakhir manual
 (kosong: suhu start + 1°C per 30 mnt); HRV unduh ulang sekali; pause tidak disimpan, tampil "berhenti x:xx".
 
+Hasil `inspect` 10 Nov (kedua pelari): training status dan training readiness = **404** → "Strained" tidak tersedia;
+lampu Merah hanya dari HRV (§7b). Splits tetap 404; FIT tetap BOLEH (Taofik 14 lap, Reza 6 lap). Field yang ada tetapi
+belum dipakai (belum direncanakan): `lactateThresholdBpm` per lari (Reza), `directWorkoutRpe`/`directWorkoutFeel` dan
+`avgGradeAdjustedSpeed` (Taofik), `baseline.lowUpper` HRV, skor tidur.
+
 Sisa beda dokumen ↔ kode setelah jawaban itu:
 - Lampu sekarang: Oranye juga karena Body Battery <40 saja (§7b: itu Kuning), Merah karena RHR +7 (§7b: Oranye), RHR dibanding
   median 28 hari (§7b: rata-rata 7 hari; profil RHR Taofik 55, Reza 61 belum ada di config.json), UNBALANCED belum dibedakan.

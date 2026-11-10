@@ -140,8 +140,8 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 - **Strides** (dokumen §5): kecepatan jam > 2,6 m/s minimal 6 detik (`coach.stride_mps`, `coach.stride_min_s`). Di detail
   hari yang rencananya menyebut strides: "x dari y terdeteksi", durasi dan pace puncak (setelah 90% jarak dasar).
 - `Ekspor Sesi`: CSV per detik mendapat kolom `suhu_c`, dan `kecepatan_m_s` memakai kecepatan jam bila ada.
-- `pacelab.py inspect` juga mencoba data Garmin "Strained" (training status / readiness). Jalur itu milik Garmin Connect
-  dan belum pasti terbuka untuk key pribadi: hasilnya hanya dilaporkan (dokumen §7b: tanpa data itu Merah hanya dari HRV).
+- `pacelab.py inspect` juga mencoba data Garmin "Strained" (training status / readiness). **Hasil 10 Nov: 404 untuk kedua
+  pelari** (jalur itu tidak terbuka untuk key pribadi). Sesuai dokumen §7b, Merah hanya dihitung dari status HRV.
 - Cadence dan elevasi per detik ikut diunduh. **Update berikutnya mengunduh ulang semua lari sekali** (lebih lama);
   setelah itu kembali inkremental. Kalau cadence kosong pada data asli: `python pacelab.py inspect`.
 
@@ -204,7 +204,7 @@ Tabel di Excel ditulis untuk manusia; ini cara program membacanya.
 
 - **Status HRV**: `BALANCED` normal; `UNBALANCED` tidak seimbang; `LOW`/`POOR` rendah. Status `NONE` = tidak ada data malam itu. **HRV semalam di bawah normal** = angka semalam di bawah batas bawah normal pribadi dari Garmin.
 - **Detak istirahat naik** = dibanding rata-rata 7 hari sebelumnya; kurang dari 7 hari data: RHR profil (`rhr` di `config.json`, Taofik 55, Reza 61). RHR diambil dari ringkasan harian; kalau kosong, dari data tidur.
-- **Lampu** (dokumen §7b, satu sebab cukup, yang paling ketat menang): MERAH = status LOW/POOR 3 hari berturut-turut → ORANYE = tidur < 5 jam dan BB < 40, RHR +7, atau UNBALANCED 3 hari → KUNING = tidur < 6 jam atau BB < 50, HRV semalam di bawah normal, UNBALANCED, RHR +5, atau LOW/POOR 1–2 hari [keputusan dashboard: belum "semua lolos"] → selain itu HIJAU. Garmin "Strained" belum dipakai (data belum tersedia).
+- **Lampu** (dokumen §7b, satu sebab cukup, yang paling ketat menang): MERAH = status LOW/POOR 3 hari berturut-turut → ORANYE = tidur < 5 jam dan BB < 40, RHR +7, atau UNBALANCED 3 hari → KUNING = tidur < 6 jam atau BB < 50, HRV semalam di bawah normal, UNBALANCED, RHR +5, atau LOW/POOR 1–2 hari [keputusan dashboard: belum "semua lolos"] → selain itu HIJAU. Garmin "Strained" tidak dipakai (inspect 10 Nov: 404, data tidak tersedia).
 - **Kenapa lampu tidak hijau**: di bawah kalimat ringkasan tertulis syarat yang kurang; klik lampunya untuk rincian
   empat syarat (HRV, Body Battery, tidur, detak istirahat) beserta nilai hari itu dan batasnya.
 - **Body Battery harian** = nilai tertinggi hari itu (setelah tidur).
