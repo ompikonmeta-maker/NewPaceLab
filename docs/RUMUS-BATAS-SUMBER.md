@@ -1,7 +1,8 @@
 # Rumus, Batas Angka, dan Sumber — Program Marathon 2027 (Taofik & Reza)
 
 Versi 10 Nov 2026. Perubahan terakhir:
-- §7b: aturan lampu (hijau/kuning/merah)
+- §5b: penilaian sesi tempo, tes, lomba (batas angka untuk dashboard)
+- §7b: aturan lampu (hijau/kuning/oranye/merah, termasuk RHR)
 - §5: jarak strides dalam rencana
 - §3b (8 Nov): cara menentukan target lomba
 
@@ -72,7 +73,7 @@ Aturan ini lahir dari kesalahan target lomba 10K 7 Nov. Targetnya 59:24, hasilny
 | 1. Dasar hitungan | **Hanya waktu lomba atau tes UTUH** (minimal 5 km tanpa berhenti), dihitung pakai Riegel. **Dilarang** memakai potongan tempo, interval, atau km tercepat dalam lomba | [P] Riegel 1981. Pelajaran 7 Nov |
 | 2. Koreksi panas | Suhu saat start 28–30°C: +3%. 30–32°C: **+5%**. Di atas 32°C: **+8%** | [K] sesuai §3; arahnya sejalan dengan Ely 2007 |
 | 3. Koreksi kelelahan | Long run ≥18 km kurang dari 7 hari sebelum lomba: **+2%** | [K] |
-| 4. Koreksi jam start | Start setelah 06:00: pakai perkiraan suhu di km terakhir, bukan suhu saat start | [K] |
+| 4. Koreksi jam start | Start setelah 06:00: pakai perkiraan suhu di km terakhir, bukan suhu saat start. **Diisi manual** oleh pengguna. Kalau kosong: suhu start + 1°C per 30 menit perkiraan durasi lomba | [K] / [E] |
 | 5. Paruh pertama | **Dikunci pakai HR, tanpa target pace.** km 1 ≤ LTHR − 15, km 2 ≤ LTHR − 6, km 3–5 ≤ LTHR − 2 | [K] |
 | 6. Paruh kedua | Pace boleh naik setelah km 5 **hanya kalau** HR masih ≥4 denyut di bawah LTHR | [K] |
 | 7. Target yang ditulis | Selalu dalam bentuk **rentang** (misalnya 64–66 menit), bukan satu angka | [K] |
@@ -113,6 +114,20 @@ Riwayat start terlalu cepat: Reza 15 Okt, 27 Okt, 1 Nov, 7 Nov (km 1 di 6:17, pa
 | **Jarak strides dalam rencana** | Kalau sel menyebut strides: **+0,15 km per stride** (termasuk jalan kakinya). Contoh: "6 km + 6 strides" = 6,9 km. Pendinginan yang tidak tertulis di sel: +0 | [K] keputusan 10 Nov 2026 |
 | Deteksi strides | Kecepatan dari jam (`enhanced_speed`) >2,6 m/s selama minimal 6 detik. Jangan pakai kecepatan dari selisih jarak, karena puncaknya terbaca terlalu cepat | [K] |
 
+## 5b. Penilaian sesi tempo, tes, dan lomba (keputusan 10 Nov 2026)
+
+| Hal | Batas | Dasar |
+|---|---|---|
+| Batas HR §3b | Yang ditandai hanya HR **di atas** batas. Contoh: km 3–5 ≤ LTHR − 2, jadi HR = LTHR − 2 masih boleh | [K] |
+| Pace ambruk (lomba, tes) | Paruh kedua lebih lambat **>5%** dari paruh pertama → "pace ambruk" | [K] |
+| Melambat di akhir (tempo) | km tempo terakhir lebih lambat **>15 detik** dari km tempo tercepat → "melambat di akhir" | [K] |
+| Jalan kaki | Jalan kaki **≥10 detik** di dalam segmen tempo atau lomba → ditandai, dengan total menitnya | [K] |
+| Tidak selesai | Lomba atau tes dengan jarak **<90%** dari jarak lomba → "tidak selesai". Sesi biasa tetap memakai 95–110% (§4) | [K] |
+| Km pertama | km 1 lebih cepat **>10 detik** dari batas lambat rencana → "start terlalu cepat" (§3b) | [K] |
+| Cek pacing berdua | Ditandai "kemungkinan terbawa" kalau ketiganya terpenuhi: (1) jam mulai dua pelari berbeda **<2 menit**, (2) selisih pace km 1 keduanya **<15 detik**, (3) km 1 salah satu pelari lebih cepat **>30 detik** dari rencananya sendiri. Berlaku umum untuk pelari mana pun | [K] |
+| Berhenti (jam di-pause) | Tidak dinilai. Cukup ditampilkan, misalnya "berhenti 2:36" (waktu total − waktu bergerak) | [K] |
+| Jarak vs gerbang | Ditampilkan sebagai **dua baris terpisah**: "Jarak" dinilai terhadap rencana, dan "Gerbang dilewati (+x km)" kalau melebihi batas gerbang | [K] |
+
 ## 6. Long run: aturan khusus
 
 | Hal | Angka | Dasar |
@@ -151,12 +166,15 @@ Body Battery adalah angka buatan Garmin (rumusnya tidak dipublikasikan), jadi ba
 
 ## 7b. Aturan lampu (keputusan 10 Nov 2026)
 
-| Lampu | Penyebab | Long run | Latihan keras |
+| Lampu | Penyebab (salah satu cukup) | Long run | Latihan keras |
 |---|---|---|---|
-| **Hijau** | §7 lolos dan status HRV Balanced | Sesuai rencana | Sesuai rencana |
-| **Kuning** | §7 baris 2, atau HRV semalam turun di bawah normal 1–2 malam | **Potong 20%** | Jadi lari santai |
-| **Merah** | Status HRV Low/Unbalanced ≥3 hari, atau Garmin "Strained" | **Lari santai ≤8 km, atau istirahat** | Istirahat atau lari santai |
+| **Hijau** | Semua lolos | Sesuai rencana | Sesuai rencana |
+| **Kuning** | §7 baris 2 · HRV semalam di bawah batas bawah normal 1–2 malam · status HRV UNBALANCED · RHR ≥ +5 | **Potong 20%** | Jadi lari santai |
+| **Oranye** | §7 baris 3 · RHR ≥ +7 · status HRV UNBALANCED ≥3 hari berturut-turut | **Potong 40%** | Jadi lari santai |
+| **Merah** | Status HRV **LOW atau POOR ≥3 hari berturut-turut** · Garmin "Strained" (kalau datanya tersedia) | **Lari santai ≤8 km, atau istirahat** | Istirahat atau lari santai |
 
+- **RHR +5/+7** dibanding rata-rata RHR 7 hari sebelumnya. Kalau data kurang dari 7 hari, pakai RHR profil (Taofik 55, Reza 61).
+- Kalau status "Strained" tidak tersedia dari Garmin, Merah hanya dihitung dari status HRV.
 - Selalu pakai yang **paling ketat** antara §7 dan lampu.
 - Sesi yang dilari lebih jauh atau lebih keras dari batas gerbang ditandai **"gerbang dilewati"**, bukan "patuh".
 - Status HRV Garmin = rata-rata 7 hari dibanding rentang pribadi, bukan angka semalam. Angka HRV antar pelari tidak bisa dibandingkan.

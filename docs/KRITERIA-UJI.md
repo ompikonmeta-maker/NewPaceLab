@@ -19,19 +19,18 @@ Angka di bawah dihitung dari data asli (FIT Garmin, export MD NewPaceLab, dan fo
 | 10 | 7:33 | 0:30 |
 
 Hasil yang diharapkan:
-- Paruh 1 (km 1–5) = **31:21**, paruh 2 (km 6–10) = **37:23** → **positive split +6:02 (+19%)** → ditandai "pace ambruk".
-- Batasnya: positive split lebih dari 5% ditandai.
-- Jalan kaki total **3:07** di km 5, 7, 8, 9, 10 → ditandai.
-- HR sudah ≥ LTHR − 2 (174) di km 4 → ditandai "HR mentok di paruh pertama" (§3b langkah 5).
+- Paruh 1 (km 1–5) = **31:21**, paruh 2 (km 6–10) = **37:23** → **positive split +6:02 (+19%)** → ditandai "pace ambruk" (§5b: >5%).
+- Jalan kaki total **3:07** di km 5, 7, 8, 9, 10 → ditandai (§5b: ≥10 detik).
+- HR km 4 = 174 = LTHR − 2 → **masih boleh**, tidak ditandai (§5b: hanya HR di atas batas yang ditandai).
 - **Tidak boleh** tertulis "sesi bersih".
 
 **Uji 1b: Reza, lomba 10K, 7 Nov**
-- Jarak 5,00 / 10 km = 50% → "tidak selesai".
-- km 1 = **6:17**, rencana mode tempo 7:25 → **68 detik lebih cepat** → melanggar aturan km pertama (§3b).
+- Jarak 5,00 / 10 km = 50% → "tidak selesai" (§5b: <90%).
+- km 1 = **6:17**, rencana mode tempo 7:25 → **68 detik lebih cepat** → "start terlalu cepat" (§5b: >10 detik).
 - HR maks 176 > LTHR 173.
 
 **Uji 1c: tempo yang melambat, 27 Okt**
-- Reza (lap 1 km per detik): 6:50 → **6:28** → 6:53. km terakhir 25 detik lebih lambat dari km tercepat → ditandai "melambat di akhir" (batas 15 detik).
+- Reza (lap 1 km per detik): 6:50 → **6:28** → 6:53. km terakhir 25 detik lebih lambat dari km tercepat → ditandai "melambat di akhir" (§5b: >15 detik).
 - Taofik: 6:12 → 5:54 → 5:51 → **tidak** ditandai.
 
 ## Poin 2: `overrides.json`
@@ -46,22 +45,16 @@ Hasil yang diharapkan:
 **Uji 3a: hari yang dipakai.** Pada Senin 2 Nov, kartu tidak boleh menulis "Long run Sabtu: Potong 20%" dari data Senin. Tulis "dinilai Sabtu pagi", atau hitung dari data pagi di hari long run.
 
 **Uji 3b: lampu merah (aturan §7b, sudah diputuskan 10 Nov).**
-- Reza 1 Nov: tidur 6,8 j, Body Battery 65 (§7 lolos), tapi HRV LOW dan lampu merah.
-- Diharapkan: "lari santai ≤8 km atau istirahat".
+- Reza 1 Nov: tidur 6,8 j, Body Battery 65 (§7 lolos), tapi status HRV LOW.
 
-**Aturan lampu (RUMUS §7b, FINAL):**
+**Aturan lampu:** ikuti tabel di RUMUS §7b (Hijau / Kuning / Oranye / Merah, termasuk RHR +5/+7 dan status HRV UNBALANCED vs LOW/POOR). Tabel tidak disalin ke sini supaya tidak ada dua versi.
 
-| Lampu | Penyebab | Long run | Latihan keras |
-|---|---|---|---|
-| Hijau | §7 lolos, HRV Balanced | Sesuai rencana | Sesuai rencana |
-| Kuning | §7 baris 2, atau HRV turun 1–2 malam | Potong 20% | Jadi lari santai |
-| Merah | Status HRV Low/Unbalanced ≥3 hari, atau Garmin "Strained" | Lari santai ≤8 km atau istirahat | Istirahat atau lari santai |
-
-Selalu pakai yang **paling ketat** dari §7 dan lampu.
+- Reza 1 Nov: status HRV LOW sudah ≥3 hari (2 Nov tertulis "rendah 4 hari") → **Merah** → "lari santai ≤8 km atau istirahat".
 
 ## Poin 4: gerbang dilewati
 
-- Taofik 1 Nov: tidur 5,6 j → §7 baris 2 → batas long run 22 × 0,8 = **17,6 km**. Aktual **21,02 km** → ditandai "gerbang dilewati (+3,4 km)", **bukan** "patuh".
+- Taofik 1 Nov: tidur 5,6 j → §7 baris 2 → batas long run 22 × 0,8 = **17,6 km**. Aktual **21,02 km**.
+- Tampil **dua baris** (§5b): "Jarak 21,02 / 22 = 95,5% ✓" **dan** "Gerbang dilewati (+3,4 km)". Uji 2 dan Uji 4 sama-sama benar.
 - Reza 1 Nov: lampu merah (§7b) → ditandai "gerbang dilewati (21 km saat lampu merah)".
 
 ## Poin 5: strides dalam jarak rencana
@@ -78,6 +71,11 @@ Selalu pakai yang **paling ketat** dari §7 dan lampu.
   - Rinciannya: 19 dtk/5:49 · 16/5:21 · 20/4:40 · 17/5:15 · 21/4:47 · 23/4:43.
   - Dengan kecepatan dari selisih jarak, puncaknya terbaca terlalu cepat (sekitar 4:25).
 - **Validasi data** (sudah dicek dari FIT asli): jarak per detik selisih 0,02 m, HR/cadence/elevasi selisih 0. JSON tidak punya 156 detik saat berhenti (km 3,7) karena jam di-pause.
+
+## Poin 7: detik saat jam di-pause
+
+Tidak perlu disimpan dan tidak dinilai (§5b). Cukup tampil "berhenti x:xx" = waktu total − waktu bergerak.
+- Uji: Taofik 10 Nov → **"berhenti 5:07"** (59:47 − 54:40).
 
 ## Poin 8: decoupling
 
@@ -112,6 +110,8 @@ Uji, Taofik 10K 7 Nov:
 
 ## Poin 12: HRV
 
+Perlu unduh ulang sekali dari Garmin. Data HRV Garmin kemungkinan sudah memuat rata-rata 7 hari dan batas atas/bawah normal pribadi.
+
 Kartu 2 Nov harus menampilkan tiga angka:
 - Taofik: semalam **37**, rata-rata 7 hari, rentang pribadi → status **Balanced**.
 - Reza: semalam **43**, rata-rata 7 hari, rentang pribadi → status **Low**.
@@ -120,10 +120,10 @@ Tambahkan satu baris penjelasan: "status = rata-rata 7 hari dibanding rentang pr
 
 ## Poin 14: cek pacing berdua
 
-**Aturan:** tandai "Reza kemungkinan terbawa" kalau ketiganya terpenuhi:
+**Aturan (§5b, berlaku untuk pelari mana pun):** tandai "kemungkinan terbawa" kalau ketiganya terpenuhi:
 1. Jam mulai keduanya berbeda kurang dari 2 menit.
 2. Selisih pace km 1 kurang dari 15 detik.
-3. km 1 Reza lebih cepat lebih dari 30 detik dari rencananya.
+3. km 1 salah satu pelari lebih cepat lebih dari 30 detik dari rencananya sendiri.
 
 Uji:
 - 7 Nov: start keduanya 06:18; km 1 Taofik 6:08, Reza 6:17 (selisih 9 detik); Reza 68 detik lebih cepat dari rencana → **ditandai**.

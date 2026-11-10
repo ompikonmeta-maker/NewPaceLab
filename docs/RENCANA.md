@@ -41,6 +41,19 @@ Update 10 Nov: `docs/RUMUS-BATAS-SUMBER.md` diganti versi 10 Nov dari Claude pro
 §7 gerbang memakai pagi hari sesi, §7b aturan lampu). Kriteria uji: `docs/KRITERIA-UJI.md`.
 Kode belum diubah; perbedaan dokumen ↔ kode dan pertanyaan dilaporkan ke omPik dulu (aturan CLAUDE.md).
 
+Jawaban omPik (10 Nov, dokumen + kriteria uji versi 2): angka baru masuk §5b (pace ambruk >5%, melambat di akhir >15 dtk,
+jalan kaki ≥10 dtk, tidak selesai <90%, start terlalu cepat >10 dtk, pacing berdua 2 mnt / 15 dtk / 30 dtk); HR = batas masih
+boleh; jarak dan "gerbang dilewati" dua baris; lampu 4 tingkat §7b (RHR +5 Kuning, +7 Oranye, dibanding rata-rata 7 hari;
+UNBALANCED Kuning, ≥3 hari Oranye; LOW/POOR ≥3 hari Merah); "Strained" dicek lewat inspect; suhu km terakhir manual
+(kosong: suhu start + 1°C per 30 mnt); HRV unduh ulang sekali; pause tidak disimpan, tampil "berhenti x:xx".
+
+Sisa beda dokumen ↔ kode setelah jawaban itu:
+- Lampu sekarang: Oranye juga karena Body Battery <40 saja (§7b: itu Kuning), Merah karena RHR +7 (§7b: Oranye), RHR dibanding
+  median 28 hari (§7b: rata-rata 7 hari; profil RHR Taofik 55, Reza 61 belum ada di config.json), UNBALANCED belum dibedakan.
+- Gerbang di kode punya baris "ganti easy 8 km" (tidur <5, BB <30, HRV rendah) yang tidak ada di §7 → dihapus atau dimasukkan ke dokumen?
+- §5b jalan kaki ≥10 dtk: dibaca sebagai total di segmen (Uji 1a menghitung km 7 yang hanya 0:08).
+- §3 tempo ≤4 km / ≥5 km: config.json perlu dua rentang tempo.
+
 Hasil cek kode (✔ benar · ◐ sebagian · ✖ sudah ada / tidak tepat):
 
 | # | Catatan | Hasil cek | Keterangan |
