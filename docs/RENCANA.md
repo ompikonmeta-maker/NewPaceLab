@@ -36,6 +36,11 @@ FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diun
 
 ## 19. Catatan dari Claude project (10 Nov) — dicatat + diverifikasi ke kode, belum dikerjakan
 
+Update 10 Nov: `docs/RUMUS-BATAS-SUMBER.md` diganti versi 10 Nov dari Claude project (§1 tukar sesi lewat `overrides.json`,
+§3 tempo ≤4 / ≥5 km, §3b target lomba, §4 jarak termasuk strides, §5 strides, §6 kecepatan dari jam + "tidak berlaku",
+§7 gerbang memakai pagi hari sesi, §7b aturan lampu). Kriteria uji: `docs/KRITERIA-UJI.md`.
+Kode belum diubah; perbedaan dokumen ↔ kode dan pertanyaan dilaporkan ke omPik dulu (aturan CLAUDE.md).
+
 Hasil cek kode (✔ benar · ◐ sebagian · ✖ sudah ada / tidak tepat):
 
 | # | Catatan | Hasil cek | Keterangan |

@@ -1,6 +1,11 @@
 # Rumus, Batas Angka, dan Sumber — Program Marathon 2027 (Taofik & Reza)
 
-Versi 28 Okt 2026. Satu tempat untuk semua angka yang dipakai di Excel, skrip `pacelab_analyze.py`, dan saran harian.
+Versi 10 Nov 2026. Perubahan terakhir:
+- §7b: aturan lampu (hijau/kuning/merah)
+- §5: jarak strides dalam rencana
+- §3b (8 Nov): cara menentukan target lomba
+
+Satu tempat untuk semua angka yang dipakai di Excel, skrip `pacelab_analyze.py`, NewPaceLab, dan saran harian.
 
 **Tanda jenis dasar:**
 - **[P]** penelitian / pedoman resmi
@@ -15,14 +20,15 @@ Versi 28 Okt 2026. Satu tempat untuk semua angka yang dipakai di Excel, skrip `p
 |---|---|---|
 | Nomor minggu (MS) | MS = bulat_bawah((tanggal − 22 Jun 2026) / 7) + 1. Minggu = Senin–Minggu | [K] |
 | Hari lomba | Minggu 13 Jun 2027 = MS51 | — |
+| Tukar sesi | Kalau sesi digeser (misalnya long run pindah ke Minggu), catat di `overrides.json`. Penilaian memakai sesi yang ditukar | [K] |
 
 ## 2. Detak jantung dan zona
 
 | Hal | Rumus / angka | Dasar |
 |---|---|---|
 | LTHR (ambang batas) | Rata-rata HR **20 menit terakhir** dari usaha keras ~30 menit, dilari sendiri | [P] Friel, *The Triathlete's Training Bible* |
-| LTHR Taofik | 176. Tes 28 Jun: 175,8. Kemungkinan sebenarnya 178–179 | data tes |
-| LTHR Reza | 173. Tes 25 Jul: 173,2. Race 5K 11 Okt: 174 | data tes |
+| LTHR Taofik | **176**. Tes 28 Jun: 175,8. Lomba 10K 7 Nov tidak mendukung dugaan 178–179 | data tes |
+| LTHR Reza | **173**. Tes 25 Jul: 173,2. Race 5K 11 Okt: 174. Perkiraan Garmin 7 Nov: 170 | data tes |
 | HRmax | Taofik 201, Reza 191 (Reza mungkin sebenarnya 193–196) | data jam |
 | Zona Taofik | Z1 <133, Z2 133–150, Z3 151–161, Z4 162–176, Z5 ≥177 | lihat catatan |
 | Zona Reza | Z1 <139, Z2 139–152, Z3 153–163, Z4 164–173, Z5 ≥174 | lihat catatan |
@@ -35,7 +41,7 @@ Versi 28 Okt 2026. Satu tempat untuk semua angka yang dipakai di Excel, skrip `p
 | Taofik | 76% LTHR | 86% | 92% | 101% |
 | Reza | 80% LTHR | 88% | 95% | 101% |
 
-Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ulang. **Akan disamakan dengan satu rumus setelah lomba 10K tanggal 7 Nov.**
+Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ulang. Lomba 10K 7 Nov gagal sebagai kalibrasi, jadi **penyamaan rumus zona ditunda sampai half marathon 23 Jan 2027.**
 
 ## 3. Pace
 
@@ -43,7 +49,7 @@ Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ul
 |---|---|---|
 | Prediksi waktu jarak lain | T2 = T1 × (D2/D1)^1,06 | [P] Riegel 1981, *American Scientist* |
 | VDOT dan pace latihan | Tabel Daniels dari waktu lomba | [P] Daniels, *Daniels' Running Formula* |
-| Koreksi panas untuk prediksi | Ditambah sekitar 5% | [E] |
+| Koreksi panas untuk prediksi lomba | Lihat §3b langkah 2 | [K] |
 | Panas saat latihan keras | Di atas 30°C: perlambat 5–8%. Di atas 32°C: jadi lari santai | [K], arah sejalan dengan Ely 2007 (MSSE) dan konsensus panas Racinais 2015 (BJSM) |
 | Aturan utama | **HR mengalahkan pace.** Kalau HR lewat batas atas, pace diturunkan | [K] |
 
@@ -53,8 +59,33 @@ Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ul
 | Easy / long run | 8:40–9:15 | 8:45–9:20 |
 | Pace maraton (MP) | 7:15–7:30 | 7:45 sekarang, target 7:30 |
 | Half marathon | 7:00 | ~7:30 |
-| Tempo | **6:00–6:10** (sementara sampai 7 Nov) | 7:10–7:20, HR jadi patokan |
-| Interval | 6:00–6:15 | 6:20–6:30 |
+| Tempo ≤4 km | **6:00–6:10** | 7:10–7:20, HR jadi patokan |
+| Tempo ≥5 km | **6:10–6:20** (berdasarkan lomba 10K 7 Nov) | 7:10–7:20, HR jadi patokan |
+| Interval | 6:00–6:15 (ditinjau 23 Jan) | 6:20–6:30 |
+
+## 3b. Cara menentukan target lomba (WAJIB, berlaku sejak 8 Nov 2026)
+
+Aturan ini lahir dari kesalahan target lomba 10K 7 Nov. Targetnya 59:24, hasilnya 68:49. Penyebabnya: target dihitung dari usaha pendek, dan aturan panas tidak dipakai.
+
+| Langkah | Aturan | Dasar |
+|---|---|---|
+| 1. Dasar hitungan | **Hanya waktu lomba atau tes UTUH** (minimal 5 km tanpa berhenti), dihitung pakai Riegel. **Dilarang** memakai potongan tempo, interval, atau km tercepat dalam lomba | [P] Riegel 1981. Pelajaran 7 Nov |
+| 2. Koreksi panas | Suhu saat start 28–30°C: +3%. 30–32°C: **+5%**. Di atas 32°C: **+8%** | [K] sesuai §3; arahnya sejalan dengan Ely 2007 |
+| 3. Koreksi kelelahan | Long run ≥18 km kurang dari 7 hari sebelum lomba: **+2%** | [K] |
+| 4. Koreksi jam start | Start setelah 06:00: pakai perkiraan suhu di km terakhir, bukan suhu saat start | [K] |
+| 5. Paruh pertama | **Dikunci pakai HR, tanpa target pace.** km 1 ≤ LTHR − 15, km 2 ≤ LTHR − 6, km 3–5 ≤ LTHR − 2 | [K] |
+| 6. Paruh kedua | Pace boleh naik setelah km 5 **hanya kalau** HR masih ≥4 denyut di bawah LTHR | [K] |
+| 7. Target yang ditulis | Selalu dalam bentuk **rentang** (misalnya 64–66 menit), bukan satu angka | [K] |
+| 8. Cek silang | Kalau target lebih cepat dari hitungan Riegel tanpa koreksi, **target salah**. Pakai hasil Riegel yang sudah dikoreksi | [K] |
+
+**Contoh (Taofik, 7 Nov, kalau aturan ini sudah dipakai):** 5K 31:29 → Riegel 65:38 → panas +5% → kelelahan +2% → **sekitar 70 menit** (rentang 69–71). Kalau 31:29 dianggap terlalu lambat karena start penuh sesak, angka itu dipakai sebagai batas lambat saja, bukan dibuang.
+
+**Aturan km pertama (semua tempo, tes, dan lomba):**
+- km 1 dilari **di pace paling lambat dari rentang, atau lebih lambat lagi.**
+- Kalau km 1 ternyata 10 detik lebih cepat dari rencana, km 2 **wajib** 10 detik lebih lambat.
+- Pasang alert di jam: pace minimum dan HR maksimum.
+
+Riwayat start terlalu cepat: Reza 15 Okt, 27 Okt, 1 Nov, 7 Nov (km 1 di 6:17, padahal rencananya 7:25).
 
 ## 4. Volume dan risiko cedera
 
@@ -69,6 +100,7 @@ Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ul
 | Lari sehari setelah lomba | Pemulihan 6 km, bukan lari sedang | [K] |
 | Long run terhadap volume mingguan | Saat ini 45–55%. Pedoman pelatih biasanya ≤30–35%. Diterima karena cuma lari 4 hari seminggu; pengamannya aturan 110% | [K] |
 | Pemanasan / pendinginan latihan keras | Pemanasan 2–2,5 km, pendinginan 1–3 km. Jumlahnya harus sama dengan "Total" di sel | [K] |
+| Penilaian jarak sesi | Patuh kalau 95–110% dari jarak rencana. Jarak rencana sudah termasuk tambahan strides (§5). Potongan yang disengaja karena gerbang (§7/§7b) dihitung patuh | [K] |
 
 ## 5. Intensitas
 
@@ -78,6 +110,8 @@ Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ul
 | Jeda setelah long run | Latihan keras paling cepat 48 jam setelah long run. Gerbangnya: HR saat pemanasan normal | [K] |
 | Tempo | Km pertama di pace paling lambat dari rentang. Rasanya berat tapi terkendali, masih bisa 3–4 kata | [K] |
 | Strides | 12–20 detik cepat (85–90% usaha), lalu jalan 60 detik, 4–6×, dalam satu file rekaman yang sama | [K] |
+| **Jarak strides dalam rencana** | Kalau sel menyebut strides: **+0,15 km per stride** (termasuk jalan kakinya). Contoh: "6 km + 6 strides" = 6,9 km. Pendinginan yang tidak tertulis di sel: +0 | [K] keputusan 10 Nov 2026 |
+| Deteksi strides | Kecepatan dari jam (`enhanced_speed`) >2,6 m/s selama minimal 6 detik. Jangan pakai kecepatan dari selisih jarak, karena puncaknya terbaca terlalu cepat | [K] |
 
 ## 6. Long run: aturan khusus
 
@@ -86,18 +120,21 @@ Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ul
 | Pembukaan | 3 km pertama di pace recovery. Transisi ke pace easy di km 4–6 | [K] |
 | **Decoupling (Pa:HR)** | Lihat rumus di bawah tabel | [P] Friel / TrainingPeaks: di bawah 5% = daya tahan aerobik bagus |
 | Target decoupling | Di bawah 8% untuk long run ≥20 km sebelum MS43. Lebih longgar dari 5% karena panas | [K] |
-| Cadence paruh 1 → paruh 2 | Waspada kalau turun 5 atau lebih | [K] tanda bentuk lari mulai rusak karena capek |
+| HR long run (aturan B) | HR boleh lewat batas atas **hanya di 25% bagian akhir**, dan decoupling di bawah 8%. Cadangan kalau decoupling tidak bisa dihitung (aturan A): lulus kalau ≥75% km di bawah batas atas | [K] keputusan 29 Okt 2026 |
+| Cadence paruh 1 → paruh 2 | Waspada kalau turun 5 atau lebih. Hitung hanya saat berlari (kecepatan >1,5 m/s), tanpa jalan kaki | [K] tanda bentuk lari mulai rusak karena capek |
 | Target cadence | Taofik 168–172, Reza 172–176. Naik maksimal sekitar 10% bertahap | [P] Heiderscheit 2011 (MSSE): cadence +5–10% mengurangi beban lutut dan pinggul |
 
 **Rumus decoupling:**
-- Ambil hanya record dengan HR di atas 80 dan kecepatan di atas 0,6 m/s.
+- Ambil hanya record dengan HR di atas 80 dan kecepatan di atas 0,6 m/s (kecepatan dari jam).
 - Bagi dua berdasarkan jumlah record (paruh 1 dan paruh 2).
 - Rasio tiap paruh = kecepatan rata-rata ÷ HR rata-rata.
 - Decoupling = (rasio paruh 1 − rasio paruh 2) ÷ rasio paruh 1 × 100%.
-- Dilaporkan dua versi: data penuh, dan tanpa 3 km pertama. Yang dinilai versi tanpa 3 km pertama.
-- **Hanya berlaku untuk lari dengan pace rata.** Tidak berlaku untuk tempo atau interval.
+- Dilaporkan dua versi: data penuh, dan tanpa 3 km pertama (dihitung menurut jarak). Yang dinilai versi tanpa 3 km pertama.
+- **Hanya berlaku untuk lari dengan pace rata.** Untuk tempo, interval, lomba, dan lari dengan strides: tulis "tidak berlaku".
 
 ## 7. Tidur dan pemulihan (gerbang pagi)
+
+Gerbang dinilai dari **data pagi di hari sesi itu sendiri** (misalnya long run Sabtu memakai data Sabtu pagi).
 
 | Kondisi | Tindakan | Dasar |
 |---|---|---|
@@ -111,6 +148,18 @@ Penyebabnya: zona Taofik berasal dari data lama, sedangkan zona Reza dihitung ul
 | Libur lari >21 hari | Mulai lagi dengan lari-jalan | [K] |
 
 Body Battery adalah angka buatan Garmin (rumusnya tidak dipublikasikan), jadi batasnya keputusan pelatih.
+
+## 7b. Aturan lampu (keputusan 10 Nov 2026)
+
+| Lampu | Penyebab | Long run | Latihan keras |
+|---|---|---|---|
+| **Hijau** | §7 lolos dan status HRV Balanced | Sesuai rencana | Sesuai rencana |
+| **Kuning** | §7 baris 2, atau HRV semalam turun di bawah normal 1–2 malam | **Potong 20%** | Jadi lari santai |
+| **Merah** | Status HRV Low/Unbalanced ≥3 hari, atau Garmin "Strained" | **Lari santai ≤8 km, atau istirahat** | Istirahat atau lari santai |
+
+- Selalu pakai yang **paling ketat** antara §7 dan lampu.
+- Sesi yang dilari lebih jauh atau lebih keras dari batas gerbang ditandai **"gerbang dilewati"**, bukan "patuh".
+- Status HRV Garmin = rata-rata 7 hari dibanding rentang pribadi, bukan angka semalam. Angka HRV antar pelari tidak bisa dibandingkan.
 
 ## 8. Makan dan minum
 
@@ -132,6 +181,7 @@ Body Battery adalah angka buatan Garmin (rumusnya tidak dipublikasikan), jadi ba
 |---|---|---|
 | Kecepatan turun (Reza) | 0,19 kg/minggu (0,24% berat badan/minggu). Maksimal 0,5 kg/minggu | [P] Garthe 2011 (IJSNEM): turun pelan (~0,7%/minggu) menjaga otot lebih baik |
 | Batas bawah | Taofik 65 kg, Reza 73 kg. Kalau rata-rata 4 minggu tembus ke bawah, tambah porsi makan | [K] |
+| Defisit distop | Saat lampu merah, atau status HRV Low/Unbalanced | [K] |
 | Beban per langkah | Sekitar 2–3× berat badan | [P] Cavanagh & Lafortune 1980 |
 | Manfaat 1 kg turun | Sekitar 1,5–2,5 detik/km | [E] |
 | Fase tanpa defisit | Absorb, Ramadan (kecuali turun sendiri), fase Marathon, Taper | [K] |
@@ -145,8 +195,6 @@ Body Battery adalah angka buatan Garmin (rumusnya tidak dipublikasikan), jadi ba
 | Manfaat cedera | Latihan kekuatan menurunkan cedera olahraga **menjadi kurang dari 1/3** (RR sekitar 0,32). Penelitiannya olahraga umum, bukan khusus lari | [P] Lauersen 2014, BJSM |
 | Manfaat performa | Lari jadi lebih hemat tenaga | [P] Blagrove 2018, *Sports Med* |
 | Lompatan (pogo, A-skip) | Baru mulai setelah 4 minggu rutin. Jangan sehari sebelum tempo atau long run | [K] |
-
-Koreksi: sebelumnya saya menulis "turun sekitar 1/3". Yang benar: risiko cedera turun **menjadi** kurang dari 1/3, atau turun sekitar 2/3.
 
 ## 11. Sepatu
 
@@ -167,17 +215,17 @@ Koreksi: sebelumnya saya menulis "turun sekitar 1/3". Yang benar: risiko cedera 
 
 | Kapan | Apa |
 |---|---|
-| Lomba 10K, 7 Nov 2026 | LTHR dan zona disamakan rumusnya, pace tempo dikunci |
-| Half marathon, 23 Jan 2027 | Pace maraton dikunci |
+| ~~Lomba 10K, 7 Nov 2026~~ | **Gagal sebagai kalibrasi.** Taofik banyak jalan kaki, Reza berhenti di 5 km. LTHR tetap 176 dan 173 (Garmin memperkirakan Reza 170). Data ini tidak mendukung dugaan LTHR Taofik 178–179 |
+| Half marathon, 23 Jan 2027 | Penyamaan rumus zona, pace tempo dan interval dikunci (interval Taofik 6:00–6:15 sekarang hampir sama dengan tempo, perlu ditinjau), pace maraton dikunci. Target half marathon dibuat dengan aturan §3b |
 | Tes 10K, 10 Apr 2027 | Evaluasi G3: decoupling di bawah 8% di long run ≥20 km |
 
 ---
 
-### Yang perlu dibereskan (temuan saat menyusun dokumen ini)
-1. Rumus zona Taofik dan Reza berbeda → samakan setelah 7 Nov.
+### Yang perlu dibereskan
+1. Rumus zona Taofik dan Reza berbeda → samakan di half marathon 23 Jan 2027.
 2. Carbo loading 8–10 g/kg di Excel lebih rendah dari pedoman 10–12 g/kg → perlu diputuskan.
 3. Isi gel dianggap 25 g, padahal GU 22 g → hitungan jumlah gel saat lomba bisa kurang 1–2.
-4. Sheet Kamus Latihan masih menulis "pendinginan 1 km" untuk tempo, padahal di kalender sudah 1–3 km.
+4. ~~Sheet Kamus Latihan masih menulis "pendinginan 1 km"~~ → sudah dibetulkan 8 Nov.
 
 ### Daftar pustaka
 - Blagrove RC dkk. 2018. Effects of strength training on the physiological determinants of middle- and long-distance running performance. *Sports Med*.
