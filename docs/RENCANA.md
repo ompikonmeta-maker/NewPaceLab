@@ -42,6 +42,11 @@ FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diun
    tukar sesi tidak boleh memindahkan lari di hari lomba/tes; lomba yang tidak selesai dinilai "tidak selesai" (§5b), bukan
    sesi Selasa. Juga: kepatuhan Taofik 100 karena lomba hanya dinilai jarak (lihat 19, poin 1).
 
+3. Detail hari: bagian "Efek latihan" dan "Data Garmin" dipindah ke urutan terakhir (setelah kesimpulan per pelari).
+4. Tombol "Lap jam / Per km" mengubah tinggi grafik (video 10 Nov): Lap jam memakai 18–46 px per km (10 km ≈ 470 px), Per km
+   memakai baris tetap 17 px per km (10 km ≈ 170 px). Bukan keputusan desain; dibuat di waktu berbeda. Usul: Per km memakai
+   skala jarak yang sama dengan Lap jam, jadi tinggi tetap dan yang berganti hanya batangnya.
+
 ## 19. Catatan dari Claude project (10 Nov) — dicatat + diverifikasi ke kode, belum dikerjakan
 
 Update 10 Nov: `docs/RUMUS-BATAS-SUMBER.md` diganti versi 10 Nov dari Claude project (§1 tukar sesi lewat `overrides.json`,
