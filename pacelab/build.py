@@ -4,6 +4,7 @@ import json
 from pathlib import Path
 
 from . import metrics as m
+from . import overrides
 from .program import load_program
 
 WEB = Path(__file__).parent / "web"
@@ -80,6 +81,9 @@ def athlete_data(a, data_dir, today):
             "bb": well.get(day.isoformat(), {}).get("bb"),
             "rhr": m.rhr(well.get(day.isoformat())),
             "hrv_status": well.get(day.isoformat(), {}).get("hrv_status"),
+            # Garmin's 7-day average and personal normal range (docs §7b: the status reads the average, not the night)
+            "hrv_week": well.get(day.isoformat(), {}).get("hrv_week"),
+            "hrv_low": well.get(day.isoformat(), {}).get("hrv_low"), "hrv_hi": well.get(day.isoformat(), {}).get("hrv_hi"),
             "level": (lights.get(day.isoformat()) or {}).get("level"),
         } for day in days],
         # §7: the long-run gate is judged on the long run's own morning; other days only say which day that is
@@ -89,7 +93,7 @@ def athlete_data(a, data_dir, today):
         "last_done_ms": last_done["ms"] if last_done else None,
         "sync": _read(folder / "state.json", {}).get("last_sync"),
         "run_days": _run_days(in_program),
-        "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None), (a.get("coach") or {}).get("walk_mps"))
+        "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None), (a.get("coach") or {}).get("walk_mps"), a.get("coach"))
                      for r in in_program],
     }
 
@@ -110,7 +114,7 @@ def _lr_today(prog, today, latest, well, lights):
 LAP_TRIG = {"distance": "a", "manual": "m", "session_end": "e", "time": "t", "position": "p"}
 
 
-def _session(r, stream, laps=None, walk=None):
+def _session(r, stream, laps=None, walk=None, coach=None):
     """One run for the Sesi tab: totals, the watch's laps (from its FIT file), per-km splits and (for runs of
     10 km or more) decoupling. "g" holds the run summary exactly as Garmin reports it."""
     s = {"id": r["id"], "date": r["date"], "time": (r.get("start") or "")[11:16], "km": round(r["km"], 2),
@@ -130,6 +134,13 @@ def _session(r, stream, laps=None, walk=None):
                     edges.append(edges[-1] + l[1])
                 for l, w in zip(s["laps"], m.walk_in(stream, walk, edges)):
                     l.append(w)
+        C = coach or {}
+        st = m.strides(stream, C.get("stride_mps", 2.6), C.get("stride_min_s", 6))
+        if st:
+            s["strides"] = st                 # [[start km, seconds, peak m/s]] from the watch's speed (docs §5)
+        tc = [v for v in (stream.get("tc") or []) if v is not None]
+        if tc:
+            s["tc"] = [min(tc), max(tc)]      # temperature range on the watch, °C
         if r["km"] >= m.LONG_RUN_MIN_KM:
             dd = m.decoupling_detail(stream)
             if dd:
@@ -156,6 +167,9 @@ def _pace(p):
 def build(cfg, athletes, today, out_path):
     # coach thresholds: config "coach", overridable per athlete
     athletes = [dict(a, coach={**cfg.get("coach", {}), **a.get("coach", {})}, effort=cfg.get("effort")) for a in athletes]
+    ovr = overrides.load(cfg.get("overrides"))
+    if ovr:
+        print("[i] %s: %d sesi diatur manual" % (cfg.get("overrides"), sum(len(v) for v in ovr.values())))
     data = [athlete_data(a, cfg["data_dir"], today) for a in athletes]
     p0 = data[0]["program"]
     ms_cur = m.ms_of(today.isoformat(), p0["ms1"])
@@ -185,7 +199,7 @@ def build(cfg, athletes, today, out_path):
         "events": [e for e in p0["events"] if e["date"] >= today.isoformat()][:3],
         "all_events": p0["events"],
         "score": score,
-        "athletes": [_slim(x, COLORS[i]) for i, x in enumerate(data)],
+        "athletes": [_slim(x, COLORS[i], ovr) for i, x in enumerate(data)],
     }
     html = (WEB / "template.html").read_text(encoding="utf-8")
     blob = json.dumps(payload, separators=(",", ":"), ensure_ascii=False).replace("</", "<\\/")
@@ -196,13 +210,13 @@ def build(cfg, athletes, today, out_path):
     return out
 
 
-def _slim(x, color):
+def _slim(x, color, ovr=None):
     prog = x["program"]
     tgt = prog["target"].get("B") or {}
     return {
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
-        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "lthr": x.get("lthr"), "zones": x.get("zones"), "cadence": x.get("cadence"), "pace": x.get("pace"), "coach": x.get("coach"), "sleep_min": prog["sleep"].get("min"),
+        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "lthr": x.get("lthr"), "ovr": (ovr or {}).get(x["id"].upper(), {}), "zones": x.get("zones"), "cadence": x.get("cadence"), "pace": x.get("pace"), "coach": x.get("coach"), "sleep_min": prog["sleep"].get("min"),
         "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "eff": x["eff"], "days": x["days"], "today": x["today"],

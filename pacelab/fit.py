@@ -83,6 +83,13 @@ def _u(raw, e):
     return None if v == _INVALID[n] else v
 
 
+def _s8(raw):
+    """sint8 (temperature); 0x7F = invalid."""
+    if not raw or len(raw) != 1 or raw[0] == 0x7F:
+        return None
+    return raw[0] - 256 if raw[0] > 127 else raw[0]
+
+
 def _alt(f, e):
     a = _u(f.get(78), e)                  # enhanced_altitude
     a = _u(f.get(2), e) if a is None else a
@@ -91,7 +98,8 @@ def _alt(f, e):
 
 def read(blob):
     """{"laps": [{start, km, sec, elapsed, hr, hr_max, cad, trigger}], "session": {...}, "records": n,
-        "stream": {"t","d","hr","cad","el"} or None}.
+        "stream": {"t","d","hr","cad","el","sp","tc"} or None}; sp = the watch's speed in m/s (enhanced_speed, else speed),
+        tc = temperature in °C. docs §5/§6: speed from the watch, not from distance differences.
 
     The stream uses timer time (pauses left out, from the timer start/stop events), like the
     sumDuration column of Garmin's activity details, so both sources cut kilometres the same way."""
@@ -99,7 +107,7 @@ def read(blob):
     if data is None:
         raise ValueError("bukan file FIT")
     laps, session, records = [], {}, 0
-    t, d, hr, cad, el = [], [], [], [], []
+    t, d, hr, cad, el, sp, tc = [], [], [], [], [], [], []
     run, acc, since = False, 0.0, None
     for g, f, e, ts in messages(data):
         if g == EVENT and _u(f.get(0), e) == 0 and ts is not None:      # timer events
@@ -125,6 +133,10 @@ def read(blob):
             hr.append(h or None)
             cad.append(round((c + (frac or 0) / 128) * 2) if c else None)  # per leg -> steps per minute
             el.append(_alt(f, e))
+            s = _u(f.get(73), e)                                            # enhanced_speed, mm/s
+            s = _u(f.get(6), e) if s is None else s                         # speed, mm/s
+            sp.append(None if s is None else round(s / 1000, 3))
+            tc.append(_s8(f.get(13)))
         elif g == LAP:
             dist, timer, elapsed, start = _u(f.get(9), e), _u(f.get(8), e), _u(f.get(7), e), _u(f.get(2), e)
             lc = _u(f.get(17), e)
@@ -140,6 +152,7 @@ def read(blob):
         elif g == SESSION:
             dist, laps_n = _u(f.get(9), e), _u(f.get(26), e)
             session = {"km": None if dist is None else round(dist / 100000, 3), "laps": laps_n}
-    stream = {"t": t, "d": d, "hr": hr, "cad": cad if any(cad) else None, "el": el if any(v is not None for v in el) else None} \
+    stream = {"t": t, "d": d, "hr": hr, "cad": cad if any(cad) else None, "el": el if any(v is not None for v in el) else None,
+              "sp": sp if any(v is not None for v in sp) else None, "tc": tc if any(v is not None for v in tc) else None} \
         if len(t) > 1 else None
     return {"laps": laps, "session": session, "records": records, "stream": stream}

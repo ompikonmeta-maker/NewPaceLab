@@ -58,6 +58,36 @@ def _speeds(t, x):
     return out
 
 
+def _vel(stream):
+    """Speed per sample: the watch's own speed ("sp", from the FIT file / directSpeed) where present (docs §5, §6),
+    else the smoothed distance difference."""
+    t, x, sp = stream.get("t") or [], stream.get("d") or [], stream.get("sp")
+    est = _speeds(t, x)
+    if not sp:
+        return est
+    return [sp[i] if i < len(sp) and sp[i] is not None else est[i] for i in range(len(est))]
+
+
+def strides(stream, min_v=2.6, min_s=6):
+    """Strides (docs §5): the watch's speed above min_v m/s for at least min_s seconds.
+    [[start km, seconds, peak m/s]]; None when the stream has no watch speed (distance differences overshoot)."""
+    t, x, sp = stream.get("t") or [], stream.get("d") or [], stream.get("sp")
+    if not sp:
+        return None
+    out, i, n = [], 0, min(len(t), len(x), len(sp))
+    while i < n:
+        if sp[i] is not None and sp[i] > min_v:
+            j = i
+            while j + 1 < n and sp[j + 1] is not None and sp[j + 1] > min_v and t[j + 1] - t[j] <= 5:
+                j += 1
+            if t[j] - t[i] + 1 >= min_s:
+                out.append([round(x[i] / 1000, 2), round(t[j] - t[i] + 1), max(sp[i:j + 1])])
+            i = j + 1
+        else:
+            i += 1
+    return out
+
+
 def per_km(stream, walk=None):
     """Splits per kilometre from a per-second stream:
     [km length, seconds, mean HR, mean cadence, elevation at the end, walking seconds].
@@ -65,7 +95,7 @@ def per_km(stream, walk=None):
     and are left out of the cadence (running cadence only). A last part shorter than 300 m is dropped."""
     t, x, hr = stream.get("t") or [], stream.get("d") or [], stream.get("hr") or []
     cad, el = stream.get("cad") or [], stream.get("el") or []
-    v = _speeds(t, x) if walk else []
+    v = _vel(stream) if walk else []
     out, k, t0, x0, acc = [], 1, t[0] if t else 0, x[0] if x else 0, [0.0, 0.0, 0.0, 0.0, 0.0]  # hr*dt, dt(hr), cad*dt, dt(cad), walk dt
 
     def close(i):
@@ -94,7 +124,7 @@ def per_km(stream, walk=None):
 def walk_in(stream, walk, edges):
     """Walking seconds inside each [edges[i], edges[i+1]) of timer time (lap boundaries = running sums of lap times)."""
     t, x = stream.get("t") or [], stream.get("d") or []
-    v = _speeds(t, x)
+    v = _vel(stream)
     out, j = [0.0] * (len(edges) - 1), 0
     for i in range(1, min(len(t), len(x))):
         dtt = t[i] - t[i - 1]
@@ -110,7 +140,7 @@ def walk_in(stream, walk, edges):
 def run_walk(stream, walk):
     """{"cad_run": time-weighted cadence while running (speed > walk), "walk_s": seconds at or below walk}."""
     t, x, cad = stream.get("t") or [], stream.get("d") or [], stream.get("cad") or []
-    v = _speeds(t, x)
+    v = _vel(stream)
     c = w = ws = 0.0
     for i in range(1, min(len(t), len(x))):
         dtt = t[i] - t[i - 1]
@@ -140,13 +170,13 @@ def decoupling_detail(stream):
     ratio = mean speed / mean HR per half, (r1 - r2) / r1 * 100.
     Returns both versions; "pct" (the rated one) leaves out the first 3 km.
     Each half: [records, km, mean speed m/s, mean HR]."""
-    t, x, hr = stream.get("t") or [], stream.get("d") or [], stream.get("hr") or []
+    t, x, hr, sp = stream.get("t") or [], stream.get("d") or [], stream.get("hr") or [], stream.get("sp")
     rec = []  # (distance from start, speed, hr, dt)
     for i in range(1, min(len(t), len(x), len(hr))):
         dtt = t[i] - t[i - 1]
         if dtt <= 0 or not hr[i]:
             continue
-        v = (x[i] - x[i - 1]) / dtt
+        v = sp[i] if sp and i < len(sp) and sp[i] is not None else (x[i] - x[i - 1]) / dtt   # §6: speed from the watch
         if hr[i] > 80 and v > 0.6:
             rec.append((x[i] - x[0], v, hr[i], dtt))
 

@@ -81,7 +81,11 @@ def cmd_inspect(cfg, athletes, base=BASE):
     a, b = (end - dt.timedelta(days=2)).isoformat(), end.isoformat()
     calls = [("sleep", S.SLEEP, {"startDate": a, "endDate": b}), ("hrv", S.HRV % (a, b), None),
              ("bodybattery", S.BB, {"startDate": a, "endDate": b}), ("daily", S.DAILY, {"startDate": a, "endDate": b}),
-             ("weight", S.WEIGHT % (a, b), {"includeAll": "true"})]
+             ("weight", S.WEIGHT % (a, b), {"includeAll": "true"}),
+             # docs §7b: Garmin "Strained" (training status) is used only if a personal key may read it; these two
+             # paths are Garmin Connect's, not confirmed for the Personal API: inspect just reports what answers
+             ("coba: training status (Strained?)", "/metrics-service/metrics/trainingstatus/aggregated/%s" % b, None),
+             ("coba: training readiness", "/metrics-service/metrics/trainingreadiness/%s" % b, None)]
     for at in athletes:
         key = load_key(at["id"], cfg["keys_dir"])
         if not key:

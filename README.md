@@ -106,7 +106,13 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   manual disimpan di browser (tidak ikut `config.json` dan tidak ikut `Ekspor Sesi`). Penilaian pelatih, kepatuhan, jenis
   sesi di Arah dan ekspor .md mengikuti tukar sesi. Hitungan "x/y sesi" minggu: hari terencana dihitung dijalani bila ada
   lari yang dinilai dengannya; rencana asli hari lari yang dipindah (mis. pemulihan Minggu) tetap "tidak dijalani"
-  [keputusan dashboard].
+  [keputusan dashboard]. Hari lomba / tes tidak pernah ditebak pindah.
+- **`overrides.json`** (dokumen §1, di folder tool, contoh: `overrides.example.json`): sesi yang diatur manual dan
+  dibaca juga oleh ekspor .md / `Ekspor Sesi`, jadi Claude project melihat rencana yang sama. Satu baris per pelari:
+  `{"date": "2026-11-01", "athlete": "TAOFIK", "session": "long_run", "km": 22, "note": "dipindah dari Sabtu"}`.
+  `session`: `long_run`, `easy`, `recovery`, `tempo`, `interval`, `race`, `rest`; tambahan `tempo_km`. Urutan yang
+  dipakai: `overrides.json` → pilihan "⇄ Nilai sebagai…" di browser → tebakan otomatis. Di linimasa ditandai
+  "dari overrides.json". Setelah file diubah: jalankan `Update Dashboard.bat` (atau `pacelab.py build`).
 - **Tooltip dengan pena / sentuhan**: muncul di kiri-atas ujung pena (kanan-atas untuk tangan kiri) supaya tidak tertutup
   tangan; mouse tetap kanan-bawah. Pilih tangan di footer ("Pena di tangan kanan / kiri"), disimpan di browser.
 - **Rincian hitungan** (tombol ⓘ di kartu Pace di zona 2 dan Meter per detak): tiap minggu, setiap sesi dan lap yang
@@ -115,9 +121,18 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   pace di zona 2, meter per detak, jarak per minggu, long run terjauh menuju 42K, decoupling, cadence vs target.
 - Rencana per hari dibaca dari teks sel Kalender Excel: `Total X km` (atau `X km` pertama), rentang pace `m:ss - m:ss/km`
   ("3 km pertama" = rentang pembukaan), "Detak jantung lo - hi" atau "di bawah X", "Pemanasan X km", "Tempo X km".
-- Sync juga mengunduh **file FIT asli dari jam** untuk setiap lari (sekali): lap persis seperti di jam, dan data per
-  detik untuk lari yang detail Garmin-nya kosong (Garmin hanya memberi detail ±120 hari terakhir). Ringkasan Garmin per
-  lari (HR maks, cadence, elevasi, training effect, beban, power, suhu, langkah, jumlah lap) disimpan apa adanya.
+- Sync juga mengunduh **file FIT asli dari jam** untuk setiap lari (sekali): lap persis seperti di jam, dan **data per
+  detik dari file FIT** (jarak, HR, cadence, elevasi sama dengan detail Garmin; ditambah kecepatan dari jam
+  `enhanced_speed` dan suhu). Detail Garmin dipakai hanya bila file FIT tidak ada (detail juga menyimpan `directSpeed`
+  bila dikirim). Kecepatan dari jam dipakai untuk decoupling, jalan kaki, cadence lari dan deteksi strides (dokumen §5,
+  §6); tanpa kecepatan jam: selisih jarak. **Update pertama setelah versi ini mengunduh ulang file FIT semua lari sekali
+  dan membaca ulang riwayat HRV** (rata-rata 7 hari dan rentang normal pribadi). Ringkasan Garmin per lari (HR maks,
+  cadence, elevasi, training effect, beban, power, suhu, langkah, jumlah lap) disimpan apa adanya.
+- **Strides** (dokumen §5): kecepatan jam > 2,6 m/s minimal 6 detik (`coach.stride_mps`, `coach.stride_min_s`). Di detail
+  hari yang rencananya menyebut strides: "x dari y terdeteksi", durasi dan pace puncak (setelah 90% jarak dasar).
+- `Ekspor Sesi`: CSV per detik mendapat kolom `suhu_c`, dan `kecepatan_m_s` memakai kecepatan jam bila ada.
+- `pacelab.py inspect` juga mencoba data Garmin "Strained" (training status / readiness). Jalur itu milik Garmin Connect
+  dan belum pasti terbuka untuk key pribadi: hasilnya hanya dilaporkan (dokumen §7b: tanpa data itu Merah hanya dari HRV).
 - Cadence dan elevasi per detik ikut diunduh. **Update berikutnya mengunduh ulang semua lari sekali** (lebih lama);
   setelah itu kembali inkremental. Kalau cadence kosong pada data asli: `python pacelab.py inspect`.
 
@@ -200,7 +215,8 @@ pacelab/sync.py       sync inkremental → data/<ATLET>/
 pacelab/program.py    pembaca Excel program (xlsx.py: pembaca .xlsx tanpa library)
 pacelab/metrics.py    semua perhitungan
 pacelab/export.py     ekspor lari satu hari (zip untuk Claude chat)
-pacelab/fit.py        pembaca file FIT Garmin (lap, sesi, data per detik) tanpa library
+pacelab/fit.py        pembaca file FIT Garmin (lap, sesi, data per detik, kecepatan jam, suhu) tanpa library
+pacelab/overrides.py  overrides.json: sesi yang diatur manual (dokumen §1)
 tools/fitgen.py       penulis file FIT kecil untuk server tiruan dan tes
 pacelab/build.py      data → dist/dashboard.html (web/template.html)
 tools/mock_garmin.py  server Garmin tiruan untuk tes & demo

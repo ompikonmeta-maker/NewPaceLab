@@ -35,9 +35,9 @@ WEIGHT = "/weight-service/weight/range/%s/%s"
 # max days per call reported by the community; longer ranges give HTTP 400
 CHUNK = {"sleep": 28, "hrv": 180, "bb": 28, "daily": 28, "weight": 180}
 REFETCH_DAYS = 3  # late-arriving sleep/HRV for the last nights
-SCHEMA = 3  # bump when wellness parsing changes: the full history is re-read once
+SCHEMA = 4  # 4: HRV 7-day average and normal range; bump when wellness parsing changes: the full history is re-read once
 STREAM_V = 2
-FIT_V = 1         # bump to download every run's FIT file once more  # bump when per-second parsing changes: every stream is downloaded once more (2: cadence, elevation)
+FIT_V = 2         # bump to download every run's FIT file once more (2: watch speed + temperature per second)  # bump when per-second parsing changes: every stream is downloaded once more (2: cadence, elevation)
 RHR_KEY = re.compile(r"resting_?heart_?rate(_?value)?$|^rhr$", re.I)
 DATE_KEY = re.compile(r"^\d{4}-\d{2}-\d{2}")
 
@@ -173,7 +173,9 @@ def norm_stream(details):
     hi = idx.get("directHeartRate")
     ci = next((idx[k] for k in ("directDoubleCadence", "directRunCadence") if k in idx), None)
     ei = next((idx[k] for k in ("directElevation", "directCorrectedElevation") if k in idx), None)
-    t, d, hr, cad, el = [], [], [], [], []
+    si = next((idx[k] for k in ("directSpeed", "directEnhancedSpeed") if k in idx), None)
+    ki = next((idx[k] for k in ("directAirTemperature", "directTemperature") if k in idx), None)
+    t, d, hr, cad, el, sp, tc = [], [], [], [], [], [], []
     val = lambda r, i: r[i] if i is not None and i < len(r) else None
     t0 = None
     for r in rows:
@@ -192,6 +194,9 @@ def norm_stream(details):
         cv, ev = val(r, ci), val(r, ei)
         cad.append(round(cv) if cv else None)
         el.append(round(ev, 1) if ev is not None else None)
+        sv, kv = val(r, si), val(r, ki)
+        sp.append(round(sv, 3) if sv is not None else None)
+        tc.append(round(kv) if kv is not None else None)
     if len(t) < 2:
         return None
     # some watches report steps per minute of one leg (~85): double it to steps per minute
@@ -199,6 +204,7 @@ def norm_stream(details):
     if cs and cs[len(cs) // 2] < 120:
         cad = [c * 2 if c else None for c in cad]
     return {"t": t, "d": d, "hr": hr, "cad": cad if cs else None, "el": el if any(e is not None for e in el) else None,
+            "sp": sp if any(v is not None for v in sp) else None, "tc": tc if any(v is not None for v in tc) else None,
             "v": STREAM_V, "keys": sorted(k for k in idx if k)}
 
 
@@ -220,6 +226,8 @@ def norm_hrv(item):
         "hrv": pick(item, "lastNightAvg"),
         "hrv_status": ((pick(item, "status") or "").upper() or None) if (pick(item, "status") or "").upper() != "NONE" else None,
         "hrv_low": pick(item, "baseline.balancedLow"),
+        "hrv_hi": pick(item, "baseline.balancedUpper"),
+        "hrv_week": pick(item, "weeklyAvg"),
     }
 
 
@@ -260,7 +268,8 @@ class Syncer:
         self.no_stream = set(self.state.get("no_stream", []))
         self.refetch = self.state.get("stream_v", 1) < STREAM_V  # older streams lack cadence/elevation
         self.no_fit = set(self.state.get("no_fit", []))
-        if self.state.get("fit_v", 0) < FIT_V:
+        self.fit_refetch = self.state.get("fit_v", 0) < FIT_V
+        if self.fit_refetch:
             self.no_fit = set()
 
     def run(self, since, until):
@@ -291,12 +300,12 @@ class Syncer:
                     new += 1
                     if new % 25 == 0:
                         self.log("    %d lari diunduh..." % new)
-                if not (self.dir / "laps" / ("%s.json" % r["id"])).is_file() and r["id"] not in self.no_fit:
+                if (self.fit_refetch or not (self.dir / "laps" / ("%s.json" % r["id"])).is_file()) and r["id"] not in self.no_fit:
                     self._fit(r)
                 self.runs[r["id"]] = r
             _write(self.dir / "runs.json", sorted(self.runs.values(), key=lambda x: x["start"] or x["date"]))
             if len(items) < page:
-                self.refetch = False
+                self.refetch = self.fit_refetch = False
                 self.state["stream_v"] = STREAM_V
                 self.state["fit_v"] = FIT_V
                 return new
@@ -328,12 +337,16 @@ class Syncer:
             self.state["no_fit"] = sorted(self.no_fit)
             return
         _write(self.dir / "laps" / ("%s.json" % r["id"]), {"laps": got["laps"], "session": got["session"]})
+        # the watch's file is the per-second source: same distance / HR / cadence as the details (checked against
+        # real files), plus the watch's speed and temperature; the details stream stays only when there is no FIT
         sp = self.dir / "streams" / ("%s.json" % r["id"])
-        if got["stream"] and not sp.is_file():
+        if got["stream"]:
+            new = not sp.is_file()
             _write(sp, dict(got["stream"], v=STREAM_V, keys=["fit"]))
             self.no_stream.discard(r["id"])
             self.state["no_stream"] = sorted(self.no_stream)
-            self.log("    + %s %.1f km: data per detik dari file FIT" % (r["date"], r["km"]))
+            if new:
+                self.log("    + %s %.1f km: data per detik dari file FIT" % (r["date"], r["km"]))
 
     # -------------------------------------------------------------- wellness
     def sync_wellness(self, since, until):

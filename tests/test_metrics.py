@@ -229,3 +229,29 @@ class ScoreTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class WatchSpeedTest(unittest.TestCase):
+    """docs §5 / §6 (versi 10 Nov): strides and decoupling read the watch's speed when the stream has it."""
+    def stream(self, sp):
+        t = list(range(len(sp)))
+        d, x = [], 0.0
+        for v in sp:
+            d.append(round(x, 1))
+            x += v
+        return {"t": t, "d": d, "hr": [150] * len(sp), "sp": sp}
+
+    def test_strides_need_six_seconds_above_2_6(self):
+        sp = [2.4] * 30 + [3.2] * 19 + [1.2] * 60 + [3.4] * 5 + [1.2] * 60 + [3.6] * 16 + [1.2] * 10
+        st = m.strides(self.stream(sp))
+        self.assertEqual([s[1] for s in st], [19, 16])            # the 5-second burst is not a stride
+        self.assertEqual(st[1][2], 3.6)
+        self.assertIsNone(m.strides({"t": [0, 1], "d": [0, 3]}))  # no watch speed: not guessed from distance
+
+    def test_decoupling_uses_watch_speed(self):
+        n = 3600
+        s = {"t": list(range(n)), "d": [i * 2.5 for i in range(n)], "hr": [140 if i < n // 2 else 150 for i in range(n)]}
+        plain = m.decoupling_detail(dict(s))
+        s["sp"] = [2.5 if i < n // 2 else 2.7 for i in range(n)]   # the watch saw a faster 2nd half
+        watch = m.decoupling_detail(s)
+        self.assertNotEqual(plain["full"], watch["full"])

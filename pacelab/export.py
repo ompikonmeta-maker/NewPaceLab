@@ -15,7 +15,7 @@ import json
 import zipfile
 from pathlib import Path
 
-from . import fit, metrics as m
+from . import fit, metrics as m, overrides
 from .sync import FIT_DOWNLOAD, GARMIN_FIELDS
 
 DAYS = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
@@ -65,18 +65,20 @@ def table(head, rows):
 
 
 def per_second_csv(stream):
-    """CSV text: detik, jarak_m, hr_bpm, kecepatan_m_s, pace_per_km, cadence_spm, elevasi_m (speed over +-2 samples)."""
+    """CSV text: detik, jarak_m, hr_bpm, kecepatan_m_s, pace_per_km, cadence_spm, elevasi_m, suhu_c.
+    Speed = the watch's own (FIT enhanced_speed) when the stream has it, else over +-2 samples."""
     t, d = stream.get("t") or [], stream.get("d") or []
     hr, cad, el = stream.get("hr") or [], stream.get("cad") or [], stream.get("el") or []
+    sp, tc = stream.get("sp") or [], stream.get("tc") or []
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator="\n")
-    w.writerow(["detik", "jarak_m", "hr_bpm", "kecepatan_m_s", "pace_per_km", "cadence_spm", "elevasi_m"])
+    w.writerow(["detik", "jarak_m", "hr_bpm", "kecepatan_m_s", "pace_per_km", "cadence_spm", "elevasi_m", "suhu_c"])
     for i in range(len(t)):
         a, b = max(0, i - 2), min(len(t) - 1, i + 2)
-        v = (d[b] - d[a]) / (t[b] - t[a]) if t[b] > t[a] else None
+        v = sp[i] if i < len(sp) and sp[i] is not None else (d[b] - d[a]) / (t[b] - t[a]) if t[b] > t[a] else None
         w.writerow([t[i], d[i], hr[i] if i < len(hr) else "", round(v, 3) if v else "",
                     pace(1000 / v) if v and v > .5 else "", cad[i] if i < len(cad) and cad[i] else "",
-                    el[i] if i < len(el) and el[i] is not None else ""])
+                    el[i] if i < len(el) and el[i] is not None else "", tc[i] if i < len(tc) and tc[i] is not None else ""])
     return buf.getvalue()
 
 
@@ -114,8 +116,12 @@ def summary(day, people, prog):
             L.append("- Tes/lomba berikutnya: " + ", ".join("%s (%s)" % (e["event"], e["date"]) for e in evs))
     for p in people:
         a = p["a"]
-        L += ["", "## %s" % a["name"], "", "### Rencana hari ini (sel Excel, apa adanya)"]
-        cell = (wk.get("days") or [""] * 7)[day.weekday()] if wk.get("days") else ""
+        if p.get("ovr"):          # docs §1: a session changed by hand is judged against overrides.json
+            L += ["", "## %s" % a["name"], "", "### Rencana yang dipakai (overrides.json, bukan sel Excel)"]
+            cell = p["ovr"]
+        else:
+            L += ["", "## %s" % a["name"], "", "### Rencana hari ini (sel Excel, apa adanya)"]
+            cell = (wk.get("days") or [""] * 7)[day.weekday()] if wk.get("days") else ""
         L += ["> " + x.strip() for x in cell.split("\n") if x.strip()] or ["> (tidak ada rencana di Excel untuk tanggal ini)"]
         z, pc = a.get("zones") or [], a.get("pace") or {}
         L += ["", "### Profil (config.json)"]
@@ -186,6 +192,7 @@ def summary(day, people, prog):
 def export_day(cfg, athletes, day, prog=None, client_for=None, with_fit=True, out_dir="ekspor", log=print):
     """Write ekspor/NewPaceLab_<day>.zip and return its path. client_for(athlete) -> Garmin client or None."""
     people, files = [], {}
+    ovr = overrides.load(cfg.get("overrides"), log)
     for a in athletes:
         folder = Path(cfg["data_dir"]) / a["id"]
         runs = [r for r in _read(folder / "runs.json", []) if r.get("date") == day.isoformat()]
@@ -219,7 +226,7 @@ def export_day(cfg, athletes, day, prog=None, client_for=None, with_fit=True, ou
             if laps:
                 files["%s%s_lap.csv" % (tag, suffix)] = lap_csv(laps).encode("utf-8")
             rows.append((r, stream, laps))
-        people.append({"a": a, "runs": rows, "well": well, "week": week})
+        people.append({"a": a, "runs": rows, "well": well, "week": week, "ovr": ovr.get(a["id"].upper(), {}).get(day.isoformat())})
     files["ringkasan.md"] = summary(day, people, prog).encode("utf-8")
     out = Path(out_dir) / ("NewPaceLab_%s.zip" % day.isoformat())
     out.parent.mkdir(parents=True, exist_ok=True)

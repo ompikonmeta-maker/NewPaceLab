@@ -87,11 +87,11 @@ class Athlete:
                 if moved != "skip":
                     aid += 1
                     self._add_run(aid, moved or day, dist, pace, rnd, race=day == dt.date(2026, 10, 11),
-                                  tempo=day.weekday() == 1 and dist >= 6)
+                                  tempo=day.weekday() == 1 and dist >= 6, strides=day.weekday() == 1 and dist < 6)
             self._add_day(day, rnd, prog)
             day += dt.timedelta(days=1)
 
-    def _add_run(self, aid, day, km, pace, rnd, race=False, tempo=False):
+    def _add_run(self, aid, day, km, pace, rnd, race=False, tempo=False, strides=False):
         step, t, d, hr, rows = 5, 0.0, 0.0, [], []
         total = km * 1000
         drift = rnd.uniform(.04, .14) if km >= 10 else .02
@@ -100,6 +100,9 @@ class Athlete:
             hard = tempo and 2500 <= d < 5500           # a tempo block after warm-up and strides
             walking = km >= 14 and d > 4000 and d % 5000 < 70    # long runs: a short walk every 5 km (drink)
             v = 1.15 if walking else 1000 / (pace * (.8 if hard else 1) * (1 + rnd.uniform(-.03, .03)))
+            if strides and d >= total - 700:                 # strides at the end: ~18 s fast, then ~60 s easy / walk
+                ph = t % 80
+                v = 3.3 + rnd.uniform(-.2, .3) if ph < 18 else 1.3
             h = self.p["hr"] * (1.12 if race or hard else 1) * (1 + drift * frac) + rnd.uniform(-2, 2)
             cad = (172 if self.p["hr"] > 145 else 168) + rnd.uniform(-2, 2) - (5 * frac if km >= 15 else 1 * frac)
             if walking:
@@ -110,7 +113,7 @@ class Athlete:
             d = min(total, d + v * step)
         rows.append([t, round(total, 1)] + rows[-1][2:])
         start = dt.datetime.combine(day, dt.time(5, rnd.randint(30, 59)))
-        self.fits[aid] = ([(r[0], r[1], r[2], r[4], r[5]) for r in rows], int(start.replace(tzinfo=dt.timezone.utc).timestamp()) - 7 * 3600,
+        self.fits[aid] = ([(r[0], r[1], r[2], r[4], r[5], r[3], 27 + int(r[0] // 1200)) for r in rows], int(start.replace(tzinfo=dt.timezone.utc).timestamp()) - 7 * 3600,
                           (2160, 2320, 2480) if tempo else ())
         old = day < self.today - dt.timedelta(days=DETAILS_DAYS)
         self.streams[aid] = {
@@ -153,6 +156,11 @@ class Athlete:
             "kg": round(p["kg"] - (1.2 if p["kg"] > 75 else 0) * prog + rnd.uniform(-.4, .4), 1) if day.weekday() == 6 else None}
 
     # ----------------------------------------------------------- responses
+    def week_hrv(self, k):
+        d = dt.date.fromisoformat(k)
+        v = [self.well[x]["hrv"] for x in ((d - dt.timedelta(days=i)).isoformat() for i in range(7)) if x in self.well]
+        return round(sum(v) / len(v)) if v else None
+
     def days(self, a, b):
         a, b = dt.date.fromisoformat(a), dt.date.fromisoformat(b)
         return [(k, v) for k, v in sorted(self.well.items()) if a <= dt.date.fromisoformat(k) <= b]
@@ -176,7 +184,7 @@ class Athlete:
         m = re.match(r"/hrv-service/hrv/daily/([\d-]+)/([\d-]+)$", path)
         if m:
             return {"userProfilePk": 1, "hrvSummaries": [
-                {"calendarDate": k, "lastNightAvg": v["hrv"], "status": v["status"],
+                {"calendarDate": k, "lastNightAvg": v["hrv"], "status": v["status"], "weeklyAvg": self.week_hrv(k),
                  "baseline": {"balancedLow": self.p["hrv"] - 4, "balancedUpper": self.p["hrv"] + 8}}
                 for k, v in self.days(m.group(1), m.group(2))]}
         if path == "/wellness-service/wellness/bodyBattery/reports/daily":

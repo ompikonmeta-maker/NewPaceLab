@@ -2,6 +2,7 @@ import io
 import struct
 import unittest
 import zipfile
+from pathlib import Path
 
 from pacelab import fit
 
@@ -61,3 +62,14 @@ class FitTest(unittest.TestCase):
     def test_not_fit(self):
         with self.assertRaises(ValueError):
             fit.read(b'{"error":"NOT_FOUND"}')
+
+
+class FitSpeedTest(unittest.TestCase):
+    def test_speed_and_temperature_per_record(self):
+        import sys
+        sys.path.insert(0, str(Path(__file__).resolve().parent.parent / "tools"))
+        import fitgen
+        rows = [(i, i * 2.8, 150, 170, 10.0, 2.8, -3 if i < 5 else 29) for i in range(30)]
+        s = fit.read(fitgen.zipped(fitgen.write_fit(rows, 1700000000)))["stream"]
+        self.assertEqual(s["sp"][:2], [2.8, 2.8])
+        self.assertEqual((s["tc"][0], s["tc"][10]), (-3, 29))       # sint8, below zero too

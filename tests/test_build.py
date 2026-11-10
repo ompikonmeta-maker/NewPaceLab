@@ -84,3 +84,20 @@ class BuildTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class OverridesTest(unittest.TestCase):
+    def test_cells_and_bad_entries(self):
+        import json, tempfile
+        from pacelab import overrides
+        with tempfile.TemporaryDirectory() as d:
+            p = Path(d) / "overrides.json"
+            p.write_text(json.dumps([{"date": "2026-11-01", "athlete": "taofik", "session": "long_run", "km": 22},
+                                     {"date": "2026-11-03", "athlete": "REZA", "session": "tempo", "km": 8, "tempo_km": 3},
+                                     {"date": "2026-11-04", "athlete": "REZA", "session": "jog"}]), encoding="utf-8")
+            msgs = []
+            got = overrides.load(str(p), msgs.append)
+        self.assertEqual(got["TAOFIK"]["2026-11-01"].split("\n")[0], "LONG RUN 22 km")
+        self.assertEqual(got["REZA"]["2026-11-03"].split("\n")[:2], ["LATIHAN KERAS: Tempo 3 km", "Total 8 km"])
+        self.assertEqual(len(msgs), 1)                              # the unknown session is skipped and reported
+        self.assertEqual(overrides.load(None), {})

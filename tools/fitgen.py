@@ -16,19 +16,22 @@ def _def(local, glob, fields):
 
 
 def write_fit(rows, start_unix, lap_m=1000, manual=()):
-    """rows: [(t seconds, distance m, hr, cadence spm, elevation m)], one per sample, timer time.
+    """rows: [(t seconds, distance m, hr, cadence spm, elevation m[, speed m/s, temperature °C])], one per sample, timer time.
     Auto-lap every lap_m metres; manual = extra lap boundaries in metres (as if the lap key was pressed).
     The last lap ends the session."""
     t0 = start_unix - FIT_EPOCH
     out = b""
     out += _def(0, 21, [(253, 4, 134), (0, 1, 0), (1, 1, 0)])                       # event: timestamp, event, type
-    out += _def(1, 20, [(253, 4, 134), (5, 4, 134), (3, 1, 2), (4, 1, 2), (78, 4, 134)])
+    out += _def(1, 20, [(253, 4, 134), (5, 4, 134), (3, 1, 2), (4, 1, 2), (78, 4, 134), (73, 4, 134), (13, 1, 1)])
     out += _def(2, 19, [(253, 4, 134), (2, 4, 134), (7, 4, 134), (8, 4, 134), (9, 4, 134), (15, 1, 2), (16, 1, 2), (17, 1, 2), (24, 1, 0)])
     out += bytes([0]) + struct.pack("<IBB", t0, 0, 0)                                 # timer start
     manual, laps, a, lap0 = sorted(manual), [], 0, 0.0      # auto-lap restarts after a manual lap, like the watch
-    for i, (t, d, hr, cad, el) in enumerate(rows):
-        out += bytes([1]) + struct.pack("<IIBBI", t0 + int(t), int(d * 100), hr or 0xFF, (cad // 2) if cad else 0xFF,
-                                        int((el + 500) * 5) if el is not None else 0xFFFFFFFF)
+    for i, row in enumerate(rows):
+        t, d, hr, cad, el = row[:5]
+        v, tmp = (list(row[5:7]) + [None, None])[:2]
+        out += bytes([1]) + struct.pack("<IIBBIIb", t0 + int(t), int(d * 100), hr or 0xFF, (cad // 2) if cad else 0xFF,
+                                        int((el + 500) * 5) if el is not None else 0xFFFFFFFF,
+                                        int(v * 1000) if v is not None else 0xFFFFFFFF, tmp if tmp is not None else 0x7F)
         last = i == len(rows) - 1
         hand = bool(manual) and d >= manual[0]
         if hand or d >= lap0 + lap_m or last:
