@@ -44,6 +44,15 @@ Python 3.8+ saja, tanpa `pip install`.
 
 ## Isi dashboard
 
+**Kalkulator target lomba** (dokumen §3b): klik chip lomba di header (atau "Target lomba"). Pilih lomba, pelari dan
+dasar hitungan: hanya lomba / tes **utuh** (jarak lomba itu sendiri, bukan potongan dari lari yang lebih panjang). Riegel
+T2 = T1 × (D2/D1)^1,06, lalu panas (28–30 °C +3%, 30–32 °C +5%, > 32 °C +8%; start setelah 06:00 memakai suhu km
+terakhir: isi sendiri, kosong = suhu start + 1 °C per 30 menit), lalu kelelahan (+2% bila ada long run ≥ 18 km kurang
+dari 7 hari sebelumnya, dari lari atau rencana). Hasil ditulis sebagai rentang ±1,5% dibulatkan ke menit
+[keputusan dashboard], plus batas HR per km dari LTHR (km 1 ≤ LTHR − 15, km 2 ≤ LTHR − 6, km 3–5 ≤ LTHR − 2; pace naik
+setelah km 5 hanya bila HR ≤ LTHR − 4). Tombol "Salin untuk Claude chat". Angka di `config.json` (`coach.heat`,
+`coach.fatigue_*`, `coach.target_band`, `lthr`).
+
 **Intro "PaceLab Duo · Road to 42K"**: film animasi ±40 detik, 7 babak, dengan kedua ikon pelari sebagai tokoh utama:
 Mulai → Tujuan (hitung mundur, tonggak lomba) → Rencana (minggu dan fase program) → Pagi (lampu tiap pelari) →
 Duel sesi (lap terbesar 4 minggu terakhir, jalan kaki, penilaian pelatih) → Progres (PB 5K, estimasi maraton vs target) →
@@ -69,12 +78,12 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 | Bagian | Sumber |
 |---|---|
 | Hitung mundur, minggu program, fase, tanda lomba | Excel: Kalender, Checkpoint |
-| Ringkasan head-to-head | lampu hari ini, est. maraton, km & long run minggu ini, HRV, Body Battery, tidur, RHR, gerbang long run |
+| Ringkasan head-to-head | lampu hari ini, est. maraton, km & long run minggu ini, **aturan 110%** (batas long run = 1,1 × lari terpanjang 30 hari sebelum hari long run, dibanding rencana; dokumen §4), HRV, Body Battery, tidur, RHR, gerbang long run |
 | Est. maraton | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir; ditampilkan juga + koreksi panas 5% |
 | Menuju 42K | long run terpanjang sejak awal program |
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
 | Latihan (filter 4 / 12 minggu / semua) | km, long run, decoupling, berat vs target per minggu yang sudah selesai; sumbu = tanggal awal minggu |
-| Pemulihan (filter 7 / 14 / 30 / 60 hari) | lampu harian, tidur, HRV, Body Battery |
+| Pemulihan (filter 7 / 14 / 30 / 60 hari) | lampu harian, tidur, Body Battery; **kartu HRV**: per pelari angka semalam, rata-rata 7 hari dan rentang normal pribadi dari Garmin + grafik pita (status = rata-rata 7 hari dibanding rentang, bukan angka semalam; dokumen §7b) |
 | 5K / 10K / Half | segmen tercepat di dalam setiap lari (data per detik): satu titik per lari. Lari yang jarak GPS-nya sedikit kurang (≥ 98%, `config.json` `effort.min_frac`) dan lari terpanjang di hari tes Checkpoint (≥ 80%, `effort.test_min_frac`) ikut dihitung: waktunya disetarakan ke jarak penuh dengan pace rata-rata, ditandai ≈ [keputusan omPik; 80% keputusan dashboard]. Klik kartu = jendela detail (grafik besar, hover ke titik terdekat, 4 mgg / 12 mgg / semua, ringkasan per pelari, 5 tercepat, ←/→ pindah jarak); garis tipis bertangga = rekor berjalan sampai hari ini, titik bercincin = tercepat. Belum ada data: grafik bayangan + tanggal tes berikutnya |
 | Full | estimasi per akhir bulan, di atas pita target B; status target per pelari sebagai chip (batas, + panas, saran saat disentuh). Keempat kartu sama tinggi, grafik mengisi sisa ruang |
 | Badge | 21/25/30/35K, 100 km/bulan, streak 7 & 14 minggu ≥90% target km, PR 5K/10K selama program |
@@ -156,6 +165,7 @@ sel Excel hari itu dipakai lebih dulu; profil jadi cadangan.
 | Gerbang pagi | baris terpisah di samping Jarak. Long run: batas = yang paling ketat dari §7 (tidur + Body Battery) dan lampu §7b (Kuning −20%, Oranye −40%, Merah lari santai ≤ 8 km, `coach.red_easy_km`); lebih dari 110% batas → "gerbang dilewati (+x km)". Latihan keras saat lampu Kuning/Oranye/Merah → "gerbang dilewati" | dokumen §5b, §7, §7b |
 | Lomba / tes | hari lomba (sel "Lomba"/"Tes" atau tanggal Checkpoint): jarak < 90% → "tidak selesai" (`coach.dnf_frac`); km 1 > 10 dtk lebih cepat dari batas lambat rencana → "start terlalu cepat" (`coach.start_fast_s`; hanya bila sel memuat rentang pace); HR km 1 ≤ LTHR − 15, km 2 ≤ LTHR − 6, km 3–5 ≤ LTHR − 2 (`lthr`, `coach.lthr_off`), HR sama dengan batas masih boleh; paruh 2 > 5% lebih lambat → "pace ambruk" (`coach.fade_pct`); jalan kaki ≥ 10 dtk total → ditandai beserta km-nya (`coach.walk_flag_s`). Kepatuhan lomba = bagian cek yang lolos | dokumen §3b, §5b |
 | Berhenti | waktu total − waktu bergerak (Garmin), ditampilkan, tidak dinilai | dokumen §5b |
+| Cek pacing berdua | hari keduanya lari: "kemungkinan terbawa" bila jam mulai beda < 2 menit, km 1 beda < 15 dtk, dan km 1 salah satu > 30 dtk lebih cepat dari batas lambat rencananya sendiri (`coach.pair_*`); juga di ekspor .md kedua pelari | dokumen §5b |
 | HR lari santai / pemulihan | hanya km di **atas** batas atas yang dihitung, maksimal 20% km (`coach.hr_over_max`); di bawah rentang aman | [keputusan omPik] |
 | HR long run | boleh lewat batas atas hanya di 25% bagian akhir (`coach.lr_tail`) dan decoupling < 8% (`coach.dec_max`). Kalau decoupling tidak ada: ≥ 75% km tidak lewat batas (`coach.lr_hr_in`) | [keputusan omPik] |
 | Pace lari santai / long run | tidak dinilai; km yang lebih cepat dari batas cepat ditandai, lebih lambat tidak apa-apa | [keputusan omPik], dokumen §3 "HR mengalahkan pace" |

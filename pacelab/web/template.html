@@ -299,6 +299,9 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 }
 .action{margin-top:auto;display:flex;align-items:center;gap:10px;background:var(--bg);border-radius:12px;padding:10px 14px;font-size:14px}
 .action b{font-weight:650}
+.hrvc+.hrvc{margin-top:12px;padding-top:10px;border-top:1px solid var(--grid)} .hrvh{display:flex;justify-content:space-between;align-items:center;gap:8px} .hrvh .who{display:flex;align-items:center;gap:6px;font-weight:650;font-size:14px}
+.hrv3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 2px} .hrv3 div{background:var(--bg);border-radius:10px;padding:5px 8px} .hrv3 small{display:block;color:var(--muted);font-size:11px} .hrv3 b{font-size:18px}
+#ch-hrv svg text{font-size:10px;fill:var(--muted)} .hrvn{margin:8px 0 0;font-size:12px;color:var(--muted)} .action.a110{margin-top:8px;flex-wrap:wrap;row-gap:2px}
 
 /* race to 42k */
 .track{display:grid;grid-template-columns:72px 1fr 120px;align-items:center;gap:14px;margin:14px 0}
@@ -520,6 +523,15 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-sc.R:not(.ghost){border-color:transparent;background:linear-gradient(270deg,color-mix(in srgb,var(--r) calc(var(--cp,0) * 30%),var(--surface)),var(--surface) 75%)} .ss-sc .km{font-size:20px;font-weight:700;letter-spacing:-.01em} .ss-sc .km small{font-size:12px;font-weight:400;color:var(--muted)}
 .ss-sc .meta{font-size:12.5px;color:var(--muted);line-height:1.35} .ss-sc .sp2{flex:1}
 .ss-sc.ghost{border-style:dashed;background:transparent;color:var(--muted);font-size:13px;justify-content:center}
+.rcb{font:inherit;cursor:pointer;transition:border-color .2s,transform .2s} .rcb:hover,.rcb:focus-visible{border-color:var(--text);transform:translateY(-1px)}
+.rcx .ssx-body{scrollbar-width:thin} .rcf{display:grid;grid-template-columns:170px minmax(0,1fr);gap:8px 12px;align-items:center;font-size:13.5px;background:var(--bg);border-radius:14px;padding:12px 14px}
+.rcf label{color:var(--text-2)} .rcf select,.rcf input{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:6px 10px;font:inherit;font-size:13.5px}
+.rcf .auto{color:var(--muted);font-size:12.5px} .rcs{list-style:none;margin:12px 0 0;padding:0;font-size:13.5px} .rcs li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;padding:7px 0;border-bottom:1px solid var(--grid)} .rcs i{font-style:normal;color:var(--muted)}
+.rcr{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:12px 0 2px} .rcr small{font-size:13.5px;font-weight:400;color:var(--muted)}
+.rct{width:100%;border-collapse:collapse;font-size:13px;margin-top:8px} .rct th,.rct td{text-align:left;padding:6px 8px;border-bottom:1px solid var(--grid)} .rct th{color:var(--muted);font-weight:600}
+.rcn{font-size:12.5px;color:var(--muted);margin:10px 0 0} .rcc{margin-top:10px;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:999px;padding:5px 14px;font:inherit;font-size:13px;cursor:pointer}
+@media (max-width:640px){.rcf{grid-template-columns:1fr}}
+.ss-pair{margin-top:12px;border-radius:14px;padding:10px 14px;background:var(--warn-bg);color:var(--text);font-size:13.5px;line-height:1.45} .ss-pair b{color:var(--warn)} .ss-pair .s2{color:var(--muted);font-size:12px}
 .ss-tag{display:inline-block;margin:3px 2px 0;font-size:11px;font-weight:700;border-radius:6px;padding:1px 7px;background:color-mix(in srgb,var(--t) 14%,transparent);color:var(--t);white-space:nowrap} .ss-tag.o{background:var(--bg);color:var(--muted);border:1px solid var(--line)}
 .ss-fr .sp .ss-tag{display:table;margin:3px auto 0}
 .ss-swd{position:relative;display:inline-block} .ss-swb{margin-top:5px;display:inline-flex;align-items:center;border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:2px 10px;font:inherit;font-size:12px;color:var(--text-2);cursor:pointer;transition:border-color .2s;white-space:nowrap}
@@ -814,6 +826,9 @@ footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;paddin
 <div class="ssx" id="ssx" aria-hidden="true"><div class="ssx-win" role="dialog" aria-modal="true" aria-labelledby="ssx-h">
   <div class="pbx-hd"><h3 id="ssx-h"></h3><span class="ss-vw" id="ssx-who" role="group" aria-label="Pelari"></span><button class="pbx-x" data-close aria-label="Tutup">×</button></div>
   <div class="ssx-body" id="ssx-body"><div></div></div><div class="sbar" id="ssx-sbar" aria-hidden="true"></div></div></div>
+<div class="ssx rcx" id="rcx" aria-hidden="true"><div class="ssx-win" role="dialog" aria-modal="true" aria-labelledby="rcx-h">
+  <div class="pbx-hd"><h3 id="rcx-h">Target lomba</h3><span class="ss-vw" id="rcx-who" role="group" aria-label="Pelari"></span><button class="pbx-x" data-close aria-label="Tutup">×</button></div>
+  <div class="ssx-body" id="rcx-body"></div></div></div>
 <div class="ss-toast" id="ss-toast" role="status" aria-live="polite"></div>
 <div class="pbx" id="pbx" aria-hidden="true"><div class="pbx-win" id="pbx-win" role="dialog" aria-modal="true" aria-labelledby="pbx-h"></div></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
@@ -859,6 +874,14 @@ const chip = (lvl, text) => `<span class="chip ${lvl}"><svg viewBox="0 0 24 24" 
 const LIGHT = {hijau: ["good", "Hijau", "siap latihan sesuai rencana"], kuning: ["warn", "Kuning", "long run dipotong 20%, latihan keras jadi lari santai"],
                oranye: ["serious", "Oranye", "long run dipotong 40%, latihan keras jadi lari santai"], merah: ["crit", "Merah", "lari santai ≤ 8 km atau istirahat"]};   // docs §7b
 // docs §7: the long-run gate is judged on that day's morning; on other days the card only names the day
+// docs §4 "Aturan 110%": long run ≤ 1,1 × the longest run of the 30 days before it
+function lr110(a) { const T = a.today || {}, wk = (a.weeks || []).find(w => w.ms === DATA.ms_cur) || {};
+  const st = addDays(DATA.ms1, (DATA.ms_cur - 1) * 7), day = T.lr_day == null ? addDays(st, 5) : addDays(st, T.lr_day), from = addDays(day, -30);
+  const xs = (a.sessions || []).filter(x => x.date >= from && x.date < day && x.date <= DATA.today);
+  if (!xs.length) return null; const top = xs.reduce((p, q) => q.km > p.km ? q : p), lim = top.km * 1.1, plan = wk.lr_t;
+  return {lim, top, plan, ok: plan == null ? null : plan <= lim + 1e-9}; }
+const lr110Txt = a => { const r = lr110(a); if (!r) return ["–", ""];
+  return [`≤ ${f1(r.lim)} km`, `terpanjang 30 hari ${f1(r.top.km)} km (${tgl(r.top.date)})${r.plan != null ? ` · rencana ${f1(r.plan)} ${r.ok ? "✓" : "lewat batas"}` : ""}`]; };
 const lrAct = a => { const T = a.today || {}, d = T.lr_day == null ? null : HARIF[(T.lr_day + 1) % 7];
   if (d == null) return ["Long run minggu ini", "–"];
   return [`Long run ${d}`, T.lr_today ? T.saturday || "belum ada data pagi ini" : `dinilai ${d} pagi`]; };
@@ -904,7 +927,8 @@ document.addEventListener("pointerout", e => { if (e.target.closest("[data-hint]
   const FLAG = '<path d="M5 21V4M5 4h11l-2 4 2 4H5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>';
   const CAL = '<rect x="3.5" y="5" width="17" height="15" rx="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M3.5 10h17M8 3v4M16 3v4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>';
   $("sub").innerHTML = `<span class="it">${ic(FLAG)}Minggu <b>${DATA.ms_cur}</b> dari ${DATA.total_weeks} · fase <b>${DATA.phase || "–"}</b></span>` +
-    DATA.events.filter(e => !/maraton/i.test(e.event)).map(e => `<span class="pill it">${ic(CAL)}${e.event.replace(/^LOMBA /i,"").replace(/HALF MARATHON/i,"Half")} · ${tgl(e.date)}</span>`).join("");
+    DATA.events.filter(e => !/maraton/i.test(e.event)).map(e => `<button type="button" class="pill it rcb" data-rc="${e.date}" title="Hitung target lomba (dokumen §3b)">${ic(CAL)}${e.event.replace(/^LOMBA /i,"").replace(/HALF MARATHON/i,"Half")} · ${tgl(e.date)}</button>`).join("") +
+    `<button type="button" class="pill it rcb" data-rc="${DATA.race_date}" title="Hitung target lomba (dokumen §3b)">${ic(CAL)}Target lomba</button>`;
   $("foot").innerHTML = `<span>Dibuat ${DATA.generated.replace("T"," ")}</span>` +
     A.map(a => `<span>${a.name}: ${a.sync ? "sync " + a.sync.replace("T"," ").slice(0,16) : "belum ada data"}</span>`).join("") +
     `<span class="hand" data-hint="Untuk pena dan sentuhan: tooltip muncul di sisi yang tidak tertutup tangan. Mouse tidak berubah.">Pena di tangan <span class="hsw" role="group" aria-label="Tangan yang memegang pena"><button data-hand="R" aria-pressed="${HAND === "R"}">kanan</button><button data-hand="L" aria-pressed="${HAND === "L"}">kiri</button></span></span>` +
@@ -975,6 +999,7 @@ function renderSummary() {
         <div>Body Battery<b>${num(l && l.bb, "int")}</b></div><div>Tidur<b>${hm(l && l.sleep_s)}</b></div>
         <div>RHR<b>${num(l && l.rhr, "int")}${l && l.notes.length ? ` <span class="muted" style="font-size:13px;font-weight:400">${l.notes.join(" ").replace("RHR ","")}</span>` : ""}</b></div></div>
       <div class="action"><span>${lrAct(a)[0]}:</span><b>${lrAct(a)[1]}</b>${w.lr_t ? `<span class="muted">dari ${w.lr_t} km</span>` : ""}</div>
+      <div class="action a110"><span>Aturan 110%:</span><b>${lr110Txt(a)[0]}</b><span class="muted">${lr110Txt(a)[1]}</span></div>
     </section>`;
   }).join("");
   const d = A.map(a => a.today.date).filter(Boolean).sort().pop();
@@ -1001,6 +1026,7 @@ function renderDuel(cur) {
     ${row("Est. maraton", v(num(a.est.sec, "hm"), "target " + targetTxt(a.target)), v(num(b.est.sec, "hm"), "target " + targetTxt(b.target)), true)}
     ${row(`Minggu ini<div class="dbars">${kmBar(side[0])}${kmBar(side[1])}</div>`, v(`${num(side[0].w.km, "f1")}<small> / ${side[0].w.km_t ?? "–"} km</small>`), v(`${num(side[1].w.km, "f1")}<small> / ${side[1].w.km_t ?? "–"} km</small>`))}
     ${row("Long run<br>minggu ini", v(`${num(lr(side[0].w), "f1")}<small> / ${side[0].w.lr_t ?? "–"} km</small>`), v(`${num(lr(side[1].w), "f1")}<small> / ${side[1].w.lr_t ?? "–"} km</small>`))}
+    ${row("Aturan 110%", v(lr110Txt(side[0].x)[0], lr110Txt(side[0].x)[1]), v(lr110Txt(side[1].x)[0], lr110Txt(side[1].x)[1]))}
     ${row("HRV", v(`${num(side[0].l && side[0].l.hrv, "int")} <small>${st(side[0])}</small>`), v(`${num(side[1].l && side[1].l.hrv, "int")} <small>${st(side[1])}</small>`))}
     ${row("Body Battery", v(num(side[0].l && side[0].l.bb, "int")), v(num(side[1].l && side[1].l.bb, "int")))}
     ${row("Tidur", v(hm(side[0].l && side[0].l.sleep_s)), v(hm(side[1].l && side[1].l.sleep_s)))}
@@ -1227,6 +1253,26 @@ function weekly() {
 }
 
 // ---------------------------------------------------------------- level 3: recovery (daily, period filter)
+// three numbers per runner (last night, Garmin's 7-day average, personal normal range) over a band chart;
+// the status is the average against the range, not the night (docs §7b)
+function hrvCard(n) { const HRVS = {BALANCED: ["good", "Balanced"], UNBALANCED: ["warn", "Unbalanced"], LOW: ["serious", "Low"], POOR: ["crit", "Poor"]};
+  $("ch-hrv").innerHTML = V().map(a => { const ds = a.days.slice(-n), last = [...ds].reverse().find(d => d.hrv != null || d.hrv_week != null) || {};
+    const vals = ds.flatMap(d => [d.hrv, d.hrv_week, d.hrv_low, d.hrv_hi]).filter(v => v != null);
+    if (!vals.length) return "";
+    const W = 300, H = 92, lo = Math.min(...vals) - 3, hi = Math.max(...vals) + 3, X = i => 22 + i * (W - 28) / Math.max(1, n - 1), Y = v => 6 + (hi - v) / (hi - lo) * (H - 22);
+    const bandI = ds.map((d, i) => d.hrv_low != null && d.hrv_hi != null ? i : -1).filter(i => i >= 0);
+    const band = bandI.length ? `<path d="M${bandI.map(i => `${X(i)} ${Y(ds[i].hrv_hi)}`).join(" L")} L${bandI.slice().reverse().map(i => `${X(i)} ${Y(ds[i].hrv_low)}`).join(" L")}Z" fill="var(--grid)"/>` : "";
+    const avg = ds.map((d, i) => d.hrv_week != null ? `${X(i)} ${Y(d.hrv_week)}` : null), seg = []; let cur = [];
+    avg.forEach(p => { if (p) cur.push(p); else if (cur.length) { seg.push(cur); cur = []; } }); if (cur.length) seg.push(cur);
+    const S = HRVS[last.hrv_status] || ["none", "–"];
+    return `<div class="hrvc"><div class="hrvh"><span class="who"><i class="dot ${a.c}"></i>${a.name}</span>${chip(S[0], "status " + S[1])}</div>
+      <div class="hrv3 num"><div><small>semalam</small><b>${last.hrv ?? "–"}</b></div><div><small>rata-rata 7 hari</small><b>${last.hrv_week ?? "–"}</b></div><div><small>rentang normal</small><b>${last.hrv_low != null && last.hrv_hi != null ? `${last.hrv_low}–${last.hrv_hi}` : "–"}</b></div></div>
+      <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="HRV ${a.name}: semalam, rata-rata 7 hari dan rentang normal">${band}
+        ${seg.map(s => `<path d="M${s.join(" L")}" fill="none" stroke="var(--${a.c})" stroke-width="2.5" stroke-linejoin="round"/>`).join("")}
+        ${ds.map((d, i) => d.hrv != null ? `<circle cx="${X(i)}" cy="${Y(d.hrv)}" r="2.4" fill="var(--surface)" stroke="var(--${a.c})" stroke-width="1.3"/>` : "").join("")}
+        <text x="18" y="${Y(hi - 3) + 4}" text-anchor="end">${Math.round(hi - 3)}</text><text x="18" y="${Y(lo + 3) + 4}" text-anchor="end">${Math.round(lo + 3)}</text>
+        ${ds.map((d, i) => `<rect x="${X(i) - (W - 28) / n / 2}" y="0" width="${(W - 28) / n}" height="${H - 14}" fill="transparent" data-sh="<span class='t1'>${a.name} · ${hari(d.date)}</span>semalam <b>${d.hrv ?? "–"}</b> · rata-rata 7 hari <b>${d.hrv_week ?? "–"}</b><br>rentang normal ${d.hrv_low ?? "–"}–${d.hrv_hi ?? "–"} · status ${d.hrv_status ? HRVS[d.hrv_status] ? HRVS[d.hrv_status][1] : d.hrv_status : "–"}"/>`).join("")}</svg></div>`; }).join("") +
+    `<p class="hrvn">Status = rata-rata 7 hari dibanding rentang normal pribadi, bukan angka semalam. Angka HRV dua pelari tidak bisa dibandingkan. Pita abu = rentang normal, garis = rata-rata 7 hari, titik = semalam.</p>`; }
 function daily() {
   const days = A[0].days.slice(-DAYN), DX = days.map(d => d.date);
   const pick = (a, k) => a.days.slice(-DAYN).map(d => d[k]);
@@ -1250,7 +1296,8 @@ function daily() {
   $("in-hrv").innerHTML = V().map(a => { const st = pick(a, "hrv_status").filter(Boolean), low = st.filter(s => s === "LOW" || s === "POOR").length, last = st[st.length - 1];
     const lvl = !last ? "none" : last === "BALANCED" && low <= 1 ? "good" : low >= 3 ? "serious" : "warn";
     return line(a, `${chip(lvl, !last ? "Belum ada" : last === "BALANCED" ? "Seimbang" : last === "UNBALANCED" ? "Tidak seimbang" : "Rendah")}<span><b>${low}</b> hari rendah dalam ${DAYN} hari</span>${tip("hrv", lvl)}`); }).join("");
-  chart("ch-hrv", {x: DX, xlab: dl, h: 200, minSpan: 20, fmtV: v => v + " ms", label: "HRV semalam",
+  if (V().some(a => a.days.some(d => d.hrv_week != null))) hrvCard(DAYN);
+  else chart("ch-hrv", {x: DX, xlab: dl, h: 200, minSpan: 20, fmtV: v => v + " ms", label: "HRV semalam",
     detail: (a, k) => { const s = a.days.slice(-DAYN)[k].hrv_status; return s ? s[0] + s.slice(1).toLowerCase() : ""; },
     series: V().map(a => ({c: a.c, area: false, v: pick(a, "hrv")}))});
 
@@ -2122,6 +2169,8 @@ const mdTxt = h => { const d = document.createElement("div");
 const mdNum = v => String(v).replace(".", ",");
 const mdRow = c => `| ${c.join(" | ")} |`;
 const mdTab = (head, rows) => rows.length ? [mdRow(head), mdRow(head.map(() => "---")), ...rows.map(mdRow)].join("\n") : "";
+function ssMdPair(s) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x => x.c === "r")], f = pairFlag(ta, sessOf(ta, s), ra, sessOf(ra, s), s);
+  return f ? "\n**Cek pacing berdua (dashboard, dokumen §5b):** " + mdTxt(f) + "\n" : ""; }
 function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, ph = phaseOf(ms), W = (A[0].plan || []).find(w => w.ms === ms) || {};
   const ev = (DATA.all_events || []).some(e => Math.floor((D(e.date) - D(DATA.ms1)) / 864e5 / 7) === ms - 1);
   const year = D(s).getFullYear(), left = Math.round((D(DATA.race_date) - D(s)) / 864e5);
@@ -2173,6 +2222,7 @@ function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) 
     if (wk) L.push(`- Km dijalani ${wk.km != null ? mdNum(f1(wk.km)) : "–"} / target ${wk.km_t ?? "–"} · long run ${wk.lr != null ? mdNum(f1(wk.lr)) : "–"} / target ${wk.lr_t ?? "–"}`);
     wx.forEach(x => L.push(`- ${HARI3[D(x.date).getDay()]} ${tgl(x.date)}: ${mdNum(f1(x.km))} km · ${paceS(x.sec / x.km)}/km · HR ${x.hr ?? "–"}${x.date === s ? " ← sesi ini" : ""}`)); });
   L.push("", "---", `Dibuat oleh NewPaceLab ${DATA.generated.replace("T", " ")} · sync ${A.map(a => a.name + " " + (a.sync || "–").replace("T", " ").slice(0, 16)).join(", ")}`);
+  if (who === "both") L.push(ssMdPair(s));
   return L.join("\n").replace(/(\d)\.(\d)/g, "$1,$2"); }   // Indonesian decimal comma
 function ssMdSave(s, f) { const who = f === "copy" ? "both" : f, txt = ssMd(s, who), name = `NewPaceLab_${s}_${who === "both" ? A.filter(a => V().includes(a)).map(a => a.name).join("-") : A.find(a => a.c === who).name}.md`;
   if (f === "copy") { const done = () => ssToast("Teks tersalin — tempel di Claude chat");
@@ -2187,6 +2237,17 @@ document.addEventListener("click", e => { const b = e.target.closest(".ss-md"), 
   document.querySelectorAll(".ss-mdw.on").forEach(w => { if (!b || !w.contains(b)) { w.classList.remove("on"); w.querySelector(".ss-md").setAttribute("aria-expanded", "false"); } });
   if (b) { const w = b.parentElement, o = !w.classList.contains("on"); w.classList.toggle("on", o); b.setAttribute("aria-expanded", o); } });
 
+// docs §5b: "kemungkinan terbawa" when both started within 2 minutes, their km 1 differ by < 15 s, and one of them
+// ran km 1 more than 30 s faster than the slow end of their own plan
+function pairCheck(ta, T, ra, R, s) { if (!T || !R || !T.time || !R.time || !T.splits.length || !R.splits.length) return null;
+  const C = ta.coach || {}, mn = q => +q.slice(0, 2) * 60 + +q.slice(3, 5), dStart = Math.abs(mn(T.time) - mn(R.time));
+  const k1 = x => spPace(x.splits[0]), dk = Math.abs(k1(T) - k1(R));
+  const slow = (a, x) => { const pl = planFill(a, parsePlan(planCell(a, s))); return pl && pl.main ? pl.main[1] : null; };
+  const fast = [[ta, T], [ra, R]].map(([a, x]) => { const sl = slow(a, x); return sl ? {a, by: sl - k1(x), sl} : null; }).filter(q => q && q.by > (C.pair_fast_s ?? 30));
+  if (C.pair_start_min == null || dStart >= C.pair_start_min || dk >= (C.pair_km1_s ?? 15) || !fast.length) return null;
+  return {dStart, dk, fast, k: [k1(T), k1(R)]}; }
+function pairFlag(ta, T, ra, R, s) { const r = pairCheck(ta, T, ra, R, s); if (!r) return "";
+  return `<b>Kemungkinan terbawa:</b> start ${r.dStart ? `beda ${r.dStart} menit` : "bersamaan"} (${T.time} · ${R.time}), km 1 hanya beda ${Math.round(r.dk)} dtk (${paceS(r.k[0])} vs ${paceS(r.k[1])}), dan km 1 ${r.fast.map(q => `${q.a.name} ${Math.round(q.by)} dtk lebih cepat dari rencananya (${paceS(q.sl)})`).join(", ")}. <span class="s2">dokumen §5b</span>`; }
 // "⇄ Nilai sebagai…": pick which planned day of the week this run is judged against
 function ssSwapBtn(a, x, s) { if (!x) return ""; if (ovrOf(a, s)) return `<span class="ss-tag o" style="margin-top:6px">diatur di overrides.json</span>`; const cur = swapOf(a, s), auto = swapAuto(a)[s] || s, man = (SWAPM[a.c] || {})[s];
   const opts = wkDays(s).map(p => [p, parsePlan(planRaw(a, p))]).filter(([p, pl]) => p <= DATA.today && pl && RUNK(pl.k));
@@ -2242,6 +2303,7 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small>${ssSwapBtn(ra, R, s)}</div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
+    ${(f => f ? `<div class="ss-pair">${f}</div>` : "")(pairFlag(ta, T, ra, R, s))}
     ${hasLap ? `<div class="ss-sec"><span class="ss-vw" role="group" aria-label="Potongan"><button data-view="lap" aria-pressed="${SSV === "lap"}">Lap jam</button><button data-view="km" aria-pressed="${SSV === "km"}">Per km</button></span>
       <span class="s2">${SSV === "lap" ? "blok = satu lap setinggi jaraknya, lebar = kecepatan" : "batang = kecepatan, lebih panjang lebih cepat"} · pita = rentang pace rencana</span></div>`
       : `<div class="ss-sec">Per km <span class="s2">· batang = kecepatan, lebih panjang lebih cepat · pita = rentang pace rencana</span></div>`}
@@ -2385,6 +2447,66 @@ function ssxRender() { const {k, c} = SSX, a = A.find(x => x.c === c), Wk = ssxW
   $("ssx-body").firstElementChild.innerHTML = `<div class="ssx-form">${form}</div>` + Wk.map((W, i) => `<div class="ssx-wk ${i === iNow || i === iOld ? "key open" : ""}"><button aria-expanded="${i === iNow || i === iOld}"><b>${i ? i + " mgg lalu" : "7 hari terakhir"}</b><span class="d">${tgl(addDays(W.lo, 1))} – ${tgl(W.hi)}</span>${i === iNow ? '<span class="tag">sekarang</span>' : i === iOld ? '<span class="tag">8 mgg lalu</span>' : ""}<span class="res num">${fmt(R[i].res)}</span></button><div class="in">${R[i].html}</div></div>`).join("")
     + (diff ? `<div class="ssx-diff num"><b>Perubahan:</b> ${diff}</div>` : "") + `<p class="ssx-how">Coret = tidak dipakai, dengan alasannya. Angka besar di kartu = minggu “sekarang”; panah = selisih dengan minggu “8 mgg lalu” (minggu tertua yang punya data dari 8 minggu terakhir).</p>`;
   $("ssx-body").scrollTop = 0; requestAnimationFrame(() => ssxS.size()); }
+// ---------------- §3b target lomba: Riegel from a whole race / test, heat and fatigue corrections, a range, HR per km
+const RCD = e => /half/i.test(e) ? 21.0975 : /maraton|marathon|42/i.test(e) ? 42.195 : /10\s*k/i.test(e) ? 10 : /5\s*k/i.test(e) ? 5 : null;
+const EFD = {"5K": 5, "10K": 10, "Half": 21.0975, "Full": 42.195};
+let RC = null;
+function rcRaces() { const ev = (DATA.all_events || []).map(e => ({d: e.date, n: e.event.replace(/^LOMBA /i, "").replace(/HALF MARATHON/i, "Half"), km: RCD(e.event)})).filter(e => e.km);
+  if (!ev.some(e => e.d === DATA.race_date)) ev.push({d: DATA.race_date, n: "Maraton", km: 42.195}); return ev.sort((a, b) => a.d < b.d ? -1 : 1); }
+function rcBases(a, before) { const out = [];   // §3b step 1: only a whole race / test: the event's own distance, run as the whole session (no segment of a longer run)
+  const evk = {}; (DATA.all_events || []).forEach(e => { const km = RCD(e.event); if (km) evk[e.date] = km; });
+  Object.entries(a.eff || {}).forEach(([k, L]) => (L || []).forEach(q => { const x = sessOf(a, q[0]);
+    if (!q[2] && EFD[k] && evk[q[0]] === EFD[k] && q[0] < before && x && x.km <= EFD[k] * 1.15) out.push({k, km: EFD[k], d: q[0], sec: q[1]}); }));
+  return out.sort((p, q) => p.d < q.d ? 1 : -1); }
+function rcFatigue(a, race) { const C = a.coach || {}, km = C.fatigue_km ?? 18, n = C.fatigue_days ?? 7;   // §3b step 3
+  for (let i = 1; i < n; i++) { const s = addDays(race, -i), x = sessOf(a, s);
+    if (x && x.km >= km && s <= DATA.today) return `${f1(x.km)} km · ${tgl(s)} (${i} hari sebelum)`;
+    const pl = s > DATA.today && parsePlan(planCell(a, s)); if (pl && pl.k === "long" && pl.km >= km) return `rencana ${f1(pl.km)} km · ${tgl(s)} (${i} hari sebelum)`; }
+  return null; }
+const heatPct = (C, tc) => { const H = C.heat || []; if (tc == null || !H.length) return 0; const [a, b, c] = H;   // §3b step 2: 28–30 +3%, 30–32 +5%, > 32 +8%
+  return c && tc > c[0] ? c[1] : b && tc >= b[0] ? b[1] : a && tc >= a[0] ? a[1] : 0; };
+function rcOpen(date) { const vis = V(); RC = {d: date, c: (vis[0] || A[0]).c, base: null, ts: 28, st: "06:00", tl: ""}; rcRender();
+  const ov = $("rcx"); ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false"); requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); ov.querySelector(".pbx-x").focus(); })); }
+function rcClose() { if (!RC) return; RC = null; const ov = $("rcx"); ov.classList.remove("open"); setTimeout(() => { ov.style.display = "none"; ov.setAttribute("aria-hidden", "true"); }, 400); }
+function rcCalc(a) { const C = a.coach || {}, races = rcRaces(), race = races.find(r => r.d === RC.d) || races[0], bases = rcBases(a, race.d), b = bases.find(q => q.d + q.k === RC.base) || bases[0];
+  if (!b) return {race, bases};
+  const riegel = b.sec * Math.pow(race.km / b.km, 1.06), late = RC.st > "06:00";
+  const auto = RC.ts != null && RC.ts !== "" ? +RC.ts + (C.heat_c_per_30min ?? 1) * riegel / 1800 : null;   // §3b step 4: empty = start + 1 °C per 30 min
+  const tc = late ? (RC.tl !== "" ? +RC.tl : auto) : (RC.ts !== "" ? +RC.ts : null), hp = heatPct(C, tc), fat = rcFatigue(a, race.d), fp = fat ? C.fatigue_pct ?? .02 : 0;
+  const t1 = riegel * (1 + hp), t2 = t1 * (1 + fp), band = C.target_band ?? .015;
+  return {race, bases, b, riegel, late, auto, tc, hp, fat, fp, t1, t2, lo: Math.round(t2 * (1 - band) / 60), hi: Math.round(t2 * (1 + band) / 60)}; }
+const mm = s => { s = Math.round(s); const h = Math.floor(s / 3600), m = Math.floor(s % 3600 / 60), x = s % 60; return h ? `${h}:${String(m).padStart(2, "0")}:${String(x).padStart(2, "0")}` : `${m}:${String(x).padStart(2, "0")}`; };
+const mins = m => m >= 60 ? `${Math.floor(m / 60)}:${String(m % 60).padStart(2, "0")}` : String(m);
+function rcRender() { const a = A.find(x => x.c === RC.c), r = rcCalc(a), C = a.coach || {}, LT = a.lthr, off = C.lthr_off || [15, 6, 2];
+  $("rcx-who").innerHTML = V().map(x => `<button data-c="${x.c}" aria-pressed="${x.c === RC.c}">${x.name}</button>`).join("");
+  const f = `<div class="rcf"><label for="rc-race">Lomba</label><select id="rc-race">${rcRaces().map(q => `<option value="${q.d}"${q.d === r.race.d ? " selected" : ""}>${esc(q.n)} · ${hariF(q.d)} ${D(q.d).getFullYear()}${q.d < DATA.today ? " (sudah lewat)" : ""}</option>`).join("")}</select>
+    <label for="rc-base">Dasar (lomba / tes utuh)</label>${r.bases.length ? `<select id="rc-base">${r.bases.map(q => `<option value="${q.d + q.k}"${r.b && q.d + q.k === r.b.d + r.b.k ? " selected" : ""}>${q.k} ${mm(q.sec)} · ${tgl(q.d)}</option>`).join("")}</select>` : `<span class="auto">belum ada lomba / tes utuh sebelum tanggal ini</span>`}
+    <label for="rc-ts">Suhu saat start (°C)</label><input id="rc-ts" type="number" step="0.5" value="${RC.ts}">
+    <label for="rc-st">Jam start</label><input id="rc-st" type="time" value="${RC.st}">
+    <label for="rc-tl">Suhu km terakhir (°C)</label><input id="rc-tl" type="number" step="0.5" value="${RC.tl}" placeholder="${r.auto != null ? "perkiraan " + f1(r.auto) + " (start + 1 °C / 30 mnt)" : "kosong = perkiraan"}">
+    <label>Long run ≥ ${C.fatigue_km ?? 18} km &lt; ${C.fatigue_days ?? 7} hari</label><span class="auto">${r.fat ? "otomatis: " + r.fat : "otomatis: tidak ada"}</span></div>`;
+  if (!r.b) { $("rcx-body").innerHTML = f + `<p class="rcn">Target hanya dihitung dari waktu lomba atau tes utuh (minimal 5 km tanpa berhenti), dokumen §3b langkah 1.</p>`; return; }
+  const pc = v => (v >= 0 ? "+" : "") + Math.round(v * 100) + "%";
+  const steps = `<ol class="rcs"><li><i>1</i><span>Riegel dari ${r.b.k} ${mm(r.b.sec)} (${tgl(r.b.d)}) · ${mm(r.b.sec)} × (${f1(r.race.km)} / ${r.b.km})<sup>1,06</sup></span><b class="num">${mm(r.riegel)}</b></li>
+    <li><i>2</i><span>Panas · ${r.tc == null ? "suhu belum diisi" : `${r.late ? "suhu km terakhir" : "suhu start"} ${f1(r.tc)} °C`} → ${pc(r.hp)}${r.late ? " (start setelah 06:00, langkah 4)" : ""}</span><b class="num">${mm(r.t1)}</b></li>
+    <li><i>3</i><span>Kelelahan · ${r.fat ? "long run " + r.fat : "tidak ada long run ≥ " + (C.fatigue_km ?? 18) + " km dalam " + (C.fatigue_days ?? 7) + " hari"} → ${pc(r.fp)}</span><b class="num">${mm(r.t2)}</b></li>
+    <li><i>8</i><span>Cek silang · tidak lebih cepat dari Riegel tanpa koreksi (${mm(r.riegel)})</span><b style="color:var(--good)">✓</b></li></ol>`;
+  const rng = `${mins(r.lo)}–${mins(r.hi)} ${r.hi >= 60 ? "jam" : "menit"}`;
+  const hr = LT ? `<table class="rct"><thead><tr><th>Bagian</th><th>Batas HR</th><th>Cara lari</th></tr></thead><tbody>
+    <tr><td>km 1</td><td class="num">≤ ${LT - off[0]}</td><td>pace paling lambat dari rentang, atau lebih lambat</td></tr>
+    <tr><td>km 2</td><td class="num">≤ ${LT - off[1]}</td><td>km 1 terlalu cepat 10 dtk → km 2 lebih lambat 10 dtk</td></tr>
+    <tr><td>km 3–5</td><td class="num">≤ ${LT - off[2]}</td><td>dikunci HR, tanpa target pace</td></tr>
+    <tr><td>setelah km 5</td><td class="num">pace naik hanya bila HR ≤ ${LT - 4}</td><td>HR masih ≥ 4 di bawah LTHR ${LT}</td></tr></tbody></table>` : `<p class="rcn">LTHR belum ada di config.json.</p>`;
+  RC.txt = `Target ${r.race.n} ${hariF(r.race.d)} (${a.name}): ${rng}. Riegel ${mm(r.riegel)} dari ${r.b.k} ${mm(r.b.sec)} (${tgl(r.b.d)}), panas ${pc(r.hp)}, kelelahan ${pc(r.fp)} → ${mm(r.t2)}.` + (LT ? ` HR: km 1 ≤ ${LT - off[0]}, km 2 ≤ ${LT - off[1]}, km 3–5 ≤ ${LT - off[2]}; pace naik setelah km 5 hanya bila HR ≤ ${LT - 4}.` : "");
+  $("rcx-body").innerHTML = f + steps + `<div class="rcr num">${rng} <small>target ditulis sebagai rentang (§3b langkah 7)</small></div>` + hr +
+    `<button class="rcc" type="button" id="rc-copy">Salin untuk Claude chat</button><p class="rcn">Dokumen §3b. Rentang = ±${Math.round((C.target_band ?? .015) * 1000) / 10}% dari hasil koreksi, dibulatkan ke menit [keputusan dashboard].</p>`; }
+document.addEventListener("click", e => { const b = e.target.closest("[data-rc]"); if (b) return rcOpen(b.dataset.rc);
+  if (!RC) return; if (e.target === $("rcx") || e.target.closest("#rcx [data-close]")) return rcClose();
+  const w = e.target.closest("#rcx-who [data-c]"); if (w) { RC.c = w.dataset.c; RC.base = null; return rcRender(); }
+  if (e.target.closest("#rc-copy")) { navigator.clipboard && navigator.clipboard.writeText(RC.txt).then(() => ssToast("Target tersalin"), () => ssToast("Tidak bisa menyalin")); } });
+document.addEventListener("change", e => { if (!RC || !e.target.closest("#rcx")) return; const id = e.target.id, v = e.target.value;
+  if (id === "rc-race") { RC.d = v; RC.base = null; } if (id === "rc-base") RC.base = v; if (id === "rc-ts") RC.ts = v; if (id === "rc-st") RC.st = v; if (id === "rc-tl") RC.tl = v; rcRender(); });
+addEventListener("keydown", e => { if (RC && e.key === "Escape") rcClose(); });
 function ssxOpen(k) { SSX = {k, c: (V()[0] || A[0]).c}; ssxRender(); const ov = $("ssx"); ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false");
   requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); ov.querySelector(".pbx-x").focus(); ssxS.size(); })); }
 function ssxClose() { if (!SSX) return; SSX = null; const ov = $("ssx"); ov.classList.remove("open"); setTimeout(() => { ov.style.display = "none"; ov.setAttribute("aria-hidden", "true"); }, 400); }
