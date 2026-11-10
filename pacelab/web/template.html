@@ -769,12 +769,12 @@ footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;paddin
   <div class="seg" role="group" aria-label="Periode hari" id="f-day">
     <button data-n="7">7 hr</button><button data-n="14" aria-pressed="true">14 hr</button><button data-n="30">30 hr</button><button data-n="60">60 hr</button></div></div>
 <div class="grid">
-  <section class="card c12"><h3>Lampu harian <small>aturan "Tidur dan Pemulihan" di Excel</small></h3><div class="strip" id="strip"></div>
+  <section class="card c12"><h3>Lampu harian <small>aturan lampu, dokumen §7b</small></h3><div class="strip" id="strip"></div>
     <div class="lgd">
-      <div><b><i style="background:var(--good)"></i>Hijau</b>Siap latihan sesuai rencana. Syarat: HRV seimbang, Body Battery ≥ 50, tidur ≥ 6 jam.</div>
-      <div><b><i style="background:#e9b949"></i>Kuning</b>Latihan keras jadi easy. Muncul bila ada syarat Hijau yang tidak terpenuhi.</div>
-      <div><b><i style="background:#e98a5c"></i>Oranye</b>Easy/recovery saja. HRV rendah 2 hari, Body Battery &lt; 40, atau detak istirahat naik +5.</div>
-      <div><b><i style="background:var(--crit)"></i>Merah</b>Istirahat. HRV rendah 3 hari, atau detak istirahat naik +7.</div></div>
+      <div><b><i style="background:var(--good)"></i>Hijau</b>Sesuai rencana. Semua lolos: tidur ≥ 6 jam, Body Battery ≥ 50, HRV seimbang, detak istirahat naik &lt; 5.</div>
+      <div><b><i style="background:#e9b949"></i>Kuning</b>Long run −20%, latihan keras jadi lari santai. Tidur &lt; 6 jam atau Body Battery &lt; 50, HRV semalam di bawah normal, HRV tidak seimbang, atau detak istirahat +5.</div>
+      <div><b><i style="background:#e98a5c"></i>Oranye</b>Long run −40%, latihan keras jadi lari santai. Tidur &lt; 5 jam dan Body Battery &lt; 40, detak istirahat +7, atau HRV tidak seimbang 3 hari.</div>
+      <div><b><i style="background:var(--crit)"></i>Merah</b>Lari santai ≤ 8 km atau istirahat. Status HRV rendah 3 hari berturut-turut.</div></div>
     <div class="lgd-none"><i></i>Tidak ada data · klik lampu di Ringkasan untuk melihat syarat yang belum terpenuhi</div></section>
   <section class="card c4"><h3>Tidur <small>jam</small></h3><div class="insight" id="in-sleep"></div><div class="chart" id="ch-sleep"></div></section>
   <section class="card c4"><h3>HRV <small>ms</small></h3><div class="insight" id="in-hrv"></div><div class="chart" id="ch-hrv"></div></section>
@@ -856,8 +856,12 @@ const ICON = {
   crit: '<path d="M8.5 8.5l7 7M15.5 8.5l-7 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>',
   none: '<path d="M8 12h8" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/>'};
 const chip = (lvl, text) => `<span class="chip ${lvl}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10.5" fill="none" stroke="currentColor" stroke-width="2"/>${ICON[lvl]}</svg>${text}</span>`;
-const LIGHT = {hijau: ["good", "Hijau", "siap latihan sesuai rencana"], kuning: ["warn", "Kuning", "latihan keras jadi easy"],
-               oranye: ["serious", "Oranye", "easy/recovery saja"], merah: ["crit", "Merah", "istirahat"]};
+const LIGHT = {hijau: ["good", "Hijau", "siap latihan sesuai rencana"], kuning: ["warn", "Kuning", "long run dipotong 20%, latihan keras jadi lari santai"],
+               oranye: ["serious", "Oranye", "long run dipotong 40%, latihan keras jadi lari santai"], merah: ["crit", "Merah", "lari santai ≤ 8 km atau istirahat"]};   // docs §7b
+// docs §7: the long-run gate is judged on that day's morning; on other days the card only names the day
+const lrAct = a => { const T = a.today || {}, d = T.lr_day == null ? null : HARIF[(T.lr_day + 1) % 7];
+  if (d == null) return ["Long run minggu ini", "–"];
+  return [`Long run ${d}`, T.lr_today ? T.saturday || "belum ada data pagi ini" : `dinilai ${d} pagi`]; };
 const line = (a, html) => `<div><i class="dot ${a.c}" aria-hidden="true"></i><span class="sr">${a.name}:</span>${html}</div>`;
 // one plain-language suggestion under every yellow / red status (green gets none)
 const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -970,7 +974,7 @@ function renderSummary() {
       <div class="vitals num"><div>HRV<b>${num(l && l.hrv, "int")} <span class="muted" style="font-size:13px;font-weight:400">${st}</span></b></div>
         <div>Body Battery<b>${num(l && l.bb, "int")}</b></div><div>Tidur<b>${hm(l && l.sleep_s)}</b></div>
         <div>RHR<b>${num(l && l.rhr, "int")}${l && l.notes.length ? ` <span class="muted" style="font-size:13px;font-weight:400">${l.notes.join(" ").replace("RHR ","")}</span>` : ""}</b></div></div>
-      <div class="action"><span>Long run Sabtu:</span><b>${a.today.saturday || "–"}</b>${w.lr_t ? `<span class="muted">dari ${w.lr_t} km</span>` : ""}</div>
+      <div class="action"><span>${lrAct(a)[0]}:</span><b>${lrAct(a)[1]}</b>${w.lr_t ? `<span class="muted">dari ${w.lr_t} km</span>` : ""}</div>
     </section>`;
   }).join("");
   const d = A.map(a => a.today.date).filter(Boolean).sort().pop();
@@ -1002,7 +1006,7 @@ function renderDuel(cur) {
     ${row("Tidur", v(hm(side[0].l && side[0].l.sleep_s)), v(hm(side[1].l && side[1].l.sleep_s)))}
     ${row("RHR", v(`${num(side[0].l && side[0].l.rhr, "int")}${side[0].l && side[0].l.notes.length ? ` <small>${side[0].l.notes.join(" ").replace("RHR ","")}</small>` : ""}`),
                  v(`${num(side[1].l && side[1].l.rhr, "int")}${side[1].l && side[1].l.notes.length ? ` <small>${side[1].l.notes.join(" ").replace("RHR ","")}</small>` : ""}`))}
-    <div class="dfoot">${side.map((s, i) => `<div class="action${i ? " r" : ""}"><i class="dot ${s.x.c}" aria-hidden="true"></i><span>Long run Sabtu:</span><b>${s.x.today.saturday || "–"}</b>${s.w.lr_t ? `<span class="muted">${s.w.lr_t} km</span>` : ""}</div>`).join("")}</div>
+    <div class="dfoot">${side.map((s, i) => `<div class="action${i ? " r" : ""}"><i class="dot ${s.x.c}" aria-hidden="true"></i><span>${lrAct(s.x)[0]}:</span><b>${lrAct(s.x)[1]}</b>${s.w.lr_t ? `<span class="muted">${s.w.lr_t} km</span>` : ""}</div>`).join("")}</div>
   </section>`;
   const d = A.map(x => x.today.date).filter(Boolean).sort().pop();
   $("sum-p").textContent = d ? `Kondisi per ${hari(d)} pagi.` : "";
@@ -1588,10 +1592,10 @@ CK.bad = CK.warn;
 const ckSvg = s => `<svg viewBox="0 0 24 24" aria-hidden="true">${CK[s || "none"]}</svg>`;
 const HRVT = {BALANCED: "Seimbang", UNBALANCED: "Tidak seimbang", LOW: "Rendah", POOR: "Buruk"};
 function ckRow(c) { const no = "tidak ada data";
-  if (c.k === "hrv") return {n: "HRV", v: c.v ? HRVT[c.v] || c.v : no, need: c.low >= 2 ? `rendah ${c.low} hari berturut-turut` : "harus seimbang", sh: c.low >= 2 ? `rendah ${c.low} hari` : "harus seimbang"};
-  if (c.k === "bb") return {n: "Body Battery", v: c.v == null ? no : Math.round(c.v), need: c.s === "bad" ? "di bawah 40" : "harus ≥ 50", sh: c.s === "bad" ? "< 40" : "≥ 50"};
+  if (c.k === "hrv") return {n: "HRV", v: c.v ? HRVT[c.v] || c.v : no, need: c.low >= 1 ? `rendah ${c.low} hari berturut-turut (3 hari = Merah)` : "harus seimbang, semalam tidak di bawah normal", sh: c.low >= 1 ? `rendah ${c.low} hari` : "harus seimbang"};
+  if (c.k === "bb") return {n: "Body Battery", v: c.v == null ? no : Math.round(c.v), need: c.s === "bad" ? "di bawah 40 dan tidur < 5 jam" : "harus ≥ 50", sh: c.s === "bad" ? "< 40" : "≥ 50"};
   if (c.k === "sleep") return {n: "Tidur", v: c.v ? hm(c.v).replace(":", " j ") + " m" : no, need: "minimal 6 jam", sh: "≥ 6 jam"};
-  return {n: "Detak istirahat", v: c.v == null ? no : `${c.v > 0 ? "+" : c.v < 0 ? "−" : "±"}${Math.abs(Math.round(c.v))} bpm`, need: "vs median 28 hari, aman bila < +5", sh: "aman < +5"};
+  return {n: "Detak istirahat", v: c.v == null ? no : `${c.v > 0 ? "+" : c.v < 0 ? "−" : "±"}${Math.abs(Math.round(c.v))} bpm`, need: "vs rata-rata 7 hari, aman bila < +5", sh: "aman < +5"};
 }
 function whyLine(l) { if (!l || !l.checks) return "";
   if (l.level === "hijau") return `<span class="why good">${ckSvg("ok")}Semua syarat Hijau terpenuhi</span>`;
@@ -1602,10 +1606,10 @@ function whyLine(l) { if (!l || !l.checks) return "";
 }
 const lchip = (a, L) => chip(L[0], L[1]).replace('<span class="chip', `<button type="button" data-lc="${a.c}" aria-expanded="false" aria-haspopup="dialog" aria-label="${a.name}: lampu ${L[1]}, lihat rincian" class="chip`).replace(/<\/span>$/, CV + "</button>");
 const LTIP = {
-  hrv: {warn: "Latihan keras hari ini jadi lari santai.", bad: "HRV rendah berhari-hari: lari santai saja."},
+  hrv: {warn: "Latihan keras hari ini jadi lari santai; long run dipotong 20%.", bad: "HRV rendah atau tidak seimbang 3 hari: lihat warna lampu."},
   bb: {warn: "Di bawah 50: long run dipotong 20%, pace recovery.", bad: "Di bawah 40 dan tidur kurang dari 5 jam: long run dipotong 40%."},
   sleep: {warn: "Di bawah 6 jam: long run dipotong 20%. Malam ini kejar target tidur."},
-  rhr: {bad: "Naik 5 atau lebih: latihan keras jadi lari santai."}};
+  rhr: {warn: "Naik 5 atau lebih: latihan keras jadi lari santai, long run −20%.", bad: "Naik 7 atau lebih: long run dipotong 40%."}};
 const lpop = $("lpop"); let lpFor = null;
 function lpClose() { lpop.classList.remove("on"); lpFor = null; document.querySelectorAll("[data-lc]").forEach(x => x.setAttribute("aria-expanded", "false")); }
 document.addEventListener("click", e => {
@@ -1869,6 +1873,7 @@ function swapAuto(a) { if (SWAPC[a.c]) return SWAPC[a.c]; const out = {}, tol = 
     miss.forEach(([m, pl]) => { let best = null;
       days.forEach((r, i) => { const x = ran(r) && sessOf(a, r); if (!x || used.has(r)) return; const own = P[i];
         if (own && RUNK(own.k) && !own.km) return;                     // own plan is a run without a distance: leave it
+        if (isRaceDay(r) || own && own.k === "race") return;            // a race or test day keeps its own plan (§5b: "tidak selesai")
         const e = err(x, pl), eo = own && RUNK(own.k) ? err(x, own) : Infinity;
         if (e <= tol && e < eo && (!best || e < best[1])) best = [r, e]; });
       if (best) { out[best[0]] = m; used.add(best[0]); } }); });
@@ -1889,12 +1894,17 @@ function parsePlan(cell, ev) { if (!cell) return null;
   const h = txt.match(/detak jantung\s*(di bawah\s*)?(\d+)\s*(?:[-–]\s*(\d+))?/i);
   const warm = txt.match(/pemanasan[^\d\n]*(\d+(?:[.,]\d+)?)\s*km/i), tk = t.match(/(?:tempo|interval)[^\d]*(\d+(?:[.,]\d+)?)\s*km/i);
   return {k: ev ? "race" : k, title: calm(t), km: tot ? num(tot[1]) : first ? num(first[1]) : null, open, main,
-    hr: h ? (h[1] ? [0, +h[2]] : [+h[2], +(h[3] || h[2])]) : null, warm: warm ? num(warm[1]) : 0, tempo: tk ? num(tk[1]) : null, iv: /interval/i.test(t)}; }
+    hr: h ? (h[1] ? [0, +h[2]] : [+h[2], +(h[3] || h[2])]) : null, warm: warm ? num(warm[1]) : 0, tempo: tk ? num(tk[1]) : null, iv: /interval/i.test(t),
+    strides: (st => st ? +(st[1] || st[2]) : /strides?/i.test(txt) ? 0 : null)(txt.match(/(\d+)\s*[x×]?\s*strides?|strides?\s*(\d+)\s*[x×]?/i))}; }
 const RUNK = k => k && !["rest", "str"].includes(k);
 const zoneOf = (a, h) => (a.zones || []).filter(b => h >= b).length;      // 0..4 = Z1..Z5
 const spPace = sp => sp[1] / sp[0];
 function sessOf(a, s) { const xs = (a.sessions || []).filter(x => x.date === s); return xs.length ? xs.reduce((p, q) => q.km > p.km ? q : p) : null; }
 // cadence as Garmin reports it for the run (averageRunningCadenceInStepsPerMinute); per-second data only when Garmin sent none
+const ssWho = x => A.find(a => (a.sessions || []).includes(x));
+const isRaceDay = s => (DATA.all_events || []).some(e => e.date === s);
+function decNA(x, a) { a = a || ssWho(x); if (!a) return false; const pl = parsePlan(planCell(a, x.date));
+  return isRaceDay(x.date) || !!pl && (pl.k === "hard" || pl.k === "race" || pl.strides != null); }   // docs §6: tempo, interval, lomba, strides
 const ssCadRun = x => x.cad_run ?? ssCad(x);   // C3: running seconds only (speed > walk_mps); Garmin's number when there is no per-second data
 const ssCad = x => { if (x.g && x.g.cad != null) return x.g.cad; const v = x.splits.filter(p => p[3]); return v.length ? v.reduce((q, p) => q + p[3] * p[1], 0) / v.reduce((q, p) => q + p[1], 0) : null; };
 const ssEf = x => x.hr ? (x.km * 1000 / (x.sec / 60)) / x.hr : null;
@@ -1909,17 +1919,18 @@ const inRng = (v, r, tol) => r && v != null && v >= r[0] - tol && v <= r[1] + to
 // Coach checks. Every number comes from the athlete profile in config.json ("coach", "pace", "zones");
 // the plan cell of that day wins over the profile. Rules: README "Penilaian pelatih" [keputusan omPik].
 const PK = {easy: "easy", long: "easy", rec: "rec"};
-function planFill(a, pl) { if (!pl || !["easy", "long", "rec", "hard"].includes(pl.k)) return pl; const P = a.pace || {}, z = a.zones || [], q = Object.assign({}, pl);
+function planFill(a, pl) { if (!pl || !["easy", "long", "rec", "hard"].includes(pl.k) || pl.filled) return pl; const P = a.pace || {}, z = a.zones || [], q = Object.assign({}, pl, {filled: true}), sk = (a.coach || {}).stride_km;
+  if (q.km && q.strides && sk) { q.km0 = q.km; q.km = Math.round((q.km + q.strides * sk) * 100) / 100; }   // docs §5: +0,15 km per stride
   if (!q.main) q.main = pl.k === "hard" ? P[pl.iv ? "interval" : "tempo"] || null : P[PK[pl.k]] || null;
   if (!q.hr && z.length > 1) q.hr = pl.k === "rec" ? [0, z[0]] : pl.k === "hard" ? null : [z[0], z[1]];
   return q; }
 // morning gate (dokumen §7, same table as the Saturday rule): planned long run cut by sleep / Body Battery
-function gateOf(a, s, pl) { const w = wellOf(a, s); if (!pl || pl.k !== "long" || !w || !w.sleep_h || w.bb == null) return null;
-  const low = ["LOW", "POOR"].includes(w.hrv_status);
-  if (w.sleep_h < 5 && w.bb < 30 && low) return {km: 8, t: "diganti easy 8 km"};
-  if (w.sleep_h < 5 && w.bb < 40) return {f: .6, t: "dipotong 40%"};
-  if (w.sleep_h >= 6 && w.bb >= 50) return null;
-  return {f: .8, t: "dipotong 20%"}; }
+function gateOf(a, s, pl) { if (!pl || pl.k !== "long") return null; const w = wellOf(a, s); if (!w) return null;
+  const c7 = w.sleep_h && w.bb != null ? (w.sleep_h < 5 && w.bb < 40 ? 2 : w.sleep_h >= 6 && w.bb >= 50 ? 0 : 1) : 0;
+  const g = Math.max(c7, {kuning: 1, oranye: 2, merah: 3}[w.level] || 0), C = a.coach || {};
+  if (!g) return null;
+  return g === 3 ? {km: C.red_easy_km || 8, t: "lampu merah: lari santai ≤ " + (C.red_easy_km || 8) + " km", red: true} : g === 2 ? {f: .6, t: "dipotong 40%"} : {f: .8, t: "dipotong 20%"}; }
+const hardGate = (a, s) => { const w = wellOf(a, s); return w && ["kuning", "oranye", "merah"].includes(w.level) ? w.level : null; };   // §7b: hard session becomes easy
 const kmPace = L => L.length ? L.reduce((q, p) => q + p[1], 0) / L.reduce((q, p) => q + p[0], 0) : null;
 const kmc = (L, bad) => `<span class="ss-kms">${L.map((v, i) => `<span class="km${bad(i) === 1 ? " f" : bad(i) === 2 ? " x" : ""}">${v}</span>`).join("")}</span>`;
 // distance window: plan × [lo, hi]; a morning-gate cut lowers the floor and still counts as done to plan
@@ -1936,6 +1947,7 @@ function lrHr(a, x, pl) { const C = a.coach || {}, hs = x.splits.filter(p => p[2
   if (C.lr_hr_in == null) return null; const inn = 1 - over.length / hs.length;
   return {ok: inn >= C.lr_hr_in, v: `${Math.round(inn * 100)}% km tidak lewat ${top}<small>${rng} lewat · cadangan (decoupling tidak ada)</small>`}; }
 function ssComp(a, x, pl0, s) { const pl = planFill(a, pl0); if (!x || !pl) return null; const C = a.coach || {}, parts = [], tol = C.tol_s || 0;
+  if (pl.k === "race" || isRaceDay(s || x.date)) { const r = (ssChecks(a, x, pl0, false, s) || []).filter(c => c[1] !== "na"); return r.length ? Math.round(r.filter(c => c[1] === "ok").length / r.length * 100) : null; }
   const kw = kmWin(a, x, pl, s || x.date); if (kw) parts.push(kw.ok ? 1 : x.km < kw.lo ? x.km / kw.lo : kw.hi / x.km);
   const seg = segOf(x, pl).filter(p => p[0] >= .5);
   if (pl.main && seg.length && !pl.iv) parts.push(seg.filter(p => pl.k === "hard" ? inRng(spPace(p), pl.main, tol) : spPace(p) >= pl.main[0]).length / seg.length);
@@ -1944,8 +1956,32 @@ function ssComp(a, x, pl0, s) { const pl = planFill(a, pl0); if (!x || !pl) retu
   return parts.length ? Math.round(mean(parts) * 100) : null; }
 // what a coach looks at, per kind of session  [label, ok|wn|na, value]
 function ssChecks(a, x, pl0, wkEvent, s) { if (!x) return null; const pl = planFill(a, pl0), k = pl ? pl.k : "easy", C = a.coach || {}, P = a.pace || {}, out = [], tol = C.tol_s || 0;
-  const kw = pl && kmWin(a, x, pl, s || x.date);
-  if (kw) out.push(["Jarak", kw.ok ? "ok" : "wn", `${f1(x.km)} / ${pl.km} km<small>${Math.round(kw.pct * 100)}%${kw.g ? ` · ${kw.g.t} (${f1(kw.g.km || pl.km * kw.g.f)} km)${kw.ok ? " · patuh" : ""}` : x.km > kw.hi ? ` · lebih dari ${Math.round(C.km[1] * 100)}%` : ""}</small>`]);
+  const day = s || x.date, race = k === "race" || isRaceDay(day), kw = pl && !race && kmWin(a, x, pl, day);
+  if (kw) out.push(["Jarak", kw.ok ? "ok" : "wn", `${f1(x.km)} / ${f1(pl.km)} km<small>${Math.round(kw.pct * 100)}%${pl.km0 ? ` · ${f1(pl.km0)} km + ${pl.strides} strides` : ""}${x.km > kw.hi ? ` · lebih dari ${Math.round(C.km[1] * 100)}%` : ""}</small>`]);
+  // §7b / §5b: going past the morning gate is its own row, next to the distance
+  if (kw && kw.g) { const lim = kw.g.km || pl.km * kw.g.f, over = x.km > lim * C.km[1];
+    out.push(["Gerbang pagi", over ? "wn" : "ok", over ? (kw.g.red ? `${f1(x.km)} km saat lampu merah<small>batas: lari santai ≤ ${lim} km · gerbang dilewati</small>` : `+${f1(x.km - lim)} km<small>batas gerbang ${f1(lim)} km (${kw.g.t}) · gerbang dilewati</small>`)
+      : `${f1(x.km)} / ${f1(lim)} km<small>${kw.g.t} · patuh</small>`]); }
+  if (k === "hard" && !race) { const hg = hardGate(a, day); if (hg) out.push(["Gerbang pagi", "wn", `latihan keras saat lampu ${LIGHT[hg][1].toLowerCase()}<small>seharusnya lari santai · gerbang dilewati</small>`]); }
+  // §5b helpers: walking inside a segment, the first km against the slow end of the plan
+  const walkRow = (L, unit) => { if (C.walk_flag_s == null || !L.some(p => p[5] != null)) return; const tot = L.reduce((q, p) => q + (p[5] || 0), 0), at = L.map((p, i) => p[5] ? i + 1 : 0).filter(Boolean);
+    out.push(["Jalan kaki", tot >= C.walk_flag_s ? "wn" : "ok", tot >= C.walk_flag_s ? `${hms(tot)}<small>${unit} ${kmc(at, () => 1)}</small>` : "tidak ada"]); };
+  const startRow = (p, slow) => { if (!p || !slow || C.start_fast_s == null) return; const v = spPace(p), d = slow - v;
+    out.push(["Start km 1", d > C.start_fast_s ? "wn" : "ok", d > C.start_fast_s ? `${paceS(v)}<small>${Math.round(d)} dtk lebih cepat dari ${paceS(slow)} · start terlalu cepat</small>` : `${paceS(v)}<small>batas lambat ${paceS(slow)}</small>`]); };
+  const naDec = why => out.push([ssTerm("dec"), "na", `tidak berlaku<small>${why}</small>`]);
+  if (race) { const dist = pl && pl.km, full = x.splits.filter(p => p[0] >= .5), fin = !dist || C.dnf_frac == null || x.km >= dist * C.dnf_frac;
+    if (dist) out.push(["Jarak", fin ? "ok" : "wn", `${f1(x.km)} / ${f1(dist)} km<small>${Math.round(x.km / dist * 100)}%${fin ? "" : " · tidak selesai"}</small>`]);
+    startRow(x.splits[0], pl && pl.main && pl.main[1]);
+    const LT = a.lthr, off = C.lthr_off;
+    if (LT && off && full.length) { const lim = [LT - off[0], LT - off[1], LT - off[2], LT - off[2], LT - off[2]], f5 = full.slice(0, 5), bad = i => f5[i][2] && f5[i][2] > lim[i];
+      out.push(["HR paruh pertama", f5.some((p, i) => bad(i)) ? "wn" : "ok", `${kmc(f5.map(p => p[2] || "–"), i => bad(i) ? 1 : 0)}<small>batas ${lim.slice(0, Math.min(3, f5.length)).join(" · ")} (LTHR ${LT})</small>`]); }
+    if (!fin) out.push(["Pace ambruk", "na", "tidak dinilai<small>tidak selesai</small>"]);
+    else if (full.length >= 4 && C.fade_pct != null) { const h = full.length >> 1, A1 = full.slice(0, h), A2 = full.slice(h), sec = L => L.reduce((q, p) => q + p[1], 0), km = L => L.reduce((q, p) => q + p[0], 0);
+      const r = (sec(A2) / km(A2)) / (sec(A1) / km(A1)) - 1, dt = sec(A2) - sec(A1);
+      const same = Math.abs(km(A1) - km(A2)) < .05, pct = `${r >= 0 ? "+" : "−"}${Math.round(Math.abs(r) * 100)}%`;   // equal halves: times (Uji 1a), else pace per half
+      out.push(["Pace ambruk", r > C.fade_pct ? "wn" : "ok", same ? `${hms(sec(A1))} → ${hms(sec(A2))}<small>paruh 2 ${dt >= 0 ? "lebih lambat +" : "lebih cepat −"}${hms(Math.abs(dt))} (${pct}, batas ${Math.round(C.fade_pct * 100)}%)</small>`
+        : `${paceS(sec(A1) / km(A1))} → ${paceS(sec(A2) / km(A2))}/km<small>paruh 2 ${r >= 0 ? "lebih lambat" : "lebih cepat"} ${pct} (batas ${Math.round(C.fade_pct * 100)}%)</small>`]); }
+    walkRow(x.splits, "km"); naDec("lomba"); stopRow(x, out); return out; }
   const easyLike = k === "easy" || k === "rec" || k === "long";
   if (k === "long" && pl.open && C.open_tol_s != null) { const op = kmPace(x.splits.slice(0, 3)); out.push(["Buka 3 km pelan", op >= pl.open[0] - C.open_tol_s ? "ok" : "wn", `${paceS(op)}/km`]); }
   if (easyLike && pl) {
@@ -1958,16 +1994,29 @@ function ssChecks(a, x, pl0, wkEvent, s) { if (!x) return null; const pl = planF
     if (x.dec != null && C.dec_max != null) out.push([ssTerm("dec"), x.km < 20 || wkEvent ? "na" : x.dec < C.dec_max ? "ok" : "wn", `${f1(x.dec)}%${x.km < 20 || wkEvent ? " · tidak dinilai" : ""}`]);
     const c = x.splits.map(p => p[3]).filter(Boolean); if (c.length >= 6 && C.cad_drop != null) { const h = c.length >> 1, dr = mean(c.slice(0, h)) - mean(c.slice(h)); out.push(["Cadence bertahan", dr < C.cad_drop ? "ok" : "wn", `${dr >= 0 ? "−" : "+"}${Math.abs(Math.round(dr))} spm`]); }
     if (C.lr_max_min) out.push([`Di bawah ${C.lr_max_min} mnt`, x.sec <= C.lr_max_min * 60 ? "ok" : "wn", hms(x.sec)]); }
-  else if (k === "hard") { const seg = segOf(x, pl).filter(p => p[0] >= .5), hs = seg.slice(1).filter(p => p[2]);
+  else if (k === "hard") { const seg = segOf(x, pl).filter(p => p[0] >= .5), hs = seg.slice(1).filter(p => p[2]), U1 = seg.some(p => typeof p[4] === "string") ? "lap" : "km";
+    if (!pl.iv && pl.main && seg.length) startRow(seg[0], pl.main[1]);
+    if (!pl.iv && seg.length >= 2 && C.slow_end_s != null) { const v = seg.map(spPace), fast = Math.min(...v), d = v[v.length - 1] - fast;
+      out.push(["Melambat di akhir", d > C.slow_end_s ? "wn" : "ok", d > C.slow_end_s ? `+${Math.round(d)} dtk<small>${U1} terakhir ${paceS(v[v.length - 1])} vs tercepat ${paceS(fast)} (batas ${C.slow_end_s} dtk)</small>` : `tidak<small>${U1} terakhir ${paceS(v[v.length - 1])}</small>`]); }
+    walkRow(seg, U1);
     const hrOk = pl.hr && hs.length ? Math.max(...hs.map(p => p[2])) <= pl.hr[1] : null;
     if (pl.iv) out.push(["Pace interval", "na", "tidak dinilai<small>data per km tidak memisahkan repetisi</small>"]);
     else if (pl.main && seg.length) { const U = seg.some(p => typeof p[4] === "string") ? " lap" : " km", v = seg.map(spPace), fast = v.filter(q => q < pl.main[0] - tol).length, slow = v.filter(q => q > pl.main[1] + tol).length, lead = P.hr_leads && hrOk;
       out.push(["Pace tempo", fast + slow === 0 ? "ok" : lead ? "na" : "wn", `${kmc(v.map(paceS), i => v[i] < pl.main[0] - tol || v[i] > pl.main[1] + tol ? 1 : 0)}<small>${fast ? fast + U + " sedikit terlalu cepat" : ""}${fast && slow ? " · " : ""}${slow ? slow + U + " terlalu lambat" : ""}${!fast && !slow ? "semua di rentang" : ""} · ${seg.some(p => typeof p[4] === "string") ? "per lap" : "per km"} ${paceS(pl.main[0] - tol)}–${paceS(pl.main[1] + tol)}${lead && fast + slow ? " · HR jadi patokan" : ""}</small>`]); }
     if (hrOk != null) out.push(["HR tempo tidak lewat batas", hrOk ? "ok" : "wn", `${kmc(seg.map(p => p[2] || "–"), i => i === 0 ? 2 : seg[i][2] > pl.hr[1] ? 1 : 0)}<small>maks ${pl.hr[1]} · ${seg.some(p => typeof p[4] === "string") ? "lap" : "km"} 1 tempo tidak dihitung</small>`]);
     if (pl.warm && P.easy && (a.zones || []).length > 1) { const w = lapsIn(x, 0, pl.warm) || x.splits.slice(0, Math.round(pl.warm)), wp = kmPace(w), wh = mean(w.map(p => p[2]).filter(Boolean)), z2 = a.zones[1];
-      out.push(["Pemanasan santai", wp && wp >= P.easy[0] && (wh == null || wh <= z2) ? "ok" : "wn", wp ? `${paceS(wp)}/km · ${wh ? Math.round(wh) + " bpm" : "–"}<small>≥ ${paceS(P.easy[0])} dan HR ≤ ${z2}</small>` : "–"]); } }
+      out.push(["Pemanasan santai", wp && wp >= P.easy[0] && (wh == null || wh <= z2) ? "ok" : "wn", wp ? `${paceS(wp)}/km · ${wh ? Math.round(wh) + " bpm" : "–"}<small>≥ ${paceS(P.easy[0])} dan HR ≤ ${z2}</small>` : "–"]); }
+    naDec(pl.iv ? "interval" : "tempo"); }
+  else if (pl && pl.strides != null) naDec("lari dengan strides");
+  stopRow(x, out);
   return out; }
-const SSTIP = {"Jarak": "Ikuti km rencana; lebih dari 110% tidak dikejar di hari lain, kurang tidak dikejar sekaligus.", "Buka 3 km pelan": "3 km pertama di pace recovery, pindah ke easy di km 4–6.",
+// §5b: stops with the watch paused are shown, not rated (total time − moving time from Garmin)
+function stopRow(x, out) { const g = x.g || {}; if (g.elapsed_s == null || g.moving_s == null) return; const d = g.elapsed_s - g.moving_s;
+  if (d >= 5) out.push(["Berhenti", "na", `${hms(d)}<small>${hms(g.elapsed_s)} total − ${hms(g.moving_s)} bergerak · tidak dinilai</small>`]); }
+const SSTIP = {"Jarak": "Ikuti km rencana; lebih dari 110% tidak dikejar di hari lain, kurang tidak dikejar sekaligus.",
+  "Gerbang pagi": "Ikuti gerbang pagi: potong long run atau ganti lari santai sesuai lampu.", "Start km 1": "km 1 di pace paling lambat dari rentang, atau lebih lambat lagi.",
+  "HR paruh pertama": "Paruh pertama dikunci HR: km 1 ≤ LTHR − 15, km 2 ≤ LTHR − 6, km 3–5 ≤ LTHR − 2.", "Pace ambruk": "Pace boleh naik setelah km 5 hanya kalau HR masih ≥ 4 di bawah LTHR.",
+  "Melambat di akhir": "Mulai tempo di pace paling lambat dari rentang, simpan tenaga untuk km terakhir.", "Jalan kaki": "Perlambat sebelum harus jalan; minum sesuai tes keringat.", "Buka 3 km pelan": "3 km pertama di pace recovery, pindah ke easy di km 4–6.",
   "HR tidak lewat batas": "Perlambat sampai detak jantung kembali di bawah batas atas. HR mengalahkan pace.", "Decoupling": "Buka pelan, minum sesuai tes keringat.",
   "Cadence bertahan": "Jaga langkah pendek dan cepat di paruh kedua.", "Km lebih cepat dari rentang": "Lari santai benar-benar santai; lebih lambat tidak apa-apa.",
   "Pace tempo": "Km pertama tempo di pace paling lambat dari rentang.", "HR tempo tidak lewat batas": "Turunkan pace tempo sedikit.",
@@ -2032,7 +2081,9 @@ function ssBf(s, host) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x =>
   if (SSV === "lap" && [T, R].some(x => x && x.laps && x.laps.length)) return ssLap(s, host, T, R, ta, ra);
   const W = Math.max(300, host.clientWidth || 900), small = W < 600, n = Math.max(T ? T.splits.length : 0, R ? R.splits.length : 0);
   if (!n) return `<p class="muted" style="text-align:center">Data per km belum ada untuk sesi ini.</p>`;
-  const RH = 17, top = 26, H = top + n * RH + 6, mid = small ? 40 : 116, sw = (W - mid) / 2;
+  // same distance scale as the lap view, so switching Lap jam / Per km only swaps the bars (the chart keeps its height)
+  const bt = x => (x.laps && x.laps.length ? x.laps : x.splits).reduce((q, l) => q + l[0], 0), tot = Math.max(...[T, R].filter(Boolean).map(bt), .5);
+  const K = Math.max(18, Math.min(46, 620 / tot)), RH = K, top = 26, H = top + tot * K + 8, mid = small ? 40 : 116, sw = (W - mid) / 2;
   const has = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), on = Object.keys(SSL).filter(k => SSLON[k] && has(k));
   const laneW = on.length ? sw * .3 : 0, gap = 16, inner = sw - (on.length ? laneW + gap : 0) - 4;
   const PL = {t: T && parsePlan(planCell(ta, s)), r: R && parsePlan(planCell(ra, s))};
@@ -2041,8 +2092,8 @@ function ssBf(s, host) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x =>
   let g = "";
   for (const [a, x, L] of [[ta, T, true], [ra, R, false]]) { if (!x) continue; const c = a.c, x0 = L ? sw : sw + mid, dir = L ? -1 : 1, xb = d => x0 + dir * d;
     const pl = PL[c], bnd = pl && pl.main;
-    if (bnd) { const bA = len(bnd[1]), bB = len(bnd[0]); g += `<rect x="${Math.min(xb(bA), xb(bB))}" y="${top - 4}" width="${Math.abs(bB - bA)}" height="${n * RH + 4}" rx="4" fill="var(--${c})" opacity=".1"/>`; }
-    x.splits.forEach((p, j) => { const w = len(spPace(p)); g += `<rect class="b" style="transform-origin:${L ? "right" : "left"};animation-delay:${j * 22}ms" x="${L ? x0 - w : x0}" y="${top + j * RH + 2}" width="${w}" height="${RH - 5}" rx="3" fill="var(--${c})"/>` + ssWalk(p[5], p[1], L, x0, w, top + j * RH + 2, RH - 5, j * 22); });
+    if (bnd) { const bA = len(bnd[1]), bB = len(bnd[0]); g += `<rect x="${Math.min(xb(bA), xb(bB))}" y="${top - 4}" width="${Math.abs(bB - bA)}" height="${tot * K + 4}" rx="4" fill="var(--${c})" opacity=".1"/>`; }
+    x.splits.forEach((p, j) => { const w = len(spPace(p)); g += `<rect class="b" style="transform-origin:${L ? "right" : "left"};animation-delay:${j * 22}ms" x="${L ? x0 - w : x0}" y="${top + j * RH + 1}" width="${w}" height="${Math.max(2, p[0] * K - 3)}" rx="3" fill="var(--${c})"/>` + ssWalk(p[5], p[1], L, x0, w, top + j * RH + 1, Math.max(2, p[0] * K - 3), j * 22); });
     const l0 = inner + 4 + gap, lx = d => x0 + dir * (l0 + d), cy = j => top + j * RH + RH / 2;
     // legend above the lane only when each item has room; the toggles below already show the line styles
     if (on.length && laneW / on.length >= 44) { g += `<line x1="${lx(0)}" x2="${lx(laneW)}" y1="${top - 7}" y2="${top - 7}" stroke="var(--line)"/>`;
@@ -2106,7 +2157,8 @@ function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) 
         if (x.walk_s != null) L.push("", `Cadence lari (tanpa jalan kaki, kecepatan > ${WMPS} m/s): ${x.cad_run != null ? Math.round(x.cad_run) + " spm" : "–"} · jalan kaki total ${hms(x.walk_s)} dari ${hms(x.sec)} (${mdNum(f1(x.walk_s / x.sec * 100))}%)`);
         if (z.length) { const zz = [0, 0, 0, 0, 0]; let tt = 0; x.splits.forEach(p => { if (p[2]) { zz[zoneOf(a, p[2])] += p[1]; tt += p[1]; } });
           if (tt) L.push("", "Waktu di zona HR (dashboard, per km): " + zz.map((v, i) => v ? `Z${i + 1} ${Math.round(v / tt * 100)}%` : "").filter(Boolean).join(" · ")); } }
-      if (x.dec != null) L.push(`Decoupling (dashboard, dokumen §6): ${mdNum(f1(x.dec))}% tanpa 3 km pertama${x.dec_full != null ? " · " + mdNum(f1(x.dec_full)) + "% data penuh" : ""}`);
+      if (x.dec != null && decNA(x, a)) L.push("Decoupling: tidak berlaku (dokumen §6: hanya untuk lari dengan pace rata)");
+      else if (x.dec != null) L.push(`Decoupling (dashboard, dokumen §6): ${mdNum(f1(x.dec))}% tanpa 3 km pertama${x.dec_full != null ? " · " + mdNum(f1(x.dec_full)) + "% data penuh" : ""}`);
       const ck = ssChecks(a, x, pl0, ev || W.event, s) || [];
       if (ck.length) { L.push("", "**Penilaian pelatih (dashboard NewPaceLab)**");
         ck.forEach(([lab, st, v]) => L.push(`- ${mdTxt(lab)}: ${mdTxt(v)} ${st === "ok" ? "✓" : st === "wn" ? "! perlu perhatian" : "(tidak dinilai)"}`));
@@ -2161,11 +2213,12 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   if ([T, R].some(x => x && x.cad_run != null)) M.push([`<span>${ssTerm("cadg")}<small class="sub">termasuk jalan</small></span>`, x => x.g && x.g.cad != null ? x.g.cad : null, v => `${Math.round(v)}<small>spm</small>`, 1]);
   if ([T, R].some(x => x && x.walk_s != null)) M.push([ssTerm("walk"), x => x.walk_s, v => v ? hms(v) : "0:00", 0]);
   M.push([ssTerm("ef"), ssEf, v => `${v.toFixed(2)}<small>m</small>`, 1]);
-  if ((T && T.dec != null) || (R && R.dec != null)) M.push([ssTerm("dec"), x => x.dec, v => `${f1(v)}<small>%</small>`, -1]);
+  if ((T && T.dec != null) || (R && R.dec != null)) M.push([ssTerm("dec"), x => x.dec == null ? null : decNA(x) ? "tidak berlaku" : x.dec, v => typeof v === "string" ? `<small>${v}</small>` : `${f1(v)}<small>%</small>`, -1]);
   const rows = `<div class="ss-vt num">${M.map(([lab, f, fmt, dir]) => { const a = T ? f(T) : null, b = R ? f(R) : null; if (a == null && b == null) return "";
-    const mx = Math.max(a || 0, b || 0) || 1, w = v => v == null ? 0 : dir < 0 ? Math.min(a ?? v, b ?? v) / v : v / mx;
+    const nb = v => typeof v === "number" ? v : null, an = nb(a), bn = nb(b), mx = Math.max(an || 0, bn || 0) || 1, w = v => nb(v) == null ? 0 : dir < 0 ? Math.min(an ?? v, bn ?? v) / v : v / mx;
     return `<span class="bb L"><i style="background:var(--t)" data-w="${w(a) * 100}"></i></span><span class="v L">${a == null ? "–" : fmt(a)}</span><span class="c">${lab}</span><span class="v R">${b == null ? "–" : fmt(b)}</span><span class="bb R"><i style="background:var(--r)" data-w="${w(b) * 100}"></i></span>`; }).join("")}</div>`;
-  const ct = ssChecks(ta, T, PT, ev, s), cr = ssChecks(ra, R, PR, ev, s), base = (ct && ct.length >= (cr || []).length ? ct : cr) || [];
+  const ct = ssChecks(ta, T, PT, ev, s), cr = ssChecks(ra, R, PR, ev, s), lk = c => c[0].replace(/\d+/g, ""), base = (ct || []).slice();
+  (cr || []).forEach(c => { if (!base.some(b => lk(b) === lk(c))) base.push(c); });
   const CK = {ok: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M7.5 12.5l3 3 6-6.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg>',
     wn: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 7v6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><circle cx="12" cy="16.6" r="1.4" fill="currentColor"/></svg>',
     na: '<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" fill="none" stroke="currentColor" stroke-width="2" stroke-dasharray="3 3"/></svg>'};
@@ -2178,11 +2231,10 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const zbar = (a, x, side) => { const z = x && zs(a, x); return `<div class="ss-zb ${side}">${z ? z.map((v, i) => v ? `<span style="background:${ZC[i]};color:${i < 2 ? "var(--text)" : "var(--surface)"}" data-w="${v * 100}" data-sh="<span class='t1'>${a.name} · Z${i + 1}</span>${Math.round(v * 100)}% waktu">${v > .15 ? `Z${i + 1} ${Math.round(v * 100)}%` : ""}</span>` : "").join("") : ""}</div>`; };
   const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), hasLap = [T, R].some(x => x && x.laps && x.laps.length);
   return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small>${ssSwapBtn(ta, T, s)}</div>` : ""}</div>
-      <div class="mid"><b>${hariF(s)}</b><span>${pl0 ? pl0.title : "di luar jadwal"}</span>${sw.tag ? `<div>${sw.tag}</div>` : ""}${(T || R) ? `<div class="ss-mdw"><button class="ss-md" data-md="${s}" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
+      <div class="mid">${(T || R) ? `<div class="ss-mdw"><button class="ss-md" data-md="${s}" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
         <div class="ss-mdm" role="menu">${T && R ? `<button role="menuitem" data-mdf="both"><b>Kedua pelari (.md)</b><small>duel lengkap, untuk perbandingan</small></button>` : ""}${T ? `<button role="menuitem" data-mdf="t"><b>Taofik saja (.md)</b><small>analisa satu pelari</small></button>` : ""}${R ? `<button role="menuitem" data-mdf="r"><b>Reza saja (.md)</b><small>analisa satu pelari</small></button>` : ""}<button role="menuitem" data-mdf="copy"><b>Salin teks</b><small>langsung tempel ke Claude chat tanpa file</small></button></div></div>` : ""}</div>
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small>${ssSwapBtn(ra, R, s)}</div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
-    ${ssGarmin(T, R, ta, ra)}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
     ${hasLap ? `<div class="ss-sec"><span class="ss-vw" role="group" aria-label="Potongan"><button data-view="lap" aria-pressed="${SSV === "lap"}">Lap jam</button><button data-view="km" aria-pressed="${SSV === "km"}">Per km</button></span>
       <span class="s2">${SSV === "lap" ? "blok = satu lap setinggi jaraknya, lebar = kecepatan" : "batang = kecepatan, lebih panjang lebih cepat"} · pita = rentang pace rencana</span></div>`
@@ -2191,7 +2243,8 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
     <div class="ss-bfw" data-d="${s}"></div>
     <div class="ss-sec">${ssTerm("zone", "Waktu di zona")}</div>
     <div class="ss-mir"><div>${zbar(ta, T, "L")}</div><div class="c">Z1–5</div><div>${zbar(ra, R, "R")}</div></div>
-    <div class="ss-verdict">${vis.includes("t") ? `<div class="ss-vd L">${ssVerdict(ta, T, PT, s)}</div>` : "<div></div>"}${vis.includes("r") ? `<div class="ss-vd">${ssVerdict(ra, R, PR, s)}</div>` : ""}</div></div>`; }
+    <div class="ss-verdict">${vis.includes("t") ? `<div class="ss-vd L">${ssVerdict(ta, T, PT, s)}</div>` : "<div></div>"}${vis.includes("r") ? `<div class="ss-vd">${ssVerdict(ra, R, PR, s)}</div>` : ""}</div>
+    ${ssGarmin(T, R, ta, ra)}</div>`; }
 
 // tag under the day's title: "dipindah dari Sabtu" on the run day, "→ Minggu" on the missed day; the runner's name when only one moved
 function swapTag(s, vis) { const W = A.filter(a => vis.includes(a.c)), ran = W.filter(a => sessOf(a, s)), from = ran.filter(a => swapOn(a, s)), to = W.filter(a => !sessOf(a, s) && movedTo(a, s));
@@ -2217,7 +2270,7 @@ function ssFeed() { const vis = V().map(a => a.c), today = DATA.today, ta = A.fi
     if (!x) { const mv = movedTo(a, d.s); return `<div class="ss-sc ghost${mv ? " mv" : ""}" style="--i:${i}">${mv ? "dipindah ke " + HARIF[D(mv).getDay()] : "tidak lari"}</div>`; }
     const cp = ssComp(a, x, pl);
     return `<div class="ss-sc ${side}" style="--i:${i};--cp:${(cp || 0) / 100}">${ssRing(a.c, cp, 40)}<div class="sp2"><div class="km num">${f1(x.km)}<small> km</small></div>
-      <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? ` · dec ${f1(x.dec)}%` : ""}</div></div></div>`; };
+      <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? (decNA(x, a) ? " · dec tidak berlaku" : ` · dec ${f1(x.dec)}%`) : ""}</div></div></div>`; };
   // a planned day counts as run when some run of the week is judged against it (moved runs included)
   const sum = (a, W) => { if (!vis.includes(a.c)) return ""; const pl = W.days.filter(d => d.s < DATA.today && RUNK(((a.c === "t" ? d.pT : d.pR) || {}).k));
     const cov = new Set(W.days.filter(d => a.c === "t" ? d.xT : d.xR).map(d => swapOf(a, d.s))), done = pl.filter(d => cov.has(d.s)), km = W.days.reduce((q, d) => q + ((a.c === "t" ? d.xT : d.xR) || {km: 0}).km, 0);
@@ -2376,7 +2429,7 @@ function ssArah() { const vis = V(), W = 300, end = DATA.today;
         return `<span class="nv">${Math.round(best(s))}<small> km</small></span>${dl(d, d > 0, `${d > 0 ? "▲" : "▼"} ${Math.abs(d)} km`, `Long run terjauh ${a.name} ${d > 0 ? "bertambah" : "berkurang"} ${Math.abs(d)} km dalam 8 minggu. Tambah jarak tetap paling jauh 1,1 × lari terpanjang 30 hari terakhir.`)}`; };
       cards.push(`<h4>Long run terjauh</h4>${pair(side, side)}<svg viewBox="0 0 ${W} 74">${[21, 30, 35, 42].map(k => `<line x1="${X(k)}" x2="${X(k)}" y1="6" y2="54" stroke="var(--line)"/><text x="${X(k)}" y="68" text-anchor="middle">${k === 21 ? "21K" : k === 42 ? "42K" : k}</text>`).join("")}${SS.map(([a, s], i) => last(s) == null ? "" : row(a, s, 18 + i * 24)).join("")}</svg>`); } }
   // 5. decoupling: gauge with the document's zones; dashed needle = 8 weeks ago
-  { const SS = vis.map(a => [a, wk(a, xs => mean(xs.filter(x => x.dec != null).map(x => x.dec)))]);
+  { const SS = vis.map(a => [a, wk(a, xs => mean(xs.filter(x => x.dec != null && !decNA(x, a)).map(x => x.dec)))]);
     if (ok(SS)) { const M = 12, cx = W / 2, cy = 66, R = 52, ang = v => Math.PI * (1 - Math.min(M, Math.max(0, v)) / M), pt = (v, r) => [cx + r * Math.cos(ang(v)), cy - r * Math.sin(ang(v))];
       const arc = (a, b, col) => { const [x1, y1] = pt(a, R), [x2, y2] = pt(b, R); return `<path d="M${x1} ${y1} A${R} ${R} 0 0 1 ${x2} ${y2}" stroke="${col}" stroke-width="9" fill="none"/>`; };
       const nd = (v, c, gh) => v == null ? "" : `<g class="${gh ? "ss-gn" : "ss-nd"}" style="--deg:${-(180 - Math.min(M, Math.max(0, v)) / M * 180)}deg" transform="translate(${cx} ${cy})"><line x1="0" y1="0" x2="${R - 14}" y2="0" stroke="var(--${c})" stroke-width="${gh ? 1.5 : 3}" stroke-linecap="round" ${gh ? 'stroke-dasharray="2 3"' : ""}/></g>`;

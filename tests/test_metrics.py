@@ -139,6 +139,7 @@ def wday(sleep_h, bb, status, rhr=55):
 
 
 class LightTest(unittest.TestCase):
+    """docs/RUMUS-BATAS-SUMBER.md §7b (versi 10 Nov 2026)."""
     def setUp(self):
         base = dt.date(2026, 10, 1)
         self.w = {(base + dt.timedelta(days=i)).isoformat(): wday(7, 70, "BALANCED") for i in range(28)}
@@ -147,47 +148,74 @@ class LightTest(unittest.TestCase):
     def set(self, **kw):
         self.w[self.day.isoformat()].update(kw)
 
+    def lv(self, profile=None):
+        return m.light(self.w, self.day, profile)["level"]
+
     def test_levels(self):
-        self.assertEqual(m.light(self.w, self.day)["level"], "hijau")
-        self.set(sleep_s=5.5 * 3600)
-        self.assertEqual(m.light(self.w, self.day)["level"], "kuning")
-        self.set(sleep_s=7 * 3600, bb=35)
-        self.assertEqual(m.light(self.w, self.day)["level"], "oranye")
-        self.set(bb=70, rhr=62)  # +7 over the 28-day median
-        self.assertEqual(m.light(self.w, self.day)["level"], "merah")
+        self.assertEqual(self.lv(), "hijau")
+        self.set(sleep_s=5.5 * 3600)                 # §7 row 2
+        self.assertEqual(self.lv(), "kuning")
+        self.set(sleep_s=7 * 3600, bb=35)            # BB < 50 alone is row 2 too
+        self.assertEqual(self.lv(), "kuning")
+        self.set(sleep_s=4.5 * 3600, bb=35)          # §7 row 3
+        self.assertEqual(self.lv(), "oranye")
+        self.set(sleep_s=7 * 3600, bb=70, rhr=60)    # +5 over the 7-day mean
+        self.assertEqual(self.lv(), "kuning")
+        self.set(rhr=62)                             # +7
+        self.assertEqual(self.lv(), "oranye")
+
+    def test_hrv_status(self):
+        self.set(hrv_status="UNBALANCED")
+        self.assertEqual(self.lv(), "kuning")
+        for i in range(3):
+            self.w[(self.day - dt.timedelta(days=i)).isoformat()]["hrv_status"] = "UNBALANCED"
+        self.assertEqual(self.lv(), "oranye")
+        for i in range(3):
+            self.w[(self.day - dt.timedelta(days=i)).isoformat()]["hrv_status"] = "LOW"
+        self.assertEqual(self.lv(), "merah")
+        self.w[(self.day - dt.timedelta(days=2)).isoformat()]["hrv_status"] = "BALANCED"
+        self.assertEqual(self.lv(), "kuning")        # LOW 2 days: not all clear
+
+    def test_last_night_under_normal_range(self):
+        self.set(hrv=40, hrv_low=43)
+        self.assertEqual(self.lv(), "kuning")
+
+    def test_rhr_profile_when_history_is_short(self):
+        self.w = {self.day.isoformat(): wday(7, 70, "BALANCED", rhr=62)}
+        self.assertEqual(self.lv(), "hijau")         # no baseline, no profile
+        self.assertEqual(self.lv(55), "oranye")      # profile 55: +7
 
     def test_checks_explain_the_level(self):
         s = lambda: {c["k"]: c["s"] for c in m.light(self.w, self.day)["checks"]}
         self.assertEqual(s(), {"hrv": "ok", "bb": "ok", "sleep": "ok", "rhr": "ok"})
         self.set(sleep_s=5.5 * 3600, bb=45)
         self.assertEqual(s(), {"hrv": "ok", "bb": "warn", "sleep": "warn", "rhr": "ok"})
-        self.set(bb=35, rhr=60, hrv_status="NONE")
-        self.assertEqual(s(), {"hrv": None, "bb": "bad", "sleep": "warn", "rhr": "bad"})
+        self.set(sleep_s=4.5 * 3600, bb=35, rhr=62, hrv_status="NONE")
+        self.assertEqual(s(), {"hrv": None, "bb": "bad", "sleep": "bad", "rhr": "bad"})
 
-    def test_green_needs_body_battery_50(self):  # morning gate, docs §7
+    def test_green_needs_body_battery_50(self):
         self.set(bb=50)
-        self.assertEqual(m.light(self.w, self.day)["level"], "hijau")
+        self.assertEqual(self.lv(), "hijau")
         self.set(bb=49)
-        self.assertEqual(m.light(self.w, self.day)["level"], "kuning")
+        self.assertEqual(self.lv(), "kuning")
 
     def test_no_hrv_reading_and_sleep_rhr(self):
         self.set(hrv_status="NONE")
-        self.assertEqual(m.light(self.w, self.day)["level"], "hijau")
+        self.assertEqual(self.lv(), "hijau")
         self.set(rhr=None, rhr_sleep=62)  # falls back to the sleep record: +7
-        self.assertEqual(m.light(self.w, self.day)["level"], "merah")
+        self.assertEqual(self.lv(), "oranye")
 
-    def test_hrv_low_streak(self):
-        for i in range(3):
-            self.w[(self.day - dt.timedelta(days=i)).isoformat()]["hrv_status"] = "LOW"
-        self.assertEqual(m.light(self.w, self.day)["level"], "merah")
-        self.w[(self.day - dt.timedelta(days=2)).isoformat()]["hrv_status"] = "BALANCED"
-        self.assertEqual(m.light(self.w, self.day)["level"], "oranye")
-
-    def test_saturday_rule(self):
+    def test_saturday_rule(self):  # §7 only; the old "ganti easy 8 km" row is not in the document
         self.assertEqual(m.saturday_rule(wday(6.5, 55, "BALANCED")), "Jalankan")
         self.assertEqual(m.saturday_rule(wday(5.5, 55, "BALANCED")), "Potong 20%")
         self.assertEqual(m.saturday_rule(wday(4.5, 35, "BALANCED")), "Potong 40%")
-        self.assertEqual(m.saturday_rule(wday(4.5, 25, "LOW")), "Ganti easy 8 km")
+        self.assertEqual(m.saturday_rule(wday(4.5, 25, "LOW")), "Potong 40%")
+
+    def test_long_run_gate_takes_the_strictest(self):  # Uji 3b: §7 passes, light red
+        w = wday(6.8, 65, "LOW")
+        self.assertEqual(m.long_run_gate(w, "merah"), "Lari santai ≤8 km atau istirahat")
+        self.assertEqual(m.long_run_gate(wday(5.6, 70, "BALANCED"), "hijau"), "Potong 20%")
+        self.assertEqual(m.long_run_gate(wday(7, 70, "BALANCED"), "oranye"), "Potong 40%")
 
 
 class ScoreTest(unittest.TestCase):

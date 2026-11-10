@@ -298,6 +298,7 @@ def estimate_series(eff, start, today):
 # ---------------------------------------------------------------- readiness
 
 LOW_HRV = ("LOW", "POOR")
+UNBAL_HRV = ("UNBALANCED",)
 
 
 def rhr(w):
@@ -305,84 +306,108 @@ def rhr(w):
     return (w or {}).get("rhr") or (w or {}).get("rhr_sleep")
 
 
-def _rhr_base(wellness, day):
-    prev = [rhr(wellness[k]) for k in wellness
-            if rhr(wellness[k]) and 0 < (day - d(k)).days <= 28]
-    return statistics.median(prev) if len(prev) >= 7 else None
+def _rhr_base(wellness, day, profile=None):
+    """docs §7b: mean resting HR of the 7 days before; the profile value (config.json "rhr") with less than 7 days."""
+    prev = [rhr(wellness.get((day - dt.timedelta(days=i)).isoformat())) for i in range(1, 8)]
+    prev = [v for v in prev if v]
+    return sum(prev) / len(prev) if len(prev) >= 7 else profile
+
+
+def _streak(wellness, day, statuses):
+    n = 0
+    while (wellness.get((day - dt.timedelta(days=n)).isoformat()) or {}).get("hrv_status") in statuses:
+        n += 1
+    return n
 
 
 def _hrv_low_run(wellness, day):
-    n = 0
-    while True:
-        w = wellness.get((day - dt.timedelta(days=n)).isoformat(), {})
-        if w.get("hrv_status") in LOW_HRV:
-            n += 1
-        else:
-            return n
+    return _streak(wellness, day, LOW_HRV)
 
 
-def light(wellness, day):
-    """Daily light from the program's 'Lampu harian' table.
+LEVELS = ("hijau", "kuning", "oranye", "merah")
 
-    MERAH : HRV below normal 3 days running, or RHR +7 vs 28-day median
-    ORANYE: HRV below normal 2 days running, or Body Battery < 40, or RHR +5
-    HIJAU : HRV balanced (or no HRV reading that night), Body Battery >= 50, sleep >= 6 h
-            (BB threshold from the morning gate, docs/RUMUS-BATAS-SUMBER.md §7)
-    KUNING: anything else (HRV slightly down, BB 40-49, sleep < 6 h)
+
+def light(wellness, day, rhr_profile=None):
+    """Daily light, docs/RUMUS-BATAS-SUMBER.md §7b (one cause is enough, the strictest wins):
+
+    MERAH : HRV status LOW/POOR 3 days running (Garmin "Strained" is not available from the API)
+    ORANYE: §7 row 3 (sleep < 5 h and Body Battery < 40), RHR >= +7, UNBALANCED 3 days running
+    KUNING: §7 row 2 (sleep < 6 h or Body Battery < 50), last night's HRV under the personal normal range,
+            status UNBALANCED, RHR >= +5; also status LOW/POOR for 1-2 days [keputusan dashboard: not "all clear"]
+    HIJAU : everything clear
+    RHR is compared with the mean of the 7 days before (profile RHR with less data).
     Returns None when there is no data for the day.
     """
     w = wellness.get(day.isoformat())
     if not w:
         return None
-    low_run = _hrv_low_run(wellness, day)
-    base = _rhr_base(wellness, day)
-    rhr_up = (rhr(w) - base) if rhr(w) and base else 0
-    bb, sl, st = w.get("bb"), w.get("sleep_s"), w.get("hrv_status")
+    low_run, unbal_run = _streak(wellness, day, LOW_HRV), _streak(wellness, day, UNBAL_HRV)
+    base = _rhr_base(wellness, day, rhr_profile)
+    rhr_up = (rhr(w) - base) if rhr(w) and base else None
+    bb, sl, st, hv, hlo = w.get("bb"), w.get("sleep_s"), w.get("hrv_status"), w.get("hrv"), w.get("hrv_low")
     st = None if st == "NONE" else st
+    night_low = bool(hv and hlo and hv < hlo)
+    sl_h = sl / 3600 if sl else None
+    lv = 0
+    if (sl_h is not None and sl_h < 6) or (bb is not None and bb < 50) or night_low or st in UNBAL_HRV \
+            or (rhr_up is not None and rhr_up >= 5) or low_run >= 1:
+        lv = 1
+    if (sl_h is not None and sl_h < 5 and bb is not None and bb < 40) or (rhr_up is not None and rhr_up >= 7) or unbal_run >= 3:
+        lv = 2
+    if low_run >= 3:
+        lv = 3
     why = []
-    if low_run >= 3 or rhr_up >= 7:
-        level = "merah"
-    elif low_run >= 2 or (bb is not None and bb < 40) or rhr_up >= 5:
-        level = "oranye"
-    elif st in ("BALANCED", None) and bb is not None and bb >= 50 and sl and sl >= 6 * 3600:
-        level = "hijau"
-    else:
-        level = "kuning"
-    if abs(round(rhr_up)) >= 1:
+    if rhr_up is not None and abs(round(rhr_up)) >= 1:
         why.append("RHR %+d" % round(rhr_up))
-    return {"level": level, "hrv": w.get("hrv"), "hrv_status": st, "bb": bb,
+    return {"level": LEVELS[lv], "hrv": hv, "hrv_status": st, "hrv_low": hlo, "bb": bb,
             "sleep_s": sl, "rhr": rhr(w), "notes": why,
-            "checks": _checks(st, low_run, bb, sl, rhr_up if rhr(w) and base else None)}
+            "checks": _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up)}
 
 
-def _checks(st, low_run, bb, sl, rhr_up):
-    """Each input of the light rule: ok, warn (keeps it from green) or bad (orange/red); None = no data."""
-    def grade(v, ok, bad):
-        return None if v is None else "bad" if bad(v) else "ok" if ok(v) else "warn"
-    hrv = "bad" if low_run >= 2 else None if st is None else "ok" if st == "BALANCED" else "warn"
+def _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up):
+    """Each input of the light: ok, warn (yellow) or bad (orange/red); None = no data."""
+    if st is None and not night_low:
+        hrv = None
+    elif low_run >= 3 or unbal_run >= 3:
+        hrv = "bad"
+    elif st != "BALANCED" or night_low:
+        hrv = "warn"
+    else:
+        hrv = "ok"
+    both = sl_h is not None and bb is not None and sl_h < 5 and bb < 40     # §7 row 3
     return [
         {"k": "hrv", "v": st, "low": low_run, "s": hrv},
-        {"k": "bb", "v": bb, "s": grade(bb, lambda v: v >= 50, lambda v: v < 40)},
-        {"k": "sleep", "v": sl, "s": grade(sl or None, lambda v: v >= 6 * 3600, lambda v: False)},
-        {"k": "rhr", "v": None if rhr_up is None else round(rhr_up, 1), "s": grade(rhr_up, lambda v: v < 5, lambda v: v >= 5)},
+        {"k": "bb", "v": bb, "s": None if bb is None else "bad" if both else "warn" if bb < 50 else "ok"},
+        {"k": "sleep", "v": round(sl_h * 3600) if sl_h else None, "s": None if not sl_h else "bad" if both else "warn" if sl_h < 6 else "ok"},
+        {"k": "rhr", "v": None if rhr_up is None else round(rhr_up, 1),
+         "s": None if rhr_up is None else "bad" if rhr_up >= 7 else "warn" if rhr_up >= 5 else "ok"},
     ]
 
 
 def saturday_rule(w):
-    """'Aturan potong long run' for the night before a long run."""
+    """§7 morning gate for a long run: sleep and Body Battery only (the light adds the rest, see long_run_gate)."""
     if not w:
         return None
     sl = (w.get("sleep_s") or 0) / 3600
     bb = w.get("bb")
     if bb is None or not w.get("sleep_s"):
         return None
-    if sl < 5 and bb < 30 and w.get("hrv_status") in LOW_HRV:
-        return "Ganti easy 8 km"
     if sl < 5 and bb < 40:
         return "Potong 40%"
     if sl >= 6 and bb >= 50:
         return "Jalankan"
     return "Potong 20%"
+
+
+GATE_RANK = {"Jalankan": 0, "Potong 20%": 1, "Potong 40%": 2, "Lari santai ≤8 km atau istirahat": 3}
+
+
+def long_run_gate(w, level):
+    """§7 + §7b: the strictest of the morning gate and the light, for a long run that morning."""
+    a = saturday_rule(w)
+    b = {"hijau": "Jalankan", "kuning": "Potong 20%", "oranye": "Potong 40%", "merah": "Lari santai ≤8 km atau istirahat"}.get(level)
+    pick = [x for x in (a, b) if x]
+    return max(pick, key=lambda x: GATE_RANK[x]) if pick else None
 
 
 # ---------------------------------------------------------------- badges & score

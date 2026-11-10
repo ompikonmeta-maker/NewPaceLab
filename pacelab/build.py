@@ -56,7 +56,7 @@ def athlete_data(a, data_dir, today):
     lights = {}
     for i in range(DAYS + 2, -1, -1):
         day = today - dt.timedelta(days=i)
-        lights[day.isoformat()] = m.light(well, day)
+        lights[day.isoformat()] = m.light(well, day, a.get("rhr"))
     latest = next((day for day in sorted(well, reverse=True) if day <= today.isoformat()), None)
 
     in_program = [r for r in runs if r["date"] >= prog["ms1"]]
@@ -64,7 +64,7 @@ def athlete_data(a, data_dir, today):
     last_done = done[-1] if done else None
     return {
         "id": a["id"], "name": a["name"],
-        "program": prog, "weight_floor": a.get("weight_floor"), "zones": a.get("zones"), "cadence": a.get("cadence"),
+        "program": prog, "weight_floor": a.get("weight_floor"), "lthr": a.get("lthr"), "zones": a.get("zones"), "cadence": a.get("cadence"),
         "pace": _pace(a.get("pace")), "coach": a.get("coach") or None,
         "has_data": bool(runs or well),
         "longest": max([r["km"] for r in in_program] or [0]),
@@ -82,8 +82,8 @@ def athlete_data(a, data_dir, today):
             "hrv_status": well.get(day.isoformat(), {}).get("hrv_status"),
             "level": (lights.get(day.isoformat()) or {}).get("level"),
         } for day in days],
-        "today": {"date": latest, "light": lights.get(latest) if latest else None,
-                  "saturday": m.saturday_rule(well.get(latest)) if latest else None},
+        # §7: the long-run gate is judged on the long run's own morning; other days only say which day that is
+        "today": dict({"date": latest, "light": lights.get(latest) if latest else None}, **_lr_today(prog, today, latest, well, lights)),
         "badges": m.badges(runs, weeks, eff, prog["ms1"]),
         "week_stats": m.week_stats(last_done, well, lights, prog["sleep"].get("min")) if last_done and runs else None,
         "last_done_ms": last_done["ms"] if last_done else None,
@@ -92,6 +92,19 @@ def athlete_data(a, data_dir, today):
         "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None), (a.get("coach") or {}).get("walk_mps"))
                      for r in in_program],
     }
+
+
+def _lr_today(prog, today, latest, well, lights):
+    """Which weekday of this program week holds the long run, and the gate when that day is today (docs §7, §7b)."""
+    ms = m.ms_of(today.isoformat(), prog["ms1"])
+    wk = next((w for w in prog["weeks"] if w["ms"] == ms), None)
+    days = (wk or {}).get("days") or []
+    lr = next((i for i, c in enumerate(days) if "LONG RUN" in str(c).strip().split("\n")[0].upper()), None) if len(days) == 7 else None   # title line only
+    is_today = lr is not None and lr == today.weekday()
+    gate = None
+    if is_today and latest == today.isoformat():
+        gate = m.long_run_gate(well.get(latest), (lights.get(latest) or {}).get("level"))
+    return {"lr_day": lr, "lr_today": is_today, "saturday": gate}
 
 
 LAP_TRIG = {"distance": "a", "manual": "m", "session_end": "e", "time": "t", "position": "p"}
@@ -189,7 +202,7 @@ def _slim(x, color):
     return {
         "id": x["id"], "name": x["name"], "c": color, "has_data": x["has_data"],
         "longest": round(x["longest"], 1),
-        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "zones": x.get("zones"), "cadence": x.get("cadence"), "pace": x.get("pace"), "coach": x.get("coach"), "sleep_min": prog["sleep"].get("min"),
+        "target": tgt, "targets": prog["target"], "weight_floor": x.get("weight_floor"), "lthr": x.get("lthr"), "zones": x.get("zones"), "cadence": x.get("cadence"), "pace": x.get("pace"), "coach": x.get("coach"), "sleep_min": prog["sleep"].get("min"),
         "weeks": [{k: w[k] for k in ("ms", "start", "km", "km_t", "lr", "lr_t", "dec", "decd", "kg", "kg_t", "done", "down", "event")}
                   for w in x["weeks"]],
         "est": x["est"], "pb": x["pb"], "eff": x["eff"], "days": x["days"], "today": x["today"],

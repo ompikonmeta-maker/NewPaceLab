@@ -69,7 +69,7 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
 | Bagian | Sumber |
 |---|---|
 | Hitung mundur, minggu program, fase, tanda lomba | Excel: Kalender, Checkpoint |
-| Ringkasan head-to-head | lampu hari ini, est. maraton, km & long run minggu ini, HRV, Body Battery, tidur, RHR, aturan Sabtu |
+| Ringkasan head-to-head | lampu hari ini, est. maraton, km & long run minggu ini, HRV, Body Battery, tidur, RHR, gerbang long run |
 | Est. maraton | Riegel (eksponen 1.06): prediksi tercepat dari usaha terbaik 5K, 10K dan Half dalam 120 hari terakhir; ditampilkan juga + koreksi panas 5% |
 | Menuju 42K | long run terpanjang sejak awal program |
 | Skor minggu lalu | % target km, % target long run, rata tidur vs target minimum masing-masing, jumlah hari hijau |
@@ -137,7 +137,10 @@ sel Excel hari itu dipakai lebih dulu; profil jadi cadangan.
 
 | Penilaian pelatih | Aturan (kunci `config.json`) | Dasar |
 |---|---|---|
-| Jarak | 95–110% rencana (`coach.km`). Long run yang dipotong gerbang pagi (−20% / −40% / ganti easy 8 km, dokumen §7) dihitung patuh | [keputusan omPik]; aturan betis diabaikan |
+| Jarak | 95–110% rencana (`coach.km`). Sel yang menyebut strides: +0,15 km per stride (`coach.stride_km`). Long run yang dipotong gerbang pagi dihitung patuh | dokumen §4, §5 |
+| Gerbang pagi | baris terpisah di samping Jarak. Long run: batas = yang paling ketat dari §7 (tidur + Body Battery) dan lampu §7b (Kuning −20%, Oranye −40%, Merah lari santai ≤ 8 km, `coach.red_easy_km`); lebih dari 110% batas → "gerbang dilewati (+x km)". Latihan keras saat lampu Kuning/Oranye/Merah → "gerbang dilewati" | dokumen §5b, §7, §7b |
+| Lomba / tes | hari lomba (sel "Lomba"/"Tes" atau tanggal Checkpoint): jarak < 90% → "tidak selesai" (`coach.dnf_frac`); km 1 > 10 dtk lebih cepat dari batas lambat rencana → "start terlalu cepat" (`coach.start_fast_s`; hanya bila sel memuat rentang pace); HR km 1 ≤ LTHR − 15, km 2 ≤ LTHR − 6, km 3–5 ≤ LTHR − 2 (`lthr`, `coach.lthr_off`), HR sama dengan batas masih boleh; paruh 2 > 5% lebih lambat → "pace ambruk" (`coach.fade_pct`); jalan kaki ≥ 10 dtk total → ditandai beserta km-nya (`coach.walk_flag_s`). Kepatuhan lomba = bagian cek yang lolos | dokumen §3b, §5b |
+| Berhenti | waktu total − waktu bergerak (Garmin), ditampilkan, tidak dinilai | dokumen §5b |
 | HR lari santai / pemulihan | hanya km di **atas** batas atas yang dihitung, maksimal 20% km (`coach.hr_over_max`); di bawah rentang aman | [keputusan omPik] |
 | HR long run | boleh lewat batas atas hanya di 25% bagian akhir (`coach.lr_tail`) dan decoupling < 8% (`coach.dec_max`). Kalau decoupling tidak ada: ≥ 75% km tidak lewat batas (`coach.lr_hr_in`) | [keputusan omPik] |
 | Pace lari santai / long run | tidak dinilai; km yang lebih cepat dari batas cepat ditandai, lebih lambat tidak apa-apa | [keputusan omPik], dokumen §3 "HR mengalahkan pace" |
@@ -147,6 +150,8 @@ sel Excel hari itu dipakai lebih dulu; profil jadi cadangan.
 | Long run: durasi | ≤ 210 menit (`coach.lr_max_min`) | dokumen §4 |
 | Tempo: pace per km | tiap km tempo di rentang ± 5 dtk (`coach.tol_s`); "sedikit terlalu cepat" / "terlalu lambat". Reza: HR jadi patokan (`pace.hr_leads`), pace tidak dinilai kalau HR aman | [keputusan omPik], dokumen §3 |
 | Tempo: HR | HR per km ≤ batas atas; km pertama tempo tidak dihitung | [keputusan omPik] |
+| Tempo: start, melambat, jalan kaki | km/lap 1 tempo > 10 dtk lebih cepat dari batas lambat → "start terlalu cepat"; km/lap terakhir > 15 dtk lebih lambat dari yang tercepat → "melambat di akhir" (`coach.slow_end_s`); jalan kaki ≥ 10 dtk di segmen tempo | dokumen §5b |
+| Decoupling tempo / interval / lomba / lari dengan strides | "tidak berlaku" (di kartu linimasa, tabel detail, kartu Arah, ekspor .md) | dokumen §6 |
 | Interval: pace | tidak dinilai: data per km tidak memisahkan repetisi | [keputusan dashboard] |
 | Pemanasan | pace ≥ batas cepat pace santai (`pace.easy`) dan HR rata ≤ batas atas Z2 (`zones[1]`) | [keputusan omPik] |
 | Kepatuhan (cincin, warna kartu) | rata-rata: skor jarak (1 di dalam jendela), % km pace sesuai aturan di atas, % km HR tidak lewat batas atas | rumus disetujui omPik, disesuaikan aturan di atas |
@@ -172,13 +177,13 @@ Status selalu ditampilkan sebagai warna + ikon + kata. Animasi mati otomatis bil
 
 Tabel di Excel ditulis untuk manusia; ini cara program membacanya.
 
-- **HRV normal** = status Garmin `BALANCED`. **Di bawah normal** = `LOW` atau `POOR`. Status `NONE` = tidak ada data malam itu (lampu dinilai dari BB dan tidur saja).
-- **Detak istirahat naik** = dibanding median 28 hari sebelumnya (minimal 7 hari data). RHR diambil dari ringkasan harian; kalau kosong, dari data tidur.
-- **Lampu**: MERAH (HRV di bawah normal 3 hari, atau RHR +7) → ORANYE (HRV di bawah normal 2 hari, BB < 40, atau RHR +5) → HIJAU (HRV balanced, BB ≥ 50, tidur ≥ 6 jam; BB ≥ 50 dari gerbang pagi dokumen §7) → selain itu KUNING.
+- **Status HRV**: `BALANCED` normal; `UNBALANCED` tidak seimbang; `LOW`/`POOR` rendah. Status `NONE` = tidak ada data malam itu. **HRV semalam di bawah normal** = angka semalam di bawah batas bawah normal pribadi dari Garmin.
+- **Detak istirahat naik** = dibanding rata-rata 7 hari sebelumnya; kurang dari 7 hari data: RHR profil (`rhr` di `config.json`, Taofik 55, Reza 61). RHR diambil dari ringkasan harian; kalau kosong, dari data tidur.
+- **Lampu** (dokumen §7b, satu sebab cukup, yang paling ketat menang): MERAH = status LOW/POOR 3 hari berturut-turut → ORANYE = tidur < 5 jam dan BB < 40, RHR +7, atau UNBALANCED 3 hari → KUNING = tidur < 6 jam atau BB < 50, HRV semalam di bawah normal, UNBALANCED, RHR +5, atau LOW/POOR 1–2 hari [keputusan dashboard: belum "semua lolos"] → selain itu HIJAU. Garmin "Strained" belum dipakai (data belum tersedia).
 - **Kenapa lampu tidak hijau**: di bawah kalimat ringkasan tertulis syarat yang kurang; klik lampunya untuk rincian
   empat syarat (HRV, Body Battery, tidur, detak istirahat) beserta nilai hari itu dan batasnya.
 - **Body Battery harian** = nilai tertinggi hari itu (setelah tidur).
-- **Aturan Sabtu**: tidur < 5 jam + BB < 30 + HRV di bawah normal → *Ganti easy 8 km*; tidur < 5 jam + BB < 40 → *Potong 40%*; tidur ≥ 6 jam + BB ≥ 50 → *Jalankan*; selain itu → *Potong 20%*.
+- **Long run minggu ini** (kartu Ringkasan): dinilai dari data pagi di hari long run itu sendiri (dokumen §7): yang paling ketat dari §7 (tidur < 5 jam + BB < 40 → *Potong 40%*; tidur ≥ 6 jam + BB ≥ 50 → *Jalankan*; selain itu *Potong 20%*) dan lampu (Kuning −20%, Oranye −40%, Merah *lari santai ≤ 8 km atau istirahat*). Hari lain: "dinilai Sabtu pagi". Baris lama "ganti easy 8 km" dihapus (tidak ada di §7).
 - **Decoupling** (dokumen §6) = record dengan HR > 80 dan kecepatan > 0,6 m/s, dibagi dua menurut jumlah record;
   rasio tiap paruh = kecepatan rata-rata ÷ HR rata-rata; (rasio 1 − rasio 2) ÷ rasio 1. Dua versi: data penuh dan
   tanpa 3 km pertama (yang dinilai). Dihitung pada lari terpanjang tiap minggu (≥ 10 km); dinilai hanya bila ≥ 20 km

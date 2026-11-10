@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 20. Perbaikan kecil dari screenshot 7 Nov (10 Nov) — dicatat, belum dikerjakan, tanpa mockup dulu
+## 20. Perbaikan kecil dari screenshot 7 Nov (10 Nov) — **sudah dibuat** (1–4)
 
 1. Detail hari: blok tengah (tanggal, judul rencana, tanda "dipindah dari…") mengulang baris linimasa tepat di atasnya → hapus
    yang di detail, sisakan tombol "Simpan untuk Claude" (dan tanda tukar sesi cukup di baris linimasa).
@@ -47,7 +47,7 @@ FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diun
    memakai baris tetap 17 px per km (10 km ≈ 170 px). Bukan keputusan desain; dibuat di waktu berbeda. Usul: Per km memakai
    skala jarak yang sama dengan Lap jam, jadi tinggi tetap dan yang berganti hanya batangnya.
 
-## 19. Catatan dari Claude project (10 Nov) — dicatat + diverifikasi ke kode, belum dikerjakan
+## 19. Catatan dari Claude project (10 Nov) — kelompok penilaian **sudah dibuat** (poin 1, 3a, 4, 5, 9 + lampu §7b); data (2, 6, 8, 12) dan tampilan baru (10, 11, 12, 14) belum
 
 Update 10 Nov: `docs/RUMUS-BATAS-SUMBER.md` diganti versi 10 Nov dari Claude project (§1 tukar sesi lewat `overrides.json`,
 §3 tempo ≤4 / ≥5 km, §3b target lomba, §4 jarak termasuk strides, §5 strides, §6 kecepatan dari jam + "tidak berlaku",
