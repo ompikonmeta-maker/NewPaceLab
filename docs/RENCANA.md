@@ -34,6 +34,14 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 20. Perbaikan kecil dari screenshot 7 Nov (10 Nov) — dicatat, belum dikerjakan, tanpa mockup dulu
+
+1. Detail hari: blok tengah (tanggal, judul rencana, tanda "dipindah dari…") mengulang baris linimasa tepat di atasnya → hapus
+   yang di detail, sisakan tombol "Simpan untuk Claude" (dan tanda tukar sesi cukup di baris linimasa).
+2. Temuan dari screenshot yang sama: Reza 7 Nov (lomba 10 km, berhenti di 5 km) ditebak "dipindah dari Selasa". Tebakan otomatis
+   tukar sesi tidak boleh memindahkan lari di hari lomba/tes; lomba yang tidak selesai dinilai "tidak selesai" (§5b), bukan
+   sesi Selasa. Juga: kepatuhan Taofik 100 karena lomba hanya dinilai jarak (lihat 19, poin 1).
+
 ## 19. Catatan dari Claude project (10 Nov) — dicatat + diverifikasi ke kode, belum dikerjakan
 
 Update 10 Nov: `docs/RUMUS-BATAS-SUMBER.md` diganti versi 10 Nov dari Claude project (§1 tukar sesi lewat `overrides.json`,
