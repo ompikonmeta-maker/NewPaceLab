@@ -301,7 +301,13 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .action b{font-weight:650}
 .hrvc+.hrvc{margin-top:12px;padding-top:10px;border-top:1px solid var(--grid)} .hrvh{display:flex;justify-content:space-between;align-items:center;gap:8px} .hrvh .who{display:flex;align-items:center;gap:6px;font-weight:650;font-size:14px}
 .hrv3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 2px} .hrv3 div{background:var(--bg);border-radius:10px;padding:5px 8px} .hrv3 small{display:block;color:var(--muted);font-size:11px} .hrv3 b{font-size:18px}
-#ch-hrv svg text{font-size:10px;fill:var(--muted)} .hrvn{margin:8px 0 0;font-size:12px;color:var(--muted)} .action.a110{margin-top:8px;flex-wrap:wrap;row-gap:2px}
+.card.sub svg text{font-size:10px;fill:var(--muted)}
+/* recovery cards: six blocks per card on one shared grid, so they line up across the three cards (title, line per runner,
+   block per runner, note); a taller row (a "Saran") grows the same row in every card */
+.card.sub{display:grid;grid-template-rows:subgrid;grid-row:span 6;align-content:start;row-gap:0} .card.sub .hrv3 small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.sub .insight,.card.sub .chart{display:contents} .card.sub>h3{margin-bottom:10px}
+.card.sub .insight>div{align-self:start;padding:3px 0;font-size:14px;color:var(--text-2)}
+.card.sub .hrvc{margin-top:16px;align-self:start} .card.sub .hrvc+.hrvc{padding-top:12px} .card.sub .hrvn{align-self:start;margin-top:12px} .card.sub .empty{align-self:start} .hrvn{margin:8px 0 0;font-size:12px;color:var(--muted)} .action.a110{margin-top:8px;flex-wrap:wrap;row-gap:2px}
 
 /* race to 42k */
 .track{display:grid;grid-template-columns:72px 1fr 120px;align-items:center;gap:14px;margin:14px 0}
@@ -788,9 +794,9 @@ footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;paddin
       <div><b><i style="background:#e98a5c"></i>Oranye</b>Long run −40%, latihan keras jadi lari santai. Tidur &lt; 5 jam dan Body Battery &lt; 40, detak istirahat +7, atau HRV tidak seimbang 3 hari.</div>
       <div><b><i style="background:var(--crit)"></i>Merah</b>Lari santai ≤ 8 km atau istirahat. Status HRV rendah 3 hari berturut-turut.</div></div>
     <div class="lgd-none"><i></i>Tidak ada data · klik lampu di Ringkasan untuk melihat syarat yang belum terpenuhi</div></section>
-  <section class="card c4"><h3>Tidur <small>jam</small></h3><div class="insight" id="in-sleep"></div><div class="chart" id="ch-sleep"></div></section>
-  <section class="card c4"><h3>HRV <small>ms</small></h3><div class="insight" id="in-hrv"></div><div class="chart" id="ch-hrv"></div></section>
-  <section class="card c4"><h3>Body Battery <small>pagi</small></h3><div class="insight" id="in-bb"></div><div class="chart" id="ch-bb"></div></section>
+  <section class="card c4 sub"><h3>Tidur <small>jam</small></h3><div class="insight" id="in-sleep"></div><div class="chart" id="ch-sleep"></div></section>
+  <section class="card c4 sub"><h3>HRV <small>ms</small></h3><div class="insight" id="in-hrv"></div><div class="chart" id="ch-hrv"></div></section>
+  <section class="card c4 sub"><h3>Body Battery <small>pagi</small></h3><div class="insight" id="in-bb"></div><div class="chart" id="ch-bb"></div></section>
 </div>
 
 <div class="section"><div><h2>Progres terbaik</h2><p>Segmen tercepat di dalam setiap lari. Grafik naik = makin cepat. Klik kartu untuk detail.</p></div></div>
@@ -1255,6 +1261,32 @@ function weekly() {
 // ---------------------------------------------------------------- level 3: recovery (daily, period filter)
 // three numbers per runner (last night, Garmin's 7-day average, personal normal range) over a band chart;
 // the status is the average against the range, not the night (docs §7b)
+// one runner's block on the recovery cards: name + chip, three numbers, a small chart with dashed limit lines and day tooltips
+function recBlock(a, head, tiles, ds, vals, refs, lo, hi, tipf, label) { const W = 300, H = 92, n = ds.length;
+  const X = i => 22 + i * (W - 28) / Math.max(1, n - 1), Y = v => 6 + (hi - v) / (hi - lo) * (H - 22), seg = []; let cur = [];
+  vals.forEach((v, i) => { if (v != null) cur.push(`${X(i)} ${Y(v)}`); else if (cur.length) { seg.push(cur); cur = []; } }); if (cur.length) seg.push(cur);
+  return `<div class="hrvc"><div class="hrvh"><span class="who"><i class="dot ${a.c}"></i>${a.name}</span>${head}</div>
+    <div class="hrv3 num">${tiles.map(([k, v]) => `<div><small>${k}</small><b>${v}</b></div>`).join("")}</div>
+    <svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="${label}">
+      ${refs.map(r => `<line x1="22" x2="${W - 6}" y1="${Y(r.y)}" y2="${Y(r.y)}" stroke="var(--muted)" stroke-dasharray="4 4" opacity=".8"/>${r.t ? `<text x="${W - 6}" y="${Y(r.y) - 4}" text-anchor="end">${r.t}</text>` : ""}`).join("")}
+      ${seg.map(q => `<path d="M${q.join(" L")}" fill="none" stroke="var(--${a.c})" stroke-width="2.5" stroke-linejoin="round"/>`).join("")}
+      ${vals.map((v, i) => v != null ? `<circle cx="${X(i)}" cy="${Y(v)}" r="2.4" fill="var(--surface)" stroke="var(--${a.c})" stroke-width="1.3"/>` : "").join("")}
+      ${ds.map((d, i) => `<rect x="${X(i) - (W - 28) / n / 2}" y="0" width="${(W - 28) / n}" height="${H - 14}" fill="transparent" data-sh="<span class='t1'>${a.name} · ${hari(d.date)}</span>${tipf(d, vals[i])}"/>`).join("")}</svg></div>`; }
+const lastV = v => [...v].reverse().find(x => x != null), meanV = v => { const q = v.filter(x => x != null); return q.length ? q.reduce((t, x) => t + x, 0) / q.length : null; };
+function sleepCard(n) { const out = V().map(a => { const ds = a.days.slice(-n), v = ds.map(d => d.sleep_h), t = a.sleep_min ? a.sleep_min / 3600 : null, l = lastV(v), m = meanV(v);
+    if (l == null) return "";
+    const q = v.filter(x => x != null).concat(t != null ? [t] : []), lo = Math.floor(Math.min(...q) - .5), hi = Math.ceil(Math.max(...q) + .5), gap = t != null ? Math.round((l - t) * 60) : null;
+    return recBlock(a, gap == null ? "" : chip(gap >= 0 ? "good" : gap >= -30 ? "warn" : "serious", gap >= 0 ? "semalam cukup" : `semalam −${-gap} mnt`),
+      [["semalam", hm(l * 3600)], [`rata ${n} hari`, hm(m * 3600)], ["target min", a.sleep_min ? hm(a.sleep_min) : "–"]], ds, v, t != null ? [{y: t, t: hm(a.sleep_min)}] : [], lo, hi,
+      (d, x) => x == null ? "tidak ada data" : `tidur <b>${hm(x * 3600)}</b>${t != null ? (x >= t ? " · ≥ target" : ` · ${Math.round((t - x) * 60)} mnt di bawah target`) : ""}`, `Tidur ${a.name} per malam dibanding target`); }).join("");
+  $("ch-sleep").innerHTML = out ? out + `<p class="hrvn">Garis putus = target tidur minimum (program Excel), titik = tiap malam.</p>` : '<div class="empty">Belum ada data di periode ini</div>'; }
+function bbCard(n) { const out = V().map(a => { const ds = a.days.slice(-n), v = ds.map(d => d.bb), l = lastV(v), m = meanV(v);
+    if (l == null) return "";
+    const low = Math.min(...v.filter(x => x != null)), lv = l >= 50 ? "good" : l >= 40 ? "warn" : "serious";
+    return recBlock(a, chip(lv, "pagi ini " + (l >= 50 ? "pulih" : l >= 40 ? "sedang" : "rendah")),
+      [["pagi ini", l], [`rata ${n} hari`, Math.round(m)], ["terendah", low]], ds, v, [{y: 50, t: "50 hijau"}, {y: 40, t: ""}], Math.max(0, Math.min(35, low - 8)), 100,
+      (d, x) => x == null ? "tidak ada data" : `Body Battery <b>${x}</b> · ${x >= 50 ? "≥ 50: syarat hijau" : x >= 40 ? "40–49: kuning" : "< 40: oranye"}`, `Body Battery pagi ${a.name}`); }).join("");
+  $("ch-bb").innerHTML = out ? out + `<p class="hrvn">Garis putus 50 = syarat hijau, 40 = batas oranye (dokumen §7b).</p>` : '<div class="empty">Belum ada data di periode ini</div>'; }
 function hrvCard(n) { const HRVS = {BALANCED: ["good", "Balanced"], UNBALANCED: ["warn", "Unbalanced"], LOW: ["serious", "Low"], POOR: ["crit", "Poor"]};
   $("ch-hrv").innerHTML = V().map(a => { const ds = a.days.slice(-n), last = [...ds].reverse().find(d => d.hrv != null || d.hrv_week != null) || {};
     const vals = ds.flatMap(d => [d.hrv, d.hrv_week, d.hrv_low, d.hrv_hi]).filter(v => v != null);
@@ -1288,24 +1320,18 @@ function daily() {
   $("in-sleep").innerHTML = V().map(a => { const m = mean(pick(a, "sleep_h")), t = a.sleep_min ? a.sleep_min / 3600 : null;
     const gap = m != null && t ? Math.round((m - t) * 60) : null;
     const lvl = gap == null ? "none" : gap >= 0 ? "good" : gap >= -30 ? "warn" : "serious";
-    return line(a, `${chip(lvl, gap == null ? "Belum ada" : gap >= 0 ? "Cukup" : "Kurang")}<span>rata <b>${hm(m == null ? null : m * 3600)}</b>${gap == null ? "" : ` · ${gap >= 0 ? "+" : "−"}${Math.abs(gap)} mnt vs target ${hm(a.sleep_min)}`}</span>${tip("sleep", lvl)}`); }).join("");
-  chart("ch-sleep", {x: DX, xlab: dl, h: 200, fmtV: v => hm(v * 3600), refs: V().filter(a => a.sleep_min).map(a => ({y: a.sleep_min/3600, c: a.c})),
-    label: "Durasi tidur harian dibanding target minimum", detail: (a, k, v) => v == null ? "" : v * 3600 >= (a.sleep_min || 0) ? "≥ target" : `${Math.round((a.sleep_min - v * 3600) / 60)} mnt di bawah target`,
-    series: V().map(a => ({c: a.c, area: false, v: pick(a, "sleep_h")}))});
+    return line(a, `${chip(lvl, gap == null ? "Belum ada" : gap >= 0 ? "Cukup" : "Kurang")}<span>rata <b>${hm(m == null ? null : m * 3600)}</b>${gap == null ? "" : ` · ${gap >= 0 ? "+" : "−"}${Math.abs(gap)} mnt dari target`}</span>${tip("sleep", lvl)}`); }).join("");
+  sleepCard(DAYN);
 
   $("in-hrv").innerHTML = V().map(a => { const st = pick(a, "hrv_status").filter(Boolean), low = st.filter(s => s === "LOW" || s === "POOR").length, last = st[st.length - 1];
     const lvl = !last ? "none" : last === "BALANCED" && low <= 1 ? "good" : low >= 3 ? "serious" : "warn";
     return line(a, `${chip(lvl, !last ? "Belum ada" : last === "BALANCED" ? "Seimbang" : last === "UNBALANCED" ? "Tidak seimbang" : "Rendah")}<span><b>${low}</b> hari rendah dalam ${DAYN} hari</span>${tip("hrv", lvl)}`); }).join("");
-  if (V().some(a => a.days.some(d => d.hrv_week != null))) hrvCard(DAYN);
-  else chart("ch-hrv", {x: DX, xlab: dl, h: 200, minSpan: 20, fmtV: v => v + " ms", label: "HRV semalam",
-    detail: (a, k) => { const s = a.days.slice(-DAYN)[k].hrv_status; return s ? s[0] + s.slice(1).toLowerCase() : ""; },
-    series: V().map(a => ({c: a.c, area: false, v: pick(a, "hrv")}))});
+  if (V().some(a => a.days.slice(-DAYN).some(d => d.hrv != null || d.hrv_week != null))) hrvCard(DAYN);
+  else $("ch-hrv").innerHTML = '<div class="empty">Belum ada data di periode ini</div>';
 
   $("in-bb").innerHTML = V().map(a => { const m = mean(pick(a, "bb")); const lvl = m == null ? "none" : m >= 50 ? "good" : m >= 40 ? "warn" : "serious";
-    return line(a, `${chip(lvl, m == null ? "Belum ada" : m >= 50 ? "Pulih" : m >= 40 ? "Sedang" : "Rendah")}<span>rata <b>${m == null ? "–" : Math.round(m)}</b> · ≥ 50 hijau, < 40 oranye</span>${tip("bb", lvl)}`); }).join("");
-  chart("ch-bb", {x: DX, xlab: dl, h: 200, ymin: 0, ymax: 100, refs: [{y: 50}, {y: 40}], fmtV: v => String(v), label: "Body Battery pagi",
-    detail: (a, k, v) => v == null ? "" : v >= 50 ? "≥ 50: syarat hijau" : v >= 40 ? "40–49: kuning" : "< 40: oranye",
-    series: V().map(a => ({c: a.c, area: false, v: pick(a, "bb")}))});
+    return line(a, `${chip(lvl, m == null ? "Belum ada" : m >= 50 ? "Pulih" : m >= 40 ? "Sedang" : "Rendah")}<span>rata <b>${m == null ? "–" : Math.round(m)}</b> · ≥ 50 hijau</span>${tip("bb", lvl)}`); }).join("");
+  bbCard(DAYN);
 }
 
 // ---------------------------------------------------------------- level 4: best efforts

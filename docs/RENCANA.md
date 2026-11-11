@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 22. Kartu Tidur, HRV, Body Battery — **omPik pilih R1** + blok sejajar, mockup diperbarui, menunggu "gas" (11 Nov)
+## 22. Kartu Tidur, HRV, Body Battery — **R1 + blok sejajar sudah dibuat** (11 Nov)
 
 R1 sejajar: tiap kartu enam blok dalam satu kisi bersama (CSS subgrid): judul · kesimpulan Taofik · kesimpulan Reza ·
 blok Taofik · blok Reza · catatan. Baris yang meninggi (mis. Saran) ikut meninggikan baris yang sama di kartu lain.
