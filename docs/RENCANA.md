@@ -34,6 +34,14 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 22. Kartu Tidur, HRV, Body Battery — mockup siap, menunggu pilihan + "gas" (11 Nov)
+
+Masalah: kartu Tidur dan Body Battery banyak ruang kosong karena kartu HRV (angka + grafik per pelari) lebih tinggi.
+Mockup: [`docs/mockup/pemulihan-kartu.html`](mockup/pemulihan-kartu.html). R1 tiga kartu seragam (Tidur: semalam /
+rata-rata / target min + grafik kecil per pelari dengan garis target; Body Battery: pagi ini / rata-rata / terendah +
+garis 50 dan 40) · R2 HRV kiri setinggi dua kartu, Tidur + Body Battery bertumpuk kanan · R3 HRV selebar layar
+(Taofik dan Reza berdampingan), Tidur + Body Battery berdampingan di bawah.
+
 ## 21. Catatan omPik 10 Nov — **sudah dibuat** (11 Nov)
 
 Mockup: [`docs/mockup/pegas-kalkulator.html`](mockup/pegas-kalkulator.html) (kalkulator sekarang vs baru; pegas lama vs baru
