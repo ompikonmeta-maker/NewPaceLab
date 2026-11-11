@@ -10,8 +10,15 @@ Paling mudah: klik dua kali **`Update Dashboard.bat`**. Data ditarik, dashboard 
 - Cepat: di tab Sesi buka harinya → **Simpan untuk Claude** → file `.md` (kedua pelari / satu pelari) atau salin teks.
   Isi: konteks program, rencana sel Excel, profil (zona, pace, cadence), kondisi pagi, ringkasan Garmin, lap jam, per km,
   zona HR, decoupling, penilaian pelatih dashboard, minggu itu. Tanpa key, akun Garmin, atau GPS.
-- Lengkap: klik dua kali **`Ekspor Sesi.bat`**, isi tanggal → `ekspor\NewPaceLab_<tanggal>.zip` berisi `ringkasan.md`,
-  CSV per detik (tanpa GPS), CSV lap, dan file FIT asli dari jam (berisi GPS; bisa dilewati). Butuh internet + key
+- Semua data: di menu yang sama **Semua data (.zip)** → `NewPaceLab_<tanggal>.zip` berisi `ringkasan.md`,
+  `<nama>_per_detik.csv` (detik, jarak, HR, kecepatan, pace, cadence, elevasi, suhu, jalan), `<nama>_per_km.csv`,
+  `<nama>_lap.csv`, `<nama>_garmin.json` (semua field ringkasan Garmin) dan `data_hari_ini.json` (rencana, profil,
+  kondisi pagi, penilaian, minggu itu). Dibuat di browser, juga di HP. Data per detik hanya ikut untuk lari
+  **10 minggu terakhir** (`config.json` → `per_detik_minggu`), karena dibawa di dalam dashboard.html (file bertambah
+  ±3–8 MB). Lari lebih lama: pakai Ekspor Sesi. **Ditambah file FIT asli…** menyalin perintah `"Ekspor Sesi.bat" <tanggal>`
+  untuk dijalankan di folder NewPaceLab di laptop (browser tidak bisa mengambil file dari Garmin).
+- Lengkap: klik dua kali **`Ekspor Sesi.bat`**, isi tanggal (atau `"Ekspor Sesi.bat" 2026-10-31`) → `ekspor\NewPaceLab_<tanggal>.zip` berisi `ringkasan.md`,
+  CSV per detik (tanpa GPS, kolom `jalan` = kecepatan ≤ `coach.walk_mps`), CSV lap, dan file FIT asli dari jam (berisi GPS; bisa dilewati). Butuh internet + key
   untuk FIT asli; tanpa itu dipakai salinan lokal. Penilaian pelatih hanya ada di file dari tombol dashboard.
 
 **Versi portable** (Python sudah di dalamnya, tidak perlu install): unduh
@@ -43,6 +50,11 @@ Python 3.8+ saja, tanpa `pip install`.
 `keys/`, `programs/*.xlsx`, `data/`, `.token_cache/`, `dist/` dan `ekspor/` tidak pernah di-commit.
 
 ## Isi dashboard
+
+**Gulir dan pegas** (ala iPhone): semua jendela bergulir (jadwal, detail sesi, decoupling, linimasa, kalkulator) memakai
+scrollbar tipis sendiri yang muncul saat menggulir dan hilang setelah 1 detik diam. Di ujung, isi tertarik seperti karet
+(rumus iOS), kembali begitu dorongan melemah (sisa luncuran touchpad diabaikan) dengan pegas tanpa lewat titik awal
+(±0,45 dtk), dan meluncur menabrak ujung = pantulan kecil. "Kurangi animasi" di Windows → tanpa pegas.
 
 **Kalkulator target lomba** (dokumen §3b): klik chip lomba di header (atau "Target lomba"). Pilih lomba, pelari dan
 dasar hitungan: hanya lomba / tes **utuh** (jarak lomba itu sendiri, bukan potongan dari lari yang lebih panjang). Riegel

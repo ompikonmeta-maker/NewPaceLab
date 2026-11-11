@@ -524,7 +524,7 @@ button.chip:hover{box-shadow:0 3px 10px rgba(0,0,0,.08);translate:0 -1px}
 .ss-sc .meta{font-size:12.5px;color:var(--muted);line-height:1.35} .ss-sc .sp2{flex:1}
 .ss-sc.ghost{border-style:dashed;background:transparent;color:var(--muted);font-size:13px;justify-content:center}
 .rcb{font:inherit;cursor:pointer;transition:border-color .2s,transform .2s} .rcb:hover,.rcb:focus-visible{border-color:var(--text);transform:translateY(-1px)}
-.rcx .ssx-body{scrollbar-width:thin} .rcf{display:grid;grid-template-columns:170px minmax(0,1fr);gap:8px 12px;align-items:center;font-size:13.5px;background:var(--bg);border-radius:14px;padding:12px 14px}
+.rcf{display:grid;grid-template-columns:170px minmax(0,1fr);gap:8px 12px;align-items:center;font-size:13.5px;background:var(--bg);border-radius:14px;padding:12px 14px}
 .rcf label{color:var(--text-2)} .rcf select,.rcf input{width:100%;min-width:0;border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:6px 10px;font:inherit;font-size:13.5px}
 .rcf .auto{color:var(--muted);font-size:12.5px} .rcs{list-style:none;margin:12px 0 0;padding:0;font-size:13.5px} .rcs li{display:grid;grid-template-columns:22px minmax(0,1fr) auto;gap:8px;padding:7px 0;border-bottom:1px solid var(--grid)} .rcs i{font-style:normal;color:var(--muted)}
 .rcr{font-size:30px;font-weight:800;letter-spacing:-.02em;margin:12px 0 2px} .rcr small{font-size:13.5px;font-weight:400;color:var(--muted)}
@@ -828,7 +828,7 @@ footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;paddin
   <div class="ssx-body" id="ssx-body"><div></div></div><div class="sbar" id="ssx-sbar" aria-hidden="true"></div></div></div>
 <div class="ssx rcx" id="rcx" aria-hidden="true"><div class="ssx-win" role="dialog" aria-modal="true" aria-labelledby="rcx-h">
   <div class="pbx-hd"><h3 id="rcx-h">Target lomba</h3><span class="ss-vw" id="rcx-who" role="group" aria-label="Pelari"></span><button class="pbx-x" data-close aria-label="Tutup">×</button></div>
-  <div class="ssx-body" id="rcx-body"></div></div></div>
+  <div class="ssx-body" id="rcx-body"><div></div></div><div class="sbar" id="rcx-sbar" aria-hidden="true"></div></div></div>
 <div class="ss-toast" id="ss-toast" role="status" aria-live="polite"></div>
 <div class="pbx" id="pbx" aria-hidden="true"><div class="pbx-win" id="pbx-win" role="dialog" aria-modal="true" aria-labelledby="pbx-h"></div></div>
 <div class="ov" id="ov" role="dialog" aria-modal="true" aria-labelledby="pv-title">
@@ -1728,31 +1728,56 @@ let flyQ = 0;
 addEventListener("scroll", () => flyQ || (flyQ = requestAnimationFrame(() => { flyQ = 0; flyPlace(); })), {passive: true});
 addEventListener("resize", () => { for (const c in fly) fly[c].off = null; flyPlace(); });
 
-// ---------------------------------------------------------------- rubber-band bounce at both scroll ends (page + schedule window)
+// ---------------------------------------------------------------- rubber-band bounce at both scroll ends (page + inner windows), iPhone-like:
+// the pull follows the iOS rubber-band curve, lets go as soon as the push fades (a touchpad's leftover glide is ignored),
+// and returns with a critically damped spring (no overshoot); gliding into an end turns its speed into a small bounce.
 function bounce(scroller, content, bar) {
-  const page = !scroller; let raw = 0, tm = 0, ty = null;
-  const lim = () => Math.min(140, (page ? innerHeight : scroller.clientHeight) * .18);
-  const atEnd = dir => { const st = page ? scrollY : scroller.scrollTop, h = page ? innerHeight : scroller.clientHeight, sh = page ? document.documentElement.scrollHeight : scroller.scrollHeight;
-    return dir > 0 ? st + h >= sh - 1 : dir < 0 && st <= 0; };
+  const page = !scroller, W = 2 * Math.PI / .45;   // spring response 0.45 s, damping ratio 1
+  let off = 0, raw = 0, mode = "idle", raf = 0, x0 = 0, v0 = 0, t0 = 0;
+  let last = 0, lastAbs = 0, falls = 0, mute = 0, rel = 0, ty = null, tv = 0, tt = 0, sTop = 0, sT = 0, sV = 0;
+  const H = () => page ? innerHeight : scroller.clientHeight, top = () => page ? scrollY : scroller.scrollTop;
+  const rub = r => Math.sign(r) * (1 - 1 / (Math.abs(r) * .55 / H() + 1)) * H();
+  const unrub = o => Math.sign(o) * (1 / (1 - Math.min(.95, Math.abs(o) / H())) - 1) * H() / .55;
+  const atEnd = dir => { const st = top(), mx = (page ? document.documentElement.scrollHeight : scroller.scrollHeight) - H();
+    return dir > 0 ? st >= mx - 1 : dir < 0 && st <= 0; };
   const skip = e => page && (ov.classList.contains("open") || (e.target.closest && e.target.closest(".ov,.xwin,.ss-box,.pbx,.ssx")));
-  const set = () => { const m = lim(), off = Math.sign(raw) * m * (1 - Math.exp(-Math.abs(raw) / (m * 2.2)));
-    content.style.transition = "none"; content.style.transform = `translateY(${(-off).toFixed(1)}px)`;
-    if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})`; } };
-  const release = () => { if (!raw) return; raw = 0; const sp = "transform .55s cubic-bezier(.25,1.45,.45,1)";
-    content.style.transition = sp; content.style.transform = "translateY(0)";
-    if (bar) { bar.style.transition = sp + ",opacity .45s"; bar.style.transform = ""; }
-    setTimeout(() => { if (!raw) { content.style.transform = ""; content.style.transition = ""; } }, 600); };
+  const paint = () => { content.style.transition = "none"; content.style.transform = Math.abs(off) < .05 ? "" : `translateY(${(-off).toFixed(2)}px)`;
+    if (bar) { bar.classList.toggle("sq-b", off > 0); bar.style.transition = "opacity .45s"; bar.style.transform = off ? `scaleY(${Math.max(.55, 1 - Math.abs(off) / 160)})` : ""; } };
+  const stop = () => { cancelAnimationFrame(raf); raf = 0; };
+  const spring = (v = 0) => { stop(); mode = "spring"; x0 = off; v0 = v; t0 = performance.now(); raw = 0;
+    const step = now => { const t = (now - t0) / 1000, e = Math.exp(-W * t);
+      off = (x0 + (v0 + W * x0) * t) * e; const v = (v0 - W * (v0 + W * x0) * t) * e;
+      if (Math.abs(off) < .1 && Math.abs(v) < 5) { off = 0; mode = "idle"; raf = 0; paint(); content.style.transition = ""; return; }
+      paint(); raf = requestAnimationFrame(step); };
+    raf = requestAnimationFrame(step); };
+  const letGo = () => { mute = performance.now() + 160; spring(); };
   const tgt = page ? window : scroller;
+  tgt.addEventListener("scroll", () => { const now = performance.now(), dt = now - sT, st = top();
+    sV = dt > 0 && dt < 120 ? (st - sTop) / dt * 1000 * .6 + sV * .4 : 0; sTop = st; sT = now;
+    if (!REDUCED && mode === "idle" && ty == null && Math.abs(sV) > 300 && atEnd(Math.sign(sV))) {   // glided into an end: small bounce
+      mute = now + 160; off = 0; spring(Math.max(-2600, Math.min(2600, sV)) * .32); } }, {passive: true});
   tgt.addEventListener("wheel", e => { if (REDUCED || e.ctrlKey || skip(e)) return;
-    const dir = Math.sign(e.deltaY); if (!dir) return;
-    if (raw && Math.sign(raw) !== dir) return release();
-    if (!atEnd(dir)) return;
-    e.preventDefault(); raw += e.deltaY * (e.deltaMode === 1 ? 16 : 1) * .6; set(); clearTimeout(tm); tm = setTimeout(release, 140);
+    const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H() : 1), dir = Math.sign(dy); if (!dir) return;
+    const now = performance.now(), gap = now - last, a = Math.abs(dy); last = now;
+    const rising = a > lastAbs * 1.15 + 1 || gap > 220; falls = gap > 150 || a > lastAbs ? 0 : a < lastAbs * .97 ? falls + 1 : falls; lastAbs = a;   // equal steps keep the count
+    if (now < mute && !rising && (off ? Math.sign(off) === dir : atEnd(dir))) { e.preventDefault(); mute = now + 160; return; }   // leftover glide
+    mute = 0;
+    if (off && Math.sign(off) !== dir) {          // pushing back the other way: unwind the stretch first
+      e.preventDefault(); stop(); mode = "drag"; raw = unrub(off) + dy; if (Math.sign(raw) !== Math.sign(off)) raw = 0; off = rub(raw); paint();
+      clearTimeout(rel); rel = setTimeout(() => off ? spring() : (mode = "idle"), 90); return; }
+    if (!off && !atEnd(dir)) return;
+    e.preventDefault();
+    if (mode === "spring") { stop(); raw = unrub(off); }
+    mode = "drag"; raw += dy; off = rub(raw); paint(); clearTimeout(rel);
+    if (falls >= 2) return letGo();             // the push is fading: the finger is off, let go now
+    rel = setTimeout(() => mode === "drag" && letGo(), 90);
   }, {passive: false});
-  tgt.addEventListener("touchstart", e => { ty = skip(e) ? null : e.touches[0].clientY; }, {passive: true});
-  tgt.addEventListener("touchmove", e => { if (ty == null || REDUCED) return; const y = e.touches[0].clientY, dy = ty - y; ty = y;
-    if (!raw && !atEnd(Math.sign(dy))) return; e.preventDefault(); const was = Math.sign(raw); raw += dy; if (was && Math.sign(raw) !== was) raw = 0; set(); }, {passive: false});
-  tgt.addEventListener("touchend", () => { ty = null; release(); });
+  tgt.addEventListener("touchstart", e => { if (skip(e)) { ty = null; return; } ty = e.touches[0].clientY; tv = 0; tt = performance.now();
+    if (mode === "spring") { stop(); mode = "drag"; raw = unrub(off); } }, {passive: true});
+  tgt.addEventListener("touchmove", e => { if (ty == null || REDUCED) return; const y = e.touches[0].clientY, dy = ty - y, now = performance.now(); ty = y;
+    if (!off && !atEnd(Math.sign(dy))) return; e.preventDefault(); const was = Math.sign(raw); raw += dy; if (was && Math.sign(raw) !== was) raw = 0;
+    const o = off; off = rub(raw); tv = (off - o) / Math.max(1, now - tt) * 1000; tt = now; mode = "drag"; paint(); }, {passive: false});
+  tgt.addEventListener("touchend", () => { ty = null; if (off) spring(Math.max(-3000, Math.min(3000, tv))); else if (mode === "drag") mode = "idle"; });
 }
 document.documentElement.style.overscrollBehaviorY = "none";
 bounce(null, document.querySelector(".wrap"));
@@ -2224,14 +2249,74 @@ function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) 
   L.push("", "---", `Dibuat oleh NewPaceLab ${DATA.generated.replace("T", " ")} · sync ${A.map(a => a.name + " " + (a.sync || "–").replace("T", " ").slice(0, 16)).join(", ")}`);
   if (who === "both") L.push(ssMdPair(s));
   return L.join("\n").replace(/(\d)\.(\d)/g, "$1,$2"); }   // Indonesian decimal comma
-function ssMdSave(s, f) { const who = f === "copy" ? "both" : f, txt = ssMd(s, who), name = `NewPaceLab_${s}_${who === "both" ? A.filter(a => V().includes(a)).map(a => a.name).join("-") : A.find(a => a.c === who).name}.md`;
-  if (f === "copy") { const done = () => ssToast("Teks tersalin — tempel di Claude chat");
-    const fall = () => { const t = document.createElement("textarea"); t.value = txt; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch (e) { ssToast("Gagal menyalin; pakai Simpan file"); } t.remove(); };
-    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fall); else fall(); return; }
+function ssMdSave(s, f) { const who = ["copy", "zip", "fit"].includes(f) ? "both" : f, txt = ssMd(s, who), name = `NewPaceLab_${s}_${who === "both" ? A.filter(a => V().includes(a)).map(a => a.name).join("-") : A.find(a => a.c === who).name}.md`;
+  if (f === "copy") return copyTxt(txt, "Teks tersalin — tempel di Claude chat");
+  if (f === "zip") return ssZip(s);
+  if (f === "fit") return copyTxt(`"Ekspor Sesi.bat" ${s}`, `Perintah disalin: "Ekspor Sesi.bat" ${s}. Tempel di jendela perintah folder NewPaceLab di laptop → ekspor\\NewPaceLab_${s}.zip dengan file FIT asli (GPS).`, 7000);
   const url = URL.createObjectURL(new Blob([txt], {type: "text/markdown;charset=utf-8"})), aEl = document.createElement("a");
   aEl.href = url; aEl.download = name; document.body.appendChild(aEl); aEl.click(); aEl.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); ssToast("Tersimpan: " + name); }
 let ssToastT = 0;
-function ssToast(t) { const el = $("ss-toast"); el.textContent = t; el.classList.add("on"); clearTimeout(ssToastT); ssToastT = setTimeout(() => el.classList.remove("on"), 2600); }
+function ssToast(t, ms = 2600) { const el = $("ss-toast"); el.textContent = t; el.classList.add("on"); clearTimeout(ssToastT); ssToastT = setTimeout(() => el.classList.remove("on"), ms); }
+function copyTxt(txt, ok, ms) { const done = () => ssToast(ok, ms);
+  const fall = () => { const t = document.createElement("textarea"); t.value = txt; t.style.position = "fixed"; t.style.opacity = "0"; document.body.appendChild(t); t.select(); try { document.execCommand("copy"); done(); } catch (e) { ssToast("Gagal menyalin: " + txt, 6000); } t.remove(); };
+  if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(done, fall); else fall(); }
+
+// ---------------- "Semua data (.zip)": the day's md + per-second / per-km / lap CSV + Garmin JSON + the day's data (RENCANA 18 D3)
+const ZCRC = (() => { const t = new Uint32Array(256); for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+const zcrc = b => { let c = -1; for (let i = 0; i < b.length; i++) c = ZCRC[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ -1) >>> 0; };
+async function zdeflate(b) { if (typeof CompressionStream === "undefined") return null;
+  try { return new Uint8Array(await new Response(new Blob([b]).stream().pipeThrough(new CompressionStream("deflate-raw"))).arrayBuffer()); } catch (e) { return null; } }
+async function zipBlob(files) {   // [[name, text]] -> a .zip Blob (deflate where the browser has it, else stored)
+  const enc = new TextEncoder(), parts = [], cen = [], n = new Date(); let off = 0;
+  const when = ((n.getFullYear() - 1980) << 25 | (n.getMonth() + 1) << 21 | n.getDate() << 16 | n.getHours() << 11 | n.getMinutes() << 5 | n.getSeconds() >> 1) >>> 0;
+  for (const [name, data] of files) { const raw = enc.encode(data), nm = enc.encode(name), crc = zcrc(raw);
+    let body = await zdeflate(raw), meth = 8; if (!body || body.length >= raw.length) { body = raw; meth = 0; }
+    const h = new DataView(new ArrayBuffer(30)); [[0, 0x04034b50, 4], [4, 20, 2], [6, 0x0800, 2], [8, meth, 2], [10, when, 4], [14, crc, 4], [18, body.length, 4], [22, raw.length, 4], [26, nm.length, 2]].forEach(([o, v, w]) => w === 4 ? h.setUint32(o, v, true) : h.setUint16(o, v, true));
+    const c = new DataView(new ArrayBuffer(46)); [[0, 0x02014b50, 4], [4, 20, 2], [6, 20, 2], [8, 0x0800, 2], [10, meth, 2], [12, when, 4], [16, crc, 4], [20, body.length, 4], [24, raw.length, 4], [28, nm.length, 2], [42, off, 4]].forEach(([o, v, w]) => w === 4 ? c.setUint32(o, v, true) : c.setUint16(o, v, true));
+    parts.push(h.buffer, nm, body); cen.push(c.buffer, nm); off += 30 + nm.length + body.length; }
+  const size = cen.reduce((t, b) => t + b.byteLength, 0), e = new DataView(new ArrayBuffer(22));
+  e.setUint32(0, 0x06054b50, true); e.setUint16(8, files.length, true); e.setUint16(10, files.length, true); e.setUint32(12, size, true); e.setUint32(16, off, true);
+  return new Blob([...parts, ...cen, e.buffer], {type: "application/zip"}); }
+const PSC = {t: 1, d: 10, hr: 1, cad: 1, el: 10, sp: 1000, tc: 1};   // same scales as build.py per_second()
+function psOf(x) { if (!x.ps) return null; const o = {};
+  for (const k in x.ps) { let v = 0; o[k] = x.ps[k].map(q => q == null ? null : (v += q) / PSC[k]); } return o; }
+const csvRow = r => r.map(v => v == null ? "" : /[",\n]/.test(String(v)) ? `"${String(v).replace(/"/g, '""')}"` : v).join(",");
+const csvPace = s => { const r = Math.round(s); return `${Math.floor(r / 60)}:${String(r % 60).padStart(2, "0")}`; };
+function psCsv(st, walk) {   // same columns as pacelab/export.py per_second_csv
+  const t = st.t || [], d = st.d || [], hr = st.hr || [], cad = st.cad || [], el = st.el || [], sp = st.sp || [], tc = st.tc || [];
+  const L = ["detik,jarak_m,hr_bpm,kecepatan_m_s,pace_per_km,cadence_spm,elevasi_m,suhu_c,jalan"];
+  for (let i = 0; i < t.length; i++) { const a = Math.max(0, i - 2), b = Math.min(t.length - 1, i + 2);
+    const v = sp[i] != null ? sp[i] : t[b] > t[a] ? (d[b] - d[a]) / (t[b] - t[a]) : null;
+    L.push(csvRow([+t[i].toFixed(1), +d[i].toFixed(1), hr[i], v ? +v.toFixed(3) : "", v && v > .5 ? csvPace(1000 / v) : "", cad[i] || "", el[i] != null ? +el[i].toFixed(1) : "", tc[i], walk && v != null ? (v <= walk ? 1 : 0) : ""])); }
+  return L.join("\n") + "\n"; }
+const kmCsv = x => ["km,jarak_km,waktu_s,pace_per_km,hr_rata,cadence_spm,elevasi_akhir_m,jalan_s", ...x.splits.map((p, i) => csvRow([i + 1, p[0], p[1], csvPace(p[1] / p[0]), p[2], p[3], p[4], p[5] || 0]))].join("\n") + "\n";
+const LAPT = {a: "auto", m: "manual", e: "akhir", t: "waktu", p: "posisi", w: "lap"};
+const lapCsv = x => ["lap,jarak_km,waktu_s,pace_per_km,hr_rata,cadence_spm,jalan_s,asal", ...x.laps.map((l, i) => csvRow([i + 1, l[0], l[1], csvPace(l[1] / l[0]), l[2], l[3], l[5] ?? "", LAPT[l[4]] || "lap"]))].join("\n") + "\n";
+function dayJson(s, run) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, ev = (DATA.all_events || []).some(e => Math.floor((D(e.date) - D(DATA.ms1)) / 864e5 / 7) === ms - 1);
+  const st = addDays(DATA.ms1, (ms - 1) * 7);
+  return JSON.stringify({tanggal: s, dibuat: DATA.generated, minggu_program: ms, fase: (phaseOf(ms) || {}).name || null, maraton: DATA.race_date,
+    lomba_tes: (DATA.all_events || []).filter(e => e.date >= addDays(s, -7)).slice(0, 4),
+    pelari: run.map(a => { const pl0 = parsePlan(planCell(a, s));
+      return {nama: a.name, rencana: {sel: planCell(a, s) || null, asal: ovrOf(a, s) ? "overrides.json" : swapOn(a, s) ? "tukar sesi dari " + swapOf(a, s) : "Excel"},
+        profil: {zona_hr: a.zones, pace_s_per_km: a.pace, cadence: a.cadence, lthr: a.lthr, ambang: a.coach},
+        kondisi_pagi: wellOf(a, s) || null,
+        lari: (a.sessions || []).filter(x => x.date === s).map(x => { const {splits, laps, ps, g, ...rest} = x;
+          return Object.assign(rest, {per_detik: ps ? "lihat " + a.name + "_per_detik.csv" : `tidak ada di dashboard (lebih lama dari ${DATA.ps_weeks || 10} minggu, atau tanpa data per detik): pakai Ekspor Sesi`,
+            penilaian: (ssChecks(a, x, pl0, ev, s) || []).map(([lab, st2, v]) => ({cek: mdTxt(lab), status: {ok: "lolos", wn: "perlu perhatian"}[st2] || "tidak dinilai", nilai: mdTxt(v)})),
+            kesimpulan: mdTxt(ssVerdict(a, x, pl0, s))}); }),
+        minggu: {ringkas: (a.weeks || []).find(q => q.ms === ms) || null, lari: (a.sessions || []).filter(x => x.date >= st && x.date <= addDays(st, 6)).map(x => ({tanggal: x.date, km: x.km, detik: x.sec, hr: x.hr}))}}; }),
+    pacing_berdua: (f => f ? mdTxt(f) : null)(pairFlag(A.find(x => x.c === "t"), sessOf(A.find(x => x.c === "t"), s), A.find(x => x.c === "r"), sessOf(A.find(x => x.c === "r"), s), s))}, null, 2); }
+async function ssZip(s) { const run = A.filter(a => V().includes(a)), F = [["ringkasan.md", ssMd(s, "both")]]; let noPs = 0;
+  run.forEach(a => { const xs = (a.sessions || []).filter(x => x.date === s);
+    xs.forEach((x, n) => { const tag = a.name + (xs.length > 1 ? "_" + (n + 1) : ""), st = psOf(x);
+      if (st) F.push([tag + "_per_detik.csv", psCsv(st, (a.coach || {}).walk_mps)]); else noPs++;
+      if (x.splits.length) F.push([tag + "_per_km.csv", kmCsv(x)]);
+      if (x.laps && x.laps.length) F.push([tag + "_lap.csv", lapCsv(x)]);
+      F.push([tag + "_garmin.json", JSON.stringify({nama: x.name, mulai: x.time, km: x.km, detik: x.sec, hr_rata: x.hr, garmin: x.g}, null, 2)]); }); });
+  F.push(["data_hari_ini.json", dayJson(s, run)]);
+  const name = `NewPaceLab_${s}.zip`, url = URL.createObjectURL(await zipBlob(F)), el = document.createElement("a");
+  el.href = url; el.download = name; document.body.appendChild(el); el.click(); el.remove(); setTimeout(() => URL.revokeObjectURL(url), 4000);
+  ssToast(noPs ? `Tersimpan: ${name} · tanpa data per detik (lari lebih lama dari ${DATA.ps_weeks || 10} minggu): pakai "Ditambah file FIT asli…"` : "Tersimpan: " + name, noPs ? 6000 : 2600); }
 document.addEventListener("click", e => { const b = e.target.closest(".ss-md"), f = e.target.closest(".ss-mdm [data-mdf]");
   if (f) { const w = f.closest(".ss-mdw"); w.classList.remove("on"); w.querySelector(".ss-md").setAttribute("aria-expanded", "false"); return ssMdSave(w.querySelector(".ss-md").dataset.md, f.dataset.mdf); }
   document.querySelectorAll(".ss-mdw.on").forEach(w => { if (!b || !w.contains(b)) { w.classList.remove("on"); w.querySelector(".ss-md").setAttribute("aria-expanded", "false"); } });
@@ -2299,7 +2384,7 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const hasL = k => [T, R].some(x => x && x.splits.some(p => p[SSL[k].i] != null)), hasLap = [T, R].some(x => x && x.laps && x.laps.length);
   return `<div class="ss-dd"><div class="ss-dtop"><div class="who">${vis.includes("t") ? ssRing("t", ssComp(ta, T, PT, s)) + `<div><b>Taofik</b><small>${morn(ta, T)}</small>${ssSwapBtn(ta, T, s)}</div>` : ""}</div>
       <div class="mid">${(T || R) ? `<div class="ss-mdw"><button class="ss-md" data-md="${s}" aria-haspopup="menu" aria-expanded="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11m0 0l-4-4m4 4l4-4M5 19h14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>Simpan untuk Claude</button>
-        <div class="ss-mdm" role="menu">${T && R ? `<button role="menuitem" data-mdf="both"><b>Kedua pelari (.md)</b><small>duel lengkap, untuk perbandingan</small></button>` : ""}${T ? `<button role="menuitem" data-mdf="t"><b>Taofik saja (.md)</b><small>analisa satu pelari</small></button>` : ""}${R ? `<button role="menuitem" data-mdf="r"><b>Reza saja (.md)</b><small>analisa satu pelari</small></button>` : ""}<button role="menuitem" data-mdf="copy"><b>Salin teks</b><small>langsung tempel ke Claude chat tanpa file</small></button></div></div>` : ""}</div>
+        <div class="ss-mdm" role="menu">${T && R ? `<button role="menuitem" data-mdf="both"><b>Kedua pelari (.md)</b><small>duel lengkap, untuk perbandingan</small></button>` : ""}<button role="menuitem" data-mdf="zip"><b>Semua data (.zip)</b><small>md + CSV per detik, per km, lap + JSON lengkap${T && R ? ", kedua pelari" : ""}</small></button><button role="menuitem" data-mdf="fit"><b>Ditambah file FIT asli…</b><small>salin perintah Ekspor Sesi untuk tanggal ini (dijalankan di laptop)</small></button>${T ? `<button role="menuitem" data-mdf="t"><b>Taofik saja (.md)</b><small>analisa satu pelari</small></button>` : ""}${R ? `<button role="menuitem" data-mdf="r"><b>Reza saja (.md)</b><small>analisa satu pelari</small></button>` : ""}<button role="menuitem" data-mdf="copy"><b>Salin teks</b><small>langsung tempel ke Claude chat tanpa file</small></button></div></div>` : ""}</div>
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small>${ssSwapBtn(ra, R, s)}</div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
@@ -2465,8 +2550,9 @@ function rcFatigue(a, race) { const C = a.coach || {}, km = C.fatigue_km ?? 18, 
   return null; }
 const heatPct = (C, tc) => { const H = C.heat || []; if (tc == null || !H.length) return 0; const [a, b, c] = H;   // §3b step 2: 28–30 +3%, 30–32 +5%, > 32 +8%
   return c && tc > c[0] ? c[1] : b && tc >= b[0] ? b[1] : a && tc >= a[0] ? a[1] : 0; };
+const rcS = ownScroll($("rcx-body"), $("rcx-sbar"), document.querySelector("#rcx .ssx-win"));
 function rcOpen(date) { const vis = V(); RC = {d: date, c: (vis[0] || A[0]).c, base: null, ts: 28, st: "06:00", tl: ""}; rcRender();
-  const ov = $("rcx"); ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false"); requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); ov.querySelector(".pbx-x").focus(); })); }
+  const ov = $("rcx"); ov.style.display = "flex"; ov.setAttribute("aria-hidden", "false"); requestAnimationFrame(() => requestAnimationFrame(() => { ov.classList.add("open"); ov.querySelector(".pbx-x").focus(); rcS.size(); })); }
 function rcClose() { if (!RC) return; RC = null; const ov = $("rcx"); ov.classList.remove("open"); setTimeout(() => { ov.style.display = "none"; ov.setAttribute("aria-hidden", "true"); }, 400); }
 function rcCalc(a) { const C = a.coach || {}, races = rcRaces(), race = races.find(r => r.d === RC.d) || races[0], bases = rcBases(a, race.d), b = bases.find(q => q.d + q.k === RC.base) || bases[0];
   if (!b) return {race, bases};
@@ -2485,7 +2571,7 @@ function rcRender() { const a = A.find(x => x.c === RC.c), r = rcCalc(a), C = a.
     <label for="rc-st">Jam start</label><input id="rc-st" type="time" value="${RC.st}">
     <label for="rc-tl">Suhu km terakhir (°C)</label><input id="rc-tl" type="number" step="0.5" value="${RC.tl}" placeholder="${r.auto != null ? "perkiraan " + f1(r.auto) + " (start + 1 °C / 30 mnt)" : "kosong = perkiraan"}">
     <label>Long run ≥ ${C.fatigue_km ?? 18} km &lt; ${C.fatigue_days ?? 7} hari</label><span class="auto">${r.fat ? "otomatis: " + r.fat : "otomatis: tidak ada"}</span></div>`;
-  if (!r.b) { $("rcx-body").innerHTML = f + `<p class="rcn">Target hanya dihitung dari waktu lomba atau tes utuh (minimal 5 km tanpa berhenti), dokumen §3b langkah 1.</p>`; return; }
+  if (!r.b) { $("rcx-body").firstElementChild.innerHTML = f + `<p class="rcn">Target hanya dihitung dari waktu lomba atau tes utuh (minimal 5 km tanpa berhenti), dokumen §3b langkah 1.</p>`; return rcS.size(); }
   const pc = v => (v >= 0 ? "+" : "") + Math.round(v * 100) + "%";
   const steps = `<ol class="rcs"><li><i>1</i><span>Riegel dari ${r.b.k} ${mm(r.b.sec)} (${tgl(r.b.d)}) · ${mm(r.b.sec)} × (${f1(r.race.km)} / ${r.b.km})<sup>1,06</sup></span><b class="num">${mm(r.riegel)}</b></li>
     <li><i>2</i><span>Panas · ${r.tc == null ? "suhu belum diisi" : `${r.late ? "suhu km terakhir" : "suhu start"} ${f1(r.tc)} °C`} → ${pc(r.hp)}${r.late ? " (start setelah 06:00, langkah 4)" : ""}</span><b class="num">${mm(r.t1)}</b></li>
@@ -2498,8 +2584,8 @@ function rcRender() { const a = A.find(x => x.c === RC.c), r = rcCalc(a), C = a.
     <tr><td>km 3–5</td><td class="num">≤ ${LT - off[2]}</td><td>dikunci HR, tanpa target pace</td></tr>
     <tr><td>setelah km 5</td><td class="num">pace naik hanya bila HR ≤ ${LT - 4}</td><td>HR masih ≥ 4 di bawah LTHR ${LT}</td></tr></tbody></table>` : `<p class="rcn">LTHR belum ada di config.json.</p>`;
   RC.txt = `Target ${r.race.n} ${hariF(r.race.d)} (${a.name}): ${rng}. Riegel ${mm(r.riegel)} dari ${r.b.k} ${mm(r.b.sec)} (${tgl(r.b.d)}), panas ${pc(r.hp)}, kelelahan ${pc(r.fp)} → ${mm(r.t2)}.` + (LT ? ` HR: km 1 ≤ ${LT - off[0]}, km 2 ≤ ${LT - off[1]}, km 3–5 ≤ ${LT - off[2]}; pace naik setelah km 5 hanya bila HR ≤ ${LT - 4}.` : "");
-  $("rcx-body").innerHTML = f + steps + `<div class="rcr num">${rng} <small>target ditulis sebagai rentang (§3b langkah 7)</small></div>` + hr +
-    `<button class="rcc" type="button" id="rc-copy">Salin untuk Claude chat</button><p class="rcn">Dokumen §3b. Rentang = ±${Math.round((C.target_band ?? .015) * 1000) / 10}% dari hasil koreksi, dibulatkan ke menit [keputusan dashboard].</p>`; }
+  $("rcx-body").firstElementChild.innerHTML = f + steps + `<div class="rcr num">${rng} <small>target ditulis sebagai rentang (§3b langkah 7)</small></div>` + hr +
+    `<button class="rcc" type="button" id="rc-copy">Salin untuk Claude chat</button><p class="rcn">Dokumen §3b. Rentang = ±${Math.round((C.target_band ?? .015) * 1000) / 10}% dari hasil koreksi, dibulatkan ke menit [keputusan dashboard].</p>`; rcS.size(); }
 document.addEventListener("click", e => { const b = e.target.closest("[data-rc]"); if (b) return rcOpen(b.dataset.rc);
   if (!RC) return; if (e.target === $("rcx") || e.target.closest("#rcx [data-close]")) return rcClose();
   const w = e.target.closest("#rcx-who [data-c]"); if (w) { RC.c = w.dataset.c; RC.base = null; return rcRender(); }

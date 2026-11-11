@@ -64,21 +64,23 @@ def table(head, rows):
     return out + ["| " + " | ".join(str(c) for c in r) + " |" for r in rows]
 
 
-def per_second_csv(stream):
-    """CSV text: detik, jarak_m, hr_bpm, kecepatan_m_s, pace_per_km, cadence_spm, elevasi_m, suhu_c.
-    Speed = the watch's own (FIT enhanced_speed) when the stream has it, else over +-2 samples."""
+def per_second_csv(stream, walk=None):
+    """CSV text: detik, jarak_m, hr_bpm, kecepatan_m_s, pace_per_km, cadence_spm, elevasi_m, suhu_c, jalan.
+    Speed = the watch's own (FIT enhanced_speed) when the stream has it, else over +-2 samples.
+    jalan = 1 when that speed is at or below walk m/s (config coach.walk_mps), 0 above, empty without speed."""
     t, d = stream.get("t") or [], stream.get("d") or []
     hr, cad, el = stream.get("hr") or [], stream.get("cad") or [], stream.get("el") or []
     sp, tc = stream.get("sp") or [], stream.get("tc") or []
     buf = io.StringIO()
     w = csv.writer(buf, lineterminator="\n")
-    w.writerow(["detik", "jarak_m", "hr_bpm", "kecepatan_m_s", "pace_per_km", "cadence_spm", "elevasi_m", "suhu_c"])
+    w.writerow(["detik", "jarak_m", "hr_bpm", "kecepatan_m_s", "pace_per_km", "cadence_spm", "elevasi_m", "suhu_c", "jalan"])
     for i in range(len(t)):
         a, b = max(0, i - 2), min(len(t) - 1, i + 2)
         v = sp[i] if i < len(sp) and sp[i] is not None else (d[b] - d[a]) / (t[b] - t[a]) if t[b] > t[a] else None
         w.writerow([t[i], d[i], hr[i] if i < len(hr) else "", round(v, 3) if v else "",
                     pace(1000 / v) if v and v > .5 else "", cad[i] if i < len(cad) and cad[i] else "",
-                    el[i] if i < len(el) and el[i] is not None else "", tc[i] if i < len(tc) and tc[i] is not None else ""])
+                    el[i] if i < len(el) and el[i] is not None else "", tc[i] if i < len(tc) and tc[i] is not None else "",
+                    (1 if v <= walk else 0) if walk and v is not None else ""])
     return buf.getvalue()
 
 
@@ -222,7 +224,7 @@ def export_day(cfg, athletes, day, prog=None, client_for=None, with_fit=True, ou
                 except Exception as e:  # noqa: BLE001 - the export still works from the local copy
                     log("  [!] %s: file FIT tidak terunduh (%s); pakai data lokal" % (a["name"], type(e).__name__))
             if stream:
-                files["%s%s_per_detik.csv" % (tag, suffix)] = per_second_csv(stream).encode("utf-8")
+                files["%s%s_per_detik.csv" % (tag, suffix)] = per_second_csv(stream, ((a.get("coach") or cfg.get("coach") or {}).get("walk_mps"))).encode("utf-8")
             if laps:
                 files["%s%s_lap.csv" % (tag, suffix)] = lap_csv(laps).encode("utf-8")
             rows.append((r, stream, laps))

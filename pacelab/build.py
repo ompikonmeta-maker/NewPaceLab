@@ -19,7 +19,30 @@ def _read(p, default):
         return default
 
 
-def athlete_data(a, data_dir, today):
+PS_SCALE = {"t": 1, "d": 10, "hr": 1, "cad": 1, "el": 10, "sp": 1000, "tc": 1}
+
+
+def per_second(stream):
+    """Per-second data packed for the page ("Semua data (.zip)"): per field, integers at PS_SCALE (0.1 m, mm/s ...),
+    each the difference from the previous non-empty value; null stays null."""
+    out = {}
+    for k, sc in PS_SCALE.items():
+        a = stream.get(k)
+        if not a or all(v is None for v in a):
+            continue
+        prev, row = 0, []
+        for v in a:
+            if v is None:
+                row.append(None)
+                continue
+            q = int(round(v * sc))
+            row.append(q - prev)
+            prev = q
+        out[k] = row
+    return out
+
+
+def athlete_data(a, data_dir, today, ps_weeks=0):
     prog = a["program"] if isinstance(a["program"], dict) else load_program(a["program"])
     folder = Path(data_dir) / a["id"]
     runs = _read(folder / "runs.json", [])
@@ -61,6 +84,12 @@ def athlete_data(a, data_dir, today):
     latest = next((day for day in sorted(well, reverse=True) if day <= today.isoformat()), None)
 
     in_program = [r for r in runs if r["date"] >= prog["ms1"]]
+    sessions = [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None), (a.get("coach") or {}).get("walk_mps"), a.get("coach"))
+                for r in in_program]
+    ps_from = (today - dt.timedelta(weeks=ps_weeks)).isoformat()   # per-second data only for the last weeks (file size)
+    for s, r in zip(sessions, in_program):
+        if ps_weeks and r["date"] >= ps_from and r["id"] in streams:
+            s["ps"] = per_second(streams[r["id"]])
     done = [w for w in weeks if w["done"]]
     last_done = done[-1] if done else None
     return {
@@ -93,8 +122,7 @@ def athlete_data(a, data_dir, today):
         "last_done_ms": last_done["ms"] if last_done else None,
         "sync": _read(folder / "state.json", {}).get("last_sync"),
         "run_days": _run_days(in_program),
-        "sessions": [_session(r, streams.get(r["id"]), _read(folder / "laps" / ("%s.json" % r["id"]), None), (a.get("coach") or {}).get("walk_mps"), a.get("coach"))
-                     for r in in_program],
+        "sessions": sessions,
     }
 
 
@@ -170,7 +198,7 @@ def build(cfg, athletes, today, out_path):
     ovr = overrides.load(cfg.get("overrides"))
     if ovr:
         print("[i] %s: %d sesi diatur manual" % (cfg.get("overrides"), sum(len(v) for v in ovr.values())))
-    data = [athlete_data(a, cfg["data_dir"], today) for a in athletes]
+    data = [athlete_data(a, cfg["data_dir"], today, cfg.get("per_detik_minggu", 10)) for a in athletes]
     p0 = data[0]["program"]
     ms_cur = m.ms_of(today.isoformat(), p0["ms1"])
     phases = []
@@ -190,6 +218,7 @@ def build(cfg, athletes, today, out_path):
     payload = {
         "generated": dt.datetime.now().isoformat(timespec="minutes"),
         "today": today.isoformat(),
+        "ps_weeks": cfg.get("per_detik_minggu", 10),
         "race_date": p0["race_date"],
         "ms1": p0["ms1"],
         "ms_cur": ms_cur,

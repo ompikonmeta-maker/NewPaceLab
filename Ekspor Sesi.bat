@@ -4,8 +4,9 @@ cd /d "%~dp0"
 set PY=python
 where python >nul 2>nul || set PY=py
 if exist "%~dp0python\python.exe" set PY="%~dp0python\python.exe"
-set TGL=
-set /p TGL=Tanggal lari (YYYY-MM-DD, kosong = hari ini):
+rem Tanggal boleh diberikan langsung: "Ekspor Sesi.bat" 2026-10-31 (disalin dari menu "Simpan untuk Claude").
+set TGL=%~1
+if "%TGL%"=="" set /p TGL=Tanggal lari (YYYY-MM-DD, kosong = hari ini):
 set FIT=
 set /p FIT=Sertakan file FIT asli dari jam? Berisi GPS. (Y/n):
 set OPT=

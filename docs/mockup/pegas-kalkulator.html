@@ -173,7 +173,7 @@ function bounceNew(scroller, content, bar) {
   scroller.addEventListener("wheel", e => { if (REDUCED || e.ctrlKey) return;
     const dy = e.deltaY * (e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? H() : 1), dir = Math.sign(dy); if (!dir) return;
     const now = performance.now(), gap = now - last, a = Math.abs(dy); last = now;
-    const rising = a > lastAbs * 1.15 + 1 || gap > 220; falls = a < lastAbs * .97 && gap < 60 ? falls + 1 : 0; lastAbs = a;
+    const rising = a > lastAbs * 1.15 + 1 || gap > 220; falls = gap > 150 || a > lastAbs ? 0 : a < lastAbs * .97 ? falls + 1 : falls; lastAbs = a;   // equal steps keep the count
     // leftover glide after the push ended: swallow it while it keeps fading
     if (now < mute && !rising && (off ? Math.sign(off) === dir : atEnd(dir))) { e.preventDefault(); mute = now + 160; return; }
     mute = 0;

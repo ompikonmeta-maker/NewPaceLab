@@ -6,6 +6,7 @@
             "stride_km": 0.15, "stride_mps": 2.6, "stride_min_s": 6, "red_easy_km": 8, "lthr_off": [15, 6, 2],
             "pair_start_min": 2, "pair_km1_s": 15, "pair_fast_s": 30,
             "heat": [[28, 0.03], [30, 0.05], [32, 0.08]], "fatigue_km": 18, "fatigue_days": 7, "fatigue_pct": 0.02, "heat_c_per_30min": 1, "target_band": 0.015},
+  "per_detik_minggu": 10,
   "effort": {"min_frac": 0.98, "test_min_frac": 0.8},
   "athletes": [
     {"id": "TAOFIK", "name": "Taofik", "program": "programs/Program_Marathon_TAOFIK.xlsx", "weight_floor": 65,

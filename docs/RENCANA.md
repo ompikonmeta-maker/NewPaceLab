@@ -34,7 +34,7 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 21. Catatan omPik 10 Nov — mockup siap, menunggu "gas"
+## 21. Catatan omPik 10 Nov — **sudah dibuat** (11 Nov)
 
 Mockup: [`docs/mockup/pegas-kalkulator.html`](mockup/pegas-kalkulator.html) (kalkulator sekarang vs baru; pegas lama vs baru
 dengan grafik tarikan dan tombol simulasi touchpad: lama tertahan 2,13 dtk, baru 0,37 dtk).
@@ -113,7 +113,7 @@ Hasil cek kode (✔ benar · ◐ sebagian · ✖ sudah ada / tidak tepat):
 | 13 | Long run pakai aturan B, A cadangan | ✖ | Sudah dibuat (0c, keputusan omPik) |
 | 14 | Cek pacing berdua (km 1) | baru | Belum ada |
 
-## 18. "Simpan untuk Claude" dengan semua data — **omPik pilih D3 (10 Nov)**, menunggu "gas"
+## 18. "Simpan untuk Claude" dengan semua data — **D3 sudah dibuat** (11 Nov)
 
 Mockup: [`docs/mockup/simpan-semua-data.html`](mockup/simpan-semua-data.html). D1 zip dari isi dashboard (md + CSV per km +
 CSV lap + JSON Garmin + JSON hari itu) · D2 D1 + data per detik 10 minggu terakhir ikut di dashboard.html (±3–8 MB) ·

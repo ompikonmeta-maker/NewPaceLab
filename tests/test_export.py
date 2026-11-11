@@ -68,7 +68,7 @@ class ExportTest(unittest.TestCase):
             self.assertIn(s, md)
         self.assertNotIn("demo-taofik", md + out)                              # never a key
         rows = list(csv.reader(io.StringIO(z.read("taofik_per_detik.csv").decode())))
-        self.assertEqual(rows[0], ["detik", "jarak_m", "hr_bpm", "kecepatan_m_s", "pace_per_km", "cadence_spm", "elevasi_m", "suhu_c"])
+        self.assertEqual(rows[0], ["detik", "jarak_m", "hr_bpm", "kecepatan_m_s", "pace_per_km", "cadence_spm", "elevasi_m", "suhu_c", "jalan"])
         self.assertGreater(len(rows), 100)
         self.assertNotIn("lat", ",".join(rows[0]))                                 # no GPS in the CSV
         self.assertEqual(z.read("taofik_asli.fit")[8:12], b".FIT")
