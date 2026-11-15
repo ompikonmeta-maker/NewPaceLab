@@ -34,6 +34,19 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 23. Lanjutan 19 poin 6 (kecepatan jam + suhu, RUMUS 15 Nov) — menunggu file RUMUS 15 Nov (15 Nov)
+
+Permintaan omPik 15 Nov: simpan kecepatan + suhu per detik, pakai kecepatan jam untuk strides / jalan kaki / cadence lari /
+decoupling (tanda "perkiraan" bila tidak ada), aturan baru §6 (decoupling tidak berlaku bila < 1,5 m/s > 10% waktu
+bergerak) dan §5b (lari bareng: HR di atas batas atas > 25% km → "terbawa pace partner"), uji 4a–4f dengan data asli.
+Status:
+- File RUMUS-BATAS-SUMBER.md versi 15 Nov **tidak ikut terlampir** → docs belum diganti, aturan baru belum dibuat.
+- Poin 1–2 sudah ada sejak 10 Nov (commit 9ff9e9d dan sebelumnya): kolom `sp` (m/s) dan `tc` (°C) di streams, dari
+  FIT `enhanced_speed`/`temperature` dan dari details `directSpeed`/`directAirTemperature`; FIT_V = 2 mengunduh ulang
+  semua lari sekali; `_vel()` memakai `sp` untuk strides, jalan kaki, cadence lari, decoupling.
+- "Strained": inspect 10 Nov = 404 (training status dan readiness), tidak tersedia.
+- Uji 4a–4f butuh data asli dan key Garmin di laptop omPik (tidak ada di lingkungan Claude).
+
 ## 22. Kartu Tidur, HRV, Body Battery — **R1 + blok sejajar sudah dibuat** (11 Nov)
 
 R1 sejajar: tiap kartu enam blok dalam satu kisi bersama (CSS subgrid): judul · kesimpulan Taofik · kesimpulan Reza ·
