@@ -2002,8 +2002,14 @@ function sessOf(a, s) { const xs = (a.sessions || []).filter(x => x.date === s);
 // cadence as Garmin reports it for the run (averageRunningCadenceInStepsPerMinute); per-second data only when Garmin sent none
 const ssWho = x => A.find(a => (a.sessions || []).includes(x));
 const isRaceDay = s => (DATA.all_events || []).some(e => e.date === s);
+// docs §6 (15 Nov): not rated either when walking / very slow (watch speed < walk_mps) is over dec_walk_frac of the moving time
+function decWalk(x, a) { a = a || ssWho(x); const C = (a && a.coach) || {}, mv = (x.g && x.g.moving_s) || x.sec;
+  if (x.walk_s == null || C.dec_walk_frac == null || !mv) return null; const f = x.walk_s / mv; return f > C.dec_walk_frac ? {w: x.walk_s, mv, f} : null; }
 function decNA(x, a) { a = a || ssWho(x); if (!a) return false; const pl = parsePlan(planCell(a, x.date));
-  return isRaceDay(x.date) || !!pl && (pl.k === "hard" || pl.k === "race" || pl.strides != null); }   // docs §6: tempo, interval, lomba, strides
+  return isRaceDay(x.date) || !!pl && (pl.k === "hard" || pl.k === "race" || pl.strides != null) || !!decWalk(x, a); }   // docs §6: tempo, interval, lomba, strides, banyak jalan kaki
+const decNATxt = (x, a) => decWalk(x, a) ? "tidak berlaku (banyak jalan kaki)" : "tidak berlaku";
+const decWalkTxt = d => `${hms(d.w)} dari ${hms(d.mv)} bergerak (${Math.round(d.f * 100)}%) di bawah ${WMPS} m/s`;
+const estTxt = x => x.v_est ? " (perkiraan)" : "";   // no watch speed in this run's data: speed from distance differences
 const ssCadRun = x => x.cad_run ?? ssCad(x);   // C3: running seconds only (speed > walk_mps); Garmin's number when there is no per-second data
 const ssCad = x => { if (x.g && x.g.cad != null) return x.g.cad; const v = x.splits.filter(p => p[3]); return v.length ? v.reduce((q, p) => q + p[3] * p[1], 0) / v.reduce((q, p) => q + p[1], 0) : null; };
 const ssEf = x => x.hr ? (x.km * 1000 / (x.sec / 60)) / x.hr : null;
@@ -2041,7 +2047,7 @@ function lrHr(a, x, pl) { const C = a.coach || {}, hs = x.splits.filter(p => p[2
   const over = x.splits.map((p, i) => p[2] > top && p[0] >= .5 ? i : -1).filter(i => i >= 0), n = x.splits.length;
   if (!over.length) return {ok: true, v: `tidak ada km di atas ${top}`};
   const rng = over.length > 1 ? `km ${over[0] + 1}–${over[over.length - 1] + 1}` : `km ${over[0] + 1}`;
-  if (x.dec != null && C.lr_tail != null && C.dec_max != null) { const tail = over.every(i => i >= Math.floor(n * (1 - C.lr_tail)));
+  if (x.dec != null && !decWalk(x, a) && C.lr_tail != null && C.dec_max != null) { const tail = over.every(i => i >= Math.floor(n * (1 - C.lr_tail)));
     return {ok: tail && x.dec < C.dec_max, v: `${rng} di atas ${top}<small>${!tail ? `bukan di ${Math.round(C.lr_tail * 100)}% akhir` : `decoupling ${f1(x.dec).replace(".", ",")}%${x.dec < C.dec_max ? " · boleh" : ""}`}</small>`}; }
   if (C.lr_hr_in == null) return null; const inn = 1 - over.length / hs.length;
   return {ok: inn >= C.lr_hr_in, v: `${Math.round(inn * 100)}% km tidak lewat ${top}<small>${rng} lewat · cadangan (decoupling tidak ada)</small>`}; }
@@ -2059,7 +2065,7 @@ function ssChecks(a, x, pl0, wkEvent, s) { if (!x) return null; const pl = planF
   if (kw) out.push(["Jarak", kw.ok ? "ok" : "wn", `${f1(x.km)} / ${f1(pl.km)} km<small>${Math.round(kw.pct * 100)}%${pl.km0 ? ` · ${f1(pl.km0)} km + ${pl.strides} strides` : ""}${x.km > kw.hi ? ` · lebih dari ${Math.round(C.km[1] * 100)}%` : ""}</small>`]);
   // §7b / §5b: going past the morning gate is its own row, next to the distance
   if (kw && kw.g) { const lim = kw.g.km || pl.km * kw.g.f, over = x.km > lim * C.km[1];
-    out.push(["Gerbang pagi", over ? "wn" : "ok", over ? (kw.g.red ? `${f1(x.km)} km saat lampu merah<small>batas: lari santai ≤ ${lim} km · gerbang dilewati</small>` : `+${f1(x.km - lim)} km<small>batas gerbang ${f1(lim)} km (${kw.g.t}) · gerbang dilewati</small>`)
+    out.push(["Gerbang pagi", over ? "wn" : "ok", over ? (kw.g.red ? `+${f1(x.km - lim)} km<small>${f1(x.km)} km saat lampu merah, batas lari santai ≤ ${lim} km · gerbang dilewati</small>` : `+${f1(x.km - lim)} km<small>batas gerbang ${f1(lim)} km (${kw.g.t}) · gerbang dilewati</small>`)
       : `${f1(x.km)} / ${f1(lim)} km<small>${kw.g.t} · patuh</small>`]); }
   if (k === "hard" && !race) { const hg = hardGate(a, day); if (hg) out.push(["Gerbang pagi", "wn", `latihan keras saat lampu ${LIGHT[hg][1].toLowerCase()}<small>seharusnya lari santai · gerbang dilewati</small>`]); }
   // §5b helpers: walking inside a segment, the first km against the slow end of the plan
@@ -2090,7 +2096,9 @@ function ssChecks(a, x, pl0, wkEvent, s) { if (!x) return null; const pl = planF
     if (pl.main) { const sp = (k === "long" && pl.open ? x.splits.slice(3) : x.splits).filter(p => p[0] >= .5), fast = sp.filter(p => spPace(p) < pl.main[0]).length;
       out.push(["Km lebih cepat dari rentang", fast ? "wn" : "ok", `${fast ? fast + " km" : "tidak ada"}<small>batas cepat ${paceS(pl.main[0])} · lebih lambat tidak apa-apa</small>`]); } }
   if (k === "long") {
-    if (x.dec != null && C.dec_max != null) out.push([ssTerm("dec"), x.km < 20 || wkEvent ? "na" : x.dec < C.dec_max ? "ok" : "wn", `${f1(x.dec)}%${x.km < 20 || wkEvent ? " · tidak dinilai" : ""}`]);
+    const dw = decWalk(x, a);
+    if (x.dec != null && dw) out.push([ssTerm("dec"), "na", `tidak berlaku (banyak jalan kaki)<small>${decWalkTxt(dw)}${estTxt(x)} · dokumen §6</small>`]);
+    else if (x.dec != null && C.dec_max != null) out.push([ssTerm("dec"), x.km < 20 || wkEvent ? "na" : x.dec < C.dec_max ? "ok" : "wn", `${f1(x.dec)}%${x.km < 20 || wkEvent ? " · tidak dinilai" : ""}${estTxt(x)}`]);
     const c = x.splits.map(p => p[3]).filter(Boolean); if (c.length >= 6 && C.cad_drop != null) { const h = c.length >> 1, dr = mean(c.slice(0, h)) - mean(c.slice(h)); out.push(["Cadence bertahan", dr < C.cad_drop ? "ok" : "wn", `${dr >= 0 ? "−" : "+"}${Math.abs(Math.round(dr))} spm`]); }
     if (C.lr_max_min) out.push([`Di bawah ${C.lr_max_min} mnt`, x.sec <= C.lr_max_min * 60 ? "ok" : "wn", hms(x.sec)]); }
   else if (k === "hard") { const seg = segOf(x, pl).filter(p => p[0] >= .5), hs = seg.slice(1).filter(p => p[2]), U1 = seg.some(p => typeof p[4] === "string") ? "lap" : "km";
@@ -2220,7 +2228,7 @@ const mdTxt = h => { const d = document.createElement("div");
 const mdNum = v => String(v).replace(".", ",");
 const mdRow = c => `| ${c.join(" | ")} |`;
 const mdTab = (head, rows) => rows.length ? [mdRow(head), mdRow(head.map(() => "---")), ...rows.map(mdRow)].join("\n") : "";
-function ssMdPair(s) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x => x.c === "r")], f = pairFlag(ta, sessOf(ta, s), ra, sessOf(ra, s), s);
+function ssMdPair(s) { const [ta, ra] = [A.find(x => x.c === "t"), A.find(x => x.c === "r")], f = pairAll(ta, sessOf(ta, s), ra, sessOf(ra, s), s);
   return f ? "\n**Cek pacing berdua (dashboard, dokumen §5b):** " + mdTxt(f) + "\n" : ""; }
 function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) + 1, ph = phaseOf(ms), W = (A[0].plan || []).find(w => w.ms === ms) || {};
   const ev = (DATA.all_events || []).some(e => Math.floor((D(e.date) - D(DATA.ms1)) / 864e5 / 7) === ms - 1);
@@ -2261,7 +2269,8 @@ function ssMd(s, who) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 7) 
         if (x.walk_s != null) L.push("", `Cadence lari (tanpa jalan kaki, kecepatan > ${WMPS} m/s): ${x.cad_run != null ? Math.round(x.cad_run) + " spm" : "–"} · jalan kaki total ${hms(x.walk_s)} dari ${hms(x.sec)} (${mdNum(f1(x.walk_s / x.sec * 100))}%)`);
         if (z.length) { const zz = [0, 0, 0, 0, 0]; let tt = 0; x.splits.forEach(p => { if (p[2]) { zz[zoneOf(a, p[2])] += p[1]; tt += p[1]; } });
           if (tt) L.push("", "Waktu di zona HR (dashboard, per km): " + zz.map((v, i) => v ? `Z${i + 1} ${Math.round(v / tt * 100)}%` : "").filter(Boolean).join(" · ")); } }
-      if (x.dec != null && decNA(x, a)) L.push("Decoupling: tidak berlaku (dokumen §6: hanya untuk lari dengan pace rata)");
+      if (x.dec != null && decWalk(x, a)) L.push(`Decoupling: tidak berlaku (banyak jalan kaki): ${decWalkTxt(decWalk(x, a))}${estTxt(x)} (dokumen §6)`);
+      else if (x.dec != null && decNA(x, a)) L.push("Decoupling: tidak berlaku (dokumen §6: hanya untuk lari dengan pace rata)");
       else if (x.dec != null) L.push(`Decoupling (dashboard, dokumen §6): ${mdNum(f1(x.dec))}% tanpa 3 km pertama${x.dec_full != null ? " · " + mdNum(f1(x.dec_full)) + "% data penuh" : ""}`);
       const ck = ssChecks(a, x, pl0, ev || W.event, s) || [];
       if (ck.length) { L.push("", "**Penilaian pelatih (dashboard NewPaceLab)**");
@@ -2331,7 +2340,7 @@ function dayJson(s, run) { const ms = Math.floor((D(s) - D(DATA.ms1)) / 864e5 / 
             penilaian: (ssChecks(a, x, pl0, ev, s) || []).map(([lab, st2, v]) => ({cek: mdTxt(lab), status: {ok: "lolos", wn: "perlu perhatian"}[st2] || "tidak dinilai", nilai: mdTxt(v)})),
             kesimpulan: mdTxt(ssVerdict(a, x, pl0, s))}); }),
         minggu: {ringkas: (a.weeks || []).find(q => q.ms === ms) || null, lari: (a.sessions || []).filter(x => x.date >= st && x.date <= addDays(st, 6)).map(x => ({tanggal: x.date, km: x.km, detik: x.sec, hr: x.hr}))}}; }),
-    pacing_berdua: (f => f ? mdTxt(f) : null)(pairFlag(A.find(x => x.c === "t"), sessOf(A.find(x => x.c === "t"), s), A.find(x => x.c === "r"), sessOf(A.find(x => x.c === "r"), s), s))}, null, 2); }
+    pacing_berdua: (f => f ? mdTxt(f) : null)(pairAll(A.find(x => x.c === "t"), sessOf(A.find(x => x.c === "t"), s), A.find(x => x.c === "r"), sessOf(A.find(x => x.c === "r"), s), s))}, null, 2); }
 async function ssZip(s) { const run = A.filter(a => V().includes(a)), F = [["ringkasan.md", ssMd(s, "both")]]; let noPs = 0;
   run.forEach(a => { const xs = (a.sessions || []).filter(x => x.date === s);
     xs.forEach((x, n) => { const tag = a.name + (xs.length > 1 ? "_" + (n + 1) : ""), st = psOf(x);
@@ -2359,6 +2368,19 @@ function pairCheck(ta, T, ra, R, s) { if (!T || !R || !T.time || !R.time || !T.s
   return {dStart, dk, fast, k: [k1(T), k1(R)]}; }
 function pairFlag(ta, T, ra, R, s) { const r = pairCheck(ta, T, ra, R, s); if (!r) return "";
   return `<b>Kemungkinan terbawa:</b> start ${r.dStart ? `beda ${r.dStart} menit` : "bersamaan"} (${T.time} · ${R.time}), km 1 hanya beda ${Math.round(r.dk)} dtk (${paceS(r.k[0])} vs ${paceS(r.k[1])}), dan km 1 ${r.fast.map(q => `${q.a.name} ${Math.round(q.by)} dtk lebih cepat dari rencananya (${paceS(q.sl)})`).join(", ")}. <span class="s2">dokumen §5b</span>`; }
+// docs §5b (15 Nov) "lari bareng": both started < pair_start_min apart on a long run / easy run (each runner's own plan);
+// a runner whose HR is over their own upper limit in more than pair_hr_frac of the km is flagged [keputusan dashboard: 25%, omPik 15 Nov]
+function pairHr(ta, T, ra, R, s) { const C = ta.coach || {}; if (!T || !R || !T.time || !R.time || C.pair_hr_frac == null || C.pair_start_min == null || isRaceDay(s)) return null;
+  const mn = q => +q.slice(0, 2) * 60 + +q.slice(3, 5); if (Math.abs(mn(T.time) - mn(R.time)) >= C.pair_start_min) return null;
+  const rows = [[ta, T], [ra, R]].map(([a, x]) => { const pl = planFill(a, parsePlan(planCell(a, s))); if (!pl || !["long", "easy", "rec"].includes(pl.k) || !pl.hr) return null;
+    const hs = x.splits.filter(p => p[2] && p[0] >= .5), over = x.splits.map((p, i) => p[2] && p[0] >= .5 && p[2] > pl.hr[1] ? i + 1 : 0).filter(Boolean);
+    return hs.length ? {a, top: pl.hr[1], over, n: hs.length, flag: over.length / hs.length > C.pair_hr_frac} : null; });
+  return rows.every(Boolean) && rows.some(r => r.flag) ? rows : null; }
+function pairHrFlag(ta, T, ra, R, s) { const r = pairHr(ta, T, ra, R, s); if (!r) return "";
+  const kmR = o => o.length ? ` (km ${o.length > 1 ? o[0] + "–" + o[o.length - 1] : o[0]})` : "";
+  return r.filter(q => q.flag).map(q => `<b>Lari bareng:</b> ${q.a.name} terbawa pace partner, ikuti HR pelari yang lebih lambat. HR di atas ${q.top} di ${q.over.length} dari ${q.n} km${kmR(q.over)}`).join("<br>")
+    + (r.some(q => !q.flag) ? ` · ${r.filter(q => !q.flag).map(q => `${q.a.name} ${q.over.length} km di atas ${q.top}`).join(", ")}` : "") + ` <span class="s2">dokumen §5b</span>`; }
+const pairAll = (ta, T, ra, R, s) => [pairFlag(ta, T, ra, R, s), pairHrFlag(ta, T, ra, R, s)].filter(Boolean).join("<br>");
 // "⇄ Nilai sebagai…": pick which planned day of the week this run is judged against
 function ssSwapBtn(a, x, s) { if (!x) return ""; if (ovrOf(a, s)) return `<span class="ss-tag o" style="margin-top:6px">diatur di overrides.json</span>`; const cur = swapOf(a, s), auto = swapAuto(a)[s] || s, man = (SWAPM[a.c] || {})[s];
   const opts = wkDays(s).map(p => [p, parsePlan(planRaw(a, p))]).filter(([p, pl]) => p <= DATA.today && pl && RUNK(pl.k));
@@ -2387,9 +2409,9 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
   const M = [["Jarak", x => x.km, v => `${f1(v)}<small>km</small>`, 1], ["Pace", x => x.sec / x.km, v => `${paceS(v)}<small>/km</small>`, -1], ["HR rata", x => x.hr, v => `${v}<small>bpm</small>`, 0],
     [ssTerm("cad", "Cadence lari"), ssCadRun, v => `${Math.round(v)}<small>spm</small>`, 1]];
   if ([T, R].some(x => x && x.cad_run != null)) M.push([`<span>${ssTerm("cadg")}<small class="sub">termasuk jalan</small></span>`, x => x.g && x.g.cad != null ? x.g.cad : null, v => `${Math.round(v)}<small>spm</small>`, 1]);
-  if ([T, R].some(x => x && x.walk_s != null)) M.push([ssTerm("walk"), x => x.walk_s, v => v ? hms(v) : "0:00", 0]);
+  if ([T, R].some(x => x && x.walk_s != null)) M.push([ssTerm("walk") + ([T, R].some(x => x && x.v_est) ? "<small>perkiraan</small>" : ""), x => x.walk_s, v => v ? hms(v) : "0:00", 0]);
   M.push([ssTerm("ef"), ssEf, v => `${v.toFixed(2)}<small>m</small>`, 1]);
-  if ((T && T.dec != null) || (R && R.dec != null)) M.push([ssTerm("dec"), x => x.dec == null ? null : decNA(x) ? "tidak berlaku" : x.dec, v => typeof v === "string" ? `<small>${v}</small>` : `${f1(v)}<small>%</small>`, -1]);
+  if ((T && T.dec != null) || (R && R.dec != null)) M.push([ssTerm("dec"), x => x.dec == null ? null : decNA(x) ? decNATxt(x) : x.dec, v => typeof v === "string" ? `<small>${v}</small>` : `${f1(v)}<small>%</small>`, -1]);
   const rows = `<div class="ss-vt num">${M.map(([lab, f, fmt, dir]) => { const a = T ? f(T) : null, b = R ? f(R) : null; if (a == null && b == null) return "";
     const nb = v => typeof v === "number" ? v : null, an = nb(a), bn = nb(b), mx = Math.max(an || 0, bn || 0) || 1, w = v => nb(v) == null ? 0 : dir < 0 ? Math.min(an ?? v, bn ?? v) / v : v / mx;
     return `<span class="bb L"><i style="background:var(--t)" data-w="${w(a) * 100}"></i></span><span class="v L">${a == null ? "–" : fmt(a)}</span><span class="c">${lab}</span><span class="v R">${b == null ? "–" : fmt(b)}</span><span class="bb R"><i style="background:var(--r)" data-w="${w(b) * 100}"></i></span>`; }).join("")}</div>`;
@@ -2414,7 +2436,7 @@ function ssDetail(s) { const ta = A.find(x => x.c === "t"), ra = A.find(x => x.c
       <div class="who R">${vis.includes("r") ? `<div><b>Reza</b><small>${morn(ra, R)}</small>${ssSwapBtn(ra, R, s)}</div>` + ssRing("r", ssComp(ra, R, PR, s)) : ""}</div></div>
     ${rows}
     ${ck ? `<div class="ss-sec">Penilaian pelatih</div><div class="ss-ck">${ck}</div>` : ""}
-    ${(f => f ? `<div class="ss-pair">${f}</div>` : "")(pairFlag(ta, T, ra, R, s))}
+    ${(f => f ? `<div class="ss-pair">${f}</div>` : "")(pairAll(ta, T, ra, R, s))}
     ${hasLap ? `<div class="ss-sec"><span class="ss-vw" role="group" aria-label="Potongan"><button data-view="lap" aria-pressed="${SSV === "lap"}">Lap jam</button><button data-view="km" aria-pressed="${SSV === "km"}">Per km</button></span>
       <span class="s2">${SSV === "lap" ? "blok = satu lap setinggi jaraknya, lebar = kecepatan" : "batang = kecepatan, lebih panjang lebih cepat"} · pita = rentang pace rencana</span></div>`
       : `<div class="ss-sec">Per km <span class="s2">· batang = kecepatan, lebih panjang lebih cepat · pita = rentang pace rencana</span></div>`}
@@ -2452,7 +2474,7 @@ function ssFeed() { const vis = V().map(a => a.c), today = DATA.today, ta = A.fi
     if (!x) { const mv = movedTo(a, d.s); return `<div class="ss-sc ghost${mv ? " mv" : ""}" style="--i:${i}">${mv ? "dipindah ke " + HARIF[D(mv).getDay()] : "tidak lari"}</div>`; }
     const cp = ssComp(a, x, pl);
     return `<div class="ss-sc ${side}" style="--i:${i};--cp:${(cp || 0) / 100}">${ssRing(a.c, cp, 40)}<div class="sp2"><div class="km num">${f1(x.km)}<small> km</small></div>
-      <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? (decNA(x, a) ? " · dec tidak berlaku" : ` · dec ${f1(x.dec)}%`) : ""}</div></div></div>`; };
+      <div class="meta num">${paceS(x.sec / x.km)}/km${x.hr ? ` · ${x.hr} bpm` : ""}${x.dec != null ? (decNA(x, a) ? " · dec " + decNATxt(x, a) : ` · dec ${f1(x.dec)}%`) : ""}</div></div></div>`; };
   // a planned day counts as run when some run of the week is judged against it (moved runs included)
   const sum = (a, W) => { if (!vis.includes(a.c)) return ""; const pl = W.days.filter(d => d.s < DATA.today && RUNK(((a.c === "t" ? d.pT : d.pR) || {}).k));
     const cov = new Set(W.days.filter(d => a.c === "t" ? d.xT : d.xR).map(d => swapOf(a, d.s))), done = pl.filter(d => cov.has(d.s)), km = W.days.reduce((q, d) => q + ((a.c === "t" ? d.xT : d.xR) || {km: 0}).km, 0);

@@ -1,6 +1,7 @@
 # Rumus, Batas Angka, dan Sumber — Program Marathon 2027 (Taofik & Reza)
 
-Versi 10 Nov 2026. Perubahan terakhir:
+Versi 15 Nov 2026. Perubahan terakhir:
+- §6: decoupling tidak berlaku kalau jalan kaki >10% · §5b: aturan lari bareng
 - §5b: penilaian sesi tempo, tes, lomba (batas angka untuk dashboard)
 - §7b: aturan lampu (hijau/kuning/oranye/merah, termasuk RHR)
 - §5: jarak strides dalam rencana
@@ -126,6 +127,7 @@ Riwayat start terlalu cepat: Reza 15 Okt, 27 Okt, 1 Nov, 7 Nov (km 1 di 6:17, pa
 | Km pertama | km 1 lebih cepat **>10 detik** dari batas lambat rencana → "start terlalu cepat" (§3b) | [K] |
 | Cek pacing berdua | Ditandai "kemungkinan terbawa" kalau ketiganya terpenuhi: (1) jam mulai dua pelari berbeda **<2 menit**, (2) selisih pace km 1 keduanya **<15 detik**, (3) km 1 salah satu pelari lebih cepat **>30 detik** dari rencananya sendiri. Berlaku umum untuk pelari mana pun | [K] |
 | Berhenti (jam di-pause) | Tidak dinilai. Cukup ditampilkan, misalnya "berhenti 2:36" (waktu total − waktu bergerak) | [K] |
+| Lari bareng | Long run dan lari santai yang dilari bersama mengikuti **batas HR pelari yang lebih lambat**. Kalau tidak bisa, pisah di km 3. Contoh 15 Nov: Reza lari di pace santai Taofik, dan HR-nya di atas 152 selama 12 dari 16 km | [K] keputusan 15 Nov 2026 |
 | Jarak vs gerbang | Ditampilkan sebagai **dua baris terpisah**: "Jarak" dinilai terhadap rencana, dan "Gerbang dilewati (+x km)" kalau melebihi batas gerbang | [K] |
 
 ## 6. Long run: aturan khusus
@@ -146,6 +148,7 @@ Riwayat start terlalu cepat: Reza 15 Okt, 27 Okt, 1 Nov, 7 Nov (km 1 di 6:17, pa
 - Decoupling = (rasio paruh 1 − rasio paruh 2) ÷ rasio paruh 1 × 100%.
 - Dilaporkan dua versi: data penuh, dan tanpa 3 km pertama (dihitung menurut jarak). Yang dinilai versi tanpa 3 km pertama.
 - **Hanya berlaku untuk lari dengan pace rata.** Untuk tempo, interval, lomba, dan lari dengan strides: tulis "tidak berlaku".
+- **Tidak berlaku juga kalau jalan kaki atau sangat lambat (kecepatan jam <1,5 m/s) lebih dari 10% waktu bergerak.** Tulis "tidak berlaku (banyak jalan kaki)". Contoh: long run 15 Nov, Taofik 22 menit dan Reza 26 menit jalan kaki dari sekitar 2,5 jam.
 
 ## 7. Tidur dan pemulihan (gerbang pagi)
 

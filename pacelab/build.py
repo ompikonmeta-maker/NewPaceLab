@@ -153,6 +153,8 @@ def _session(r, stream, laps=None, walk=None, coach=None):
          "laps": [[l["km"], l["sec"], l.get("hr"), l.get("cad"), LAP_TRIG.get(l.get("trigger"), "w")]
                   for l in (laps or {}).get("laps", []) if l.get("km") is not None and l.get("sec")]}
     if stream:
+        if not stream.get("sp"):
+            s["v_est"] = True                 # no watch speed (older data): walking, cadence and decoupling use distance differences
         s["splits"] = m.per_km(stream, walk)      # [km, s, HR, cadence (running only with walk), elevation, walking s]
         if walk:
             s.update(m.run_walk(stream, walk))

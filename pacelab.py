@@ -8,6 +8,7 @@
   python pacelab.py demo         dashboard dari data rekaan (tanpa key, tanpa internet)
   python pacelab.py inspect      struktur respons Garmin (nama field saja, tanpa nilai)
   python pacelab.py ekspor 2026-10-27   simpan lari satu hari untuk Claude chat (ekspor/*.zip; --tanpa-fit)
+  python pacelab.py uji          uji data asli RENCANA 23 (kecepatan jam, strides, decoupling, lari bareng, gerbang)
 
 Opsi: --who TAOFIK|REZA|ALL   --since YYYY-MM-DD   --config config.json
 """
@@ -215,7 +216,7 @@ def cmd_demo(cfg, athletes):
 
 def main(argv=None):
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
-    ap.add_argument("command", nargs="?", default="all", choices=["all", "sync", "build", "check", "demo", "inspect", "ekspor"])
+    ap.add_argument("command", nargs="?", default="all", choices=["all", "sync", "build", "check", "demo", "inspect", "ekspor", "uji"])
     ap.add_argument("tanggal", nargs="?", help="untuk ekspor: YYYY-MM-DD (default hari ini)")
     ap.add_argument("--tanpa-fit", action="store_true", help="ekspor tanpa file FIT asli (FIT memuat GPS)")
     ap.add_argument("--who", default="ALL")
@@ -236,6 +237,13 @@ def main(argv=None):
         cmd_inspect(cfg, athletes)
     if args.command == "demo":
         cmd_demo(cfg, cfg["athletes"])
+    if args.command == "uji":
+        from pacelab.uji import run as run_uji
+
+        def client_for(a):
+            key = load_key(a["id"], cfg["keys_dir"])
+            return Client(a["id"], key, cache_dir=str(Path(cfg["data_dir"]).parent / ".token_cache")) if key else None
+        ok = run_uji(dict(cfg, export_dir=str(ROOT / "ekspor")), client_for)
     if args.command == "ekspor":
         try:
             day = dt.date.fromisoformat(args.tanggal) if args.tanggal else dt.date.today()

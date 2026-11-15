@@ -149,6 +149,16 @@ Tombol di kanan atas menyalakan/mematikan tiap pelari.
   §6); tanpa kecepatan jam: selisih jarak. **Update pertama setelah versi ini mengunduh ulang file FIT semua lari sekali
   dan membaca ulang riwayat HRV** (rata-rata 7 hari dan rentang normal pribadi). Ringkasan Garmin per lari (HR maks,
   cadence, elevasi, training effect, beban, power, suhu, langkah, jumlah lap) disimpan apa adanya.
+- **RUMUS 15 Nov.** Decoupling **tidak berlaku (banyak jalan kaki)** kalau waktu di bawah 1,5 m/s (kecepatan jam) lebih dari
+  10% waktu bergerak Garmin (`coach.dec_walk_frac`, dokumen §6); aturan HR long run B lalu memakai cadangan A.
+  **Lari bareng** (§5b): start beda < 2 menit dan rencana kedua pelari long run / lari santai / pemulihan → pelari yang HR-nya
+  di atas batas atas rencananya sendiri di lebih dari 25% km ditandai "terbawa pace partner, ikuti HR pelari yang lebih lambat"
+  (`coach.pair_hr_frac`) [keputusan dashboard: angka 25% dari omPik 15 Nov, dokumen hanya memberi contoh 12 dari 16 km].
+  Lari tanpa kecepatan jam (data lama) memakai selisih jarak dan ditandai **perkiraan** di jalan kaki dan decoupling.
+  Gerbang lampu merah ditulis "+x km" seperti gerbang lain.
+- **`python pacelab.py uji`**: uji data asli RENCANA 23 (4a kecepatan jam vs FIT asli, 4b strides 10 Nov, 4c decoupling 1 Nov,
+  4d jalan kaki 15 Nov, 4e lari bareng 15 Nov, 4f gerbang Reza 15 Nov), dicetak LULUS / GAGAL dengan angka aktual.
+  FIT 4a diambil dari `ekspor\NewPaceLab_2026-11-10.zip`, kalau tidak ada diunduh (butuh key + internet).
 - **Strides** (dokumen §5): kecepatan jam > 2,6 m/s minimal 6 detik (`coach.stride_mps`, `coach.stride_min_s`). Di detail
   hari yang rencananya menyebut strides: "x dari y terdeteksi", durasi dan pace puncak (setelah 90% jarak dasar).
 - `Ekspor Sesi`: CSV per detik mendapat kolom `suhu_c`, dan `kecepatan_m_s` memakai kecepatan jam bila ada.

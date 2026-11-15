@@ -101,3 +101,20 @@ class OverridesTest(unittest.TestCase):
         self.assertEqual(got["REZA"]["2026-11-03"].split("\n")[:2], ["LATIHAN KERAS: Tempo 3 km", "Total 8 km"])
         self.assertEqual(len(msgs), 1)                              # the unknown session is skipped and reported
         self.assertEqual(overrides.load(None), {})
+
+
+class Rencana23Test(unittest.TestCase):
+    def test_est_flag_without_watch_speed(self):
+        from pacelab.build import _session
+        st = {"t": list(range(0, 1200, 5)), "d": [i * 12.0 for i in range(240)], "hr": [140] * 240}
+        r = {"id": 1, "date": "2026-11-01", "start": "2026-11-01T06:00:00", "km": 2.9, "sec": 1195}
+        self.assertTrue(_session(r, st, None, 1.5, {})["v_est"])
+        st["sp"] = [2.4] * 240
+        self.assertNotIn("v_est", _session(r, st, None, 1.5, {}))
+
+    def test_uji_plan_parsing(self):
+        from pacelab import uji
+        self.assertEqual(uji.kind("LONG RUN 16 km"), "long")
+        self.assertEqual(uji.kind("Lari pemulihan 5 km"), "rec")
+        self.assertEqual(uji.plan_km("LONG RUN 16 km\nDetak jantung 133 - 150"), 16.0)
+        self.assertEqual(uji.plan_km("Tempo 4 km\nTotal 8,5 km"), 8.5)
