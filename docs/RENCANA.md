@@ -34,7 +34,13 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 23. Lanjutan 19 poin 6 (kecepatan jam + suhu, RUMUS 15 Nov) — **sudah dibuat**, menunggu hasil `pacelab.py uji` (15 Nov)
+## 23. Lanjutan 19 poin 6 (kecepatan jam + suhu, RUMUS 15 Nov) — **sudah dibuat, uji data asli 10/10 lulus** (15 Nov)
+
+Hasil `pacelab.py uji` di laptop omPik: 4a directSpeed dan kolom sp vs FIT enhanced_speed selisih 0,000 m/s (directSpeed ada
+di data detail) · 4b 6 strides 19s/5:49 · 16/5:21 · 20/4:40 · 17/5:15 · 21/4:47 · 23/4:43 · 4c Reza (id 24923290410, 05:56)
+2,8 / 4,3 %, Taofik 4,9 / 8,3 % · 4d jalan kaki Taofik 18:20 dari 2:32:17 (12,0 %), Reza 21:17 dari 2:33:20 (13,9 %) → tidak
+berlaku · 4e Reza 11 dari 16 km di atas 152 (km 6–16) ditandai, Taofik 0 km di atas 150 · 4f Reza merah (LOW 6 hari),
+16 km → gerbang dilewati (+8 km). Catatan: perkiraan omPik 22 / 26 menit jalan kaki dan "12 dari 16 km" sedikit berbeda.
 
 - docs/RUMUS-BATAS-SUMBER.md diganti versi 15 Nov (beda dengan 10 Nov: §5b baris "Lari bareng", §6 aturan jalan kaki > 10%).
 - Poin 1–2 sudah ada sejak 10 Nov: kolom `sp` (m/s) dan `tc` (°C) di streams (dari FIT `enhanced_speed`/`temperature`, cadangan
