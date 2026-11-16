@@ -301,13 +301,22 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .action b{font-weight:650}
 .hrvc+.hrvc{margin-top:12px;padding-top:10px;border-top:1px solid var(--grid)} .hrvh{display:flex;justify-content:space-between;align-items:center;gap:8px} .hrvh .who{display:flex;align-items:center;gap:6px;font-weight:650;font-size:14px}
 .hrv3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 2px} .hrv3 div{background:var(--bg);border-radius:10px;padding:5px 8px} .hrv3 small{display:block;color:var(--muted);font-size:11px} .hrv3 b{font-size:18px}
-.card.sub svg text{font-size:10px;fill:var(--muted)}
+.card.rg svg text{font-size:10px;fill:var(--muted)}
+/* Jarak per minggu + Berat: one shared grid (title, up to five lines, chart, 6-week strip), so both cards line up */
+.card.vg{display:grid;grid-template-rows:subgrid;grid-row:span 8;align-content:start;row-gap:0} .card.vg .insight{display:contents}
+.card.vg .insight>div{align-self:start;padding:3px 0;font-size:14px;color:var(--text-2)} .card.vg>h3{margin-bottom:10px}
+.card.vg .insight>.defn{font-size:12.5px;color:var(--muted);padding:0 0 0 18px} .card.vg .chart{grid-row:7;margin-top:12px} .card.vg .acw{grid-row:8}
+.defn{font-size:12.5px;color:var(--muted);padding-left:18px} .acw{margin-top:12px;border-top:1px solid var(--grid);padding-top:10px;font-size:13px} .acw:empty{display:none}
+.acw-h{font-weight:650;margin-bottom:6px} .acw-h small{color:var(--muted);font-weight:400}
+.acw-r{display:grid;grid-template-columns:70px repeat(6,minmax(0,1fr));gap:6px;align-items:center;margin:6px 0} .acw-r .who{font-size:13px;display:flex;align-items:center;gap:6px}
+.acw-p{background:var(--bg);border-radius:8px;padding:3px 4px;text-align:center} .acw-p small{display:block;color:var(--muted);font-size:10.5px} .acw-p.hi{background:var(--warn-bg);color:var(--warn);font-weight:700}
+@media (max-width:640px){.acw-r{grid-template-columns:repeat(6,minmax(0,1fr))} .acw-r .who{grid-column:1/-1}}
 /* recovery cards: six blocks per card on one shared grid, so they line up across the three cards (title, line per runner,
    block per runner, note); a taller row (a "Saran") grows the same row in every card */
-.card.sub{display:grid;grid-template-rows:subgrid;grid-row:span 6;align-content:start;row-gap:0} .card.sub .hrv3 small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.card.sub .insight,.card.sub .chart{display:contents} .card.sub>h3{margin-bottom:10px}
-.card.sub .insight>div{align-self:start;padding:3px 0;font-size:14px;color:var(--text-2)}
-.card.sub .hrvc{margin-top:16px;align-self:start} .card.sub .hrvc+.hrvc{padding-top:12px} .card.sub .hrvn{align-self:start;margin-top:12px} .card.sub .empty{align-self:start} .hrvn{margin:8px 0 0;font-size:12px;color:var(--muted)} .action.a110{margin-top:8px;flex-wrap:wrap;row-gap:2px}
+.card.rg{display:grid;grid-template-rows:subgrid;grid-row:span 6;align-content:start;row-gap:0} .card.rg .hrv3 small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card.rg .insight,.card.rg .chart{display:contents} .card.rg>h3{margin-bottom:10px}
+.card.rg .insight>div{align-self:start;padding:3px 0;font-size:14px;color:var(--text-2)}
+.card.rg .hrvc{margin-top:16px;align-self:start} .card.rg .hrvc+.hrvc{padding-top:12px} .card.rg .hrvn{align-self:start;margin-top:12px} .card.rg .empty{align-self:start} .hrvn{margin:8px 0 0;font-size:12px;color:var(--muted)} .action.a110{margin-top:8px;flex-wrap:wrap;row-gap:2px}
 
 /* race to 42k */
 .track{display:grid;grid-template-columns:72px 1fr 120px;align-items:center;gap:14px;margin:14px 0}
@@ -777,10 +786,10 @@ footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;paddin
   <div class="seg" role="group" aria-label="Periode minggu" id="f-wk">
     <button data-n="4">4 mgg</button><button data-n="12" aria-pressed="true">12 mgg</button><button data-n="0">Semua</button></div></div>
 <div class="grid">
-  <section class="card c6"><h3>Jarak per minggu <small>km</small></h3><div class="insight" id="in-km"></div><div class="chart" id="ch-km"></div></section>
+  <section class="card c6 vg"><h3>Jarak per minggu <small>km</small></h3><div class="insight" id="in-km"></div><div class="chart" id="ch-km"></div><div class="acw" id="acw-km"></div></section>
+  <section class="card c6 vg"><h3>Berat vs target <small>kg · selisih dari target Excel</small></h3><div class="insight" id="in-wt"></div><div class="chart" id="ch-wt"></div><div class="acw" id="acw-wt"></div></section>
   <section class="card c6"><h3>Long run <small>km</small></h3><div class="insight" id="in-lr"></div><div class="chart" id="ch-lr"></div></section>
   <section class="card c6"><h3><span class="h3t">Decoupling<button class="info" id="dec-info" aria-expanded="false" aria-haspopup="dialog" aria-label="Apa itu decoupling?"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="7" r="1.5" fill="currentColor"/><path d="M12 11v7" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button></span><small>% tanpa 3 km pertama · target &lt; 8</small></h3><div class="insight" id="in-dec"></div><div class="chart" id="ch-dec"></div></section>
-  <section class="card c6"><h3>Berat vs target <small>kg · selisih dari target Excel</small></h3><div class="insight" id="in-wt"></div><div class="chart" id="ch-wt"></div></section>
 </div>
 
 <div class="section"><div><h2>Pemulihan</h2><p>Data harian dari jam Garmin.</p></div>
@@ -794,9 +803,9 @@ footer .hsw button{border:0;background:none;font:inherit;font-size:12.5px;paddin
       <div><b><i style="background:#e98a5c"></i>Oranye</b>Long run −40%, latihan keras jadi lari santai. Tidur &lt; 5 jam dan Body Battery &lt; 40, detak istirahat +7, atau HRV tidak seimbang 3 hari.</div>
       <div><b><i style="background:var(--crit)"></i>Merah</b>Lari santai ≤ 8 km atau istirahat. Status HRV rendah 3 hari berturut-turut.</div></div>
     <div class="lgd-none"><i></i>Tidak ada data · klik lampu di Ringkasan untuk melihat syarat yang belum terpenuhi</div></section>
-  <section class="card c4 sub"><h3>Tidur <small>jam</small></h3><div class="insight" id="in-sleep"></div><div class="chart" id="ch-sleep"></div></section>
-  <section class="card c4 sub"><h3>HRV <small>ms</small></h3><div class="insight" id="in-hrv"></div><div class="chart" id="ch-hrv"></div></section>
-  <section class="card c4 sub"><h3>Body Battery <small>pagi</small></h3><div class="insight" id="in-bb"></div><div class="chart" id="ch-bb"></div></section>
+  <section class="card c4 rg"><h3>Tidur <small>jam</small></h3><div class="insight" id="in-sleep"></div><div class="chart" id="ch-sleep"></div></section>
+  <section class="card c4 rg"><h3>HRV <small>ms</small></h3><div class="insight" id="in-hrv"></div><div class="chart" id="ch-hrv"></div></section>
+  <section class="card c4 rg"><h3>Body Battery <small>pagi</small></h3><div class="insight" id="in-bb"></div><div class="chart" id="ch-bb"></div></section>
 </div>
 
 <div class="section"><div><h2>Progres terbaik</h2><p>Segmen tercepat di dalam setiap lari. Grafik naik = makin cepat. Klik kartu untuk detail.</p></div></div>
@@ -1225,6 +1234,17 @@ function weekly() {
   chart("ch-km", {x: X, xlab: wl, ymin: 0, label: "Jarak per minggu dibanding target",
     detail: (a, k, v, tv) => { const w = wkOf(a, k); return (tv ? `${pct(v / tv)} dari target` : "") + flag(w); },
     series: [...V().map(a => ({c: a.c, v: col(a, "km_t"), target: 1})), ...V().map(a => ({c: a.c, v: col(a, "km")}))]});
+  // docs §4: ACWR = last finished week ÷ mean of the 4 weeks before (alarm > acwr_max); rise over 2 weeks (careful > vol2_max)
+  const vol = a => { const d = a.weeks.filter(w => w.done && w.km != null), ac = w => { const j = d.indexOf(w), pp = d.slice(Math.max(0, j - 4), j); return pp.length === 4 && mean(pp.map(q => q.km)) ? w.km / mean(pp.map(q => q.km)) : null; };
+    if (d.length < 5) return null; const L = d[d.length - 1], two = d[d.length - 3];
+    return {L, base: mean(d.slice(-5, -1).map(q => q.km)), acwr: ac(L), up: two && two.km ? L.km / two.km - 1 : null, hist: d.slice(-6).map(w => [w.ms, ac(w)]).filter(q => q[1] != null)}; };
+  const f2 = v => v.toFixed(2).replace(".", ","), VC = A[0].coach || {};
+  if (VC.acwr_max != null) {
+    $("in-km").innerHTML += V().map(a => { const v = vol(a), C = a.coach || {}; if (!v) return "";
+      const bad = v.acwr > C.acwr_max, bad2 = v.up != null && C.vol2_max != null && v.up > C.vol2_max;
+      return line(a, `${chip(bad || bad2 ? "warn" : "good", bad ? `ACWR ${f2(v.acwr)} alarm` : bad2 ? `Naik ${Math.round(v.up * 100)}% dalam 2 mgg` : `ACWR ${f2(v.acwr)}`)}<span>MS${v.L.ms} <b>${f1(v.L.km)}</b> ÷ rata 4 mgg ${f1(v.base)} km · 2 mgg ${v.up == null ? "–" : (v.up >= 0 ? "+" : "−") + Math.round(Math.abs(v.up) * 100) + "%"}</span>`); }).join("");
+    const rows = V().map(a => { const v = vol(a); return v && v.hist.length ? `<div class="acw-r"><span class="who"><i class="dot ${a.c}"></i>${a.name}</span>${v.hist.map(([ms, r]) => `<span class="acw-p${r > (a.coach || {}).acwr_max ? " hi" : ""}" data-sh="<span class='t1'>${a.name} · MS${ms}</span>ACWR ${f2(r)}${r > (a.coach || {}).acwr_max ? " · di atas " + f2((a.coach || {}).acwr_max) : ""}"><small>MS${ms}</small>${f2(r)}</span>`).join("")}</div>` : ""; }).join("");
+    $("acw-km").innerHTML = rows ? `<div class="acw-h">ACWR per minggu <small>alarm &gt; ${f2(VC.acwr_max)} · dokumen §4</small></div>${rows}` : ""; }
 
   $("in-lr").innerHTML = V().map(a => { const ws = idx.map(i => a.weeks[i]).filter(w => w && w.lr_t && w.lr != null);
     const w = ws[ws.length - 1]; const p = w ? w.lr / w.lr_t : null;
@@ -1250,12 +1270,24 @@ function weekly() {
     if (!kg.length) return line(a, `${chip("none", "Belum ditimbang")}<span>timbang Minggu pagi</span>`);
     const avg = mean(kg), n = kg.length, xm = (n - 1) / 2;
     const rate = n >= 3 ? kg.reduce((s, y, i) => s + (i - xm) * (y - avg), 0) / kg.reduce((s, y, i) => s + (i - xm) ** 2, 0) : null;
-    const floor = a.weight_floor, lvl = floor && avg < floor ? "serious" : rate != null && rate < -.5 ? "warn" : "good";
+    const floor = a.weight_floor, lvl = floor && avg < floor ? "serious" : rate != null && rate < -((a.coach || {}).wt_loss_max ?? .5) ? "warn" : "good";
     return line(a, `${chip(lvl, lvl === "serious" ? "Di bawah batas" : lvl === "warn" ? "Turun terlalu cepat" : "Aman")}<span>rata ${n} mgg <b>${f1(avg)}</b>${rate == null ? "" :
       Math.abs(rate) < .05 ? " · stabil" : ` · ${rate < 0 ? "turun" : "naik"} <b>${Math.abs(rate).toFixed(1)} kg/mgg</b>`}${floor ? ` · batas bawah ${floor}` : ""}</span>${tip(lvl === "serious" ? "wtFloor" : "wtFast", lvl)}`); }).join("");
   chart("ch-wt", {x: X, xlab: wl, gaps: false, refs: [{y: 0}], minSpan: 3, label: "Selisih berat terhadap target mingguan",
     fmtV: v => (v > 0 ? "+" : "") + f1(v) + " kg", detail: (a, k) => { const w = wkOf(a, k); return w.kg != null ? `${f1(w.kg)} kg · target ${f1(w.kg_t)}` : ""; },
     series: V().map(a => ({c: a.c, area: false, v: diff(a)}))});
+  // docs §9: no deficit in these phases, and stop it on a red light or HRV status Low / Unbalanced
+  const ND = (A[0].coach || {}).no_deficit, ms = DATA.ms_cur, ph = (DATA.phases || []).find(p => p.a <= ms && p.b >= ms);
+  if (ND && ph) { const next = DATA.phases.find(p => p.a > ms && ND.includes(p.name)), HS = {LOW: "Low", POOR: "Poor", UNBALANCED: "Unbalanced"};
+    $("in-wt").innerHTML += V().map(a => { const w = [...a.days].reverse().find(d => d.level || d.hrv_status) || {};
+      const why = ND.includes(ph.name) ? "fase " + ph.name : w.level === "merah" ? "lampu merah" : HS[w.hrv_status] ? "status HRV " + HS[w.hrv_status] : null;
+      return line(a, `${chip(why ? "warn" : "good", why ? "Defisit stop" : "Defisit boleh")}<span>${why ? why + " · makan sesuai kebutuhan" : "fase " + ph.name}</span>`); }).join("")
+      + (next ? `<div class="defn">Fase tanpa defisit berikutnya: ${next.name} (MS${next.a}–${next.b}) · dokumen §9</div>` : ""); }
+  // weekly change, mirroring the ACWR strip next to it: a loss over wt_loss_max kg in a week is marked (docs §9)
+  const wrows = V().map(a => { const d = a.weeks.filter(w => w.done && w.kg != null), lim = (a.coach || {}).wt_loss_max ?? .5;
+    const ch = d.slice(-7).map((w, i, arr) => i ? [w.ms, w.kg - arr[i - 1].kg, w.kg] : null).filter(Boolean).slice(-6);
+    return ch.length ? `<div class="acw-r"><span class="who"><i class="dot ${a.c}"></i>${a.name}</span>${ch.map(([m, dk, kg]) => `<span class="acw-p${dk < -lim ? " hi" : ""}" data-sh="<span class='t1'>${a.name} · MS${m}</span>${f1(kg)} kg · ${dk >= 0 ? "+" : "−"}${Math.abs(dk).toFixed(1).replace(".", ",")} kg dari minggu sebelumnya"><small>MS${m}</small>${dk >= 0 ? "+" : "−"}${Math.abs(dk).toFixed(1).replace(".", ",")}</span>`).join("")}</div>` : ""; }).join("");
+  $("acw-wt").innerHTML = wrows ? `<div class="acw-h">Perubahan berat per minggu <small>kg · waspada turun &gt; ${String((A[0].coach || {}).wt_loss_max ?? .5).replace(".", ",")} kg · dokumen §9</small></div>${wrows}` : "";
 }
 
 // ---------------------------------------------------------------- level 3: recovery (daily, period filter)

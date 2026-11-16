@@ -34,7 +34,13 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
-## 24. Sisa aturan dokumen: alarm volume (§4) dan defisit (§9) — mockup siap, menunggu pilihan + "gas" (16 Nov)
+## 24. Sisa aturan dokumen: alarm volume (§4) dan defisit (§9) — **V2 sudah dibuat** (16 Nov)
+
+Dibuat V2. Supaya seimbang: kartu Berat dipindah ke sebelah Jarak (Long run + Decoupling di baris bawah), keduanya satu
+kisi bersama (judul, baris kesimpulan, grafik, deret 6 minggu sejajar); kartu Berat mendapat deret "Perubahan berat per
+minggu" (turun > 0,5 kg ditandai, §9) sebagai pasangan deret ACWR. Perbaikan efek mengambang kartu Tidur/HRV/Body Battery:
+kelas `sub` bentrok dengan subjudul header (animasi `forwards` menahan posisi kartu), diganti `rg`.
+
 
 Mockup: [`docs/mockup/alarm-volume-defisit.html`](mockup/alarm-volume-defisit.html). V1 satu baris per pelari: kartu Jarak
 "ACWR x,xx" (minggu terakhir ÷ rata 4 minggu sebelumnya, alarm > 1,3) + kenaikan 2 minggu (waspada > 30%); kartu Berat
@@ -375,7 +381,7 @@ Mockup: [`docs/mockup/detail-sesi.html`](mockup/detail-sesi.html) (buka di brows
 Yang perlu diputuskan juga: zona HR Taofik dan Reza beda rumus (dokumen §2), disamakan setelah lomba 10K 7 Nov.
 Kalau B dipasang sebelum itu, dashboard memakai zona yang tertulis di dokumen sekarang.
 
-## 2. Aturan dokumen yang belum dipakai di dashboard
+## 2. Aturan dokumen yang belum dipakai di dashboard — **ditutup** (sisa dibuat di rencana 24)
 
 | Aturan | Dokumen | Bisa tampil di |
 |---|---|---|

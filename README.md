@@ -51,6 +51,12 @@ Python 3.8+ saja, tanpa `pip install`.
 
 ## Isi dashboard
 
+**Alarm volume dan defisit** (dokumen §4, §9): kartu Jarak per minggu dan Berat bersebelahan dengan blok sejajar. Jarak:
+"ACWR x,xx" = km minggu terakhir ÷ rata-rata 4 minggu sebelumnya (alarm > 1,3, `coach.acwr_max`) dan kenaikan 2 minggu
+(waspada > 30%, `coach.vol2_max`), plus deret ACWR 6 minggu. Berat: "Defisit boleh / stop" (stop saat fase
+`coach.no_deficit` = Absorb, Ramadan, Marathon, Taper, lampu merah, atau status HRV Low/Poor/Unbalanced), fase tanpa defisit
+berikutnya, dan deret perubahan berat per minggu (turun > 0,5 kg ditandai, `coach.wt_loss_max`).
+
 **Gulir dan pegas** (ala iPhone): semua jendela bergulir (jadwal, detail sesi, decoupling, linimasa, kalkulator) memakai
 scrollbar tipis sendiri yang muncul saat menggulir dan hilang setelah 1 detik diam. Di ujung, isi tertarik seperti karet
 (rumus iOS), kembali begitu dorongan melemah (sisa luncuran touchpad diabaikan) dengan pegas tanpa lewat titik awal
