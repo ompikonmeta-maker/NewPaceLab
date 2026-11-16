@@ -3,7 +3,7 @@ numbers found. Reads data/ (and ekspor/*.zip or Garmin for the original FIT); pr
 
   4a  watch speed: details directSpeed and the stored stream vs the FIT file's enhanced_speed, Taofik 10 Nov
   4b  strides Taofik 10 Nov: 6 strides, 16-23 s, peak pace 4:40-5:49
-  4c  decoupling 1 Nov: Reza (start 05:56) 2,8 / 4,3 %, Taofik 4,9 / 8,4 % (+-0,3)
+  4c  decoupling 1 Nov: Reza 24923290410 2,8 / 4,3 %, Taofik 24923291752 4,9 / 8,4 % (+-0,3)
   4d  long run 15 Nov: walking (< walk_mps) > dec_walk_frac of the moving time -> "tidak berlaku (banyak jalan kaki)"
   4e  lari bareng 15 Nov: Reza flagged (HR over his upper limit in > pair_hr_frac of the km), Taofik not
   4f  gate 15 Nov: Reza red light (HRV LOW) -> limit red_easy_km, 16 km -> "Gerbang dilewati (+8 km)"
@@ -142,18 +142,20 @@ def u4b(cfg):
 
 def u4c(cfg):
     print("\n4c. Decoupling 1 Nov")
-    for aid, start, want in (("REZA", "05:56", (2.8, 4.3)), ("TAOFIK", None, (4.9, 8.4))):
-        r = _run(cfg, aid, date="2026-11-01", start=start)
+    for aid, rid, want in (("REZA", "24923290410", (2.8, 4.3)), ("TAOFIK", "24923291752", (4.9, 8.4))):   # ralat omPik 15 Nov
+        r = _run(cfg, aid, rid)
         name = _ath(cfg, aid)["name"]
         st = r and _stream(cfg, aid, r["id"])
         dd = st and m.decoupling_detail(st)
         if not dd:
-            ok(name, False, "sesi%s tidak ditemukan atau tanpa data per detik" % (" mulai " + start if start else ""), "%s / %s %%" % (num(want[0]), num(want[1])))
+            ok(name, False, "lari %s tidak ditemukan atau tanpa data per detik" % rid, "%s / %s %%" % (num(want[0]), num(want[1])))
             continue
         good = abs(dd["pct"] - want[0]) <= 0.3 and dd.get("full") is not None and abs(dd["full"] - want[1]) <= 0.3
         ok("%s (id %s, mulai %s%s)" % (name, r["id"], (r.get("start") or "")[11:16], "" if st.get("sp") else ", perkiraan: tanpa kecepatan jam"), good,
            "%s %% tanpa 3 km · %s %% penuh" % (num(dd["pct"]), num(dd["full"]) if dd.get("full") is not None else "–"),
            "%s / %s %% (±0,3)" % (num(want[0]), num(want[1])))
+        if r.get("date") != "2026-11-01":
+            print("        [!] tanggal lari ini %s, bukan 2026-11-01" % r.get("date"))
 
 
 def u4d(cfg):

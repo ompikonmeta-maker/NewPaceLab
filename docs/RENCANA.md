@@ -3,7 +3,7 @@
 Diperbarui 29 Okt 2026 (sore). Tidak ada yang dikerjakan sebelum omPik memilih dan bilang "gas".
 Setiap rencana punya mockup dulu (lihat CLAUDE.md).
 
-## 9. Per km vs lap Garmin — lap Garmin tidak tersedia; menunggu pilihan pengganti
+## 9. Per km vs lap Garmin — **ditutup** (lap asli dari file FIT, rencana 11)
 
 Hasil `inspect` (29 Okt, kedua pelari): splits / typedsplits / split_summaries = 404 untuk key pribadi; details hanya berisi
 metricDescriptors (data per detik), tanpa daftar lap. Pengganti yang mungkin: B1 segmen dari rencana Excel (pemanasan /
@@ -33,6 +33,18 @@ manual ke folder lokal dan dibaca dashboard.
 Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama (±28 Okt − 120 hari = 30 Jun).
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
+
+## 24. Sisa aturan dokumen: alarm volume (§4) dan defisit (§9) — mockup siap, menunggu pilihan + "gas" (16 Nov)
+
+Mockup: [`docs/mockup/alarm-volume-defisit.html`](mockup/alarm-volume-defisit.html). V1 satu baris per pelari: kartu Jarak
+"ACWR x,xx" (minggu terakhir ÷ rata 4 minggu sebelumnya, alarm > 1,3) + kenaikan 2 minggu (waspada > 30%); kartu Berat
+"Defisit boleh / stop" (stop: fase Absorb, Ramadan, Marathon, Taper, lampu merah, status HRV Low/Unbalanced) + fase tanpa
+defisit berikutnya. V2 = V1 + deret ACWR 6 minggu di bawah grafik Jarak.
+
+Dibereskan 16 Nov ("gas semua rencana"): uji 4c memakai id lari dari omPik (Reza 24923290410, Taofik 24923291752);
+`garmin_probe.py` disalin ke `tools/` (hasil probe_output/ tidak di-commit); rencana 1, 9, 17 dan 3 ditutup (sudah
+digantikan tab Sesi, lap dari FIT, film intro 17b, dan uji decoupling 4c). Arsip sesi lama "Garmin Personal API downloader"
+butuh izin omPik. Pull request ke `main` belum dibuat (tunggu perintah eksplisit).
 
 ## 23. Lanjutan 19 poin 6 (kecepatan jam + suhu, RUMUS 15 Nov) — **sudah dibuat, uji data asli 10/10 lulus** (15 Nov)
 
@@ -160,7 +172,7 @@ sebagai tokoh utama: Mulai → Tujuan (hitung mundur, tonggak lomba) → Rencana
 Duel sesi (lap, jalan kaki, penilaian) → Progres (PB 5K, estimasi) → 42K (nama, 4 fitur, Masuk dashboard).
 Dibuat dengan kode, angka dari data saat itu; diputar saat pertama dibuka + tombol "Tentang" di footer; suara opsional.
 
-## 17. Intro dashboard — mockup siap, digantikan 17b; menunggu pilihan + "gas"
+## 17. Intro dashboard — **ditutup** (digantikan 17b)
 
 Mockup: [`docs/mockup/intro.html`](mockup/intro.html). I1 Garis start (hitung mundur + dua pelari, mendarat jadi header) ·
 I2 Dua detak (garis detak jantung) · I3 Kabar pagi (lampu pagi + rencana hari ini + lari baru) · I4 Perjalanan 51 minggu ·
@@ -349,7 +361,7 @@ Perlu diputuskan:
   (usulan: rata-rata jarak ÷ rencana, % waktu pace di rentang, % waktu HR di rentang).
 - Pace di zona 2 dan meter per detak: tampilkan keduanya atau satu saja?
 
-## 1. Detail hasil lari per sesi — menunggu pilihan
+## 1. Detail hasil lari per sesi — **ditutup** (digantikan tab Sesi 0b, cadence + elevasi ada)
 
 Mockup: [`docs/mockup/detail-sesi.html`](mockup/detail-sesi.html) (buka di browser).
 
@@ -367,21 +379,21 @@ Kalau B dipasang sebelum itu, dashboard memakai zona yang tertulis di dokumen se
 
 | Aturan | Dokumen | Bisa tampil di |
 |---|---|---|
-| Aturan 110% untuk tiap long run | §4 | B, atau penanda di grafik Long run |
+| ~~Aturan 110% untuk tiap long run~~ (sudah, rencana 19) | §4 | |
 | Alarm ACWR > 1,3 (volume minggu ini ÷ rata 4 minggu sebelumnya) | §4 | kartu Jarak per minggu |
 | Kenaikan volume > 30% dalam 2 minggu | §4 | kartu Jarak per minggu |
-| Long run lebih dari 210 menit | §4 | B, grafik Long run |
+| ~~Long run lebih dari 210 menit~~ (sudah, penilaian long run) | §4 | |
 | Fase tanpa defisit (Absorb, Ramadan, Marathon, Taper) | §9 | kartu Berat |
-| Cadence paruh 2 turun ≥ 5 | §6 | B (butuh D) |
+| ~~Cadence paruh 2 turun ≥ 5~~ (sudah, "Cadence bertahan") | §6 | |
 
-## 3. Menunggu data dari omPik
+## 3. Menunggu data dari omPik — **ditutup** (decoupling 1 Nov cocok, uji 4c)
 
 - Satu hasil decoupling dari `pacelab_analyze.py` (tanggal lari + angka) untuk dicocokkan dengan dashboard.
 
 ## 4. Lain-lain (pernah ditawarkan, belum dijawab)
 
 - Arsipkan sesi Claude lama "Garmin Personal API downloader".
-- Pindahkan `garmin_probe.py` ke `tools/`.
+- ~~Pindahkan `garmin_probe.py` ke `tools/`~~ (16 Nov).
 - Buat pull request ke `main`.
 
 ## Catatan, bukan rencana
