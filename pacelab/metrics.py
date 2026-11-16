@@ -391,10 +391,10 @@ def light(wellness, day, rhr_profile=None):
         why.append("RHR %+d" % round(rhr_up))
     return {"level": LEVELS[lv], "hrv": hv, "hrv_status": st, "hrv_low": hlo, "bb": bb,
             "sleep_s": sl, "rhr": rhr(w), "notes": why,
-            "checks": _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up)}
+            "checks": _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up, hv, hlo)}
 
 
-def _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up):
+def _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up, night=None, night_min=None):
     """Each input of the light: ok, warn (yellow) or bad (orange/red); None = no data."""
     if st is None and not night_low:
         hrv = None
@@ -406,7 +406,8 @@ def _checks(st, low_run, unbal_run, night_low, bb, sl_h, rhr_up):
         hrv = "ok"
     both = sl_h is not None and bb is not None and sl_h < 5 and bb < 40     # §7 row 3
     return [
-        {"k": "hrv", "v": st, "low": low_run, "s": hrv},
+        # which HRV cause it was (§7b): status LOW/POOR or UNBALANCED, or last night under the personal normal range
+        {"k": "hrv", "v": st, "low": low_run, "unbal": unbal_run, "night": night, "night_min": night_min, "night_low": night_low, "s": hrv},
         {"k": "bb", "v": bb, "s": None if bb is None else "bad" if both else "warn" if bb < 50 else "ok"},
         {"k": "sleep", "v": round(sl_h * 3600) if sl_h else None, "s": None if not sl_h else "bad" if both else "warn" if sl_h < 6 else "ok"},
         {"k": "rhr", "v": None if rhr_up is None else round(rhr_up, 1),

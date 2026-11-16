@@ -302,6 +302,7 @@ body.ready .phases i b{animation:fillx 1.2s .4s var(--ease) forwards}
 .hrvc+.hrvc{margin-top:12px;padding-top:10px;border-top:1px solid var(--grid)} .hrvh{display:flex;justify-content:space-between;align-items:center;gap:8px} .hrvh .who{display:flex;align-items:center;gap:6px;font-weight:650;font-size:14px}
 .hrv3{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:6px 0 2px} .hrv3 div{background:var(--bg);border-radius:10px;padding:5px 8px} .hrv3 small{display:block;color:var(--muted);font-size:11px} .hrv3 b{font-size:18px}
 .card.rg svg text{font-size:10px;fill:var(--muted)}
+#rerr{position:fixed;left:16px;right:16px;bottom:16px;z-index:95;background:var(--crit-bg);color:var(--crit);border:1px solid var(--crit);border-radius:12px;padding:10px 14px;font-size:13px;user-select:all}
 /* Jarak per minggu + Berat: one shared grid (title, up to five lines, chart, 6-week strip), so both cards line up */
 .card.vg{display:grid;grid-template-rows:subgrid;grid-row:span 8;align-content:start;row-gap:0} .card.vg .insight{display:contents}
 .card.vg .insight>div{align-self:start;padding:3px 0;font-size:14px;color:var(--text-2)} .card.vg>h3{margin-bottom:10px}
@@ -891,15 +892,29 @@ const LIGHT = {hijau: ["good", "Hijau", "siap latihan sesuai rencana"], kuning: 
 // docs §7: the long-run gate is judged on that day's morning; on other days the card only names the day
 // docs §4 "Aturan 110%": long run ≤ 1,1 × the longest run of the 30 days before it
 function lr110(a) { const T = a.today || {}, wk = (a.weeks || []).find(w => w.ms === DATA.ms_cur) || {};
-  const st = addDays(DATA.ms1, (DATA.ms_cur - 1) * 7), day = T.lr_day == null ? addDays(st, 5) : addDays(st, T.lr_day), from = addDays(day, -30);
+  const st = addDays(DATA.ms1, (DATA.ms_cur - 1) * 7), day = lrDayOf(a, st) || (T.lr_day == null ? addDays(st, 5) : addDays(st, T.lr_day)), from = addDays(day, -30);
   const xs = (a.sessions || []).filter(x => x.date >= from && x.date < day && x.date <= DATA.today);
   if (!xs.length) return null; const top = xs.reduce((p, q) => q.km > p.km ? q : p), lim = top.km * 1.1, plan = wk.lr_t;
   return {lim, top, plan, ok: plan == null ? null : plan <= lim + 1e-9}; }
 const lr110Txt = a => { const r = lr110(a); if (!r) return ["–", ""];
   return [`≤ ${f1(r.lim)} km`, `terpanjang 30 hari ${f1(r.top.km)} km (${tgl(r.top.date)})${r.plan != null ? ` · rencana ${f1(r.plan)} ${r.ok ? "✓" : "lewat batas"}` : ""}`]; };
-const lrAct = a => { const T = a.today || {}, d = T.lr_day == null ? null : HARIF[(T.lr_day + 1) % 7];
+// the long-run day of the week holding s, after overrides.json and the session swap (docs §1)
+const lrDayOf = (a, s) => wkDays(s).find(d => { const pl = parsePlan(planCell(a, d)); return pl && pl.k === "long"; }) || null;
+const lrAct = a => { const s = (a.today || {}).date || DATA.today, lr = lrDayOf(a, s), d = lr ? HARIF[D(lr).getDay()] : null;
   if (d == null) return ["Long run minggu ini", "–"];
-  return [`Long run ${d}`, T.lr_today ? T.saturday || "belum ada data pagi ini" : `dinilai ${d} pagi`]; };
+  if (lr !== s) return [`Long run ${d}`, lr < s ? "sudah lewat" : `dinilai ${d} pagi`];
+  const g = gateOf(a, s, planFill(a, parsePlan(planCell(a, s))));
+  return [`Long run ${d}`, wellOf(a, s) ? (g ? g.t : "jalankan sesuai rencana") : "belum ada data pagi ini"]; };
+// docs §7 / §7b: only the rule for today's own session; the long run is judged on its own morning (uji 3a)
+function todayAct(a, l) { const s = (a.today || {}).date || DATA.today, pl = parsePlan(planCell(a, s)), k = pl && pl.k, lr = lrDayOf(a, s), lv = l.level, P = [];
+  if (k === "long") { const g = gateOf(a, s, planFill(a, pl)); P.push(`long run hari ini ${g ? g.t : "sesuai rencana"}`); }
+  else { if (k === "hard") P.push(lv === "hijau" ? "latihan keras sesuai rencana" : lv === "merah" ? "latihan keras hari ini: istirahat atau lari santai" : "latihan keras hari ini jadi lari santai");
+    else if (k === "rest") P.push("hari ini istirahat");
+    else if (k === "str") P.push("hari ini latihan kekuatan");
+    else if (k) P.push("lari santai hari ini sesuai rencana");
+    else P.push(lv === "hijau" ? "siap latihan sesuai rencana" : LIGHT[lv][2]);
+    if (lr && lr > s) P.push(`long run: dinilai ${HARIF[D(lr).getDay()]} pagi`); }
+  const t = P.join(" · "); return t[0].toUpperCase() + t.slice(1); }
 const line = (a, html) => `<div><i class="dot ${a.c}" aria-hidden="true"></i><span class="sr">${a.name}:</span>${html}</div>`;
 // one plain-language suggestion under every yellow / red status (green gets none)
 const BULB = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-3.5 10.9c.6.5 1 1.2 1 2.1h5c0-.9.4-1.6 1-2.1A6 6 0 0 0 12 3z" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
@@ -1000,7 +1015,7 @@ function renderSummary() {
     const lr = w.lr >= 10 ? w.lr : null;
     const st = l && l.hrv_status ? l.hrv_status[0] + l.hrv_status.slice(1).toLowerCase() : "–";
     const head = !a.has_data ? "Belum ada data. Jalankan Update Dashboard." :
-      `${L ? `Hari ini ${L[1].toLowerCase()}: ${L[2]}.` : ""} Est. maraton ${hm(a.est.sec)}, ${es[1][0].toLowerCase() + es[1].slice(1)}.`;
+      `${L ? `Hari ini ${L[1].toLowerCase()}: ${todayAct(a, l).toLowerCase()}.` : ""} Est. maraton ${hm(a.est.sec)}, ${es[1][0].toLowerCase() + es[1].slice(1)}.`;
     return `<section class="card ${span} sum" aria-label="Ringkasan ${a.name}">
       <div class="top">${who(a)}${L ? lchip(a, L) : chip("none", "Tidak ada data")}</div>
       <p class="headline">${head}${whyLine(l)}</p>
@@ -1026,7 +1041,7 @@ function renderDuel(cur) {
   const [a, b] = V(), side = [a, b].map(x => ({x, w: cur(x), l: x.today.light}));
   const head = s => { const L = s.l ? LIGHT[s.l.level] : null, es = estStatus(s.x);
     return { chip: L ? lchip(s.x, L) : chip("none", "Tidak ada data"),
-             txt: (!s.x.has_data ? "Belum ada data." : `${L ? L[2][0].toUpperCase() + L[2].slice(1) + ". " : ""}${es[1]}.`) + whyLine(s.l) }; };
+             txt: (!s.x.has_data ? "Belum ada data." : `${L ? todayAct(s.x, s.l) + ". " : ""}${es[1]}.`) + whyLine(s.l) }; };
   const H = side.map(head);
   const st = s => s.l && s.l.hrv_status ? s.l.hrv_status[0] + s.l.hrv_status.slice(1).toLowerCase() : "";
   const lr = w => w.lr >= 10 ? w.lr : null;
@@ -1238,7 +1253,7 @@ function weekly() {
   const vol = a => { const d = a.weeks.filter(w => w.done && w.km != null), ac = w => { const j = d.indexOf(w), pp = d.slice(Math.max(0, j - 4), j); return pp.length === 4 && mean(pp.map(q => q.km)) ? w.km / mean(pp.map(q => q.km)) : null; };
     if (d.length < 5) return null; const L = d[d.length - 1], two = d[d.length - 3];
     return {L, base: mean(d.slice(-5, -1).map(q => q.km)), acwr: ac(L), up: two && two.km ? L.km / two.km - 1 : null, hist: d.slice(-6).map(w => [w.ms, ac(w)]).filter(q => q[1] != null)}; };
-  const f2 = v => v.toFixed(2).replace(".", ","), VC = A[0].coach || {};
+  const f2 = v => v == null || !isFinite(v) ? "–" : v.toFixed(2).replace(".", ","), VC = A[0].coach || {};
   if (VC.acwr_max != null) {
     $("in-km").innerHTML += V().map(a => { const v = vol(a), C = a.coach || {}; if (!v) return "";
       const bad = v.acwr > C.acwr_max, bad2 = v.up != null && C.vol2_max != null && v.up > C.vol2_max;
@@ -1697,7 +1712,11 @@ CK.bad = CK.warn;
 const ckSvg = s => `<svg viewBox="0 0 24 24" aria-hidden="true">${CK[s || "none"]}</svg>`;
 const HRVT = {BALANCED: "Seimbang", UNBALANCED: "Tidak seimbang", LOW: "Rendah", POOR: "Buruk"};
 function ckRow(c) { const no = "tidak ada data";
-  if (c.k === "hrv") return {n: "HRV", v: c.v ? HRVT[c.v] || c.v : no, need: c.low >= 1 ? `rendah ${c.low} hari berturut-turut (3 hari = Merah)` : "harus seimbang, semalam tidak di bawah normal", sh: c.low >= 1 ? `rendah ${c.low} hari` : "harus seimbang"};
+  if (c.k === "hrv") { const bal = !c.v || c.v === "BALANCED";   // §7b: name the cause that actually failed
+    if (c.night_low && bal) return {n: "HRV semalam", v: c.night, need: `di bawah batas bawah normal ${c.night_min} (status ${c.v ? HRVT[c.v] : "–"})`, sh: `normal ≥${c.night_min}`};
+    const night = c.night_low ? ` · semalam ${c.night}, normal ≥${c.night_min}` : "";
+    return {n: "Status HRV", v: c.v ? HRVT[c.v] || c.v : no, need: (c.low >= 1 ? `rendah ${c.low} hari berturut-turut (3 hari = Merah)` : c.unbal >= 1 ? `tidak seimbang ${c.unbal} hari (3 hari = Oranye)` : "harus seimbang") + night,
+      sh: (c.low >= 1 ? `rendah ${c.low} hari` : c.unbal >= 1 ? `${c.unbal} hari` : "harus seimbang") + night}; }
   if (c.k === "bb") return {n: "Body Battery", v: c.v == null ? no : Math.round(c.v), need: c.s === "bad" ? "di bawah 40 dan tidur < 5 jam" : "harus ≥ 50", sh: c.s === "bad" ? "< 40" : "≥ 50"};
   if (c.k === "sleep") return {n: "Tidur", v: c.v ? hm(c.v).replace(":", " j ") + " m" : no, need: "minimal 6 jam", sh: "≥ 6 jam"};
   return {n: "Detak istirahat", v: c.v == null ? no : `${c.v > 0 ? "+" : c.v < 0 ? "−" : "±"}${Math.abs(Math.round(c.v))} bpm`, need: "vs rata-rata 7 hari, aman bila < +5", sh: "aman < +5"};
@@ -2773,7 +2792,16 @@ function miniFill() { const S = D(DATA.ms1), R = D(DATA.race_date), p = Math.max
 new IntersectionObserver(es => es.forEach(e => $("st-mini").classList.toggle("on", !e.isIntersecting && e.boundingClientRect.top < 0)), {threshold: 0}).observe($("leg2"));
 addEventListener("resize", tabInd);
 
-function renderAll() { lpClose(); xdecClose(); renderTrack(); renderSummary(); renderRace(); renderScore(); weekly(); daily(); renderPB(); renderBadges(); flyBuild(); if (TAB === "sesi") renderSesi(); }
+// one section that fails on unexpected data must not stop the rest of the page (cards, hover, filters); the error is shown
+function safe(name, f) { try { f(); } catch (e) { console.error("[" + name + "]", e); RERR.push(name + ": " + e.message); } }
+const RERR = [];
+function showErr() { let el = $("rerr"); if (!RERR.length) { if (el) el.remove(); return; }
+  if (!el) { el = document.createElement("div"); el.id = "rerr"; el.setAttribute("role", "alert"); document.body.appendChild(el); }
+  el.textContent = "Bagian dashboard gagal dibuat — kirim teks ini ke Claude: " + [...new Set(RERR)].join(" | "); }
+function renderAll() { lpClose(); xdecClose(); RERR.length = 0;
+  [["lintasan", renderTrack], ["ringkasan", renderSummary], ["lomba", renderRace], ["skor", renderScore], ["mingguan", weekly], ["harian", daily],
+   ["progres", renderPB], ["lencana", renderBadges], ["pelari", flyBuild]].forEach(([n, f]) => safe(n, f));
+  if (TAB === "sesi") safe("sesi", renderSesi); showErr(); }
 function filter(groupId, set, render, ids) {
   $(groupId).querySelectorAll("button").forEach(b => { if (!b.hasAttribute("aria-pressed")) b.setAttribute("aria-pressed", "false"); });
   $(groupId).onclick = e => { const b = e.target.closest("button"); if (!b || b.getAttribute("aria-pressed") === "true") return;
@@ -2785,10 +2813,10 @@ function filter(groupId, set, render, ids) {
 renderLegend();
 if (TAB === "sesi") { $("p-ring").classList.add("st-hide"); $("p-sesi").classList.remove("st-hide"); }
 renderAll();
-tabSel(); miniFill();
+safe("tab", tabSel); safe("mini", miniFill); showErr();
 observeAll();
-filter("f-wk", n => WK = n, weekly, ["ch-km", "ch-lr", "ch-dec", "ch-wt"]);
-filter("f-day", n => DAYN = n, daily, ["ch-sleep", "ch-hrv", "ch-bb", "strip"]);
+filter("f-wk", n => WK = n, () => { safe("mingguan", weekly); showErr(); }, ["ch-km", "ch-lr", "ch-dec", "ch-wt"]);
+filter("f-day", n => DAYN = n, () => { safe("harian", daily); showErr(); }, ["ch-sleep", "ch-hrv", "ch-bb", "strip"]);
 $("legend").onclick = e => {
   const b = e.target.closest(".tog"); if (!b) return;
   const c = b.dataset.c;

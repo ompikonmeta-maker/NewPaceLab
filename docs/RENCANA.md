@@ -34,6 +34,17 @@ Garmin menjawab details kosong untuk lari lebih tua ±120 hari dari sync pertama
 Termasuk minggu MS1 (23–28 Jun). Perbaikan: ambil data per detik dari file FIT (record per detik) bila details kosong;
 FIT juga memberi lap. Perlu dicek: apakah FIT lari April–Juni masih boleh diunduh.
 
+## 25. Bug lampu 16 Nov + kartu tidak melayang (16 Nov) — **sudah dibuat**
+
+1. Alasan Kuning menyebut "HRV Seimbang" padahal penyebabnya HRV semalam di bawah normal → sekarang "HRV semalam 39 (normal ≥41)";
+   status LOW/UNBALANCED disebut "Status HRV …" dengan jumlah harinya.
+2. Baris lampu di Ringkasan memakai aturan sesi hari ini saja: long run hari ini → gerbang hari itu; hari lain → "latihan keras
+   hari ini jadi lari santai" / "hari ini istirahat" / "lari santai hari ini sesuai rencana" + "long run: dinilai <hari> pagi"
+   (hari long run setelah overrides.json / tukar sesi). Baris "Long run <hari>" dan aturan 110% memakai hari yang sama.
+3. Kartu tidak melayang di build omPik: tidak bisa diulang dengan data demo (semua 16 kartu naik 3 px, juga setelah intro).
+   Dugaan: error JavaScript dengan data asli menghentikan sisa halaman. Tiap bagian sekarang dibuat terpisah (satu bagian gagal
+   tidak menghentikan yang lain) dan errornya tampil di kotak merah bawah layar untuk dikirim ke Claude.
+
 ## 24. Sisa aturan dokumen: alarm volume (§4) dan defisit (§9) — **V2 sudah dibuat** (16 Nov)
 
 Dibuat V2. Supaya seimbang: kartu Berat dipindah ke sebelah Jarak (Long run + Decoupling di baris bawah), keduanya satu
